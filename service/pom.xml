@@ -9,4 +9,12 @@
     </parent>
     
     <artifactId>leaflet-service</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>leaflet-persistence</artifactId>
+            <version>0.1.SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>

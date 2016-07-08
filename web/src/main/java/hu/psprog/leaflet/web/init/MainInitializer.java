@@ -27,7 +27,7 @@ public class MainInitializer implements WebApplicationInitializer {
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
 
-        LOGGER.info("[leaflet] backend application initialization started...");
+        LOGGER.info("Starting [leaflet] backend application...");
 
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
         applicationContext.register(ApplicationContextConfig.class);
