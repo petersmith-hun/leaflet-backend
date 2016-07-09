@@ -2,56 +2,29 @@ package hu.psprog.leaflet.persistence.entity;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Blog entry entity class.
+ * Document entity class.
  *
  * Relations:
- *  - {@link Entry} 1:N {@link Attachment}
- *  - {@link Entry} 1:N {@link Comment}
- *  - {@link Entry} N:1 {@link Category}
- *  - {@link Entry} N:1 {@link User}
- *  - {@link Entry} N:M {@link Tag}
+ *  - {@link Document} N:1 {@link User}
  *
  * @author Peter Smith
  */
 @Entity
-@Table(name = DatabaseConstants.TABLE_ENTRIES)
-public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
+@Table(name = DatabaseConstants.TABLE_DOCUMENTS)
+public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = DatabaseConstants.COLUMN_USER_ID,
-            foreignKey = @ForeignKey(name = DatabaseConstants.FK_ENTRY_USER))
+            foreignKey = @ForeignKey(name = DatabaseConstants.FK_DOCUMENT_USER))
     private User user;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = DatabaseConstants.COLUMN_CATEGORY_ID,
-            foreignKey = @ForeignKey(name = DatabaseConstants.FK_ENTRY_CATEGORY))
-    private Category category;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = DatabaseConstants.TABLE_ENTRIES_TAGS,
-            joinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_ENTRY_ID,
-                    foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_ENTRY)),
-            inverseJoinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_TAG_ID,
-                    foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_TAG)))
-    private List<Tag> tags;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DatabaseConstants.MAPPED_BY_ENTRY)
-    private List<Attachment> attachments;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DatabaseConstants.MAPPED_BY_ENTRY)
-    private List<Comment> comments;
 
     @Column(name = DatabaseConstants.COLUMN_TITLE)
     private String title;
 
     @Column(name = DatabaseConstants.COLUMN_LINK)
     private String link;
-
-    @Column(name = DatabaseConstants.COLUMN_PROLOGUE, columnDefinition = DatabaseConstants.DEF_TEXT)
-    private String prologue;
 
     @Column(name = DatabaseConstants.COLUMN_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
     private String content;
@@ -69,23 +42,16 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Enumerated(EnumType.STRING)
     private Locale locale;
 
-    public Entry() {
+    public Document() {
         // Serializable
     }
 
-    public Entry(Long id, Date created, Date lastModified, boolean enabled, User user, Category category,
-                 List<Tag> tags, List<Attachment> attachments, List<Comment> comments, String title, String link,
-                 String prologue, String content, String seoTitle, String seoDescription, String seoKeywords,
-                 Locale locale) {
+    public Document(Long id, Date created, Date lastModified, boolean enabled, User user, String title, String link,
+                    String content, String seoTitle, String seoDescription, String seoKeywords, Locale locale) {
         super(id, created, lastModified, enabled);
         this.user = user;
-        this.category = category;
-        this.tags = tags;
-        this.attachments = attachments;
-        this.comments = comments;
         this.title = title;
         this.link = link;
-        this.prologue = prologue;
         this.content = content;
         this.seoTitle = seoTitle;
         this.seoDescription = seoDescription;
@@ -99,14 +65,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
     }
 
     public String getTitle() {
@@ -123,14 +81,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setLink(String link) {
         this.link = link;
-    }
-
-    public String getPrologue() {
-        return prologue;
-    }
-
-    public void setPrologue(String prologue) {
-        this.prologue = prologue;
     }
 
     public String getContent() {
@@ -173,51 +123,23 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.locale = locale;
     }
 
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<Attachment> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<Attachment> attachments) {
-        this.attachments = attachments;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     @Override
     public String toString() {
         return super.toString();
     }
 
     /**
-     * Entry entity builder.
+     * Document entity builder.
      */
     public static class Builder {
+
         private Long id;
         private Date created;
         private Date lastModified;
         private boolean enabled;
         private User user;
-        private Category category;
-        private List<Tag> tags;
-        private List<Attachment> attachments;
-        private List<Comment> comments;
         private String title;
         private String link;
-        private String prologue;
         private String content;
         private String seoTitle;
         private String seoDescription;
@@ -249,26 +171,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
-        public Builder withCategory(Category category) {
-            this.category = category;
-            return this;
-        }
-
-        public Builder withTags(List<Tag> tags) {
-            this.tags = tags;
-            return this;
-        }
-
-        public Builder withAttachments(List<Attachment> attachments) {
-            this.attachments = attachments;
-            return this;
-        }
-
-        public Builder withComments(List<Comment> comments) {
-            this.comments = comments;
-            return this;
-        }
-
         public Builder withTitle(String title) {
             this.title = title;
             return this;
@@ -276,11 +178,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
         public Builder withLink(String link) {
             this.link = link;
-            return this;
-        }
-
-        public Builder withPrologue(String prologue) {
-            this.prologue = prologue;
             return this;
         }
 
@@ -309,9 +206,9 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
-        public Entry createEntry() {
-            return new Entry(id, created, lastModified, enabled, user, category, tags, attachments, comments,
-                    title, link, prologue, content, seoTitle, seoDescription, seoKeywords, locale);
+        public Document createDocument() {
+            return new Document(id, created, lastModified, enabled, user, title, link, content,
+                    seoTitle, seoDescription, seoKeywords, locale);
         }
     }
 }

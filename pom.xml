@@ -33,6 +33,7 @@
         <slf4j.version>1.7.19</slf4j.version>
         <hibernate.version>5.1.0.Final</hibernate.version>
         <hibernate.validator.version>5.2.4.Final</hibernate.validator.version>
+        <commons.lang.version>3.4</commons.lang.version>
         
         <!-- compiler settings -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -140,6 +141,13 @@
                 <version>${logback.version}</version>
                 <scope>provided</scope>
             </dependency>
+
+            <!-- other dependencies -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     
@@ -155,6 +163,10 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
     

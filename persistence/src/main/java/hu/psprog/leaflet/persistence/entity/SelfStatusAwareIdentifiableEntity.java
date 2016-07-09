@@ -13,13 +13,13 @@ import java.util.Date;
 @MappedSuperclass
 public class SelfStatusAwareIdentifiableEntity<T extends Serializable> extends IdentifiableEntity<T> {
 
-    @Column(name = "date_created")
+    @Column(name = DatabaseConstants.COLUMN_DATE_CREATED)
     private Date created;
 
-    @Column(name = "date_last_modified")
+    @Column(name = DatabaseConstants.COLUMN_DATE_LAST_MODIFIED)
     private Date lastModified;
 
-    @Column(name = "is_enabled")
+    @Column(name = DatabaseConstants.COLUMN_IS_ENABLED)
     private boolean enabled;
 
     public SelfStatusAwareIdentifiableEntity() {
@@ -61,5 +61,10 @@ public class SelfStatusAwareIdentifiableEntity<T extends Serializable> extends I
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }
