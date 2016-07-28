@@ -10,3 +10,4 @@
 *.mwb.bak
 .springBeans
 deploy.bat
+*/docs/*

@@ -47,7 +47,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_TITLE)
     private String title;
 
-    @Column(name = DatabaseConstants.COLUMN_LINK)
+    @Column(name = DatabaseConstants.COLUMN_LINK, unique = true)
     private String link;
 
     @Column(name = DatabaseConstants.COLUMN_PROLOGUE, columnDefinition = DatabaseConstants.DEF_TEXT)

@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.config;
 
-import hu.psprog.leaflet.persistence.repository.BlogEntryRepository;
 import hu.psprog.leaflet.web.exception.InitializationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

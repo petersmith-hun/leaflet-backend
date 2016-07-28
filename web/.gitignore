@@ -9,3 +9,4 @@
 *.csv
 *.mwb.bak
 .springBeans
+*/docs/*
