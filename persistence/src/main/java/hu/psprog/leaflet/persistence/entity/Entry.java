@@ -1,6 +1,16 @@
 package hu.psprog.leaflet.persistence.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Date;
 import java.util.List;
 
@@ -38,12 +48,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                     foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_TAG)))
     private List<Tag> tags;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DatabaseConstants.MAPPED_BY_ENTRY)
-    private List<Attachment> attachments;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = DatabaseConstants.MAPPED_BY_ENTRY)
-    private List<Comment> comments;
-
     @Column(name = DatabaseConstants.COLUMN_TITLE)
     private String title;
 
@@ -69,20 +73,20 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Enumerated(EnumType.STRING)
     private Locale locale;
 
+    @Column(name = DatabaseConstants.COLUMN_STATUS)
+    private EntryStatus status;
+
     public Entry() {
         // Serializable
     }
 
     public Entry(Long id, Date created, Date lastModified, boolean enabled, User user, Category category,
-                 List<Tag> tags, List<Attachment> attachments, List<Comment> comments, String title, String link,
-                 String prologue, String content, String seoTitle, String seoDescription, String seoKeywords,
-                 Locale locale) {
+                 List<Tag> tags, String title, String link, String prologue, String content, String seoTitle,
+                 String seoDescription, String seoKeywords, Locale locale, EntryStatus status) {
         super(id, created, lastModified, enabled);
         this.user = user;
         this.category = category;
         this.tags = tags;
-        this.attachments = attachments;
-        this.comments = comments;
         this.title = title;
         this.link = link;
         this.prologue = prologue;
@@ -91,6 +95,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.seoDescription = seoDescription;
         this.seoKeywords = seoKeywords;
         this.locale = locale;
+        this.status = status;
     }
 
     public User getUser() {
@@ -181,22 +186,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.tags = tags;
     }
 
-    public List<Attachment> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<Attachment> attachments) {
-        this.attachments = attachments;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
     @Override
     public String toString() {
         return super.toString();
@@ -213,8 +202,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         private User user;
         private Category category;
         private List<Tag> tags;
-        private List<Attachment> attachments;
-        private List<Comment> comments;
         private String title;
         private String link;
         private String prologue;
@@ -223,6 +210,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         private String seoDescription;
         private String seoKeywords;
         private Locale locale;
+        private EntryStatus status;
 
         public Builder withId(Long id) {
             this.id = id;
@@ -256,16 +244,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
         public Builder withTags(List<Tag> tags) {
             this.tags = tags;
-            return this;
-        }
-
-        public Builder withAttachments(List<Attachment> attachments) {
-            this.attachments = attachments;
-            return this;
-        }
-
-        public Builder withComments(List<Comment> comments) {
-            this.comments = comments;
             return this;
         }
 
@@ -309,9 +287,14 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
+        public Builder withStatus(EntryStatus status) {
+            this.status = status;
+            return this;
+        }
+
         public Entry createEntry() {
-            return new Entry(id, created, lastModified, enabled, user, category, tags, attachments, comments,
-                    title, link, prologue, content, seoTitle, seoDescription, seoKeywords, locale);
+            return new Entry(id, created, lastModified, enabled, user, category, tags, title, link, prologue, content,
+                    seoTitle, seoDescription, seoKeywords, locale, status);
         }
     }
 }

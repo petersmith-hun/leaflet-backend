@@ -1,8 +1,9 @@
 package hu.psprog.leaflet.persistence.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Tag entity class.
@@ -19,22 +20,13 @@ public class Tag extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_TITLE, unique = true)
     private String title;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = DatabaseConstants.TABLE_ENTRIES_TAGS,
-            joinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_TAG_ID,
-                    foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_TAG)),
-            inverseJoinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_ENTRY_ID,
-                    foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_ENTRY)))
-    private List<Entry> entries;
-
     public Tag() {
         // Serializable
     }
 
-    public Tag(Long id, Date created, Date lastModified, boolean enabled, String title, List<Entry> entries) {
+    public Tag(Long id, Date created, Date lastModified, boolean enabled, String title) {
         super(id, created, lastModified, enabled);
         this.title = title;
-        this.entries = entries;
     }
 
     public String getTitle() {
@@ -43,14 +35,6 @@ public class Tag extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public List<Entry> getEntries() {
-        return entries;
-    }
-
-    public void setEntries(List<Entry> entries) {
-        this.entries = entries;
     }
 
     @Override
@@ -68,7 +52,6 @@ public class Tag extends SelfStatusAwareIdentifiableEntity<Long> {
         private Date lastModified;
         private boolean enabled;
         private String title;
-        private List<Entry> entries;
 
         public Builder withId(Long id) {
             this.id = id;
@@ -95,13 +78,8 @@ public class Tag extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
-        public Builder withEntries(List<Entry> entries) {
-            this.entries = entries;
-            return this;
-        }
-
         public Tag createTag() {
-            return new Tag(id, created, lastModified, enabled, title, entries);
+            return new Tag(id, created, lastModified, enabled, title);
         }
     }
 }

@@ -4,8 +4,7 @@ import hu.psprog.leaflet.service.crud.CreateOperationCapableService;
 import hu.psprog.leaflet.service.crud.DeleteOperationCapableService;
 import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
-import hu.psprog.leaflet.service.vo.ModifiableUserVO;
-import hu.psprog.leaflet.service.vo.SafeUserVO;
+import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -14,8 +13,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Peter Smith
  */
 public interface UserService extends UserDetailsService,
-        CreateOperationCapableService<ModifiableUserVO, Long>,
-        ReadOperationCapableService<SafeUserVO, Long>,
-        UpdateOperationCapableService<ModifiableUserVO, SafeUserVO, Long>,
-        DeleteOperationCapableService<SafeUserVO, Long> {
+        CreateOperationCapableService<UserVO, Long>,
+        ReadOperationCapableService<UserVO, Long>,
+        UpdateOperationCapableService<UserVO, UserVO, Long>,
+        DeleteOperationCapableService<UserVO, Long> {
 }

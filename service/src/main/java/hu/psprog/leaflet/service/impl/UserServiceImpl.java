@@ -5,8 +5,7 @@ import hu.psprog.leaflet.persistence.repository.UserRepository;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
-import hu.psprog.leaflet.service.vo.ModifiableUserVO;
-import hu.psprog.leaflet.service.vo.SafeUserVO;
+import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -52,7 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SafeUserVO getOne(Long userID) throws EntityNotFoundException {
+    public UserVO getOne(Long userID) throws EntityNotFoundException {
 
         User user = userRepository.findOne(userID);
 
@@ -64,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<SafeUserVO> getAll() {
+    public List<UserVO> getAll() {
 
         return userRepository.findAll().stream()
                 .map(user -> userToUserVOConverter.convert(user))
@@ -72,27 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long createOne(ModifiableUserVO userVO) {
-        return null;
-    }
-
-    @Override
-    public List<Long> createBulk(List<ModifiableUserVO> userVOList) {
-        return null;
-    }
-
-    @Override
-    public SafeUserVO updateOne(Long aLong, ModifiableUserVO updatedEntity) {
-        return null;
-    }
-
-    @Override
-    public List<SafeUserVO> updateBulk(Map<Long, ModifiableUserVO> updatedEntities) {
-        return null;
-    }
-
-    @Override
-    public void deleteByEntity(SafeUserVO entity) {
+    public void deleteByEntity(UserVO entity) {
 
     }
 
@@ -104,5 +83,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteBulkByIDs(List<Long> longs) {
 
+    }
+
+    @Override
+    public Long createOne(UserVO entity) {
+        return null;
+    }
+
+    @Override
+    public List<Long> createBulk(List<UserVO> entities) {
+        return null;
+    }
+
+    @Override
+    public UserVO updateOne(Long aLong, UserVO updatedEntity) {
+        return null;
+    }
+
+    @Override
+    public List<UserVO> updateBulk(Map<Long, UserVO> updatedEntities) {
+        return null;
     }
 }

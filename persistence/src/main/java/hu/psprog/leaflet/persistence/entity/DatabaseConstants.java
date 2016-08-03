@@ -59,6 +59,7 @@ public final class DatabaseConstants {
     static final String MAPPED_BY_USER = "user";
     static final String MAPPED_BY_CATEGORY = "category";
     static final String MAPPED_BY_ENTRY = "entry";
+    static final String COLUMN_STATUS = "status";
 
     private DatabaseConstants() {}
 }
