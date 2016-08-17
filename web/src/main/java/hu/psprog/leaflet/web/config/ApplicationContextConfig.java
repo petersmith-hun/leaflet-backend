@@ -1,11 +1,14 @@
 package hu.psprog.leaflet.web.config;
 
+import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.web.exception.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import javax.naming.InitialContext;
@@ -26,6 +29,9 @@ public class ApplicationContextConfig {
 
     protected static final String COMPONENT_SCAN = "hu.psprog.leaflet";
 
+    @Value(ConfigurationProperty.RUN_LEVEL)
+    private String runLevelName;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer applicationConfigPropertySource() throws InitializationException {
 
@@ -43,6 +49,29 @@ public class ApplicationContextConfig {
         } catch (IOException exception) {
             throw new InitializationException("Main application configuration file specified by JNDI not found or malformed.");
         }
+    }
+
+    @Bean
+    @DependsOn("applicationConfigPropertySource")
+    public RunLevel runLevel() {
+
+        RunLevel runLevel = RunLevel.PRODUCTION;
+
+        switch (runLevelName) {
+            case "INIT":
+                runLevel = RunLevel.INIT;
+                LOGGER.warn(" ** APPLICATION IS RUNNING IN INIT MODE - PLEASE CHANGE BEFORE DEPLOYING TO PRODUCTION **");
+                break;
+            case "MAINTENANCE":
+                runLevel = RunLevel.MAINTENANCE;
+                LOGGER.warn(" ** APPLICATION IS RUNNING IN MAINTENANCE MODE, LOGGING LEVEL WILL BE [DEBUG] **");
+                break;
+            default:
+                LOGGER.info("Application is running in production mode.");
+                break;
+        }
+
+        return runLevel;
     }
 
     private static Properties loadPropertiesFromInputStream(InputStream inputStream) throws IOException {
