@@ -21,5 +21,5 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
      * @param entry {@link Entry} object to retrieve tags associated with
      * @return List of Tag objects or {@code null} if no Tag found
      */
-    public List<Tag> findByEntry(Entry entry);
+    //public List<Tag> findByEntry(Entry entry);
 }

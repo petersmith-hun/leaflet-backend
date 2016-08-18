@@ -187,7 +187,7 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements
             return this;
         }
 
-        public UserVO createSafeUserVO() {
+        public UserVO createUserVO() {
             return new UserVO(id, created, lastModified, enabled, username, email, authorities, password, locale);
         }
     }
