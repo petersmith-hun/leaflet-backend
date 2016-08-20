@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.service.UserService;
+import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -239,6 +240,33 @@ public class UserServiceImplIT {
         assertThat(updatedUserVO.getUsername(), equalTo(updatedUsername));
         assertThat(resultedUserVO.getUsername(), equalTo(updatedUsername));
         assertThat(resultedUserVO.getEmail(), equalTo(userToUpdate.getEmail()));
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
+    public void testChangePassword() throws ServiceException {
+
+        // given
+        String updatedPassword = "new password";
+
+        // when
+        userService.changePassword(USER_ID1_ID, updatedPassword);
+
+        // then
+        assertThat(userService.getOne(USER_ID1_ID).getPassword(), equalTo(updatedPassword));
+    }
+
+    @Test
+    @Transactional
+    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
+    public void testChangeRole() throws ServiceException {
+
+        // when
+        userService.changeAuthority(USER_ID1_ID, Authority.EDITOR);
+
+        // then
+        assertThat(userService.getOne(USER_ID1_ID).getAuthorities().iterator().next(), equalTo(Authority.EDITOR));
     }
 
     @Test

@@ -1,8 +1,11 @@
 package hu.psprog.leaflet.service.impl;
 
+import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.facade.UserRepositoryFacade;
+import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.RunLevel;
+import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -47,7 +50,8 @@ public class UserServiceImplTest {
     @Mock
     private UserVOToUserConverter userVOToUserConverter;
 
-
+    @Mock
+    private AuthorityToRoleConverter authorityToRoleConverter;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -273,6 +277,67 @@ public class UserServiceImplTest {
         assertThat(result, equalTo(user.getId()));
         verify(userVOToUserConverter).convert(userVO);
         verify(userRepository).save(user);
+    }
+
+    @Test
+    public void testChangePasswordWithSuccess() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        String updatedPassword = "new password";
+        given(userRepository.exists(id)).willReturn(true);
+
+        // when
+        userService.changePassword(id, updatedPassword);
+
+        // then
+        verify(userRepository).updatePassword(id, updatedPassword);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void testChangePasswordWithFailure() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        String updatedPassword = "new password";
+        given(userRepository.exists(id)).willReturn(false);
+
+        // when
+        userService.changePassword(id, updatedPassword);
+
+        // then
+        verify(userRepository, never()).updatePassword(id, updatedPassword);
+    }
+
+    @Test
+    public void testChangeAuthorityWithSuccess() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        given(userRepository.exists(id)).willReturn(true);
+        given(authorityToRoleConverter.convert(Authority.ADMIN)).willReturn(Role.ADMIN);
+
+        // when
+        userService.changeAuthority(id, Authority.ADMIN);
+
+        // then
+        verify(userRepository).updateRole(id, Role.ADMIN);
+        verify(authorityToRoleConverter).convert(Authority.ADMIN);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void testChangeAuthorityWithFailure() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        given(userRepository.exists(id)).willReturn(false);
+
+        // when
+        userService.changeAuthority(id, Authority.ADMIN);
+
+        // then
+        verify(userRepository, never()).updateRole(id, Role.ADMIN);
+        verify(authorityToRoleConverter, never()).convert(Authority.ADMIN);
     }
 
     @Test

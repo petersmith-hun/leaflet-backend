@@ -7,8 +7,10 @@ import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
 import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
+import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.vo.UserVO;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
@@ -33,4 +35,20 @@ public interface UserService extends UserDetailsService,
      * @throws UserInitializationException when application is not running in INIT mode, or there's already an existing primary administrator user
      */
     public Long initialize(UserVO userVO) throws UserInitializationException, EntityCreationException;
+
+    /**
+     * Changes given user's password.
+     *
+     * @param id ID of user to update password for
+     * @param password new password
+     */
+    public void changePassword(Long id, String password) throws EntityNotFoundException;
+
+    /**
+     * Changes given user's authority (role).
+     *
+     * @param id ID of user to update role for
+     * @param grantedAuthority new granted authority
+     */
+    public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException;
 }

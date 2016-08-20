@@ -1,11 +1,12 @@
 package hu.psprog.leaflet.service.impl;
 
-import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.facade.UserRepositoryFacade;
 import hu.psprog.leaflet.service.UserService;
+import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.common.RunLevel;
+import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -49,6 +49,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserVOToUserConverter userVOToUserConverter;
+
+    @Autowired
+    private AuthorityToRoleConverter authorityToRoleConverter;
 
     @Autowired
     private RunLevel runLevel;
@@ -190,8 +193,7 @@ public class UserServiceImpl implements UserService {
             throw new UserInitializationException("Application already initialized");
         }
 
-        GrantedAuthority adminAuthority = new SimpleGrantedAuthority(Role.ADMIN.name());
-        userVO.setAuthorities(Arrays.asList(adminAuthority));
+        userVO.setAuthorities(Arrays.asList(Authority.ADMIN));
         User user = userVOToUserConverter.convert(userVO);
         User savedUser = userRepository.save(user);
 
@@ -200,6 +202,26 @@ public class UserServiceImpl implements UserService {
         }
 
         return savedUser.getId();
+    }
+
+    @Override
+    public void changePassword(Long id, String password) throws EntityNotFoundException {
+
+        if (!userRepository.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userRepository.updatePassword(id, password);
+    }
+
+    @Override
+    public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException {
+
+        if (!userRepository.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userRepository.updateRole(id, authorityToRoleConverter.convert(grantedAuthority));
     }
 
 
