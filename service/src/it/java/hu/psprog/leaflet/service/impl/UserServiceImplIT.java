@@ -210,15 +210,14 @@ public class UserServiceImplIT {
 
         // given
         GrantedAuthority adminAuthority = new SimpleGrantedAuthority(Role.ADMIN.name());
-        Long initUserID = 1L;
 
         // when
         UserVO initVO = new UserVOTestDataGenerator().generate();
         Long result = userService.initialize(initVO);
 
         // then
-        assertThat(result, equalTo(initUserID));
-        assertThat(userService.getOne(initUserID).getAuthorities().iterator().next(), equalTo(adminAuthority));
+        assertThat(userService.count(), equalTo(1L));
+        assertThat(userService.getAll().get(0).getAuthorities().iterator().next(), equalTo(adminAuthority));
     }
 
     @Test
