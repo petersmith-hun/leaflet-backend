@@ -17,6 +17,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 /**
+ * Context configuration for integration tests.
+ *
  * @author Peter Smith
  */
 @Profile("it")

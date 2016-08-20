@@ -4,6 +4,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Additional service layer configuration.
+ *
  * @author Peter Smith
  */
 @Configuration

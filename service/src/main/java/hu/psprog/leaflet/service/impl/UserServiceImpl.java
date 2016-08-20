@@ -101,13 +101,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteByEntity(UserVO entity) throws ServiceException {
 
-        User user = userRepository.findOne(entity.getId());
-
-        if(user == null) {
-            throw new EntityNotFoundException(User.class, null);
+        if (!userRepository.exists(entity.getId())) {
+            throw new EntityNotFoundException(User.class, entity.getId());
         }
 
-        deleteByID(user.getId());
+        deleteByID(entity.getId());
     }
 
     @Override

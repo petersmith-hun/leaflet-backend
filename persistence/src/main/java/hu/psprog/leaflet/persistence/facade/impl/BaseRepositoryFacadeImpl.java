@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Default implementation of {@link BaseRepositoryFacade}.
+ *
  * @author Peter Smith
  */
 public abstract class BaseRepositoryFacadeImpl<T extends SerializableEntity, ID extends Serializable> implements BaseRepositoryFacade<T, ID> {

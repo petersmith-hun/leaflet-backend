@@ -6,6 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 /**
+ * Converts {@link GrantedAuthority} to {@link Role} object.
+ *
  * @author Peter Smith
  */
 @Component

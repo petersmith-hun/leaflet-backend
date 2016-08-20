@@ -4,11 +4,12 @@ import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Random test {@link User} entity generator.
+ *
  * @author Peter Smith
  */
 public class UserEntityTestDataGenerator implements TestDataGenerator<User> {

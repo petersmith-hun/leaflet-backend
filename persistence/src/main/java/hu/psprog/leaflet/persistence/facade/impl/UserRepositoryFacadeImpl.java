@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
+ * Repository facade implementation for {@link UserRepository}.
+ *
  * @author Peter Smith
  */
 @Component

@@ -6,6 +6,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
+ * Converts {@link Comment} to {@link CommentVO} object.
+ *
  * @author Peter Smith
  */
 @Component

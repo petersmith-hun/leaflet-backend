@@ -4,6 +4,8 @@ import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 
 /**
+ * Facade for {@link hu.psprog.leaflet.persistence.repository.UserRepository}.
+ *
  * @author Peter Smith
  */
 public interface UserRepositoryFacade extends BaseRepositoryFacade<User, Long>, SelfStatusAwareRepositoryFacade<Long> {

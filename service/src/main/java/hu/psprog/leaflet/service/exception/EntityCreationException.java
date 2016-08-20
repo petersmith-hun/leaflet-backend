@@ -1,6 +1,8 @@
 package hu.psprog.leaflet.service.exception;
 
 /**
+ * Exception to be thrown when an entity can not be created.
+ *
  * @author Peter Smith
  */
 public class EntityCreationException extends ServiceException {

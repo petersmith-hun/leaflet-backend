@@ -8,6 +8,10 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * Base facade for repositories.
+ *
+ * @param <T> base entity of type T
+ * @param <ID> entity identifier of type ID
  * @author Peter Smith
  */
 public interface BaseRepositoryFacade<T extends SerializableEntity, ID extends Serializable> {

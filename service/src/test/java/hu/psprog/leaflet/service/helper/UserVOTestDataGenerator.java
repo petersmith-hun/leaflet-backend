@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Random test {@link UserVO} entity generator.
+ *
  * @author Peter Smith
  */
 public class UserVOTestDataGenerator implements TestDataGenerator<UserVO> {

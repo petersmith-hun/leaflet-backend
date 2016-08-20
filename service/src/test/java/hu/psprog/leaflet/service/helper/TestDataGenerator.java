@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * Generic test data generator.
+ *
+ * @param <T> type of entity to generate
  * @author Peter Smith
  */
 public interface TestDataGenerator<T extends Serializable> {

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.io.Serializable;
 
 /**
+ * Default implementation of {@link SelfStatusAwareRepositoryFacade}.
+ *
  * @author Peter Smith
  */
 public abstract class SelfStatusAwareRepositoryFacadeImpl<T extends SerializableEntity, ID extends Serializable>

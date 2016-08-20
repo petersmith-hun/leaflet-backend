@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
+ * Converts {@link UserVO} to {@link User} object.
+ *
  * @author Peter Smith
  */
 @Component

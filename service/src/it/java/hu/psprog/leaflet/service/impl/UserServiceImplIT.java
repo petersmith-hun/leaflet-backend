@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.entity.Locale;
+import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
@@ -205,13 +206,19 @@ public class UserServiceImplIT {
 
     @Test
     @Transactional
-    public void testInitializeWithSuccess() throws UserInitializationException, EntityCreationException {
+    public void testInitializeWithSuccess() throws ServiceException {
+
+        // given
+        GrantedAuthority adminAuthority = new SimpleGrantedAuthority(Role.ADMIN.name());
+        Long initUserID = 1L;
 
         // when
-        Long result = userService.initialize(controlUserVO);
+        UserVO initVO = new UserVOTestDataGenerator().generate();
+        Long result = userService.initialize(initVO);
 
         // then
-        assertThat(result, equalTo(USER_ID1_ID));
+        assertThat(result, equalTo(initUserID));
+        assertThat(userService.getOne(initUserID).getAuthorities().iterator().next(), equalTo(adminAuthority));
     }
 
     @Test
