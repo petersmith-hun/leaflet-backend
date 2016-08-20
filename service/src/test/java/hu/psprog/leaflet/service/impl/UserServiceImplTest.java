@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.repository.UserRepository;
+import hu.psprog.leaflet.persistence.facade.UserRepositoryFacade;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.helper.UserEntityTestDataGenerator;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 public class UserServiceImplTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserRepositoryFacade userRepository;
 
     @Mock
     private UserToUserVOConverter userToUserVOConverter;

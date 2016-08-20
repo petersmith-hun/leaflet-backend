@@ -2,7 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.repository.UserRepository;
+import hu.psprog.leaflet.persistence.facade.UserRepositoryFacade;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.common.RunLevel;
@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     private static final String USERNAME_NOT_FOUND_MESSAGE_PATTERN = "User identified by username [%s] not found";
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryFacade userRepository;
 
     @Autowired
     private UserToUserVOConverter userToUserVOConverter;
@@ -102,6 +102,11 @@ public class UserServiceImpl implements UserService {
     public void deleteByEntity(UserVO entity) throws ServiceException {
 
         User user = userRepository.findOne(entity.getId());
+
+        if(user == null) {
+            throw new EntityNotFoundException(User.class, null);
+        }
+
         deleteByID(user.getId());
     }
 
@@ -133,7 +138,7 @@ public class UserServiceImpl implements UserService {
             throw new EntityCreationException(User.class);
         }
 
-        return savedUser.getId();
+        return user.getId();
     }
 
     @Override
@@ -151,25 +156,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
 
-        User user = null;
-        try {
-            user = userRepository.findOne(id);
-        } catch (IllegalArgumentException exc) {
+        User updatedUser = userRepository.updateOne(id, userVOToUserConverter.convert(updatedEntity));
+
+        if (updatedUser == null) {
             throw new EntityNotFoundException(User.class, id);
         }
 
-        if (user == null) {
-            throw new EntityNotFoundException(User.class, id);
-        }
-
-        updatedEntity.setId(id);
-        User savedUser = userRepository.save(userVOToUserConverter.convert(updatedEntity));
-
-        if (savedUser == null) {
-            throw new EntityCreationException(User.class);
-        }
-
-        return userToUserVOConverter.convert(savedUser);
+        return userToUserVOConverter.convert(updatedUser);
     }
 
     @Override
@@ -219,5 +212,25 @@ public class UserServiceImpl implements UserService {
         Page entityPage = userRepository.findAll(pageable);
 
         return PageableUtil.convertPage(entityPage, userToUserVOConverter);
+    }
+
+    @Override
+    public void enable(Long id) throws EntityNotFoundException {
+
+        if (!userRepository.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userRepository.enable(id);
+    }
+
+    @Override
+    public void disable(Long id) throws EntityNotFoundException {
+
+        if (!userRepository.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userRepository.disable(id);
     }
 }

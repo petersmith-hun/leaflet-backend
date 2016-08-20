@@ -21,13 +21,14 @@ import javax.sql.DataSource;
  */
 @Profile("it")
 @Configuration
-@ComponentScan(basePackages = "hu.psprog.leaflet.service")
+@ComponentScan(basePackages = LeafletITContextConfig.COMPONENT_SCAN_PACKAGE)
 @EnableJpaRepositories(basePackages = LeafletITContextConfig.REPOSITORY_PACKAGE)
 public class LeafletITContextConfig {
 
     public static final String INTEGRATION_TEST_DB_SCRIPT_USERS = "classpath:/service_it_db_script_users.sql";
     public static final String REPOSITORY_PACKAGE = "hu.psprog.leaflet.persistence.repository";
     public static final String ENTITY_PACKAGE = "hu.psprog.leaflet.persistence.entity";
+    public static final String COMPONENT_SCAN_PACKAGE = "hu.psprog.leaflet.service";
 
     @Bean
     public DataSource dataSource() {
@@ -53,7 +54,7 @@ public class LeafletITContextConfig {
     }
 
     @Bean
-    public PlatformTransactionManager platformTransactionManager() {
+    public PlatformTransactionManager transactionManager() {
 
         JpaTransactionManager txManager = new JpaTransactionManager();
         txManager.setEntityManagerFactory(entityManagerFactory());

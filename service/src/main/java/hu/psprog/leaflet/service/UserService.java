@@ -4,6 +4,7 @@ import hu.psprog.leaflet.service.crud.CreateOperationCapableService;
 import hu.psprog.leaflet.service.crud.DeleteOperationCapableService;
 import hu.psprog.leaflet.service.crud.PageableService;
 import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
+import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
@@ -20,7 +21,8 @@ public interface UserService extends UserDetailsService,
         ReadOperationCapableService<UserVO, Long>,
         UpdateOperationCapableService<UserVO, UserVO, Long>,
         DeleteOperationCapableService<UserVO, Long>,
-        PageableService<UserVO, UserVO.OrderBy> {
+        PageableService<UserVO, UserVO.OrderBy>,
+        StatusChangeCapableService<Long> {
 
     /**
      * Initializes user database with first administrator user. Application must be running in INIT mode,

@@ -20,7 +20,7 @@ public class PageableUtil {
 
     public static Pageable createPage(int page, int limit, OrderDirection direction, String orderBy) {
 
-        return new PageRequest(page, limit, direction.getDirection(), orderBy);
+        return new PageRequest(page - 1, limit, direction.getDirection(), orderBy);
     }
 
     public static <T extends BaseVO, S extends SerializableEntity> EntityPageVO<T> convertPage(Page<S> page, Converter<S, T> converter) {

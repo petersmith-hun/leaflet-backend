@@ -34,6 +34,46 @@ public class EntityPageVO<T extends BaseVO> {
         this.hasPrevious = hasPrevious;
     }
 
+    public long getEntityCount() {
+        return entityCount;
+    }
+
+    public int getPageCount() {
+        return pageCount;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public int getEntityCountOnPage() {
+        return entityCountOnPage;
+    }
+
+    public List<T> getEntitiesOnPage() {
+        return entitiesOnPage;
+    }
+
+    public boolean isFirst() {
+        return first;
+    }
+
+    public boolean isLast() {
+        return last;
+    }
+
+    public boolean hasNext() {
+        return hasNext;
+    }
+
+    public boolean hasPrevious() {
+        return hasPrevious;
+    }
+
     public static class Builder {
 
         private long entityCount;
