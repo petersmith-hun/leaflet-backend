@@ -40,19 +40,15 @@ public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements U
     @Override
     public User updateOne(Long id, User updatedEntity) {
 
-        User updatedUser = null;
         User currentUser = jpaRepository.findOne(id);
-
         if (currentUser != null) {
             currentUser.setDefaultLocale(updatedEntity.getDefaultLocale());
             currentUser.setEmail(updatedEntity.getEmail());
             currentUser.setLastModified(new Date());
             currentUser.setUsername(updatedEntity.getUsername());
             jpaRepository.flush();
-
-            updatedUser = jpaRepository.getOne(id);
         }
 
-        return updatedUser;
+        return currentUser;
     }
 }
