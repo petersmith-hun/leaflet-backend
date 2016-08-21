@@ -1,4 +1,4 @@
-package hu.psprog.leaflet.persistence.facade;
+package hu.psprog.leaflet.persistence.dao;
 
 import hu.psprog.leaflet.persistence.entity.SerializableEntity;
 import org.springframework.data.domain.Page;
@@ -8,13 +8,13 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Base facade for repositories.
+ * Base DAO for repositories.
  *
  * @param <T> base entity of type T
  * @param <ID> entity identifier of type ID
  * @author Peter Smith
  */
-public interface BaseRepositoryFacade<T extends SerializableEntity, ID extends Serializable> {
+public interface BaseDAO<T extends SerializableEntity, ID extends Serializable> {
 
     public boolean exists(ID id);
 

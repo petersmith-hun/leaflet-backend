@@ -2,7 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.facade.UserRepositoryFacade;
+import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
@@ -42,7 +42,7 @@ import static org.mockito.Mockito.verify;
 public class UserServiceImplTest {
 
     @Mock
-    private UserRepositoryFacade userRepository;
+    private UserDAO userDAO;
 
     @Mock
     private UserToUserVOConverter userToUserVOConverter;
@@ -73,13 +73,13 @@ public class UserServiceImplTest {
 
         // given
         String email = user.getEmail();
-        given(userRepository.findByEmail(email)).willReturn(user);
+        given(userDAO.findByEmail(email)).willReturn(user);
 
         // when
         userService.loadUserByUsername(email);
 
         // then
-        verify(userRepository).findByEmail(email);
+        verify(userDAO).findByEmail(email);
         verify(userToUserVOConverter).convert(user);
     }
 
@@ -88,7 +88,7 @@ public class UserServiceImplTest {
 
         // given
         String email = user.getEmail();
-        given(userRepository.findByEmail(email)).willReturn(null);
+        given(userDAO.findByEmail(email)).willReturn(null);
 
         // when
         userService.loadUserByUsername(email);
@@ -103,7 +103,7 @@ public class UserServiceImplTest {
 
         // given
         Long userID = 1L;
-        given(userRepository.findOne(userID)).willReturn(null);
+        given(userDAO.findOne(userID)).willReturn(null);
 
         // when
         userService.getOne(userID);
@@ -116,28 +116,28 @@ public class UserServiceImplTest {
     public void testDeleteByEntity() throws ServiceException {
 
         // given
-        given(userRepository.exists(userVO.getId())).willReturn(false);
+        given(userDAO.exists(userVO.getId())).willReturn(false);
 
         // when
         userService.deleteByEntity(userVO);
 
         // then
         // expected exception
-        verify(userRepository, never()).delete(any());
+        verify(userDAO, never()).delete(any());
     }
 
     @Test(expected = EntityNotFoundException.class)
     public void testDeleteByID() throws ServiceException {
 
         // given
-        willThrow(IllegalArgumentException.class).given(userRepository).delete(userVO.getId());
+        willThrow(IllegalArgumentException.class).given(userDAO).delete(userVO.getId());
 
         // when
         userService.deleteByID(userVO.getId());
 
         // then
         // expected exception
-        verify(userRepository, never()).delete(any());
+        verify(userDAO, never()).delete(any());
     }
 
     @Test
@@ -145,14 +145,14 @@ public class UserServiceImplTest {
 
         // given
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userRepository.save(user)).willReturn(user);
+        given(userDAO.save(user)).willReturn(user);
 
         // when
         Long result = userService.createOne(userVO);
 
         // then
         verify(userVOToUserConverter).convert(userVO);
-        verify(userRepository).save(user);
+        verify(userDAO).save(user);
         assertThat(result, equalTo(user.getId()));
     }
 
@@ -161,7 +161,7 @@ public class UserServiceImplTest {
 
         // given
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userRepository.save(user)).willReturn(null);
+        given(userDAO.save(user)).willReturn(null);
 
         // when
         userService.createOne(userVO);
@@ -169,7 +169,7 @@ public class UserServiceImplTest {
         // then
         // expected exception
         verify(userVOToUserConverter).convert(userVO);
-        verify(userRepository).save(user);
+        verify(userDAO).save(user);
     }
 
     @Test
@@ -177,7 +177,7 @@ public class UserServiceImplTest {
 
         // given
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userRepository.updateOne(user.getId(), user)).willReturn(user);
+        given(userDAO.updateOne(user.getId(), user)).willReturn(user);
 
         // when
         userService.updateOne(user.getId(), userVO);
@@ -185,7 +185,7 @@ public class UserServiceImplTest {
         // then
         verify(userVOToUserConverter).convert(userVO);
         verify(userToUserVOConverter).convert(user);
-        verify(userRepository).updateOne(user.getId(), user);
+        verify(userDAO).updateOne(user.getId(), user);
     }
 
     @Test(expected = EntityNotFoundException.class)
@@ -193,7 +193,7 @@ public class UserServiceImplTest {
 
         // given
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userRepository.updateOne(user.getId(), user)).willReturn(null);
+        given(userDAO.updateOne(user.getId(), user)).willReturn(null);
 
         // when
         userService.updateOne(user.getId(), userVO);
@@ -201,7 +201,7 @@ public class UserServiceImplTest {
         // then
         verify(userVOToUserConverter).convert(userVO);
         verify(userToUserVOConverter, never()).convert(user);
-        verify(userRepository).updateOne(user.getId(), user);
+        verify(userDAO).updateOne(user.getId(), user);
     }
 
     @Test
@@ -211,9 +211,9 @@ public class UserServiceImplTest {
         Field runLevel = userService.getClass().getDeclaredField("runLevel");
         runLevel.setAccessible(true);
         runLevel.set(userService, RunLevel.INIT);
-        given(userRepository.count()).willReturn(0L);
+        given(userDAO.count()).willReturn(0L);
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userRepository.save(user)).willReturn(user);
+        given(userDAO.save(user)).willReturn(user);
 
         // when
         Long result = userService.initialize(userVO);
@@ -221,7 +221,7 @@ public class UserServiceImplTest {
         // then
         assertThat(result, equalTo(user.getId()));
         verify(userVOToUserConverter).convert(userVO);
-        verify(userRepository).save(user);
+        verify(userDAO).save(user);
     }
 
     @Test(expected = UserInitializationException.class)
@@ -236,9 +236,9 @@ public class UserServiceImplTest {
         userService.initialize(userVO);
 
         // then
-        verify(userRepository, never()).count();
+        verify(userDAO, never()).count();
         verify(userVOToUserConverter, never()).convert(userVO);
-        verify(userRepository, never()).save(user);
+        verify(userDAO, never()).save(user);
     }
 
     @Test(expected = UserInitializationException.class)
@@ -248,15 +248,15 @@ public class UserServiceImplTest {
         Field runLevel = userService.getClass().getDeclaredField("runLevel");
         runLevel.setAccessible(true);
         runLevel.set(userService, RunLevel.INIT);
-        given(userRepository.count()).willReturn(1L);
+        given(userDAO.count()).willReturn(1L);
 
         // when
         userService.initialize(userVO);
 
         // then
-        verify(userRepository).count();
+        verify(userDAO).count();
         verify(userVOToUserConverter, never()).convert(userVO);
-        verify(userRepository, never()).save(user);
+        verify(userDAO, never()).save(user);
     }
 
     @Test(expected = EntityCreationException.class)
@@ -266,9 +266,9 @@ public class UserServiceImplTest {
         Field runLevel = userService.getClass().getDeclaredField("runLevel");
         runLevel.setAccessible(true);
         runLevel.set(userService, RunLevel.INIT);
-        given(userRepository.count()).willReturn(0L);
+        given(userDAO.count()).willReturn(0L);
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userRepository.save(user)).willReturn(null);
+        given(userDAO.save(user)).willReturn(null);
 
         // when
         Long result = userService.initialize(userVO);
@@ -276,7 +276,7 @@ public class UserServiceImplTest {
         // then
         assertThat(result, equalTo(user.getId()));
         verify(userVOToUserConverter).convert(userVO);
-        verify(userRepository).save(user);
+        verify(userDAO).save(user);
     }
 
     @Test
@@ -285,13 +285,13 @@ public class UserServiceImplTest {
         // given
         Long id = 1L;
         String updatedPassword = "new password";
-        given(userRepository.exists(id)).willReturn(true);
+        given(userDAO.exists(id)).willReturn(true);
 
         // when
         userService.changePassword(id, updatedPassword);
 
         // then
-        verify(userRepository).updatePassword(id, updatedPassword);
+        verify(userDAO).updatePassword(id, updatedPassword);
     }
 
     @Test(expected = EntityNotFoundException.class)
@@ -300,13 +300,13 @@ public class UserServiceImplTest {
         // given
         Long id = 1L;
         String updatedPassword = "new password";
-        given(userRepository.exists(id)).willReturn(false);
+        given(userDAO.exists(id)).willReturn(false);
 
         // when
         userService.changePassword(id, updatedPassword);
 
         // then
-        verify(userRepository, never()).updatePassword(id, updatedPassword);
+        verify(userDAO, never()).updatePassword(id, updatedPassword);
     }
 
     @Test
@@ -314,14 +314,14 @@ public class UserServiceImplTest {
 
         // given
         Long id = 1L;
-        given(userRepository.exists(id)).willReturn(true);
+        given(userDAO.exists(id)).willReturn(true);
         given(authorityToRoleConverter.convert(Authority.ADMIN)).willReturn(Role.ADMIN);
 
         // when
         userService.changeAuthority(id, Authority.ADMIN);
 
         // then
-        verify(userRepository).updateRole(id, Role.ADMIN);
+        verify(userDAO).updateRole(id, Role.ADMIN);
         verify(authorityToRoleConverter).convert(Authority.ADMIN);
     }
 
@@ -330,13 +330,13 @@ public class UserServiceImplTest {
 
         // given
         Long id = 1L;
-        given(userRepository.exists(id)).willReturn(false);
+        given(userDAO.exists(id)).willReturn(false);
 
         // when
         userService.changeAuthority(id, Authority.ADMIN);
 
         // then
-        verify(userRepository, never()).updateRole(id, Role.ADMIN);
+        verify(userDAO, never()).updateRole(id, Role.ADMIN);
         verify(authorityToRoleConverter, never()).convert(Authority.ADMIN);
     }
 
@@ -345,14 +345,14 @@ public class UserServiceImplTest {
 
         // given
         Long id = 1L;
-        given(userRepository.exists(id)).willReturn(true);
+        given(userDAO.exists(id)).willReturn(true);
 
         // when
         userService.enable(id);
 
         // then
-        verify(userRepository).exists(id);
-        verify(userRepository).enable(id);
+        verify(userDAO).exists(id);
+        verify(userDAO).enable(id);
     }
 
     @Test(expected = EntityNotFoundException.class)
@@ -360,14 +360,14 @@ public class UserServiceImplTest {
 
         // given
         Long id = 1L;
-        given(userRepository.exists(id)).willReturn(false);
+        given(userDAO.exists(id)).willReturn(false);
 
         // when
         userService.enable(id);
 
         // then
-        verify(userRepository).exists(id);
-        verify(userRepository, never()).enable(id);
+        verify(userDAO).exists(id);
+        verify(userDAO, never()).enable(id);
     }
 
     @Test
@@ -375,14 +375,14 @@ public class UserServiceImplTest {
 
         // given
         Long id = 1L;
-        given(userRepository.exists(id)).willReturn(true);
+        given(userDAO.exists(id)).willReturn(true);
 
         // when
         userService.disable(id);
 
         // then
-        verify(userRepository).exists(id);
-        verify(userRepository).disable(id);
+        verify(userDAO).exists(id);
+        verify(userDAO).disable(id);
     }
 
     @Test(expected = EntityNotFoundException.class)
@@ -390,13 +390,13 @@ public class UserServiceImplTest {
 
         // given
         Long id = 1L;
-        given(userRepository.exists(id)).willReturn(false);
+        given(userDAO.exists(id)).willReturn(false);
 
         // when
         userService.disable(id);
 
         // then
-        verify(userRepository).exists(id);
-        verify(userRepository, never()).disable(id);
+        verify(userDAO).exists(id);
+        verify(userDAO, never()).disable(id);
     }
 }

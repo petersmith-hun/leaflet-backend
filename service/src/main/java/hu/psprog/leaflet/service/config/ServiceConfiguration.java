@@ -11,5 +11,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan(ServiceConfiguration.PERSISTENCE_FACADE_PACKAGE)
 public class ServiceConfiguration {
-    public static final String PERSISTENCE_FACADE_PACKAGE = "hu.psprog.leaflet.persistence.facade";
+    public static final String PERSISTENCE_FACADE_PACKAGE = "hu.psprog.leaflet.persistence.dao";
 }

@@ -1,8 +1,8 @@
-package hu.psprog.leaflet.persistence.facade.impl;
+package hu.psprog.leaflet.persistence.dao.impl;
 
 import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
 import hu.psprog.leaflet.persistence.entity.SerializableEntity;
-import hu.psprog.leaflet.persistence.facade.BaseRepositoryFacade;
+import hu.psprog.leaflet.persistence.dao.BaseDAO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,15 +12,15 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Default implementation of {@link BaseRepositoryFacade}.
+ * Default implementation of {@link BaseDAO}.
  *
  * @author Peter Smith
  */
-public abstract class BaseRepositoryFacadeImpl<T extends SerializableEntity, ID extends Serializable> implements BaseRepositoryFacade<T, ID> {
+public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Serializable> implements BaseDAO<T, ID> {
 
     protected JpaRepository<T, ID> jpaRepository;
 
-    public BaseRepositoryFacadeImpl(JpaRepository<T, ID> jpaRepository) {
+    public BaseDAOImpl(JpaRepository<T, ID> jpaRepository) {
         this.jpaRepository = jpaRepository;
     }
 

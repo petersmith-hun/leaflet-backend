@@ -1,8 +1,8 @@
-package hu.psprog.leaflet.persistence.facade.impl;
+package hu.psprog.leaflet.persistence.dao.impl;
 
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.facade.UserRepositoryFacade;
+import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * Repository facade implementation for {@link UserRepository}.
+ * DAO implementation for {@link UserRepository}.
  *
  * @author Peter Smith
  */
 @Component
-public class UserRepositoryFacadeImpl extends SelfStatusAwareRepositoryFacadeImpl<User, Long> implements UserRepositoryFacade {
+public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements UserDAO {
 
     @Autowired
-    public UserRepositoryFacadeImpl(final UserRepository userRepository) {
+    public UserDAOImpl(final UserRepository userRepository) {
         super(userRepository);
     }
 

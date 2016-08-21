@@ -1,14 +1,14 @@
-package hu.psprog.leaflet.persistence.facade;
+package hu.psprog.leaflet.persistence.dao;
 
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 
 /**
- * Facade for {@link hu.psprog.leaflet.persistence.repository.UserRepository}.
+ * DAO for {@link hu.psprog.leaflet.persistence.repository.UserRepository}.
  *
  * @author Peter Smith
  */
-public interface UserRepositoryFacade extends BaseRepositoryFacade<User, Long>, SelfStatusAwareRepositoryFacade<Long> {
+public interface UserDAO extends BaseDAO<User, Long>, SelfStatusAwareDAO<Long> {
 
     public User findByEmail(String email);
 
