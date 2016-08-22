@@ -2,6 +2,7 @@ package hu.psprog.leaflet.persistence.repository;
 
 import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -39,4 +40,12 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
      * @return List of Entry objects or {@code null} if no Entry found
      */
     public List<Entry> findByCategory(Category category);
+
+    /**
+     * Returns {@link List} of {@link Entry} objects associated with given {@link Tag}.
+     *
+     * @param tag {@link Tag} object to retrieve entries associated with
+     * @return List of Entry objects or {@code null} if no Entry found
+     */
+    public List<Entry> findByTags(Tag tag);
 }
