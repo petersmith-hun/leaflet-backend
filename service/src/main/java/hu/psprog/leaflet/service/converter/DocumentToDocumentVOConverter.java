@@ -6,6 +6,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
+ * Converts {@link Document} to {@link DocumentVO} object.
+ *
  * @author Peter Smith
  */
 @Component

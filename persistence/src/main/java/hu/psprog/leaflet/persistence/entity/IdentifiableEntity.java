@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
 public class IdentifiableEntity<T extends Serializable> implements SerializableEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private T id;
 
     public IdentifiableEntity() {

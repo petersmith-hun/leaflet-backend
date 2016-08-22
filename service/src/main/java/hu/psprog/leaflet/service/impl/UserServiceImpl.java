@@ -1,16 +1,32 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.repository.UserRepository;
+import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.service.UserService;
+import hu.psprog.leaflet.service.common.Authority;
+import hu.psprog.leaflet.service.common.OrderDirection;
+import hu.psprog.leaflet.service.common.RunLevel;
+import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
+import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
+import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.exception.UserInitializationException;
+import hu.psprog.leaflet.service.util.PageableUtil;
+import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,10 +42,19 @@ public class UserServiceImpl implements UserService {
     private static final String USERNAME_NOT_FOUND_MESSAGE_PATTERN = "User identified by username [%s] not found";
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDAO userDAO;
 
     @Autowired
     private UserToUserVOConverter userToUserVOConverter;
+
+    @Autowired
+    private UserVOToUserConverter userVOToUserConverter;
+
+    @Autowired
+    private AuthorityToRoleConverter authorityToRoleConverter;
+
+    @Autowired
+    private RunLevel runLevel;
 
     /**
      * Loads a user by its email address (instead of username).
@@ -41,7 +66,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        User user = userRepository.findByEmail(email);
+        User user = userDAO.findByEmail(email);
 
         if(user == null) {
             throw new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE_PATTERN, email));
@@ -51,9 +76,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserVO getOne(Long userID) throws EntityNotFoundException {
+    public UserVO getOne(Long userID) throws ServiceException {
 
-        User user = userRepository.findOne(userID);
+        User user = userDAO.findOne(userID);
 
         if(user == null) {
             throw new EntityNotFoundException(User.class, userID);
@@ -65,43 +90,167 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserVO> getAll() {
 
-        return userRepository.findAll().stream()
+        return userDAO.findAll().stream()
                 .map(user -> userToUserVOConverter.convert(user))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteByEntity(UserVO entity) {
+    public Long count() {
 
+        return userDAO.count();
     }
 
     @Override
-    public void deleteByID(Long aLong) {
+    public void deleteByEntity(UserVO entity) throws ServiceException {
 
+        if (!userDAO.exists(entity.getId())) {
+            throw new EntityNotFoundException(User.class, entity.getId());
+        }
+
+        deleteByID(entity.getId());
     }
 
     @Override
-    public void deleteBulkByIDs(List<Long> longs) {
+    public void deleteByID(Long userID) throws ServiceException {
 
+        try {
+            userDAO.delete(userID);
+        } catch (IllegalArgumentException exc) {
+            throw new EntityNotFoundException(User.class, userID);
+        }
     }
 
     @Override
-    public Long createOne(UserVO entity) {
-        return null;
+    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
+
+        for (Long id : ids) {
+            deleteByID(id);
+        }
     }
 
     @Override
-    public List<Long> createBulk(List<UserVO> entities) {
-        return null;
+    public Long createOne(UserVO entity) throws ServiceException {
+
+        User user = userVOToUserConverter.convert(entity);
+        User savedUser = userDAO.save(user);
+
+        if (savedUser == null) {
+            throw new EntityCreationException(User.class);
+        }
+
+        return user.getId();
     }
 
     @Override
-    public UserVO updateOne(Long aLong, UserVO updatedEntity) {
-        return null;
+    public List<Long> createBulk(List<UserVO> entities) throws ServiceException {
+
+        List<Long> ids = new LinkedList<>();
+        for(UserVO entity : entities) {
+            Long id = createOne(entity);
+            ids.add(id);
+        }
+
+        return ids;
     }
 
     @Override
-    public List<UserVO> updateBulk(Map<Long, UserVO> updatedEntities) {
-        return null;
+    public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
+
+        User updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
+
+        if (updatedUser == null) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        return userToUserVOConverter.convert(updatedUser);
+    }
+
+    @Override
+    public List<UserVO> updateBulk(Map<Long, UserVO> updatedEntities) throws ServiceException {
+
+        List<UserVO> userVOs = new LinkedList<>();
+
+        Iterator<Map.Entry<Long, UserVO>> entities = updatedEntities.entrySet().iterator();
+        while (entities.hasNext()) {
+            Map.Entry<Long, UserVO> currentEntity = entities.next();
+            UserVO updatedEntity = updateOne(currentEntity.getKey(), currentEntity.getValue());
+            userVOs.add(updatedEntity);
+        }
+
+        return userVOs;
+    }
+
+    @Override
+    public Long initialize(UserVO userVO) throws UserInitializationException, EntityCreationException {
+
+        if(runLevel != RunLevel.INIT) {
+            throw new UserInitializationException("Application is NOT in INIT mode");
+        }
+
+        long userCount = userDAO.count();
+        if(userCount > 0) {
+            throw new UserInitializationException("Application already initialized");
+        }
+
+        userVO.setAuthorities(Arrays.asList(Authority.ADMIN));
+        User user = userVOToUserConverter.convert(userVO);
+        User savedUser = userDAO.save(user);
+
+        if (savedUser == null) {
+            throw new EntityCreationException(User.class);
+        }
+
+        return savedUser.getId();
+    }
+
+    @Override
+    public void changePassword(Long id, String password) throws EntityNotFoundException {
+
+        if (!userDAO.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userDAO.updatePassword(id, password);
+    }
+
+    @Override
+    public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException {
+
+        if (!userDAO.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userDAO.updateRole(id, authorityToRoleConverter.convert(grantedAuthority));
+    }
+
+
+    @Override
+    public EntityPageVO<UserVO> getEntityPage(int page, int limit, OrderDirection direction, UserVO.OrderBy orderBy) {
+
+        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
+        Page entityPage = userDAO.findAll(pageable);
+
+        return PageableUtil.convertPage(entityPage, userToUserVOConverter);
+    }
+
+    @Override
+    public void enable(Long id) throws EntityNotFoundException {
+
+        if (!userDAO.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userDAO.enable(id);
+    }
+
+    @Override
+    public void disable(Long id) throws EntityNotFoundException {
+
+        if (!userDAO.exists(id)) {
+            throw new EntityNotFoundException(User.class, id);
+        }
+
+        userDAO.disable(id);
     }
 }

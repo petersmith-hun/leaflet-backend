@@ -15,6 +15,23 @@ import java.util.Date;
  */
 public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements UserDetails {
 
+    public static enum OrderBy {
+        ID("id"),
+        USERNAME("username"),
+        EMAIL("email"),
+        CREATED("created");
+
+        private String field;
+
+        OrderBy(String field) {
+            this.field = field;
+        }
+
+        public String getField() {
+            return field;
+        }
+    }
+
     private String username;
     private String email;
     private Collection<GrantedAuthority> authorities;
@@ -170,7 +187,7 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements
             return this;
         }
 
-        public UserVO createSafeUserVO() {
+        public UserVO createUserVO() {
             return new UserVO(id, created, lastModified, enabled, username, email, authorities, password, locale);
         }
     }
