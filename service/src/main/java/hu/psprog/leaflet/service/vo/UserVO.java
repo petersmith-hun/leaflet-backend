@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements UserDetails {
 
-    public static enum OrderBy {
+    public enum OrderBy {
         ID("id"),
         USERNAME("username"),
         EMAIL("email"),

@@ -1,31 +1,31 @@
 package hu.psprog.leaflet.service.converter;
 
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * Converts {@link Entry} to {@link EntryVO} object.
+ * Converts {@link EntryVO} to {@link Entry} object.
  *
  * @author Peter Smith
  */
 @Component
-public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
+public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
 
     @Autowired
-    private UserToUserVOConverter userToUserVOConverter;
+    private UserVOToUserConverter userVOToUserConverter;
 
     @Override
-    public EntryVO convert(Entry source) {
+    public Entry convert(EntryVO source) {
 
-        EntryVO.Builder builder = new EntryVO.Builder();
-        builder.withContent(source.getContent())
-                .withCreated(source.getCreated())
-                .withEnabled(source.isEnabled())
+        Entry.Builder builder = new Entry.Builder();
+        builder.withCreated(source.getCreated())
+                .isEnabled(source.isEnabled())
                 .withLastModified(source.getLastModified())
-                .withEntryStatus(source.getStatus().name())
+                .withStatus(EntryStatus.valueOf(source.getEntryStatus()))
                 .withLocale(source.getLocale())
                 .withId(source.getId())
                 .withLink(source.getLink())
@@ -36,10 +36,10 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
                 .withSeoKeywords(source.getSeoKeywords())
                 .withTitle(source.getTitle());
 
-        if (source.getUser() != null) {
-            builder.withOwner(userToUserVOConverter.convert(source.getUser()));
+        if (source.getOwner() != null) {
+            builder.withUser(userVOToUserConverter.convert(source.getOwner()));
         }
 
-        return builder.createEntryVO();
+        return builder.createEntry();
     }
 }

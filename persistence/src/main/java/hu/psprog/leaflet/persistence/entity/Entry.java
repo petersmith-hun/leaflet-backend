@@ -186,6 +186,14 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.tags = tags;
     }
 
+    public EntryStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EntryStatus status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return super.toString();

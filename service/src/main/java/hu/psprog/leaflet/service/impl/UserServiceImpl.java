@@ -229,7 +229,7 @@ public class UserServiceImpl implements UserService {
     public EntityPageVO<UserVO> getEntityPage(int page, int limit, OrderDirection direction, UserVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Page entityPage = userDAO.findAll(pageable);
+        Page<User> entityPage = userDAO.findAll(pageable);
 
         return PageableUtil.convertPage(entityPage, userToUserVOConverter);
     }
