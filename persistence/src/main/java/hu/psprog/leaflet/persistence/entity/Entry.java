@@ -74,6 +74,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     private Locale locale;
 
     @Column(name = DatabaseConstants.COLUMN_STATUS)
+    @Enumerated(EnumType.STRING)
     private EntryStatus status;
 
     public Entry() {
@@ -184,6 +185,14 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public EntryStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EntryStatus status) {
+        this.status = status;
     }
 
     @Override

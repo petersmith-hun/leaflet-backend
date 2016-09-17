@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
+ * Value objects having fields for creation and last modification, and for status.
+ *
  * @author Peter Smith
  */
 public class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SerializableEntity>
