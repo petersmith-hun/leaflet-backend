@@ -7,6 +7,10 @@ import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.repository.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -43,6 +47,11 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
     @Override
     public List<Entry> findByTags(Tag tag) {
         return ((EntryRepository) jpaRepository).findByTags(tag);
+    }
+
+    @Override
+    public Page<Entry> findAll(Specification<Entry> specification, Pageable pageable) {
+        return ((JpaSpecificationExecutor<Entry>) jpaRepository).findAll(specification, pageable);
     }
 
     @Override

@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.converter;
 
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
+import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
@@ -38,7 +39,10 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
                 .withTitle(source.getTitle());
 
         if (source.getOwner() != null) {
-            builder.withUser(userVOToUserConverter.convert(source.getOwner()));
+            User user = new User.Builder()
+                    .withId(source.getOwner().getId())
+                    .createUser();
+            builder.withUser(user);
         }
 
         return builder.createEntry();

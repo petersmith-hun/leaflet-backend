@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.repository.specification.EntrySpecification;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
@@ -156,6 +157,15 @@ public class EntryServiceImpl implements EntryService {
         }
 
         return entryToEntryVOConverter.convert(entry);
+    }
+
+    @Override
+    public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
+
+        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
+        Page<Entry> entityPage = entryDAO.findAll(EntrySpecification.isPublic, pageable);
+
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }
 
     @Override

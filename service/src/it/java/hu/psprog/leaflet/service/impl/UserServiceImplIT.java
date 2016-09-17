@@ -43,7 +43,7 @@ import static org.hamcrest.Matchers.equalTo;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = LeafletITContextConfig.class)
-@ActiveProfiles("it")
+@ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class UserServiceImplIT {
 
     private static final String USER_ID1_EMAIL = "lflt-it-5101@leaflet.dev";

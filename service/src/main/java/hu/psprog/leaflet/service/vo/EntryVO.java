@@ -6,6 +6,8 @@ import hu.psprog.leaflet.persistence.entity.Locale;
 import java.util.Date;
 
 /**
+ * Value object for {@link Entry} entity.
+ *
  * @author Peter Smith
  */
 public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
@@ -35,6 +37,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
     private String seoKeywords;
     private String entryStatus;
     private UserVO owner;
+    private CategoryVO category;
     private Locale locale;
 
     public EntryVO() {
@@ -43,7 +46,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
 
     public EntryVO(Long id, Date created, Date lastModified, boolean enabled, String title, String link,
                    String prologue, String content, String seoTitle, String seoDescription, String seoKeywords,
-                   String entryStatus, UserVO owner, Locale locale) {
+                   String entryStatus, UserVO owner, CategoryVO categoryVO, Locale locale) {
         super(id, created, lastModified, enabled);
         this.title = title;
         this.link = link;
@@ -54,6 +57,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
         this.seoKeywords = seoKeywords;
         this.entryStatus = entryStatus;
         this.owner = owner;
+        this.category = categoryVO;
         this.locale = locale;
     }
 
@@ -137,6 +141,14 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
         this.locale = locale;
     }
 
+    public CategoryVO getCategoryVO() {
+        return category;
+    }
+
+    public void setCategoryVO(CategoryVO categoryVO) {
+        this.category = categoryVO;
+    }
+
     /**
      * EntryVO builder.
      */
@@ -155,6 +167,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
         private String seoKeywords;
         private String entryStatus;
         private UserVO owner;
+        private CategoryVO category;
         private Locale locale;
 
         public Builder withId(Long id) {
@@ -222,6 +235,11 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
             return this;
         }
 
+        public Builder withCategory(CategoryVO category) {
+            this.category = category;
+            return this;
+        }
+
         public Builder withLocale(Locale locale) {
             this.locale = locale;
             return this;
@@ -229,7 +247,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
 
         public EntryVO createEntryVO() {
             return new EntryVO(id, created, lastModified, enabled, title, link, prologue, content,
-                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, locale);
+                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, category, locale);
         }
     }
 }

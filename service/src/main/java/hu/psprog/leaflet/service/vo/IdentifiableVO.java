@@ -5,6 +5,8 @@ import hu.psprog.leaflet.persistence.entity.SerializableEntity;
 import java.io.Serializable;
 
 /**
+ * Value objects having identifier field (ID).
+ *
  * @author Peter Smith
  */
 public class IdentifiableVO<ID extends Serializable, T extends SerializableEntity> extends BaseVO<T> {

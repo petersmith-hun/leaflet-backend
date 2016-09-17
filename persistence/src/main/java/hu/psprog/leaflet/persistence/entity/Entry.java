@@ -74,6 +74,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     private Locale locale;
 
     @Column(name = DatabaseConstants.COLUMN_STATUS)
+    @Enumerated(EnumType.STRING)
     private EntryStatus status;
 
     public Entry() {
