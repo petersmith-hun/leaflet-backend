@@ -6,6 +6,7 @@ import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -25,13 +26,13 @@ public class CommentDAOImpl extends SelfStatusAwareDAOImpl<Comment, Long> implem
     }
 
     @Override
-    public List<Comment> findByEntry(Entry entry) {
-        return ((CommentRepository) jpaRepository).findByEntry(entry);
+    public List<Comment> findByEntry(Pageable pageable, Entry entry) {
+        return ((CommentRepository) jpaRepository).findByEntry(pageable, entry);
     }
 
     @Override
-    public List<Comment> findByUser(User user) {
-        return ((CommentRepository) jpaRepository).findByUser(user);
+    public List<Comment> findByUser(Pageable pageable,  User user) {
+        return ((CommentRepository) jpaRepository).findByUser(pageable, user);
     }
 
     @Override
