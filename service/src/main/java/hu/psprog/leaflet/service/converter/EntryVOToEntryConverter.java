@@ -32,7 +32,6 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
                 .withId(source.getId())
                 .withLink(source.getLink())
                 .withPrologue(source.getPrologue())
-                .withTitle(source.getTitle())
                 .withSeoTitle(source.getSeoTitle())
                 .withSeoDescription(source.getSeoDescription())
                 .withSeoKeywords(source.getSeoKeywords())
