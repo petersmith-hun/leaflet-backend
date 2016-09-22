@@ -34,6 +34,10 @@ public class Comment extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_CONTENT, length = 2000)
     private String content;
 
+    public Comment() {
+        // Serializable
+    }
+
     public Comment(Long id, Date created, Date lastModified, boolean enabled, User user, Entry entry, String content) {
         super(id, created, lastModified, enabled);
         this.user = user;

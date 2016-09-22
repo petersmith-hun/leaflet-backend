@@ -32,5 +32,14 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      */
     public EntryVO findByLink(String link) throws EntityNotFoundException;
 
+    /**
+     * Returns a page of public entries.
+     *
+     * @param page page number
+     * @param limit maximum number of items on a page
+     * @param direction order direction
+     * @param orderBy order by field
+     * @return
+     */
     public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
 }
