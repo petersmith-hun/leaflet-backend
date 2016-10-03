@@ -2,6 +2,7 @@ package hu.psprog.leaflet.persistence.dao;
 
 import hu.psprog.leaflet.persistence.entity.Attachment;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ import java.util.List;
 public interface AttachmentDAO extends BaseDAO<Attachment, Long>, SelfStatusAwareDAO<Long> {
 
     public List<Attachment> findByEntry(Entry entry);
+
+    public List<Attachment> findByEntry(Specification<Attachment> specification, Entry entry);
 }
