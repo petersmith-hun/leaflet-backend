@@ -1,6 +1,4 @@
-package hu.psprog.leaflet.persistence.entity.metamodel;
-
-import hu.psprog.leaflet.persistence.entity.Comment;
+package hu.psprog.leaflet.persistence.entity;
 
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
@@ -11,6 +9,6 @@ import javax.persistence.metamodel.StaticMetamodel;
  * @author Peter Smith
  */
 @StaticMetamodel(Comment.class)
-public class Comment_ {
-    public static volatile SingularAttribute<Comment, Boolean> enabled;
+public class Comment_ extends SelfStatusAwareIdentifiableEntity_ {
+    public static volatile SingularAttribute<Comment, Entry> entry;
 }

@@ -32,6 +32,7 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
         }
 
         return new User.Builder()
+                .withId(source.getId())
                 .withCreated(source.getCreated())
                 .withPassword(source.getPassword())
                 .withUsername(source.getUsername())

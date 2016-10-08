@@ -2,7 +2,7 @@ package hu.psprog.leaflet.persistence.repository.specification;
 
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
-import hu.psprog.leaflet.persistence.entity.metamodel.Entry_;
+import hu.psprog.leaflet.persistence.entity.Entry_;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
