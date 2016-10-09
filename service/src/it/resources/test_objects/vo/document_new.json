@@ -1,0 +1,16 @@
+{
+    "id"            : 5,
+    "title"         : "Test document newly created",
+    "link"          : "test-document-newly-created-20161009",
+    "content"       : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tristique urna libero, et viverra metus tempus nec. Nulla varius quam arcu, ut auctor mauris egestas mollis. Phasellus nec ex nec augue rhoncus vulputate. Nulla tempor diam eget egestas ultrices. Sed dignissim diam posuere sem hendrerit efficitur. Quisque condimentum, arcu vel euismod accumsan, nisi mi volutpat turpis, a pharetra sapien erat ut libero. Integer luctus eu nibh eu volutpat. Proin pulvinar blandit ipsum, ut pretium lorem tincidunt nec.",
+    "seoTitle"      : "Test document newly created",
+    "seoDescription": "Test document newly created",
+    "seoKeywords"   : "Test document newly created",
+    "locale"        : "EN",
+    "created"       : 1471514400000,
+    "lastModified"  : 1471514400000,
+    "enabled"       : true,
+    "owner"         : {
+        "id"            : 2
+    }
+}
