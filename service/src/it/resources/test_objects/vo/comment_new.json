@@ -1,0 +1,14 @@
+{
+    "id"            : 11,
+    "created"       : 1471514400000,
+    "lastModified"  : 1471514400000,
+    "enabled"       : true,
+    "content"       : "Test comment newly created",
+    "entryVO"       : {
+        "id"            : 1,
+        "entryStatus"        : "PUBLIC"
+    },
+    "owner"         : {
+        "id"            : 3
+    }
+}

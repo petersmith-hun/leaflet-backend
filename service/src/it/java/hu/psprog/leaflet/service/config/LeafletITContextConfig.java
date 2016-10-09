@@ -33,6 +33,7 @@ public class LeafletITContextConfig {
     public static final String INTEGRATION_TEST_DB_SCRIPT_USERS = "classpath:/service_it_db_script_users.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_ENTRIES = "classpath:/service_it_db_script_entries.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_CATEGORIES = "classpath:/service_it_db_script_categories.sql";
+    public static final String INTEGRATION_TEST_DB_SCRIPT_COMMENTS = "classpath:/service_it_db_script_comments.sql";
 
     public static final String REPOSITORY_PACKAGE = "hu.psprog.leaflet.persistence.repository";
     public static final String ENTITY_PACKAGE = "hu.psprog.leaflet.persistence.entity";

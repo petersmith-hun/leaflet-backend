@@ -7,29 +7,29 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * Converts {@link Comment} to {@link CommentVO} object.
+ * Converts {@link CommentVO} value object to {@link Comment} entity.
  *
  * @author Peter Smith
  */
 @Component
-public class CommentToCommentVOConverter implements Converter<Comment, CommentVO> {
+public class CommentVOToCommentConverter implements Converter<CommentVO, Comment> {
 
     @Autowired
-    private UserToUserVOConverter userToUserVOConverter;
+    private UserVOToUserConverter userVOToUserConverter;
 
     @Autowired
-    private EntryToEntryVOConverter entryToEntryVOConverter;
+    private EntryVOToEntryConverter entryVOToEntryConverter;
 
     @Override
-    public CommentVO convert(Comment source) {
+    public Comment convert(CommentVO source) {
 
-        return new CommentVO.Builder()
+        return new Comment.Builder()
                 .withId(source.getId())
                 .withContent(source.getContent())
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())
-                .withEntryVO(entryToEntryVOConverter.convert(source.getEntry()))
-                .withOwner(userToUserVOConverter.convert(source.getUser()))
-                .createCommentVO();
+                .withEntry(entryVOToEntryConverter.convert(source.getEntryVO()))
+                .withUser(userVOToUserConverter.convert(source.getOwner()))
+                .createComment();
     }
 }
