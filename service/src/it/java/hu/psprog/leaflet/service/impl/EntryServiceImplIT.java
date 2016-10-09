@@ -143,7 +143,6 @@ public class EntryServiceImplIT {
         Long id = 2L;
 
         // when
-        entryService.getAll();
         entryService.enable(id);
 
         // then
