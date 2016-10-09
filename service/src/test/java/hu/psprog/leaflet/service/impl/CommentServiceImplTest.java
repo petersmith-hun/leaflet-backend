@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -117,14 +118,13 @@ public class CommentServiceImplTest {
     public void testGetAllWithEmptyList() throws ServiceException {
 
         // given
-        List<CommentVO> emptyVOList = new LinkedList<>();
         given(commentDAO.findAll()).willReturn(new LinkedList<>());
 
         // when
         List<CommentVO> result = commentService.getAll();
 
         // then
-        assertThat(result, equalTo(emptyVOList));
+        assertThat(result, empty());
         verify(commentDAO).findAll();
         verify(commentToCommentVOConverter, never()).convert(any(Comment.class));
     }
