@@ -16,6 +16,7 @@ import hu.psprog.leaflet.service.vo.EntryVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -163,7 +164,10 @@ public class EntryServiceImpl implements EntryService {
     public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Page<Entry> entityPage = entryDAO.findAll(EntrySpecification.isPublic, pageable);
+        Specifications<Entry> specs = Specifications
+                .where(EntrySpecification.isPublic)
+                .and(EntrySpecification.isEnabled);
+        Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }

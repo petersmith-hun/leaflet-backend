@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import javax.persistence.GeneratedValue;
@@ -36,6 +37,11 @@ public class IdentifiableEntity<T extends Serializable> implements SerializableE
 
     public void setId(T id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 
     @Override
