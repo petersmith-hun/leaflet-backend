@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.persistence.repository.specification;
 
 import hu.psprog.leaflet.persistence.entity.Attachment;
-import hu.psprog.leaflet.persistence.entity.metamodel.Attachment_;
+import hu.psprog.leaflet.persistence.entity.Attachment_;
 import org.springframework.data.jpa.domain.Specification;
 
 /**

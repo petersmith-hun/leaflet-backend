@@ -32,5 +32,5 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long>, J
      * @param entry {@link Entry} object to retrieve attachments associated with
      * @return List of Attachment objects or {@code null} if no Attachment found
      */
-    public List<Attachment> findByEntry(Specification<Entry> specification, Entry entry);
+    public List<Attachment> findByEntry(Specification<Attachment> specification, Entry entry);
 }

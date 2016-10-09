@@ -30,7 +30,7 @@ public class AttachmentDAOImpl extends SelfStatusAwareDAOImpl<Attachment, Long> 
     }
 
     @Override
-    public List<Attachment> findByEntry(Specification<Entry> specification, Entry entry) {
+    public List<Attachment> findByEntry(Specification<Attachment> specification, Entry entry) {
         return ((AttachmentRepository) jpaRepository).findByEntry(specification, entry);
     }
 
