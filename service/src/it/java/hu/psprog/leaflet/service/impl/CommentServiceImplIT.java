@@ -33,6 +33,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
@@ -52,6 +53,7 @@ public class CommentServiceImplIT {
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     private static final String COMMENT_1 = "comment_1";
+    private static final String COMMENT_NEW = "comment_new";
     private static final String ENTRY_1 = "entry_1";
 
     @Autowired
@@ -188,6 +190,61 @@ public class CommentServiceImplIT {
 
         // then
         assertThat(result, equalTo(10L));
+    }
+
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
+    public void testCreateOne() throws IOException, ServiceException {
+
+        // given
+        CommentVO createdComment = testObjectReader.read(COMMENT_NEW, TestObjectReader.ObjectDirectory.VO, CommentVO.class);
+
+        // when
+        Long result = commentService.createOne(createdComment);
+
+        // then
+        assertThat(result, greaterThanOrEqualTo(11L));
+        assertThat(commentService.getOne(result), notNullValue());
+        assertThat(commentService.getOne(result).getContent(), equalTo("Test comment newly created"));
+    }
+
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
+    public void testUpdateOne() throws ServiceException {
+
+        // given
+        String updatedCommentContent = "Updated comment content";
+        Long id = 4L;
+        CommentVO commentToUpdate = commentService.getOne(id);
+        commentToUpdate.setContent(updatedCommentContent);
+
+        // when
+        CommentVO result = commentService.updateOne(id, commentToUpdate);
+
+        // then
+        CommentVO updatedCommentVO = commentService.getOne(id);
+        assertThat(updatedCommentVO, notNullValue());
+        assertThat(updatedCommentVO.getContent(), equalTo(updatedCommentContent));
+        assertThat(result.equals(updatedCommentVO), equalTo(true));
+    }
+
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
+    public void testDeleteByEntity() throws ServiceException {
+
+        // given
+        Long id = 4L;
+        CommentVO commentToDelete = commentService.getOne(id);
+
+        // when
+        commentService.deleteByEntity(commentToDelete);
+
+        // then
+        assertThat(commentService.count(), equalTo(9L));
+        assertThat(commentService.getAll().stream().noneMatch(e -> commentToDelete.equals(e)), equalTo(true));
     }
 
     public static class PagingParameterProvider {

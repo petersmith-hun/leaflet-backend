@@ -26,9 +26,11 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
     public User convert(UserVO source) {
 
         Role role = null;
-        Iterator<? extends GrantedAuthority> authorityIterator = source.getAuthorities().iterator();
-        while (authorityIterator.hasNext()) {
-            role = Role.valueOf(authorityIterator.next().getAuthority());
+        if (source.getAuthorities() != null) {
+            Iterator<? extends GrantedAuthority> authorityIterator = source.getAuthorities().iterator();
+            while (authorityIterator.hasNext()) {
+                role = Role.valueOf(authorityIterator.next().getAuthority());
+            }
         }
 
         return new User.Builder()
