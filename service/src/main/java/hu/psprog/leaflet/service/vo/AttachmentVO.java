@@ -89,12 +89,12 @@ public class AttachmentVO extends SelfStatusAwareIdentifiableVO<Long, Attachment
         this.type = type;
     }
 
-    public boolean isProtected() {
+    public boolean getIsProtected() {
         return isProtected;
     }
 
-    public void setProtected(boolean aProtected) {
-        isProtected = aProtected;
+    public void setIsProtected(boolean isProtected) {
+        this.isProtected = isProtected;
     }
 
     /**

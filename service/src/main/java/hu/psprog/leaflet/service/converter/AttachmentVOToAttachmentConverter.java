@@ -29,7 +29,7 @@ public class AttachmentVOToAttachmentConverter implements Converter<AttachmentVO
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())
                 .isEnabled(source.isEnabled())
-                .isProtected(source.isProtected())
+                .isProtected(source.getIsProtected())
                 .withEntry(entryVOToEntryConverter.convert(source.getEntryVO()))
                 .createAttachment();
     }

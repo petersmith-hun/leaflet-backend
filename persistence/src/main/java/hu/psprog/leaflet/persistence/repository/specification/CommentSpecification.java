@@ -17,6 +17,12 @@ public class CommentSpecification {
      */
     public static Specification<Comment> isEnabled = (root, query, builder) -> builder.equal(root.get(Comment_.enabled), true);
 
+    /**
+     * Filter to list comments by owner entry.
+     *
+     * @param entry owner {@link Entry} entity.
+     * @return filter to list of comments owned by given entry
+     */
     public static Specification<Comment> isOwnedByEntry(Entry entry) {
         return (root, query, builder) -> builder.equal(root.get(Comment_.entry), entry);
     }

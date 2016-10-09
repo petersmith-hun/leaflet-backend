@@ -4,8 +4,10 @@ import hu.psprog.leaflet.persistence.dao.AttachmentDAO;
 import hu.psprog.leaflet.persistence.entity.Attachment;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.repository.AttachmentRepository;
+import hu.psprog.leaflet.persistence.repository.specification.AttachmentSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -31,7 +33,8 @@ public class AttachmentDAOImpl extends SelfStatusAwareDAOImpl<Attachment, Long> 
 
     @Override
     public List<Attachment> findByEntry(Specification<Attachment> specification, Entry entry) {
-        return ((AttachmentRepository) jpaRepository).findByEntry(specification, entry);
+        return ((AttachmentRepository) jpaRepository).findAll(Specifications.where(specification)
+                .and(AttachmentSpecification.isOwnedByEntry(entry)));
     }
 
     @Override

@@ -256,9 +256,7 @@ public class CommentServiceImplIT {
         Long id = 5L;
 
         // when
-        commentService.getAll();
         commentService.enable(id);
-        commentService.getAll();
 
         // then
         assertThat(commentService.getOne(id).isEnabled(), equalTo(true));
@@ -273,9 +271,7 @@ public class CommentServiceImplIT {
         Long id = 1L;
 
         // when
-        commentService.getAll();
         commentService.disable(id);
-        commentService.getAll();
 
         // then
         assertThat(commentService.getOne(id).isEnabled(), equalTo(false));

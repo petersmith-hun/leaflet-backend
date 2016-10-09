@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
 /**
@@ -9,4 +10,5 @@ import javax.persistence.metamodel.StaticMetamodel;
  */
 @StaticMetamodel(Attachment.class)
 public class Attachment_ extends SelfStatusAwareIdentifiableEntity_ {
+    public static volatile SingularAttribute<Attachment, Entry> entry;
 }
