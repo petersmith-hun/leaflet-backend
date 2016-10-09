@@ -30,6 +30,7 @@ public class CommentVOToCommentConverter implements Converter<CommentVO, Comment
                 .withLastModified(source.getLastModified())
                 .withEntry(entryVOToEntryConverter.convert(source.getEntryVO()))
                 .withUser(userVOToUserConverter.convert(source.getOwner()))
+                .isEnabled(source.isEnabled())
                 .createComment();
     }
 }

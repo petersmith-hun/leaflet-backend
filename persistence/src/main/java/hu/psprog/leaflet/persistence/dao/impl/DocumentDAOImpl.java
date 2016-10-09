@@ -2,13 +2,15 @@ package hu.psprog.leaflet.persistence.dao.impl;
 
 import hu.psprog.leaflet.persistence.dao.DocumentDAO;
 import hu.psprog.leaflet.persistence.entity.Document;
-import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * DAO implementation for {@link DocumentRepository}.
@@ -24,8 +26,13 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
     }
 
     @Override
-    public List<Document> findByUser(User user) {
-        return ((DocumentRepository) jpaRepository).findByUser(user);
+    public Page<Document> findAll(Specification<Document> specification, Pageable pageable) {
+        return ((JpaSpecificationExecutor) jpaRepository).findAll(specification, pageable);
+    }
+
+    @Override
+    public Document findByLink(String link) {
+        return ((DocumentRepository) jpaRepository).findByLink(link);
     }
 
     @Override
