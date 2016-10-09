@@ -47,6 +47,7 @@
         <h2.version>1.4.192</h2.version>
         <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
+        <junit.params.version>1.0.5</junit.params.version>
     </properties>
 	
     <dependencyManagement>
@@ -180,6 +181,12 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>pl.pragmatists</groupId>
+                <artifactId>JUnitParams</artifactId>
+                <version>${junit.params.version}</version>
                 <scope>test</scope>
             </dependency>
 

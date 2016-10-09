@@ -133,4 +133,34 @@ public class EntryServiceImplIT {
         assertThat(result.getId(), equalTo(controlEntryVO.getId()));
         assertThat(result.getTitle(), equalTo(controlEntryVO.getTitle()));
     }
+
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES)
+    public void testEnable() throws ServiceException {
+
+        // given
+        Long id = 2L;
+
+        // when
+        entryService.enable(id);
+
+        // then
+        assertThat(entryService.getOne(id).isEnabled(), equalTo(true));
+    }
+
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES)
+    public void testDisable() throws ServiceException {
+
+        // given
+        Long id = 1L;
+
+        // when
+        entryService.disable(id);
+
+        // then
+        assertThat(entryService.getOne(id).isEnabled(), equalTo(false));
+    }
 }

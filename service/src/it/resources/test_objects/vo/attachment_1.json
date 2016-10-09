@@ -1,0 +1,14 @@
+{
+    "id"            : 1,
+    "title"         : "Attachment 1",
+    "filename"      : "attachment_1.jar",
+    "description"   : "Test attachment 1",
+    "type"          : "application/java-archive",
+    "isProtected"   : false,
+    "created"       : 1471514400000,
+    "lastModified"  : 1471514400000,
+    "enabled"       : true,
+    "entryVO"       : {
+        "id"            : 1
+    }
+}

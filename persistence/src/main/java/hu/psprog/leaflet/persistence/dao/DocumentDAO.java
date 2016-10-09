@@ -1,9 +1,9 @@
 package hu.psprog.leaflet.persistence.dao;
 
 import hu.psprog.leaflet.persistence.entity.Document;
-import hu.psprog.leaflet.persistence.entity.User;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
  * DAO for {@link hu.psprog.leaflet.persistence.repository.DocumentRepository}.
@@ -12,5 +12,7 @@ import java.util.List;
  */
 public interface DocumentDAO extends BaseDAO<Document, Long>, SelfStatusAwareDAO<Long> {
 
-    public List<Document> findByUser(User user);
+    public Page<Document> findAll(Specification<Document> specification, Pageable pageable);
+
+    public Document findByLink(String link);
 }

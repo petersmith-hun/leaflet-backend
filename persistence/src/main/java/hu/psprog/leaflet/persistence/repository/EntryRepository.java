@@ -4,7 +4,6 @@ import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * @author Peter Smith
  */
 @Repository
-public interface EntryRepository extends JpaRepository<Entry, Long>, JpaSpecificationExecutor<Entry> {
+public interface EntryRepository extends SelfStatusAwareJpaRepository<Entry, Long>, JpaSpecificationExecutor<Entry> {
 
     /**
      * Returns {@link Entry} object identified by given link.

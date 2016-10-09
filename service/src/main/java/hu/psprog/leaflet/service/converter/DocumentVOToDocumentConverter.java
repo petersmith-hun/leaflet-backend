@@ -7,23 +7,23 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 /**
- * Converts {@link Document} to {@link DocumentVO} object.
+ * Converts {@link DocumentVO} value object to {@link Document} entity.
  *
  * @author Peter Smith
  */
 @Component
-public class DocumentToDocumentVOConverter implements Converter<Document, DocumentVO> {
+public class DocumentVOToDocumentConverter implements Converter<DocumentVO, Document> {
 
     @Autowired
-    private UserToUserVOConverter userToUserVOConverter;
+    private UserVOToUserConverter userVOToUserConverter;
 
     @Override
-    public DocumentVO convert(Document source) {
+    public Document convert(DocumentVO source) {
 
-        DocumentVO.Builder builder = new DocumentVO.Builder();
+        Document.Builder builder = new Document.Builder();
         builder.withContent(source.getContent())
                 .withCreated(source.getCreated())
-                .withEnabled(source.isEnabled())
+                .isEnabled(source.isEnabled())
                 .withLastModified(source.getLastModified())
                 .withLocale(source.getLocale())
                 .withId(source.getId())
@@ -33,10 +33,10 @@ public class DocumentToDocumentVOConverter implements Converter<Document, Docume
                 .withSeoKeywords(source.getSeoKeywords())
                 .withTitle(source.getTitle());
 
-        if (source.getUser() != null) {
-            builder.withOwner(userToUserVOConverter.convert(source.getUser()));
+        if (source.getOwner() != null) {
+            builder.withUser(userVOToUserConverter.convert(source.getOwner()));
         }
 
-        return builder.createDocumentVO();
+        return builder.createDocument();
     }
 }
