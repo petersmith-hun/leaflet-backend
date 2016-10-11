@@ -41,7 +41,7 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
                 .withDefaultLocale(source.getLocale())
                 .withLastModified(new Date())
                 .withEmail(source.getEmail())
-                .withLastLogin(null)
+                .withLastLogin(source.getLastLogin())
                 .withRole(role)
                 .isEnabled(source.isEnabled())
                 .createUser();

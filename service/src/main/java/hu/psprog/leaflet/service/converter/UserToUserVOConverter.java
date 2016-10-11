@@ -36,6 +36,7 @@ public class UserToUserVOConverter implements Converter<User, UserVO> {
                 .withLocale(source.getDefaultLocale())
                 .withPassword(source.getPassword())
                 .withUsername(source.getUsername())
+                .withLastLogin(source.getLastLogin())
                 .createUserVO();
     }
 }

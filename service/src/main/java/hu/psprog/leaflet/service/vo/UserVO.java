@@ -37,19 +37,21 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements
     private Collection<GrantedAuthority> authorities;
     private String password;
     private Locale locale;
+    private Date lastLogin;
 
     public UserVO() {
         // Serializable
     }
 
     public UserVO(Long id, Date created, Date lastModified, boolean enabled, String username, String email,
-                  Collection<GrantedAuthority> authorities, String password, Locale locale) {
+                  Collection<GrantedAuthority> authorities, String password, Locale locale, Date lastLogin) {
         super(id, created, lastModified, enabled);
         this.username = username;
         this.email = email;
         this.authorities = authorities;
         this.password = password;
         this.locale = locale;
+        this.lastLogin = lastLogin;
     }
 
     @Override
@@ -130,6 +132,14 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements
         return super.isEnabled();
     }
 
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
     public static class Builder {
 
         private Long id;
@@ -141,6 +151,7 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements
         private Collection<GrantedAuthority> authorities;
         private String password;
         private Locale locale;
+        private Date lastLogin;
 
         public Builder withId(Long id) {
             this.id = id;
@@ -187,8 +198,14 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements
             return this;
         }
 
+        public Builder withLastLogin(Date lastLogin) {
+            this.lastLogin = lastLogin;
+            return this;
+        }
+
         public UserVO createUserVO() {
-            return new UserVO(id, created, lastModified, enabled, username, email, authorities, password, locale);
+            return new UserVO(id, created, lastModified, enabled, username, email, authorities, password,
+                    locale, lastLogin);
         }
     }
 }
