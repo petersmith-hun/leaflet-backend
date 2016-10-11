@@ -4,9 +4,12 @@ import hu.psprog.leaflet.persistence.dao.TagDAO;
 import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * DAO implementation for {@link TagRepository}.
@@ -19,6 +22,11 @@ public class TagDAOImpl extends SelfStatusAwareDAOImpl<Tag, Long> implements Tag
     @Autowired
     public TagDAOImpl(final TagRepository tagRepository) {
         super(tagRepository);
+    }
+
+    @Override
+    public List<Tag> findAll(Specification<Tag> specification) {
+        return ((JpaSpecificationExecutor) jpaRepository).findAll(specification);
     }
 
     @Override
