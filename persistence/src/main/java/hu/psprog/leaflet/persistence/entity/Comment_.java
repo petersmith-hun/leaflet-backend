@@ -11,4 +11,6 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Comment.class)
 public class Comment_ extends SelfStatusAwareIdentifiableEntity_ {
     public static volatile SingularAttribute<Comment, Entry> entry;
+    public static volatile SingularAttribute<Comment, String> content;
+    public static volatile SingularAttribute<Comment, User> user;
 }
