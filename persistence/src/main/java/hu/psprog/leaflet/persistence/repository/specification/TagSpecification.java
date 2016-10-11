@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.persistence.repository.specification;
 
 import hu.psprog.leaflet.persistence.entity.Tag;
-import hu.psprog.leaflet.persistence.entity.metamodel.Tag_;
+import hu.psprog.leaflet.persistence.entity.Tag_;
 import org.springframework.data.jpa.domain.Specification;
 
 /**

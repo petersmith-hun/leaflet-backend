@@ -84,11 +84,10 @@ public class DocumentServiceImplTest {
         given(documentDAO.findOne(id)).willReturn(null);
 
         // when
-        DocumentVO result = documentService.getOne(id);
+        documentService.getOne(id);
 
         // then
         // expected exception
-        assertThat(result, equalTo(documentVO));
         verify(documentDAO).findOne(id);
         verify(documentToDocumentVOConverter, never()).convert(document);
     }
