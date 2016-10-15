@@ -5,7 +5,7 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>0.1.SNAPSHOT</version>
+        <version>0.2-alpha</version>
     </parent>
 
     <packaging>war</packaging>
@@ -16,17 +16,15 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>leaflet-service</artifactId>
-            <version>0.1.SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>leaflet-rest-api</artifactId>
-            <version>0.1</version>
         </dependency>
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>leaflet-jwt-component</artifactId>
-            <version>0.1.SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -53,19 +51,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
 
         <dependency>
