@@ -19,6 +19,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // TODO temporary configuration - shall be changed during the implementation of LFLT-16!
         http.authorizeRequests()
-                .anyRequest().permitAll();
+                .anyRequest().permitAll()
+                .and()
+            .csrf()
+                .disable();
     }
 }
