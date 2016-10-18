@@ -46,7 +46,6 @@ public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements U
             currentUser.setEmail(updatedEntity.getEmail());
             currentUser.setLastModified(new Date());
             currentUser.setUsername(updatedEntity.getUsername());
-            currentUser.setLastLogin(updatedEntity.getLastLogin());
             jpaRepository.flush();
         }
 
