@@ -108,7 +108,7 @@ public class UserServiceImplIT {
         UserDetails result = userService.loadUserByUsername(USER_ID1_EMAIL);
 
         // then
-        assertThat(result.getUsername(), equalTo(USER_ID1_USERNAME));
+        assertThat(result.getUsername(), equalTo(USER_ID1_EMAIL));
     }
 
     @Test(expected = UsernameNotFoundException.class)
@@ -187,7 +187,7 @@ public class UserServiceImplIT {
         Long result = userService.createOne(createdUserVO);
 
         // then
-        assertThat(userService.loadUserByUsername(USER_ID6_EMAIL), equalTo(createdUserVO));
+        assertThat(userService.getOne(result), equalTo(createdUserVO));
     }
 
     @Test(expected = UserInitializationException.class)

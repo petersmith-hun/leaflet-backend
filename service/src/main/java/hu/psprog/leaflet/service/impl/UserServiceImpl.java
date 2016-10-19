@@ -7,6 +7,7 @@ import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
+import hu.psprog.leaflet.service.converter.RoleToAuthorityConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -54,6 +55,9 @@ public class UserServiceImpl implements UserService {
     private AuthorityToRoleConverter authorityToRoleConverter;
 
     @Autowired
+    private RoleToAuthorityConverter roleToAuthorityConverter;
+
+    @Autowired
     private RunLevel runLevel;
 
     /**
@@ -72,7 +76,15 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE_PATTERN, email));
         }
 
-        return userToUserVOConverter.convert(user);
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                user.isEnabled(),
+                user.isEnabled(),
+                user.isEnabled(),
+                user.isEnabled(),
+                Arrays.asList(roleToAuthorityConverter.convert(user.getRole()))
+        );
     }
 
     @Override
@@ -139,7 +151,7 @@ public class UserServiceImpl implements UserService {
             throw new EntityCreationException(User.class);
         }
 
-        return user.getId();
+        return savedUser.getId();
     }
 
     @Override

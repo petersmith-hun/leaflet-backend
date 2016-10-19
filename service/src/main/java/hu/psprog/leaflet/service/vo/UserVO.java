@@ -3,7 +3,6 @@ package hu.psprog.leaflet.service.vo;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.User;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
@@ -13,7 +12,7 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements UserDetails {
+public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> {
 
     public enum OrderBy {
         ID("id"),
@@ -97,34 +96,16 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> implements
         this.locale = locale;
     }
 
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
-    @Override
     public String getPassword() {
         return password;
     }
 
-    @Override
     public String getUsername() {
         return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
     }
 
     @Override

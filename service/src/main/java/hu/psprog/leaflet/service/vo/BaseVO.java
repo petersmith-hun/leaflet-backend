@@ -4,12 +4,13 @@ import hu.psprog.leaflet.persistence.entity.SerializableEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 
 /**
  * @author Peter Smith
  */
-public class BaseVO<T extends SerializableEntity> {
+public class BaseVO<T extends SerializableEntity> implements Serializable {
 
     private static final String PASSWORD_FIELD = "password";
 
