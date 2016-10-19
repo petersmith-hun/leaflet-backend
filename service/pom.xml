@@ -14,7 +14,11 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>leaflet-persistence</artifactId>
-            <version>0.2-alpha</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>leaflet-jwt-component</artifactId>
         </dependency>
 
         <dependency>

@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
@@ -11,11 +12,14 @@ import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
+import hu.psprog.leaflet.service.vo.AuthRequestVO;
+import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.annotation.AJAXRequest;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
+import hu.psprog.leaflet.web.rest.conversion.user.LoginRequestModelToAuthenticationRequestVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.user.UpdateProfileRequestModelToUserVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.user.UserInitializeRequestModelToUserVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.user.UserVOToExtendedUserDataModelEntityConverter;
@@ -79,6 +83,9 @@ public class UsersController {
 
     @Autowired
     private UpdateProfileRequestModelToUserVOConverter updateProfileRequestModelToUserVOConverter;
+
+    @Autowired
+    private LoginRequestModelToAuthenticationRequestVOConverter loginRequestModelToAuthenticationRequestVOConverter;
 
     @Autowired
     private ValidationErrorMessagesConverter validationErrorMessagesConverter;
@@ -273,6 +280,22 @@ public class UsersController {
             LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
             throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
         }
+    }
+
+    /**
+     * POST /users/signin
+     * Claims token for given existing user.
+     *
+     * @param loginRequestModel user's email and password
+     * @return process status and if "sign-in" is successful, the generated token
+     */
+    @RequestMapping(method = RequestMethod.POST, path = "/users/signin")
+    public BaseBodyDataModel claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel) {
+
+        AuthRequestVO requestModel = loginRequestModelToAuthenticationRequestVOConverter.convert(loginRequestModel);
+        AuthResponseVO authenticationAnswer = userService.claimToken(requestModel);
+
+        return null;
     }
 
     private void hashPassword(UserPasswordRequestModel userPasswordRequestModel) {

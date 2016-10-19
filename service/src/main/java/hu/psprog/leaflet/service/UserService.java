@@ -1,5 +1,7 @@
 package hu.psprog.leaflet.service;
 
+import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
+import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationRequestModel;
 import hu.psprog.leaflet.service.crud.CreateOperationCapableService;
 import hu.psprog.leaflet.service.crud.DeleteOperationCapableService;
 import hu.psprog.leaflet.service.crud.PageableService;
@@ -9,6 +11,8 @@ import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
+import hu.psprog.leaflet.service.vo.AuthRequestVO;
+import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -51,4 +55,12 @@ public interface UserService extends UserDetailsService,
      * @param grantedAuthority new granted authority
      */
     public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException;
+
+    /**
+     * Requests JWT token for given user (identified by {@link JWTAuthenticationRequestModel}).
+     *
+     * @param authRequestVO user data
+     * @return token wrapped in {@link JWTAuthenticationAnswerModel} if user is successfully authenticated
+     */
+    public AuthResponseVO claimToken(AuthRequestVO authRequestVO);
 }
