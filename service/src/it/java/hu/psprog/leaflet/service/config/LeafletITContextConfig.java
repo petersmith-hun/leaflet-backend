@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.service.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import org.springframework.context.annotation.Bean;
@@ -13,10 +14,16 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -95,5 +102,30 @@ public class LeafletITContextConfig {
     public ObjectMapper objectMapper() {
 
         return new ObjectMapper();
+    }
+
+    @Bean
+    public JWTComponent jwtUtility() {
+        return new JWTComponentStub();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsServiceStub();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService());
+
+        return authenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+
+        return new ProviderManager(Arrays.asList(authenticationProvider()));
     }
 }

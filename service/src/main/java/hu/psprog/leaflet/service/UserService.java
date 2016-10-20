@@ -1,7 +1,5 @@
 package hu.psprog.leaflet.service;
 
-import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
-import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationRequestModel;
 import hu.psprog.leaflet.service.crud.CreateOperationCapableService;
 import hu.psprog.leaflet.service.crud.DeleteOperationCapableService;
 import hu.psprog.leaflet.service.crud.PageableService;
@@ -57,10 +55,10 @@ public interface UserService extends UserDetailsService,
     public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException;
 
     /**
-     * Requests JWT token for given user (identified by {@link JWTAuthenticationRequestModel}).
+     * Requests JWT token for given user (identified by {@link AuthRequestVO}).
      *
      * @param authRequestVO user data
-     * @return token wrapped in {@link JWTAuthenticationAnswerModel} if user is successfully authenticated
+     * @return claim result (status and token if successful)
      */
     public AuthResponseVO claimToken(AuthRequestVO authRequestVO);
 }

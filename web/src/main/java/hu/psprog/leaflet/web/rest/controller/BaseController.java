@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
+import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Base REST controller.
+ * Exception handlers.
  *
  * @author Peter Smith
  */
@@ -31,6 +32,20 @@ public class BaseController {
     public ErrorMessageDataModel resourceNotFoundExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Requested resource is not available.", exception);
+
+        return new ErrorMessageDataModel.Builder()
+                .withMessage(exception.getMessage())
+                .build();
+    }
+
+    /**
+     * HTTP 401 exception handler.
+     */
+    @ExceptionHandler(AuthenticationFailureException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorMessageDataModel authenticationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
+
+        LOGGER.error("Exception thrown during user authentication.", exception);
 
         return new ErrorMessageDataModel.Builder()
                 .withMessage(exception.getMessage())

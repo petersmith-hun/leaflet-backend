@@ -18,7 +18,9 @@ import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.annotation.AJAXRequest;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.exception.TokenClaimException;
 import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
+import hu.psprog.leaflet.web.rest.conversion.user.AuthResponseVOToLoginResponseDataModelConverter;
 import hu.psprog.leaflet.web.rest.conversion.user.LoginRequestModelToAuthenticationRequestVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.user.UpdateProfileRequestModelToUserVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.user.UserInitializeRequestModelToUserVOConverter;
@@ -57,6 +59,7 @@ public class UsersController {
     private static final String PATH_IDENTIFIED_USER = "/{id}";
     private static final String PATH_IDENTIFIED_USER_UPDATE_ROLE = "/{id}/role";
     private static final String PATH_IDENTIFIED_USER_UPDATE_PASSWORD = "/{id}/password";
+    private static final String PATH_CLAIM_TOKEN = "/claim";
     private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = "/{id}/profile";
 
     private static final String REQUESTED_USER_IS_NOT_EXISTING = "Requested user is not existing.";
@@ -65,6 +68,7 @@ public class UsersController {
     private static final String SERVICE_HAS_THROWN_AN_EXCEPTION = "Service has thrown an exception. See details:";
     private static final String USER_COULD_NOT_BE_CREATED = "User could not be created. See details:";
     private static final String USER_ACCOUNT_COULD_NOT_BE_CREATED = "Your user account could not be created. Please try again later!";
+    private static final String AUTHENTICATION_FAILED = "Authentication failed.";
 
     @Autowired
     private UserService userService;
@@ -86,6 +90,9 @@ public class UsersController {
 
     @Autowired
     private LoginRequestModelToAuthenticationRequestVOConverter loginRequestModelToAuthenticationRequestVOConverter;
+
+    @Autowired
+    private AuthResponseVOToLoginResponseDataModelConverter authResponseVOToLoginResponseDataModelConverter;
 
     @Autowired
     private ValidationErrorMessagesConverter validationErrorMessagesConverter;
@@ -289,13 +296,17 @@ public class UsersController {
      * @param loginRequestModel user's email and password
      * @return process status and if "sign-in" is successful, the generated token
      */
-    @RequestMapping(method = RequestMethod.POST, path = "/users/signin")
-    public BaseBodyDataModel claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel) {
+    @RequestMapping(method = RequestMethod.POST, path = PATH_CLAIM_TOKEN)
+    public BaseBodyDataModel claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel) throws TokenClaimException {
 
         AuthRequestVO requestModel = loginRequestModelToAuthenticationRequestVOConverter.convert(loginRequestModel);
         AuthResponseVO authenticationAnswer = userService.claimToken(requestModel);
 
-        return null;
+        if (authenticationAnswer.getAuthenticationResult() == AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS) {
+            throw new TokenClaimException();
+        }
+
+        return authResponseVOToLoginResponseDataModelConverter.convert(authenticationAnswer);
     }
 
     private void hashPassword(UserPasswordRequestModel userPasswordRequestModel) {

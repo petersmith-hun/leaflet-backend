@@ -2,8 +2,8 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.User;
+import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
-import hu.psprog.leaflet.security.jwt.util.JWTUtility;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
@@ -67,6 +67,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JWTComponent jwtComponent;
 
     @Autowired
     private RunLevel runLevel;
@@ -284,9 +287,8 @@ public class UserServiceImpl implements UserService {
         try {
             Authentication authentication = new UsernamePasswordAuthenticationToken(authRequestVO.getUsername(), authRequestVO.getPassword());
             authenticationManager.authenticate(authentication);
-            UserDetails userDetails = loadUserByUsername(String.valueOf(authentication.getPrincipal()));
-
-            JWTAuthenticationAnswerModel authenticationAnswer = JWTUtility.generateToken(userDetails);
+            UserDetails userDetails = loadUserByUsername(authRequestVO.getUsername());
+            JWTAuthenticationAnswerModel authenticationAnswer = jwtComponent.generateToken(userDetails);
 
             return builder
                     .withAuthenticationResult(AuthResponseVO.AuthenticationResult.AUTH_SUCCESS)
