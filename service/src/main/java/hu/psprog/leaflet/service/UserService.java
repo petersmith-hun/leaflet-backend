@@ -13,15 +13,13 @@ import hu.psprog.leaflet.service.vo.AuthRequestVO;
 import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * User service operations interface.
  *
  * @author Peter Smith
  */
-public interface UserService extends UserDetailsService,
-        CreateOperationCapableService<UserVO, Long>,
+public interface UserService extends CreateOperationCapableService<UserVO, Long>,
         ReadOperationCapableService<UserVO, Long>,
         UpdateOperationCapableService<UserVO, UserVO, Long>,
         DeleteOperationCapableService<UserVO, Long>,

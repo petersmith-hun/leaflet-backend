@@ -19,8 +19,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -97,33 +95,6 @@ public class UserServiceImplIT {
                 .withEmail(USER_ID6_EMAIL)
                 .withAuthorities(ADMIN_AUTHORITY)
                 .createUserVO();
-    }
-
-    @Test
-    @Transactional
-    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
-    public void testLoadByUsernameWithExistingUser() {
-
-        // when
-        UserDetails result = userService.loadUserByUsername(USER_ID1_EMAIL);
-
-        // then
-        assertThat(result.getUsername(), equalTo(USER_ID1_EMAIL));
-    }
-
-    @Test(expected = UsernameNotFoundException.class)
-    @Transactional
-    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
-    public void testLoadByUsernameWithNonExistingUser() {
-
-        // given
-        String email = "nonexisting@user.dev";
-
-        // when
-        userService.loadUserByUsername(email);
-
-        // then
-        // expected exception
     }
 
     @Test

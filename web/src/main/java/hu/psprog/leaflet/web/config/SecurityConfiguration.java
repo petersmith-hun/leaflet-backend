@@ -1,7 +1,8 @@
 package hu.psprog.leaflet.web.config;
 
+import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationProvider;
+import hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,9 +12,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Web Security configuration.
@@ -24,11 +27,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String USER_DETAILS_SERVICE_BEAN_NAME = "userServiceImpl";
+    private static final String PATH_USERS_CLAIM = "/users/claim";
+    private static final String PATH_USERS_REGISTER = "/users/register";
 
     @Autowired
-    @Qualifier(USER_DETAILS_SERVICE_BEAN_NAME)
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JWTAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,7 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider claimAuthenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -44,13 +50,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authenticationProvider;
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    @Bean
+    public AuthenticationProvider jwtAuthenticationProvider() {
 
-        auth.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder())
-            .and()
-            .authenticationProvider(authenticationProvider());
+        return new JWTAuthenticationProvider();
     }
 
     @Bean
@@ -60,13 +63,35 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+        auth
+            .authenticationProvider(claimAuthenticationProvider())
+            .authenticationProvider(jwtAuthenticationProvider());
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         // TODO temporary configuration - shall be changed during the implementation of LFLT-16!
-        http.authorizeRequests()
-                .anyRequest().permitAll()
+        http
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+            .authorizeRequests()
+                .antMatchers(PATH_USERS_CLAIM, PATH_USERS_REGISTER)
+                    .anonymous()
+                .anyRequest()
+                    .authenticated()
                 .and()
+
             .csrf()
-                .disable();
+                .disable()
+
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+
+            .anonymous()
+                .key(JWTAuthenticationFilter.ANONYMOUS_USERNAME);
     }
 }

@@ -30,7 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -48,10 +48,11 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final String USERNAME_NOT_FOUND_MESSAGE_PATTERN = "User identified by username [%s] not found";
-
     @Autowired
     private UserDAO userDAO;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private UserToUserVOConverter userToUserVOConverter;
@@ -73,33 +74,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RunLevel runLevel;
-
-    /**
-     * Loads a user by its email address (instead of username).
-     *
-     * @param email email address to load user by
-     * @return UserDetails object holding necessary user data
-     * @throws UsernameNotFoundException when no user found by specified email address
-     */
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-        User user = userDAO.findByEmail(email);
-
-        if(user == null) {
-            throw new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE_PATTERN, email));
-        }
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                user.isEnabled(),
-                user.isEnabled(),
-                user.isEnabled(),
-                user.isEnabled(),
-                Arrays.asList(roleToAuthorityConverter.convert(user.getRole()))
-        );
-    }
 
     @Override
     public UserVO getOne(Long userID) throws ServiceException {
@@ -287,7 +261,7 @@ public class UserServiceImpl implements UserService {
         try {
             Authentication authentication = new UsernamePasswordAuthenticationToken(authRequestVO.getUsername(), authRequestVO.getPassword());
             authenticationManager.authenticate(authentication);
-            UserDetails userDetails = loadUserByUsername(authRequestVO.getUsername());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(authRequestVO.getUsername());
             JWTAuthenticationAnswerModel authenticationAnswer = jwtComponent.generateToken(userDetails);
 
             return builder

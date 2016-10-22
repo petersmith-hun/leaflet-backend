@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -49,6 +50,9 @@ public class LeafletITContextConfig {
     public static final String ENTITY_PACKAGE = "hu.psprog.leaflet.persistence.entity";
     public static final String COMPONENT_SCAN_PACKAGE = "hu.psprog.leaflet.service";
     public static final String INTEGRATION_TEST_CONFIG_PROFILE = "it";
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Bean
     public DataSource dataSource() {
@@ -110,15 +114,10 @@ public class LeafletITContextConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceStub();
-    }
-
-    @Bean
     public AuthenticationProvider authenticationProvider() {
 
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setUserDetailsService(userDetailsService);
 
         return authenticationProvider;
     }

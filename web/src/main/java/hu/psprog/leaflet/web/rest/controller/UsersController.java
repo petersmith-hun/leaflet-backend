@@ -68,7 +68,6 @@ public class UsersController {
     private static final String SERVICE_HAS_THROWN_AN_EXCEPTION = "Service has thrown an exception. See details:";
     private static final String USER_COULD_NOT_BE_CREATED = "User could not be created. See details:";
     private static final String USER_ACCOUNT_COULD_NOT_BE_CREATED = "Your user account could not be created. Please try again later!";
-    private static final String AUTHENTICATION_FAILED = "Authentication failed.";
 
     @Autowired
     private UserService userService;
