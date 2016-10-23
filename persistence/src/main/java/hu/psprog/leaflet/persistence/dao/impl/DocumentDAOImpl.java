@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -35,6 +36,7 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
         return ((DocumentRepository) jpaRepository).findByLink(link);
     }
 
+    @Transactional
     @Override
     public Document updateOne(Long id, Document updatedEntity) {
 

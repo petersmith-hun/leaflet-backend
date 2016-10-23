@@ -9,17 +9,17 @@ import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
+import hu.psprog.leaflet.service.vo.AuthRequestVO;
+import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * User service operations interface.
  *
  * @author Peter Smith
  */
-public interface UserService extends UserDetailsService,
-        CreateOperationCapableService<UserVO, Long>,
+public interface UserService extends CreateOperationCapableService<UserVO, Long>,
         ReadOperationCapableService<UserVO, Long>,
         UpdateOperationCapableService<UserVO, UserVO, Long>,
         DeleteOperationCapableService<UserVO, Long>,
@@ -51,4 +51,12 @@ public interface UserService extends UserDetailsService,
      * @param grantedAuthority new granted authority
      */
     public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException;
+
+    /**
+     * Requests JWT token for given user (identified by {@link AuthRequestVO}).
+     *
+     * @param authRequestVO user data
+     * @return claim result (status and token if successful)
+     */
+    public AuthResponseVO claimToken(AuthRequestVO authRequestVO);
 }

@@ -1,11 +1,12 @@
 package hu.psprog.leaflet.service.impl;
 
+import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
+import hu.psprog.leaflet.service.converter.RoleToAuthorityConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -21,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.lang.reflect.Field;
 
@@ -53,6 +53,9 @@ public class UserServiceImplTest {
     @Mock
     private AuthorityToRoleConverter authorityToRoleConverter;
 
+    @Mock
+    private RoleToAuthorityConverter roleToAuthorityConverter;
+
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -66,36 +69,6 @@ public class UserServiceImplTest {
     public void setup() {
         userVO = userVOTestDataGenerator.generate();
         user = userEntityTestDataGenerator.generate();
-    }
-
-    @Test
-    public void testLoadByUsernameWithSuccess() {
-
-        // given
-        String email = user.getEmail();
-        given(userDAO.findByEmail(email)).willReturn(user);
-
-        // when
-        userService.loadUserByUsername(email);
-
-        // then
-        verify(userDAO).findByEmail(email);
-        verify(userToUserVOConverter).convert(user);
-    }
-
-    @Test(expected = UsernameNotFoundException.class)
-    public void testLoadByUsernameWithException() {
-
-        // given
-        String email = user.getEmail();
-        given(userDAO.findByEmail(email)).willReturn(null);
-
-        // when
-        userService.loadUserByUsername(email);
-
-        // then
-        // expected exception
-        verify(userToUserVOConverter, never()).convert(user);
     }
 
     @Test(expected = EntityNotFoundException.class)

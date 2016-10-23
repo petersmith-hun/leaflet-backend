@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -37,6 +38,7 @@ public class AttachmentDAOImpl extends SelfStatusAwareDAOImpl<Attachment, Long> 
                 .and(AttachmentSpecification.isOwnedByEntry(entry)));
     }
 
+    @Transactional
     @Override
     public Attachment updateOne(Long id, Attachment updatedEntity) {
 

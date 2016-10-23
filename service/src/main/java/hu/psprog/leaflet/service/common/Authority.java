@@ -10,11 +10,34 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  */
 public interface Authority {
 
-    public static final GrantedAuthority ADMIN = new SimpleGrantedAuthority("ADMIN");
+    enum AuthorityName {
+        ADMIN,
+        USER,
+        EDITOR,
+        SERVICE
+    }
 
-    public static final GrantedAuthority USER = new SimpleGrantedAuthority("USER");
+    GrantedAuthority ADMIN = new SimpleGrantedAuthority(AuthorityName.ADMIN.name());
 
-    public static final GrantedAuthority EDITOR = new SimpleGrantedAuthority("EDITOR");
+    GrantedAuthority USER = new SimpleGrantedAuthority(AuthorityName.USER.name());
 
-    public static final GrantedAuthority SERVICE = new SimpleGrantedAuthority("SERVICE");
+    GrantedAuthority EDITOR = new SimpleGrantedAuthority(AuthorityName.EDITOR.name());
+
+    GrantedAuthority SERVICE = new SimpleGrantedAuthority(AuthorityName.SERVICE.name());
+
+    static GrantedAuthority getAuthorityByName(String authorityName) {
+
+        switch (Authority.AuthorityName.valueOf(authorityName)) {
+            case ADMIN:
+                return Authority.ADMIN;
+            case USER:
+                return Authority.USER;
+            case EDITOR:
+                return Authority.EDITOR;
+            case SERVICE:
+                return Authority.SERVICE;
+            default:
+                return Authority.USER;
+        }
+    }
 }

@@ -1,12 +1,15 @@
 package hu.psprog.leaflet.service.impl;
 
-import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.dao.UserDAO;
+import hu.psprog.leaflet.persistence.entity.User;
+import hu.psprog.leaflet.security.jwt.JWTComponent;
+import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
+import hu.psprog.leaflet.service.converter.RoleToAuthorityConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -14,14 +17,20 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.util.PageableUtil;
+import hu.psprog.leaflet.service.vo.AuthRequestVO;
+import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -39,10 +48,11 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final String USERNAME_NOT_FOUND_MESSAGE_PATTERN = "User identified by username [%s] not found";
-
     @Autowired
     private UserDAO userDAO;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private UserToUserVOConverter userToUserVOConverter;
@@ -54,26 +64,16 @@ public class UserServiceImpl implements UserService {
     private AuthorityToRoleConverter authorityToRoleConverter;
 
     @Autowired
+    private RoleToAuthorityConverter roleToAuthorityConverter;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JWTComponent jwtComponent;
+
+    @Autowired
     private RunLevel runLevel;
-
-    /**
-     * Loads a user by its email address (instead of username).
-     *
-     * @param email email address to load user by
-     * @return UserDetails object holding necessary user data
-     * @throws UsernameNotFoundException when no user found by specified email address
-     */
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-        User user = userDAO.findByEmail(email);
-
-        if(user == null) {
-            throw new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE_PATTERN, email));
-        }
-
-        return userToUserVOConverter.convert(user);
-    }
 
     @Override
     public UserVO getOne(Long userID) throws ServiceException {
@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService {
             throw new EntityCreationException(User.class);
         }
 
-        return user.getId();
+        return savedUser.getId();
     }
 
     @Override
@@ -224,7 +224,6 @@ public class UserServiceImpl implements UserService {
         userDAO.updateRole(id, authorityToRoleConverter.convert(grantedAuthority));
     }
 
-
     @Override
     public EntityPageVO<UserVO> getEntityPage(int page, int limit, OrderDirection direction, UserVO.OrderBy orderBy) {
 
@@ -244,6 +243,7 @@ public class UserServiceImpl implements UserService {
         userDAO.enable(id);
     }
 
+
     @Override
     public void disable(Long id) throws EntityNotFoundException {
 
@@ -252,5 +252,28 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.disable(id);
+    }
+
+    @Override
+    public AuthResponseVO claimToken(AuthRequestVO authRequestVO) {
+
+        AuthResponseVO.Builder builder = new AuthResponseVO.Builder();
+        try {
+            Authentication authentication = new UsernamePasswordAuthenticationToken(authRequestVO.getUsername(), authRequestVO.getPassword());
+            authenticationManager.authenticate(authentication);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(authRequestVO.getUsername());
+            JWTAuthenticationAnswerModel authenticationAnswer = jwtComponent.generateToken(userDetails);
+
+            return builder
+                    .withAuthenticationResult(AuthResponseVO.AuthenticationResult.AUTH_SUCCESS)
+                    .withToken(authenticationAnswer.getToken())
+                    .createAuthResponseVO();
+
+        } catch (AuthenticationException exception) {
+
+            return builder
+                    .withAuthenticationResult(AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS)
+                    .createAuthResponseVO();
+        }
     }
 }

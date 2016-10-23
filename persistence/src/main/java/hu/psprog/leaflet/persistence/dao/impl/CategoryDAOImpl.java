@@ -5,6 +5,7 @@ import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -21,6 +22,7 @@ public class CategoryDAOImpl extends SelfStatusAwareDAOImpl<Category, Long> impl
         super(categoryRepository);
     }
 
+    @Transactional
     @Override
     public Category updateOne(Long id, Category updatedEntity) {
 

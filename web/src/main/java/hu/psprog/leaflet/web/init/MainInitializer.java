@@ -22,7 +22,7 @@ public class MainInitializer implements WebApplicationInitializer {
     public static final String FILTER_MAP_ALL_URL = "/*";
     public static final String FILTER_SPRING_SECURITY = "springSecurityFilterChain";
     public static final String SERVLET_NAME = "rest-mvc-dispatcher";
-    public static final String SERVLET_MAPPING = "/api";
+    public static final String SERVLET_MAPPING = "/";
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
