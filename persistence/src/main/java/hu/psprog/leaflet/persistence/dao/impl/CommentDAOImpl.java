@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -44,6 +45,7 @@ public class CommentDAOImpl extends SelfStatusAwareDAOImpl<Comment, Long> implem
         return ((CommentRepository) jpaRepository).findByUser(pageable, user);
     }
 
+    @Transactional
     @Override
     public Comment updateOne(Long id, Comment updatedEntity) {
 

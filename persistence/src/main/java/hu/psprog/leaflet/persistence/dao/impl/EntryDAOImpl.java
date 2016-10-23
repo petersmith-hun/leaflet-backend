@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -54,6 +55,7 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
         return ((JpaSpecificationExecutor<Entry>) jpaRepository).findAll(specification, pageable);
     }
 
+    @Transactional
     @Override
     public Entry updateOne(Long id, Entry updatedEntity) {
 

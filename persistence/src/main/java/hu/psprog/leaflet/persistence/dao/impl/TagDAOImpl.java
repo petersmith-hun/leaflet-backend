@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,7 @@ public class TagDAOImpl extends SelfStatusAwareDAOImpl<Tag, Long> implements Tag
         return ((JpaSpecificationExecutor) jpaRepository).findAll(specification);
     }
 
+    @Transactional
     @Override
     public Tag updateOne(Long id, Tag updatedEntity) {
 

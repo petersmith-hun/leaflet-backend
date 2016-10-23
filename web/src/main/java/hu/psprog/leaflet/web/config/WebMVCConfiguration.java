@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.web.interceptor.ResponseWrapperInterceptor;
 import hu.psprog.leaflet.web.rest.mapper.AutoWrappingJacksonHttpMessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,12 @@ public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
     @Bean
     public HttpMessageConverter<?> autoWrappingJacksonHttpMessageConverter() {
         return new AutoWrappingJacksonHttpMessageConverter();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+
+        return new ObjectMapper();
     }
 
     @Override

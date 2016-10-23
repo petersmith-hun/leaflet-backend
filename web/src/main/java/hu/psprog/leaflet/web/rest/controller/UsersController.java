@@ -55,13 +55,15 @@ public class UsersController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
 
     private static final String PATH_VARIABLE_USER_ID = "id";
+
     private static final String PATH_INIT = "/init";
     private static final String PATH_IDENTIFIED_USER = "/{id}";
     private static final String PATH_IDENTIFIED_USER_UPDATE_ROLE = "/{id}/role";
     private static final String PATH_IDENTIFIED_USER_UPDATE_PASSWORD = "/{id}/password";
     private static final String PATH_CLAIM_TOKEN = "/claim";
-    private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = "/{id}/profile";
+    private static final String PATH_REGISTER = "/register";
 
+    private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = "/{id}/profile";
     private static final String REQUESTED_USER_IS_NOT_EXISTING = "Requested user is not existing.";
     private static final String INITIALIZATION_FAILED_SEE_DETAILS = "Initialization failed. See details:";
     private static final String INITIALIZATION_IS_NOT_AVAILABLE_NOW = "Initialization is not available now.";
@@ -201,6 +203,7 @@ public class UsersController {
      * @throws ResourceNotFoundException when no user exists identified by the given ID
      */
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_IDENTIFIED_USER)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable(PATH_VARIABLE_USER_ID) Long id) throws ResourceNotFoundException {
 
         try {
@@ -306,6 +309,34 @@ public class UsersController {
         }
 
         return authResponseVOToLoginResponseDataModelConverter.convert(authenticationAnswer);
+    }
+
+    /**
+     * POST /users/register
+     * Public registration endpoints for visitors.
+     *
+     * @param userInitializeRequestModel user data
+     * @param bindingResult validation results
+     * @return created user's data
+     */
+    @RequestMapping(method = RequestMethod.POST, path = PATH_REGISTER)
+    public BaseBodyDataModel signUp(@RequestBody @Valid UserInitializeRequestModel userInitializeRequestModel,
+                                    BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
+
+        if (bindingResult.hasErrors()) {
+            return validationErrorMessagesConverter.convert(bindingResult.getAllErrors());
+        } else {
+            try {
+                hashPassword(userInitializeRequestModel);
+                Long userID = userService.createOne(userInitializeRequestModelToUserVOConverter.convert(userInitializeRequestModel));
+                UserVO createdUser = userService.getOne(userID);
+
+                return userVOToExtendedUserDataModelEntityConverter.convert(createdUser);
+            } catch (ServiceException e) {
+                LOGGER.error(USER_COULD_NOT_BE_CREATED, e);
+                throw new RequestCouldNotBeFulfilledException(USER_ACCOUNT_COULD_NOT_BE_CREATED);
+            }
+        }
     }
 
     private void hashPassword(UserPasswordRequestModel userPasswordRequestModel) {

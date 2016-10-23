@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * User repository interface for Hibernate JPA persistence manager.
@@ -29,6 +30,7 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
      * @param id identifier of {@link User}
      * @param password new password
      */
+    @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.password = :password WHERE u.id = :id")
     public void updatePassword(@Param("id") Long id, @Param("password") String password);
@@ -39,6 +41,7 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
      * @param id identifier of {@link User}
      * @param role new role
      */
+    @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.role = :role WHERE u.id = :id")
     public void updateRole(@Param("id") Long id, @Param("role") Role role);

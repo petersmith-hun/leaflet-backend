@@ -6,6 +6,7 @@ import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -24,19 +25,20 @@ public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements U
 
     @Override
     public User findByEmail(String email) {
-        return ((UserRepository )jpaRepository).findByEmail(email);
+        return ((UserRepository) jpaRepository).findByEmail(email);
     }
 
     @Override
     public void updatePassword(Long id, String password) {
-        ((UserRepository )jpaRepository).updatePassword(id, password);
+        ((UserRepository) jpaRepository).updatePassword(id, password);
     }
 
     @Override
     public void updateRole(Long id, Role role) {
-        ((UserRepository )jpaRepository).updateRole(id, role);
+        ((UserRepository) jpaRepository).updateRole(id, role);
     }
 
+    @Transactional
     @Override
     public User updateOne(Long id, User updatedEntity) {
 

@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.config;
 
 import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationProvider;
 import hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter;
+import hu.psprog.leaflet.web.rest.handler.RESTAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -57,6 +59,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
+    AuthenticationEntryPoint restAuthenticationEntryPoint() {
+
+        return new RESTAuthenticationEntryPoint();
+    }
+
+    @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
@@ -89,6 +97,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
             .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+
+            .exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint())
                 .and()
 
             .anonymous()
