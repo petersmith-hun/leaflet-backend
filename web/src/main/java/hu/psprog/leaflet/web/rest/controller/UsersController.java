@@ -47,23 +47,18 @@ import javax.validation.Valid;
  * @author Peter Smith
  */
 @RestController
-@RequestMapping(UsersController.BASE_MAPPING)
-public class UsersController {
-
-    static final String BASE_MAPPING = "/users";
+@RequestMapping(BaseController.BASE_PATH_USERS)
+public class UsersController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
 
-    private static final String PATH_VARIABLE_USER_ID = "id";
-
     private static final String PATH_INIT = "/init";
-    private static final String PATH_IDENTIFIED_USER = "/{id}";
-    private static final String PATH_IDENTIFIED_USER_UPDATE_ROLE = "/{id}/role";
-    private static final String PATH_IDENTIFIED_USER_UPDATE_PASSWORD = "/{id}/password";
+    private static final String PATH_IDENTIFIED_USER_UPDATE_ROLE = PATH_PART_ID + "/role";
+    private static final String PATH_IDENTIFIED_USER_UPDATE_PASSWORD = PATH_PART_ID + "/password";
     private static final String PATH_CLAIM_TOKEN = "/claim";
     private static final String PATH_REGISTER = "/register";
+    private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = PATH_PART_ID + "/profile";
 
-    private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = "/{id}/profile";
     private static final String REQUESTED_USER_IS_NOT_EXISTING = "Requested user is not existing.";
     private static final String INITIALIZATION_FAILED_SEE_DETAILS = "Initialization failed. See details:";
     private static final String INITIALIZATION_IS_NOT_AVAILABLE_NOW = "Initialization is not available now.";
@@ -183,8 +178,8 @@ public class UsersController {
      * @return user's data
      * @throws ResourceNotFoundException when no user exists identified by the given ID
      */
-    @RequestMapping(method = RequestMethod.GET, path = PATH_IDENTIFIED_USER)
-    public BaseBodyDataModel getUserByID(@PathVariable(PATH_VARIABLE_USER_ID) Long id) throws ResourceNotFoundException {
+    @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
+    public BaseBodyDataModel getUserByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             UserVO userVO = userService.getOne(id);
@@ -202,9 +197,9 @@ public class UsersController {
      * @param id ID of an existing user
      * @throws ResourceNotFoundException when no user exists identified by the given ID
      */
-    @RequestMapping(method = RequestMethod.DELETE, path = PATH_IDENTIFIED_USER)
+    @RequestMapping(method = RequestMethod.DELETE, path = PATH_PART_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUser(@PathVariable(PATH_VARIABLE_USER_ID) Long id) throws ResourceNotFoundException {
+    public void deleteUser(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             UserVO userVO = userService.getOne(id);
@@ -225,7 +220,7 @@ public class UsersController {
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_ROLE)
     @ResponseStatus(HttpStatus.CREATED)
-    public BaseBodyDataModel updateRole(@PathVariable(PATH_VARIABLE_USER_ID) Long id,
+    public BaseBodyDataModel updateRole(@PathVariable(PATH_VARIABLE_ID) Long id,
                                         @RequestBody @Valid UpdateRoleRequestModel updateRoleRequestModel)
             throws ResourceNotFoundException {
 
@@ -250,7 +245,7 @@ public class UsersController {
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PROFILE)
     @ResponseStatus(HttpStatus.CREATED)
-    public BaseBodyDataModel updateProfile(@PathVariable(PATH_VARIABLE_USER_ID) Long id,
+    public BaseBodyDataModel updateProfile(@PathVariable(PATH_VARIABLE_ID) Long id,
                                            @RequestBody @Valid UpdateProfileRequestModel updateProfileRequestModel)
             throws ResourceNotFoundException {
 
@@ -275,7 +270,7 @@ public class UsersController {
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PASSWORD)
     @ResponseStatus(HttpStatus.CREATED)
-    public BaseBodyDataModel updatePassword(@PathVariable(PATH_VARIABLE_USER_ID) Long id,
+    public BaseBodyDataModel updatePassword(@PathVariable(PATH_VARIABLE_ID) Long id,
                                             @RequestBody @Valid UserPasswordRequestModel userPasswordRequestModel)
             throws ResourceNotFoundException {
 

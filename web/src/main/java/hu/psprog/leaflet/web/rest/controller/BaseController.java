@@ -24,6 +24,19 @@ public class BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
+    static final String BASE_PATH_USERS = "/users";
+    static final String BASE_PATH_ENTRIES = "/entries";
+
+    static final String PATH_VARIABLE_ID = "id";
+    static final String PATH_VARIABLE_PAGE = "page";
+    static final String PATH_VARIABLE_LINK = "link";
+    static final String PATH_VARIABLE_STATUS = "status";
+
+    static final String PATH_PART_ID = "/{id}";
+    static final String PATH_PART_PAGE = "/{page}";
+    static final String PATH_PART_LINK = "/{link}";
+    static final String PATH_PART_STATUS = "/{status}";
+
     /**
      * HTTP 404 exception handler.
      */
