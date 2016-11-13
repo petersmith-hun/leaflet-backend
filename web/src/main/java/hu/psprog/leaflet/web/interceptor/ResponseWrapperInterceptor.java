@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.interceptor;
 
 import hu.psprog.leaflet.web.annotation.AJAXRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -14,6 +15,7 @@ import java.util.Objects;
  *
  * @author Peter Smith
  */
+@Component
 public class ResponseWrapperInterceptor extends HandlerInterceptorAdapter {
 
     @Override

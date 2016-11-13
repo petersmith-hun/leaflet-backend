@@ -31,12 +31,12 @@ public class BaseController {
     static final String PATH_VARIABLE_ID = "id";
     static final String PATH_VARIABLE_PAGE = "page";
     static final String PATH_VARIABLE_LINK = "link";
-    static final String PATH_VARIABLE_STATUS = "status";
 
     static final String PATH_PART_ID = "/{id}";
     static final String PATH_PART_PAGE = "/{page}";
     static final String PATH_PART_LINK = "/{link}";
-    static final String PATH_PART_STATUS = "/{status}";
+
+    static final String PATH_CHANGE_STATUS = PATH_PART_ID + "/status";
 
     static final String REQUEST_PARAMETER_LIMIT = "limit";
     static final String REQUEST_PARAMETER_ORDER_BY = "orderBy";

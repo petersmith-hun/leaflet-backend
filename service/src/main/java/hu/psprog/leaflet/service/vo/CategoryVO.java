@@ -40,6 +40,12 @@ public class CategoryVO extends SelfStatusAwareIdentifiableVO<Long, Category> {
         this.description = description;
     }
 
+    public static CategoryVO wrapMinimumVO(Long id) {
+        return new Builder()
+                .withId(id)
+                .createCategoryVO();
+    }
+
     /**
      * CategoryVO builder.
      */
