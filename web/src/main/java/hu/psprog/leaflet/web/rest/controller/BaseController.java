@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
 import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
@@ -7,23 +8,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Exception handlers.
+ * Exception handlers, common constants and operations.
  *
  * @author Peter Smith
  */
-@ControllerAdvice
-@ResponseBody
 public class BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
+
+    private static final String BODY = "body";
 
     static final String BASE_PATH_USERS = "/users";
     static final String BASE_PATH_ENTRIES = "/entries";
@@ -54,13 +54,13 @@ public class BaseController {
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorMessageDataModel resourceNotFoundExceptionHandler(HttpServletRequest request, Exception exception) {
+    public ModelAndView resourceNotFoundExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Requested resource is not available.", exception);
 
-        return new ErrorMessageDataModel.Builder()
+        return wrap(new ErrorMessageDataModel.Builder()
                 .withMessage(exception.getMessage())
-                .build();
+                .build());
     }
 
     /**
@@ -68,13 +68,13 @@ public class BaseController {
      */
     @ExceptionHandler(AuthenticationFailureException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorMessageDataModel authenticationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
+    public ModelAndView authenticationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Exception thrown during user authentication.", exception);
 
-        return new ErrorMessageDataModel.Builder()
+        return wrap(new ErrorMessageDataModel.Builder()
                 .withMessage(exception.getMessage())
-                .build();
+                .build());
     }
 
     /**
@@ -82,12 +82,27 @@ public class BaseController {
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorMessageDataModel defaultExceptionHandler(HttpServletRequest request, Exception exception) {
+    public ModelAndView defaultExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Default handler caught exception.", exception);
 
-        return new ErrorMessageDataModel.Builder()
+        return wrap(new ErrorMessageDataModel.Builder()
                 .withMessage(exception.getMessage())
-                .build();
+                .build());
+    }
+
+    /**
+     * Wraps controllers answer into {@link ModelAndView} object.
+     * Answer will be stored under BODY key.
+     *
+     * @param answer raw answer of controller
+     * @return wrapped answer
+     */
+    protected ModelAndView wrap(BaseBodyDataModel answer) {
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(BODY, answer);
+
+        return modelAndView;
     }
 }
