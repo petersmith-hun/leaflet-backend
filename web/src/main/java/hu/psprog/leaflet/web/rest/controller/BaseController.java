@@ -5,6 +5,7 @@ import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,6 +37,17 @@ public class BaseController {
     static final String PATH_PART_PAGE = "/{page}";
     static final String PATH_PART_LINK = "/{link}";
     static final String PATH_PART_STATUS = "/{status}";
+
+    static final String REQUEST_PARAMETER_LIMIT = "limit";
+    static final String REQUEST_PARAMETER_ORDER_BY = "orderBy";
+    static final String REQUEST_PARAMETER_ORDER_DIRECTION = "orderDirection";
+
+    static final String PAGINATION_DEFAULT_LIMIT = "10";
+    static final String PAGINATION_DEFAULT_ORDER_BY = "CREATED";
+    static final String PAGINATION_DEFAULT_ORDER_DIRECTION = "ASC";
+
+    @Autowired
+    protected HttpServletRequest httpServletRequest;
 
     /**
      * HTTP 404 exception handler.
