@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.web.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hu.psprog.leaflet.web.interceptor.ResponseWrapperInterceptor;
+import hu.psprog.leaflet.web.interceptor.ResponseFillerInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
     public static final String IS_AJAX_REQUEST = "isAjax";
 
     @Autowired
-    private ResponseWrapperInterceptor responseWrapperInterceptor;
+    private ResponseFillerInterceptor responseFillerInterceptor;
 
     @Bean
     public ObjectMapper objectMapper() {
@@ -43,7 +43,7 @@ public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(responseWrapperInterceptor);
+        registry.addInterceptor(responseFillerInterceptor);
         super.addInterceptors(registry);
     }
 }

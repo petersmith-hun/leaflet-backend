@@ -2,6 +2,8 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
+import hu.psprog.leaflet.api.rest.response.common.PaginationDataModel;
+import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public class BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
     private static final String BODY = "body";
+    private static final String REQUEST_PARAMETER_PAGINATION = "pagination";
 
     static final String BASE_PATH_USERS = "/users";
     static final String BASE_PATH_ENTRIES = "/entries";
@@ -89,6 +92,22 @@ public class BaseController {
         return wrap(new ErrorMessageDataModel.Builder()
                 .withMessage(exception.getMessage())
                 .build());
+    }
+
+    protected void fillPagination(EntityPageVO entityPageVO) {
+
+        PaginationDataModel paginationDataModel = new PaginationDataModel.Builder()
+                .withEntityCount(entityPageVO.getEntityCount())
+                .withEntityCountOnPage(entityPageVO.getEntityCountOnPage())
+                .withPageCount(entityPageVO.getPageCount())
+                .withPageNumber(entityPageVO.getPageNumber())
+                .withIsFirst(entityPageVO.isFirst())
+                .withIsLast(entityPageVO.isLast())
+                .withHasNext(entityPageVO.hasNext())
+                .withHasPrevious(entityPageVO.hasPrevious())
+                .build();
+
+        httpServletRequest.setAttribute(REQUEST_PARAMETER_PAGINATION, paginationDataModel);
     }
 
     /**

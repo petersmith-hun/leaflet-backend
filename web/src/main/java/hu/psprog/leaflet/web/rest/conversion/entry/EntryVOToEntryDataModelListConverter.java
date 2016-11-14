@@ -15,7 +15,7 @@ import java.util.List;
  * @author Peter Smith
  */
 @Component
-public class EntryVOToEntryDataModelListConveter implements Converter<List<EntryVO>, BaseBodyDataModel> {
+public class EntryVOToEntryDataModelListConverter implements Converter<List<EntryVO>, BaseBodyDataModel> {
 
     private static final String LIST_NODE_NAME = "entries";
 

@@ -3,11 +3,16 @@ package hu.psprog.leaflet.web.rest.controller;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.service.EntryService;
+import hu.psprog.leaflet.service.common.OrderDirection;
+import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
+import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryCreateRequestModelToEntryVOConverter;
+import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEntryDataModelListConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToExtendedEntryDataModelEntityConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +46,8 @@ public class EntriesController extends BaseController {
 
     private static final String ENTRY_COULD_NOT_BE_CREATED = "Entry could not be created. See details: ";
     private static final String BLOG_ENTRY_COULD_NOT_BE_CREATED = "Blog entry could not be created, please try again later!";
+    private static final String THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING = "The entry you are looking for is not existing.";
+    private static final String REQUESTED_ENTRY_NOT_FOUND = "Requested entry not found";
 
     @Autowired
     private EntryService entryService;
@@ -53,6 +60,9 @@ public class EntriesController extends BaseController {
 
     @Autowired
     private EntryVOToExtendedEntryDataModelEntityConverter entryVOToExtendedEntryDataModelEntityConverter;
+
+    @Autowired
+    private EntryVOToEntryDataModelListConverter entryVOToEntryDataModelListConverter;
 
     /**
      * GET /entries
@@ -82,7 +92,10 @@ public class EntriesController extends BaseController {
                                                     @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
                                                     @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        return null;
+        EntityPageVO<EntryVO> entryPage = entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
+        fillPagination(entryPage);
+
+        return wrap(entryVOToEntryDataModelListConverter.convert(entryPage.getEntitiesOnPage()));
     }
 
     /**
@@ -93,9 +106,16 @@ public class EntriesController extends BaseController {
      * @return identified entry
      */
     @RequestMapping(method = RequestMethod.GET, value = PATH_ENTRY_BY_LINK)
-    public ModelAndView getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link) {
+    public ModelAndView getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
 
-        return null;
+        try {
+            EntryVO entryVO = entryService.findByLink(link);
+
+            return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
+        } catch (EntityNotFoundException e) {
+            LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
+            throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
+        }
     }
 
     /**
