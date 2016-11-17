@@ -68,7 +68,9 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
             currentEntry.setSeoDescription(updatedEntity.getSeoDescription());
             currentEntry.setSeoKeywords(updatedEntity.getSeoKeywords());
             currentEntry.setLink(updatedEntity.getLink());
+            currentEntry.setCategory(updatedEntity.getCategory());
             currentEntry.setLastModified(new Date());
+            currentEntry.setStatus(updatedEntity.getStatus());
             jpaRepository.flush();
         }
 

@@ -21,7 +21,7 @@
         <java.version>1.8</java.version>
 
         <!-- leaflet internal dependency versions -->
-        <leaflet.rest-api.version>0.1.10</leaflet.rest-api.version>
+        <leaflet.rest-api.version>0.2.1</leaflet.rest-api.version>
         <leaflet.jwt-component.version>1.4</leaflet.jwt-component.version>
         
         <!-- Spring versions -->

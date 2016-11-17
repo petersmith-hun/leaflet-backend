@@ -24,7 +24,7 @@ public class EntityPageVO<T extends BaseVO> {
                         List<T> entitiesOnPage, boolean first, boolean last, boolean hasNext, boolean hasPrevious) {
         this.entityCount = entityCount;
         this.pageCount = pageCount;
-        this.pageNumber = pageNumber;
+        this.pageNumber = pageNumber + 1;
         this.pageSize = pageSize;
         this.entityCountOnPage = entityCountOnPage;
         this.entitiesOnPage = entitiesOnPage;

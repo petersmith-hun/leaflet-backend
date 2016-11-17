@@ -121,6 +121,12 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> {
         this.lastLogin = lastLogin;
     }
 
+    public static UserVO wrapMinimumVO(Long id) {
+        return new Builder()
+                .withId(id)
+                .createUserVO();
+    }
+
     public static class Builder {
 
         private Long id;

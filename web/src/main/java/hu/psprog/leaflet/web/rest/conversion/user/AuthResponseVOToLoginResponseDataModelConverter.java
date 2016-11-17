@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.web.rest.conversion.user;
 
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.entity.LoginResponseDataModel;
+import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

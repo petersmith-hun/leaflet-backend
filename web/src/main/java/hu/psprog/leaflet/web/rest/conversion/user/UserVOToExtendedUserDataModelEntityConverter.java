@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.web.rest.conversion.user;
 
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.entity.ExtendedUserDataModel;
+import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
