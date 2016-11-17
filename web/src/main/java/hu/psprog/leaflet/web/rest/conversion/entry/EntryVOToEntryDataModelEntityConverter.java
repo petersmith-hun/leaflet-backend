@@ -29,6 +29,7 @@ public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO
     public BaseBodyDataModel convert(EntryVO entryVO) {
 
         EntryDataModel.Builder builder = new EntryDataModel.Builder()
+                .withID(entryVO.getId())
                 .withTitle(entryVO.getTitle())
                 .withLink(entryVO.getLink())
                 .withPrologue(entryVO.getPrologue())

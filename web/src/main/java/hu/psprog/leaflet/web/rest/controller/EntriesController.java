@@ -11,7 +11,7 @@ import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
-import hu.psprog.leaflet.web.rest.conversion.entry.EntryCreateRequestModelToEntryVOConverter;
+import hu.psprog.leaflet.web.rest.conversion.entry.EntryUpdateRequestModelToEntryVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEntryDataModelListConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToExtendedEntryDataModelEntityConverter;
 import org.slf4j.Logger;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * REST controller for blog entry related entry points.
@@ -43,6 +44,7 @@ public class EntriesController extends BaseController {
 
     private static final String PATH_PAGE_OF_ENTRIES = "/page" + PATH_PART_PAGE;
     private static final String PATH_ENTRY_BY_LINK = "/link" + PATH_PART_LINK;
+    private static final String PATH_CHANGE_PUBLICITY = PATH_PART_ID + "/publicity";
 
     private static final String ENTRY_COULD_NOT_BE_CREATED = "Entry could not be created. See details: ";
     private static final String BLOG_ENTRY_COULD_NOT_BE_CREATED = "Blog entry could not be created, please try again later!";
@@ -56,7 +58,7 @@ public class EntriesController extends BaseController {
     private ValidationErrorMessagesConverter validationErrorMessagesConverter;
 
     @Autowired
-    private EntryCreateRequestModelToEntryVOConverter entryCreateRequestModelToEntryVOConverter;
+    private EntryUpdateRequestModelToEntryVOConverter entryUpdateRequestModelToEntryVOConverter;
 
     @Autowired
     private EntryVOToExtendedEntryDataModelEntityConverter entryVOToExtendedEntryDataModelEntityConverter;
@@ -73,7 +75,9 @@ public class EntriesController extends BaseController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView getAllEntries() {
 
-        return null;
+        List<EntryVO> entries = entryService.getAll();
+
+        return wrap(entryVOToEntryDataModelListConverter.convert(entries));
     }
 
     /**
@@ -126,9 +130,16 @@ public class EntriesController extends BaseController {
      * @return identified entry
      */
     @RequestMapping(method = RequestMethod.GET, value = PATH_PART_ID)
-    public ModelAndView getEntryByID(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) {
+    public ModelAndView getEntryByID(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
-        return null;
+        try {
+            EntryVO entryVO = entryService.getOne(id);
+
+            return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
+        } catch (ServiceException e) {
+            LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
+            throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
+        }
     }
 
     /**
@@ -148,7 +159,7 @@ public class EntriesController extends BaseController {
             return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
         } else {
             try {
-                Long entryID = entryService.createOne(entryCreateRequestModelToEntryVOConverter.convert(entryCreateRequestModel));
+                Long entryID = entryService.createOne(entryUpdateRequestModelToEntryVOConverter.convert(entryCreateRequestModel));
                 EntryVO createdEntry = entryService.getOne(entryID);
 
                 return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(createdEntry));
@@ -171,9 +182,21 @@ public class EntriesController extends BaseController {
     @RequestMapping(method = RequestMethod.PUT, value = PATH_PART_ID)
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView updateEntry(@PathVariable(PATH_VARIABLE_ID) Long id,
-                                    @RequestBody @Valid EntryUpdateRequestModel entryUpdateRequestModel, BindingResult bindingResult) {
+                                    @RequestBody @Valid EntryUpdateRequestModel entryUpdateRequestModel, BindingResult bindingResult) throws ResourceNotFoundException {
 
-        return null;
+        if (bindingResult.hasErrors()) {
+            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+        } else {
+            try {
+                entryService.updateOne(id, entryUpdateRequestModelToEntryVOConverter.convert(entryUpdateRequestModel));
+                EntryVO entryVO = entryService.getOne(id);
+
+                return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
+            } catch (ServiceException e) {
+                LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
+                throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
+            }
+        }
     }
 
     /**
@@ -185,9 +208,22 @@ public class EntriesController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_CHANGE_STATUS)
     @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) {
+    public ModelAndView changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
-        return null;
+        try {
+            EntryVO entryVO = entryService.getOne(id);
+            if (entryVO.isEnabled()) {
+                entryService.disable(id);
+            } else {
+                entryService.enable(id);
+            }
+            EntryVO updatedEntryVO = entryService.getOne(id);
+
+            return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(updatedEntryVO));
+        } catch (ServiceException e) {
+            LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
+            throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
+        }
     }
 
     /**
@@ -198,8 +234,14 @@ public class EntriesController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.DELETE, value = PATH_PART_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteEntry(@PathVariable(PATH_VARIABLE_ID) Long id) {
+    public void deleteEntry(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
-
+        try {
+            EntryVO entryVO = entryService.getOne(id);
+            entryService.deleteByEntity(entryVO);
+        } catch (ServiceException e) {
+            LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
+            throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
+        }
     }
 }

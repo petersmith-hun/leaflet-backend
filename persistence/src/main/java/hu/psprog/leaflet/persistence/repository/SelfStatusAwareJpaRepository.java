@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 
@@ -23,6 +24,7 @@ public interface SelfStatusAwareJpaRepository<T extends SerializableEntity, ID e
      *
      * @param id identifier of entity
      */
+    @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE #{#entityName} e SET e.enabled = true WHERE e.id = :id")
     public void enable(@Param("id") ID id);
@@ -32,6 +34,7 @@ public interface SelfStatusAwareJpaRepository<T extends SerializableEntity, ID e
      *
      * @param id identifier of entity
      */
+    @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE #{#entityName} e SET e.enabled = false WHERE e.id = :id")
     public void disable(@Param("id") ID id);
