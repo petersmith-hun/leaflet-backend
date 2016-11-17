@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private static final String UNAUTHORIZED_ACCESS = "Unauthorized access";
+    private static final String CONTENT_TYPE = "application/json";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -33,6 +34,7 @@ public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 .withMessage(UNAUTHORIZED_ACCESS)
                 .build();
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(CONTENT_TYPE);
         responseWriter.println(objectMapper.writeValueAsString(errorMessageDataModel));
     }
 }
