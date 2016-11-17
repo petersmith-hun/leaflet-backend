@@ -8,6 +8,7 @@ import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserPasswordRequestModel;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
@@ -128,6 +129,9 @@ public class UsersController extends BaseController {
                 UserVO createdUser = userService.getOne(userID);
 
                 return wrap(userVOToExtendedUserDataModelEntityConverter.convert(createdUser));
+            } catch (ConstraintViolationException e) {
+                LOGGER.error("Constraint violation", e);
+                throw new RequestCouldNotBeFulfilledException("Provided email address is already in use.");
             } catch (ServiceException e) {
                 LOGGER.error(USER_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(USER_ACCOUNT_COULD_NOT_BE_CREATED);
