@@ -266,7 +266,7 @@ public class UserServiceImplIT {
         assertThat(result.getEntityCount(), equalTo(5L));
         assertThat(result.getEntityCountOnPage(), equalTo(2));
         assertThat(result.getPageCount(), equalTo(3));
-        assertThat(result.getPageNumber(), equalTo(1));
+        assertThat(result.getPageNumber(), equalTo(2));
 
     }
 
