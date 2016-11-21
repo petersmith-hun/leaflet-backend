@@ -12,6 +12,7 @@ import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.RoleToAuthorityConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -33,6 +34,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PersistenceException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -133,7 +135,12 @@ public class UserServiceImpl implements UserService {
     public Long createOne(UserVO entity) throws ServiceException {
 
         User user = userVOToUserConverter.convert(entity);
-        User savedUser = userDAO.save(user);
+        User savedUser;
+        try {
+            savedUser = userDAO.save(user);
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (savedUser == null) {
             throw new EntityCreationException(User.class);
@@ -157,7 +164,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
 
-        User updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
+        User updatedUser;
+        try {
+            updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (updatedUser == null) {
             throw new EntityNotFoundException(User.class, id);

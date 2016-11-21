@@ -5,6 +5,7 @@ import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
 import hu.psprog.leaflet.api.rest.response.common.PaginationDataModel;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
+import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,8 @@ public class BaseController {
     static final String PAGINATION_DEFAULT_ORDER_BY = "CREATED";
     static final String PAGINATION_DEFAULT_ORDER_DIRECTION = "ASC";
 
+    static final String CONSTRAINT_VIOLATION = "Constraint violation";
+
     @Autowired
     protected HttpServletRequest httpServletRequest;
 
@@ -75,6 +78,20 @@ public class BaseController {
     public ModelAndView authenticationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Exception thrown during user authentication.", exception);
+
+        return wrap(new ErrorMessageDataModel.Builder()
+                .withMessage(exception.getMessage())
+                .build());
+    }
+
+    /**
+     * HTTP 409 exception handler.
+     */
+    @ExceptionHandler(RequestCouldNotBeFulfilledException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ModelAndView requestCouldNotBeFulfilledExceptionHandler(HttpServletRequest request, Exception exception) {
+
+        LOGGER.error("User interaction caused a recognized exception.", exception);
 
         return wrap(new ErrorMessageDataModel.Builder()
                 .withMessage(exception.getMessage())

@@ -7,6 +7,7 @@ import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,7 +102,12 @@ public class EntryServiceImpl implements EntryService {
     public Long createOne(EntryVO entity) throws ServiceException {
 
         Entry entry = entryVOToEntryConverter.convert(entity);
-        Entry savedEntry = entryDAO.save(entry);
+        Entry savedEntry;
+        try {
+            savedEntry = entryDAO.save(entry);
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (savedEntry == null) {
             throw new EntityCreationException(Entry.class);
@@ -124,7 +131,12 @@ public class EntryServiceImpl implements EntryService {
     @Override
     public EntryVO updateOne(Long id, EntryVO updatedEntity) throws ServiceException {
 
-        Entry updatedEntry = entryDAO.updateOne(id, entryVOToEntryConverter.convert(updatedEntity));
+        Entry updatedEntry;
+        try {
+            updatedEntry = entryDAO.updateOne(id, entryVOToEntryConverter.convert(updatedEntity));
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (updatedEntry == null) {
             throw new EntityNotFoundException(Entry.class, id);

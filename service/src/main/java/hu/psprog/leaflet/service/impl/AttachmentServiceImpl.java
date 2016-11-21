@@ -8,6 +8,7 @@ import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.AttachmentToAttachmentVOConverter;
 import hu.psprog.leaflet.service.converter.AttachmentVOToAttachmentConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -101,7 +103,12 @@ public class AttachmentServiceImpl implements AttachmentService {
     public Long createOne(AttachmentVO entity) throws ServiceException {
 
         Attachment attachment = attachmentVOToAttachmentConverter.convert(entity);
-        Attachment savedAttachment = attachmentDAO.save(attachment);
+        Attachment savedAttachment;
+        try {
+            savedAttachment = attachmentDAO.save(attachment);
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (savedAttachment == null) {
             throw new EntityCreationException(Attachment.class);
@@ -125,7 +132,12 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public AttachmentVO updateOne(Long id, AttachmentVO updatedEntity) throws ServiceException {
 
-        Attachment updatedAttachment = attachmentDAO.updateOne(id, attachmentVOToAttachmentConverter.convert(updatedEntity));
+        Attachment updatedAttachment;
+        try {
+            updatedAttachment = attachmentDAO.updateOne(id, attachmentVOToAttachmentConverter.convert(updatedEntity));
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (updatedAttachment == null) {
             throw new EntityNotFoundException(Attachment.class, id);

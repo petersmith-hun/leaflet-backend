@@ -4,6 +4,7 @@ import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -50,6 +51,7 @@ public class EntriesController extends BaseController {
     private static final String BLOG_ENTRY_COULD_NOT_BE_CREATED = "Blog entry could not be created, please try again later!";
     private static final String THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING = "The entry you are looking for is not existing.";
     private static final String REQUESTED_ENTRY_NOT_FOUND = "Requested entry not found";
+    private static final String AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS = "An entry with the same 'link' already exists.";
 
     @Autowired
     private EntryService entryService;
@@ -163,6 +165,9 @@ public class EntriesController extends BaseController {
                 EntryVO createdEntry = entryService.getOne(entryID);
 
                 return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(createdEntry));
+            } catch (ConstraintViolationException e) {
+                LOGGER.error(CONSTRAINT_VIOLATION, e);
+                throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
             } catch (ServiceException e) {
                 LOGGER.error(ENTRY_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(BLOG_ENTRY_COULD_NOT_BE_CREATED);
@@ -182,7 +187,8 @@ public class EntriesController extends BaseController {
     @RequestMapping(method = RequestMethod.PUT, value = PATH_PART_ID)
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView updateEntry(@PathVariable(PATH_VARIABLE_ID) Long id,
-                                    @RequestBody @Valid EntryUpdateRequestModel entryUpdateRequestModel, BindingResult bindingResult) throws ResourceNotFoundException {
+                                    @RequestBody @Valid EntryUpdateRequestModel entryUpdateRequestModel, BindingResult bindingResult)
+            throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
             return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
@@ -192,6 +198,9 @@ public class EntriesController extends BaseController {
                 EntryVO entryVO = entryService.getOne(id);
 
                 return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
+            } catch (ConstraintViolationException e) {
+                LOGGER.error(CONSTRAINT_VIOLATION, e);
+                throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
             } catch (ServiceException e) {
                 LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
                 throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
