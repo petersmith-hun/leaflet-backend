@@ -38,6 +38,7 @@ public class UserVOToExtendedUserDataModelEntityConverter implements Converter<U
                 .withCreated(commonFormatter.formatDate(userVO.getCreated(), httpServletRequest.getLocale()))
                 .withLastLogin(commonFormatter.formatDate(userVO.getLastLogin(), httpServletRequest.getLocale()))
                 .withEmail(userVO.getEmail())
+                .withLastModified(commonFormatter.formatDate(userVO.getLastModified(), httpServletRequest.getLocale()))
                 .withUsername(userVO.getUsername())
                 .withID(userVO.getId())
                 .build();
