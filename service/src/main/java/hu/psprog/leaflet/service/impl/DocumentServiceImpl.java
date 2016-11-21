@@ -7,6 +7,7 @@ import hu.psprog.leaflet.service.DocumentService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.DocumentToDocumentVOConverter;
 import hu.psprog.leaflet.service.converter.DocumentVOToDocumentConverter;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,7 +94,12 @@ public class DocumentServiceImpl implements DocumentService {
     public Long createOne(DocumentVO entity) throws ServiceException {
 
         Document document = documentVOToDocumentConverter.convert(entity);
-        Document savedDocument = documentDAO.save(document);
+        Document savedDocument;
+        try {
+            savedDocument = documentDAO.save(document);
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (savedDocument == null) {
             throw new EntityCreationException(Document.class);
@@ -116,7 +123,12 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public DocumentVO updateOne(Long id, DocumentVO updatedEntity) throws ServiceException {
 
-        Document updatedDocument = documentDAO.updateOne(id, documentVOToDocumentConverter.convert(updatedEntity));
+        Document updatedDocument;
+        try {
+            updatedDocument = documentDAO.updateOne(id, documentVOToDocumentConverter.convert(updatedEntity));
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (updatedDocument == null) {
             throw new EntityNotFoundException(Document.class, id);

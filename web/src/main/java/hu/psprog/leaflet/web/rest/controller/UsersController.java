@@ -66,6 +66,7 @@ public class UsersController extends BaseController {
     private static final String SERVICE_HAS_THROWN_AN_EXCEPTION = "Service has thrown an exception. See details:";
     private static final String USER_COULD_NOT_BE_CREATED = "User could not be created. See details:";
     private static final String USER_ACCOUNT_COULD_NOT_BE_CREATED = "Your user account could not be created. Please try again later!";
+    private static final String PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Provided email address is already in use.";
 
     @Autowired
     private UserService userService;
@@ -130,8 +131,8 @@ public class UsersController extends BaseController {
 
                 return wrap(userVOToExtendedUserDataModelEntityConverter.convert(createdUser));
             } catch (ConstraintViolationException e) {
-                LOGGER.error("Constraint violation", e);
-                throw new RequestCouldNotBeFulfilledException("Provided email address is already in use.");
+                LOGGER.error(CONSTRAINT_VIOLATION, e);
+                throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);
             } catch (ServiceException e) {
                 LOGGER.error(USER_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(USER_ACCOUNT_COULD_NOT_BE_CREATED);
@@ -251,13 +252,16 @@ public class UsersController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView updateProfile(@PathVariable(PATH_VARIABLE_ID) Long id,
                                            @RequestBody @Valid UpdateProfileRequestModel updateProfileRequestModel)
-            throws ResourceNotFoundException {
+            throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         try {
             userService.updateOne(id, updateProfileRequestModelToUserVOConverter.convert(updateProfileRequestModel));
             UserVO userVO = userService.getOne(id);
 
             return wrap(userVOToExtendedUserDataModelEntityConverter.convert(userVO));
+        } catch (ConstraintViolationException e) {
+            LOGGER.error(CONSTRAINT_VIOLATION, e);
+            throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
             throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);

@@ -164,7 +164,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
 
-        User updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
+        User updatedUser;
+        try {
+            updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
+        } catch (PersistenceException e) {
+            throw new ConstraintViolationException(e);
+        }
 
         if (updatedUser == null) {
             throw new EntityNotFoundException(User.class, id);
