@@ -17,6 +17,7 @@ public final class DatabaseConstants {
     static final String TABLE_TAGS = TABLE_PREFIX + "tags";
     static final String TABLE_ENTRIES = TABLE_PREFIX + "entries";
     static final String TABLE_ENTRIES_TAGS = TABLE_PREFIX + "entries_tags";
+    static final String TABLE_DCP = TABLE_PREFIX + "dynamic_config_properties";
 
     static final String COLUMN_DATE_CREATED = "date_created";
     static final String COLUMN_DATE_LAST_MODIFIED = "date_last_modified";
@@ -43,6 +44,9 @@ public final class DatabaseConstants {
     static final String COLUMN_CATEGORY_ID = "category_id";
     static final String COLUMN_PROLOGUE = "prologue";
     static final String COLUMN_TAG_ID = "tag_id";
+    static final String COLUMN_STATUS = "status";
+    static final String COLUMN_KEY = "dcp_key";
+    static final String COLUMN_VALUE = "dcp_value";
 
     static final String FK_ATTACHMENT_ENTRY = "FK_ATTACHMENT_ENTRY";
     static final String FK_DOCUMENT_USER = "FK_DOCUMENT_USER";
@@ -59,7 +63,6 @@ public final class DatabaseConstants {
     static final String MAPPED_BY_USER = "user";
     static final String MAPPED_BY_CATEGORY = "category";
     static final String MAPPED_BY_ENTRY = "entry";
-    static final String COLUMN_STATUS = "status";
 
     private DatabaseConstants() {}
 }
