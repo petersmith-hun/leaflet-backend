@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.persistence.PersistenceException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -30,7 +31,7 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
     private Map<String, String> dcpStore;
 
     @PostConstruct
-    public void setup() {
+    public void populateStore() {
         LOGGER.info("Populating DCP Store...");
         dcpStore = dynamicConfigurationPropertyDAO.findAll().stream()
                 .collect(Collectors.toMap(DynamicConfigurationProperty::getKey, DynamicConfigurationProperty::getValue));
@@ -44,7 +45,12 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
 
     @Override
     public String get(String key) {
-        return dcpStore.get(key);
+        String value = dcpStore.get(key);
+        if (Objects.isNull(value)) {
+            LOGGER.warn("No value found for requested key '{}'.", key);
+        }
+
+        return value;
     }
 
     @Override
@@ -57,14 +63,6 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
         } catch (PersistenceException e) {
             LOGGER.error("An exception occurred while storing DCP entry.", e);
             throw new ServiceException(e);
-        }
-    }
-
-    @Override
-    public void bulkAdd(Map<String, String> properties) throws ServiceException {
-
-        for(Map.Entry<String, String> entry : properties.entrySet()) {
-            add(entry.getKey(), entry.getValue());
         }
     }
 

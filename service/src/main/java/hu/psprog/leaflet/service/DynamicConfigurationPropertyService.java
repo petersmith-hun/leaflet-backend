@@ -35,13 +35,6 @@ public interface DynamicConfigurationPropertyService {
     void add(String key, String value) throws ServiceException;
 
     /**
-     * Creates new properties.
-     *
-     * @param properties map of new properties.
-     */
-    void bulkAdd(Map<String, String> properties) throws ServiceException;
-
-    /**
      * Updates an existing property.
      *
      * @param key key of the property
