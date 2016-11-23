@@ -11,6 +11,7 @@ import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.processor.ResponseProcessor;
 import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryUpdateRequestModelToEntryVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEntryDataModelListConverter;
@@ -45,7 +46,6 @@ public class EntriesController extends BaseController {
 
     private static final String PATH_PAGE_OF_ENTRIES = "/page" + PATH_PART_PAGE;
     private static final String PATH_ENTRY_BY_LINK = "/link" + PATH_PART_LINK;
-    private static final String PATH_CHANGE_PUBLICITY = PATH_PART_ID + "/publicity";
 
     private static final String ENTRY_COULD_NOT_BE_CREATED = "Entry could not be created. See details: ";
     private static final String BLOG_ENTRY_COULD_NOT_BE_CREATED = "Blog entry could not be created, please try again later!";
@@ -55,6 +55,9 @@ public class EntriesController extends BaseController {
 
     @Autowired
     private EntryService entryService;
+
+    @Autowired
+    private ResponseProcessor responseProcessor;
 
     @Autowired
     private ValidationErrorMessagesConverter validationErrorMessagesConverter;
@@ -98,7 +101,8 @@ public class EntriesController extends BaseController {
                                                     @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
                                                     @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        EntityPageVO<EntryVO> entryPage = entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
+        EntityPageVO<EntryVO> entryPage =
+                responseProcessor.process(entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy)));
         fillPagination(entryPage);
 
         return wrap(entryVOToEntryDataModelListConverter.convert(entryPage.getEntitiesOnPage()));
@@ -115,7 +119,7 @@ public class EntriesController extends BaseController {
     public ModelAndView getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
 
         try {
-            EntryVO entryVO = entryService.findByLink(link);
+            EntryVO entryVO = responseProcessor.process(entryService.findByLink(link));
 
             return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
         } catch (EntityNotFoundException e) {

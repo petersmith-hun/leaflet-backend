@@ -10,7 +10,7 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
+public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implements CustomSEODataProviderVO<EntryVO> {
 
     public enum OrderBy {
         ID("id"),
@@ -147,6 +147,26 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> {
 
     public void setCategoryVO(CategoryVO categoryVO) {
         this.category = categoryVO;
+    }
+
+    @Override
+    public String getSEOTitle() {
+        return seoTitle;
+    }
+
+    @Override
+    public String getSEODescription() {
+        return seoDescription;
+    }
+
+    @Override
+    public String getSEOKeywords() {
+        return seoKeywords;
+    }
+
+    @Override
+    public EntryVO getEntity() {
+        return this;
     }
 
     /**

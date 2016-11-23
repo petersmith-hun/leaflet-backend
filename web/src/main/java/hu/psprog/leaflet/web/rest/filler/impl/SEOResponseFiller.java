@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.filler.impl;
 
+import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,9 @@ import java.util.Objects;
 public class SEOResponseFiller implements ResponseFiller {
 
     private static final String IS_AJAX_REQUEST = "isAjaxRequest";
+
+    @Autowired
+    private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
 
     @Autowired
     private HttpServletRequest httpServletRequest;
