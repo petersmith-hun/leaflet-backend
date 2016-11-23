@@ -21,6 +21,8 @@ public class RequestParameter {
     public static final String SEO_META_DESCRIPTION = "META_DESCRIPTION";
     public static final String SEO_META_KEYWORDS = "META_KEYWORDS";
 
+    public static final String IS_AJAX_REQUEST = "IS_AJAX_REQUEST";
+
     private RequestParameter() {
         // prevent initialization
     }

@@ -42,6 +42,6 @@ public class PaginationResponseFiller implements ResponseFiller {
 
     @Override
     public boolean shouldFill() {
-        return Objects.nonNull(httpServletRequest.getAttribute(PAGINATION));
+        return Objects.nonNull(httpServletRequest.getAttribute(RequestParameter.PAGINATION_ENTITY_COUNT));
     }
 }
