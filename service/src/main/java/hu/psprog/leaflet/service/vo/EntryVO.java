@@ -32,6 +32,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     private String link;
     private String prologue;
     private String content;
+    private String rawContent;
     private String seoTitle;
     private String seoDescription;
     private String seoKeywords;
@@ -45,13 +46,14 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     }
 
     public EntryVO(Long id, Date created, Date lastModified, boolean enabled, String title, String link,
-                   String prologue, String content, String seoTitle, String seoDescription, String seoKeywords,
-                   String entryStatus, UserVO owner, CategoryVO categoryVO, Locale locale) {
+                   String prologue, String content, String rawContent, String seoTitle, String seoDescription,
+                   String seoKeywords, String entryStatus, UserVO owner, CategoryVO categoryVO, Locale locale) {
         super(id, created, lastModified, enabled);
         this.title = title;
         this.link = link;
         this.prologue = prologue;
         this.content = content;
+        this.rawContent = rawContent;
         this.seoTitle = seoTitle;
         this.seoDescription = seoDescription;
         this.seoKeywords = seoKeywords;
@@ -91,6 +93,14 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getRawContent() {
+        return rawContent;
+    }
+
+    public void setRawContent(String rawContent) {
+        this.rawContent = rawContent;
     }
 
     public String getSeoTitle() {
@@ -141,11 +151,11 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         this.locale = locale;
     }
 
-    public CategoryVO getCategoryVO() {
+    public CategoryVO getCategory() {
         return category;
     }
 
-    public void setCategoryVO(CategoryVO categoryVO) {
+    public void setCategory(CategoryVO categoryVO) {
         this.category = categoryVO;
     }
 
@@ -182,6 +192,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         private String link;
         private String prologue;
         private String content;
+        private String rawContent;
         private String seoTitle;
         private String seoDescription;
         private String seoKeywords;
@@ -230,6 +241,11 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
             return this;
         }
 
+        public Builder withRawContent(String rawContent) {
+            this.rawContent = rawContent;
+            return this;
+        }
+
         public Builder withSeoTitle(String seoTitle) {
             this.seoTitle = seoTitle;
             return this;
@@ -266,7 +282,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         }
 
         public EntryVO createEntryVO() {
-            return new EntryVO(id, created, lastModified, enabled, title, link, prologue, content,
+            return new EntryVO(id, created, lastModified, enabled, title, link, prologue, content, rawContent,
                     seoTitle, seoDescription, seoKeywords, entryStatus, owner, category, locale);
         }
     }

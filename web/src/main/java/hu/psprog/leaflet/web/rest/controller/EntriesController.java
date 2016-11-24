@@ -14,6 +14,7 @@ import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.processor.ResponseProcessor;
 import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryUpdateRequestModelToEntryVOConverter;
+import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEditEntryDataModelEntityConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEntryDataModelListConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToExtendedEntryDataModelEntityConverter;
 import org.slf4j.Logger;
@@ -67,6 +68,9 @@ public class EntriesController extends BaseController {
 
     @Autowired
     private EntryVOToExtendedEntryDataModelEntityConverter entryVOToExtendedEntryDataModelEntityConverter;
+
+    @Autowired
+    private EntryVOToEditEntryDataModelEntityConverter entryVOToEditEntryDataModelEntityConverter;
 
     @Autowired
     private EntryVOToEntryDataModelListConverter entryVOToEntryDataModelListConverter;
@@ -141,7 +145,7 @@ public class EntriesController extends BaseController {
         try {
             EntryVO entryVO = entryService.getOne(id);
 
-            return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
+            return wrap(entryVOToEditEntryDataModelEntityConverter.convert(entryVO));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

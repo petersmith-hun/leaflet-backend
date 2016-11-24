@@ -60,6 +60,9 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
     private String content;
 
+    @Column(name = DatabaseConstants.COLUMN_RAW_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
+    private String rawContent;
+
     @Column(name = DatabaseConstants.COLUMN_SEO_TITLE)
     private String seoTitle;
 
@@ -82,8 +85,8 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     }
 
     public Entry(Long id, Date created, Date lastModified, boolean enabled, User user, Category category,
-                 List<Tag> tags, String title, String link, String prologue, String content, String seoTitle,
-                 String seoDescription, String seoKeywords, Locale locale, EntryStatus status) {
+                 List<Tag> tags, String title, String link, String prologue, String content, String rawContent,
+                 String seoTitle, String seoDescription, String seoKeywords, Locale locale, EntryStatus status) {
         super(id, created, lastModified, enabled);
         this.user = user;
         this.category = category;
@@ -92,6 +95,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.link = link;
         this.prologue = prologue;
         this.content = content;
+        this.rawContent = rawContent;
         this.seoTitle = seoTitle;
         this.seoDescription = seoDescription;
         this.seoKeywords = seoKeywords;
@@ -145,6 +149,14 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getRawContent() {
+        return rawContent;
+    }
+
+    public void setRawContent(String rawContent) {
+        this.rawContent = rawContent;
     }
 
     public String getSeoTitle() {
@@ -215,6 +227,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         private String link;
         private String prologue;
         private String content;
+        private String rawContent;
         private String seoTitle;
         private String seoDescription;
         private String seoKeywords;
@@ -276,6 +289,11 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
+        public Builder withRawContent(String rawContent) {
+            this.rawContent = rawContent;
+            return this;
+        }
+
         public Builder withSeoTitle(String seoTitle) {
             this.seoTitle = seoTitle;
             return this;
@@ -303,7 +321,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
         public Entry createEntry() {
             return new Entry(id, created, lastModified, enabled, user, category, tags, title, link, prologue, content,
-                    seoTitle, seoDescription, seoKeywords, locale, status);
+                    rawContent, seoTitle, seoDescription, seoKeywords, locale, status);
         }
     }
 }
