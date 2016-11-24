@@ -24,6 +24,7 @@ public class EntryUpdateRequestModelToEntryVOConverter implements Converter<Entr
                 .withLink(entryUpdateRequestModel.getLink())
                 .withPrologue(entryUpdateRequestModel.getPrologue())
                 .withContent(entryUpdateRequestModel.getContent())
+                .withRawContent(entryUpdateRequestModel.getRawContent())
                 .withCategory(CategoryVO.wrapMinimumVO(entryUpdateRequestModel.getCategoryID()))
                 .withEnabled(entryUpdateRequestModel.isEnabled())
                 .withSeoTitle(entryUpdateRequestModel.getMetaTitle())

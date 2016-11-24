@@ -37,6 +37,7 @@ public final class DatabaseConstants {
     static final String COLUMN_USER_ID = "user_id";
     static final String COLUMN_LINK = "link";
     static final String COLUMN_CONTENT = "content";
+    static final String COLUMN_RAW_CONTENT = "raw_content";
     static final String COLUMN_SEO_TITLE = "seo_title";
     static final String COLUMN_SEO_DESCRIPTION = "seo_description";
     static final String COLUMN_SEO_KEYWORDS = "seo_keywords";

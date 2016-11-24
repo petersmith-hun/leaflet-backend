@@ -13,6 +13,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 public class Entry_ extends SelfStatusAwareIdentifiableEntity_ {
     public static volatile SingularAttribute<Entry, EntryStatus> status;
     public static volatile SingularAttribute<Entry, String> content;
+    public static volatile SingularAttribute<Entry, String> rawContent;
     public static volatile SingularAttribute<Entry, String> prologue;
     public static volatile SingularAttribute<Entry, String> link;
     public static volatile SingularAttribute<Entry, Locale> locale;
