@@ -44,6 +44,7 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
         if (currentDocument != null) {
             currentDocument.setTitle(updatedEntity.getTitle());
             currentDocument.setContent(updatedEntity.getContent());
+            currentDocument.setRawContent(updatedEntity.getRawContent());
             currentDocument.setSeoTitle(updatedEntity.getSeoTitle());
             currentDocument.setSeoDescription(updatedEntity.getSeoDescription());
             currentDocument.setSeoKeywords(updatedEntity.getSeoKeywords());

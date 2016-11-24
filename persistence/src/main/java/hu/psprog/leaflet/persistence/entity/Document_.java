@@ -11,6 +11,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Document.class)
 public class Document_ extends SelfStatusAwareIdentifiableEntity_ {
     public static volatile SingularAttribute<Document, String> content;
+    public static volatile SingularAttribute<Document, String> rawContent;
     public static volatile SingularAttribute<Document, String> link;
     public static volatile SingularAttribute<Document, Locale> locale;
     public static volatile SingularAttribute<Document, String> title;

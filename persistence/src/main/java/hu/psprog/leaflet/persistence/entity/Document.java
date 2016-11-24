@@ -36,6 +36,9 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
     private String content;
 
+    @Column(name = DatabaseConstants.COLUMN_RAW_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
+    private String rawContent;
+
     @Column(name = DatabaseConstants.COLUMN_SEO_TITLE)
     private String seoTitle;
 
@@ -54,12 +57,13 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
     }
 
     public Document(Long id, Date created, Date lastModified, boolean enabled, User user, String title, String link,
-                    String content, String seoTitle, String seoDescription, String seoKeywords, Locale locale) {
+                    String content, String rawContent, String seoTitle, String seoDescription, String seoKeywords, Locale locale) {
         super(id, created, lastModified, enabled);
         this.user = user;
         this.title = title;
         this.link = link;
         this.content = content;
+        this.rawContent = rawContent;
         this.seoTitle = seoTitle;
         this.seoDescription = seoDescription;
         this.seoKeywords = seoKeywords;
@@ -96,6 +100,14 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getRawContent() {
+        return rawContent;
+    }
+
+    public void setRawContent(String rawContent) {
+        this.rawContent = rawContent;
     }
 
     public String getSeoTitle() {
@@ -148,6 +160,7 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
         private String title;
         private String link;
         private String content;
+        private String rawContent;
         private String seoTitle;
         private String seoDescription;
         private String seoKeywords;
@@ -193,6 +206,11 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
+        public Builder withRawContent(String rawContent) {
+            this.rawContent = rawContent;
+            return this;
+        }
+
         public Builder withSeoTitle(String seoTitle) {
             this.seoTitle = seoTitle;
             return this;
@@ -214,7 +232,7 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
         }
 
         public Document createDocument() {
-            return new Document(id, created, lastModified, enabled, user, title, link, content,
+            return new Document(id, created, lastModified, enabled, user, title, link, content, rawContent,
                     seoTitle, seoDescription, seoKeywords, locale);
         }
     }
