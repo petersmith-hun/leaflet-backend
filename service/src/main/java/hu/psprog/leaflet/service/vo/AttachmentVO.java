@@ -97,6 +97,12 @@ public class AttachmentVO extends SelfStatusAwareIdentifiableVO<Long, Attachment
         this.isProtected = isProtected;
     }
 
+    public static AttachmentVO wrapMinimumVO(Long id) {
+        return new Builder()
+                .withId(id)
+                .createAttachmentVO();
+    }
+
     /**
      * Attachment value object builder.
      */

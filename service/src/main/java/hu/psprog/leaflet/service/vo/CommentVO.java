@@ -65,6 +65,12 @@ public class CommentVO extends SelfStatusAwareIdentifiableVO<Long, Comment> {
         this.content = content;
     }
 
+    public static CommentVO wrapMinimumVO(Long id) {
+        return new Builder()
+                .withId(id)
+                .createCommentVO();
+    }
+
     /**
      * Builder for {@link CommentVO} class.
      */

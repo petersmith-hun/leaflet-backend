@@ -138,6 +138,12 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
         this.locale = locale;
     }
 
+    public static DocumentVO wrapMinimumVO(Long id) {
+        return new Builder()
+                .withId(id)
+                .createDocumentVO();
+    }
+
     /**
      * Builder for {@link DocumentVO}.
      */

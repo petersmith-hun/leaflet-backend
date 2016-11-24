@@ -179,6 +179,12 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         return this;
     }
 
+    public static EntryVO wrapMinimumVO(Long id) {
+        return new Builder()
+                .withId(id)
+                .createEntryVO();
+    }
+
     /**
      * EntryVO builder.
      */

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * Converts {@link EntryVO} to {@link Entry} object.
  *
@@ -37,6 +39,10 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
                 .withSeoDescription(source.getSeoDescription())
                 .withSeoKeywords(source.getSeoKeywords())
                 .withTitle(source.getTitle());
+
+        if (Objects.nonNull(source.getEntryStatus())) {
+            builder.withStatus(EntryStatus.valueOf(source.getEntryStatus()));
+        }
 
         if (source.getOwner() != null) {
             User user = new User.Builder()

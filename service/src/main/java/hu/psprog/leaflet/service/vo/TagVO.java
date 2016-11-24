@@ -46,6 +46,12 @@ public class TagVO extends SelfStatusAwareIdentifiableVO<Long, Tag> {
         this.title = title;
     }
 
+    public static TagVO wrapMinimumVO(Long id) {
+        return new Builder()
+                .withId(id)
+                .createTagVO();
+    }
+
     /**
      * Builder for {@link TagVO}.
      */
