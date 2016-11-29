@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>0.2-alpha</version>
+    <version>0.3-alpha</version>
     
     <modules>
         <module>web</module>
@@ -21,7 +21,7 @@
         <java.version>1.8</java.version>
 
         <!-- leaflet internal dependency versions -->
-        <leaflet.rest-api.version>0.2.3</leaflet.rest-api.version>
+        <leaflet.rest-api.version>0.3.0</leaflet.rest-api.version>
         <leaflet.jwt-component.version>1.4.1</leaflet.jwt-component.version>
         
         <!-- Spring versions -->

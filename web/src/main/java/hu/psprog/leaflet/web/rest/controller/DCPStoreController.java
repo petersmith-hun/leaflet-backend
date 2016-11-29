@@ -45,6 +45,7 @@ public class DCPStoreController extends BaseController {
     private ValidationErrorMessagesConverter validationErrorMessagesConverter;
 
     /**
+     * GET /dcp
      * Lists all existing DCP Store entries.
      *
      * @return list of existing DCP entries
@@ -61,6 +62,7 @@ public class DCPStoreController extends BaseController {
     }
 
     /**
+     * POST /dcp
      * Creates a new DCP Store entry.
      *
      * @param dcpRequestModel {@link DCPRequestModel} object holding entry data
@@ -85,6 +87,7 @@ public class DCPStoreController extends BaseController {
     }
 
     /**
+     * PUT /dcp
      * Updates an existing DCP Store entry.
      *
      * @param dcpRequestModel {@link DCPRequestModel} object holding entry data
@@ -109,6 +112,7 @@ public class DCPStoreController extends BaseController {
     }
 
     /**
+     * DELETE /dcp
      * Deletes an existing DCP Store entry.
      *
      * @param dcpRequestModel {@link DCPRequestModel} object holding entry data (only the key is required)
