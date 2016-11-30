@@ -44,6 +44,7 @@ public class BaseController {
     static final String PATH_PART_LINK = "/{link}";
 
     static final String PATH_CHANGE_STATUS = PATH_PART_ID + "/status";
+    static final String PATH_PUBLIC = "/public";
 
     static final String REQUEST_PARAMETER_LIMIT = "limit";
     static final String REQUEST_PARAMETER_ORDER_BY = "orderBy";

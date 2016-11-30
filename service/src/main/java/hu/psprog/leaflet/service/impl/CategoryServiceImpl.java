@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.CategoryDAO;
 import hu.psprog.leaflet.persistence.entity.Category;
+import hu.psprog.leaflet.persistence.repository.specification.CategorySpecification;
 import hu.psprog.leaflet.service.CategoryService;
 import hu.psprog.leaflet.service.converter.CategoryToCategoryVOConverter;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
@@ -51,6 +52,14 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryVO> getAll() {
 
         return categoryDAO.findAll().stream()
+                .map(e -> categoryToCategoryVOConverter.convert(e))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryVO> getAllPublic() {
+
+        return categoryDAO.findAll(CategorySpecification.isEnabled).stream()
                 .map(e -> categoryToCategoryVOConverter.convert(e))
                 .collect(Collectors.toList());
     }
@@ -139,5 +148,25 @@ public class CategoryServiceImpl implements CategoryService {
         for (long id : ids) {
             deleteByID(id);
         }
+    }
+
+    @Override
+    public void enable(Long id) throws EntityNotFoundException {
+
+        if (!categoryDAO.exists(id)) {
+            throw new EntityNotFoundException(Category.class, id);
+        }
+
+        categoryDAO.enable(id);
+    }
+
+    @Override
+    public void disable(Long id) throws EntityNotFoundException {
+
+        if (!categoryDAO.exists(id)) {
+            throw new EntityNotFoundException(Category.class, id);
+        }
+
+        categoryDAO.disable(id);
     }
 }

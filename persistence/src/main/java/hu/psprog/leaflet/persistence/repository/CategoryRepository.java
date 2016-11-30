@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.persistence.repository;
 
 import hu.psprog.leaflet.persistence.entity.Category;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  * @author Peter Smith
  */
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends SelfStatusAwareJpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
 }

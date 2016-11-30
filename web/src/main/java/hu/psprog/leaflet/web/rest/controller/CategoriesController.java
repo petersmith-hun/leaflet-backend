@@ -76,6 +76,20 @@ public class CategoriesController extends BaseController {
     }
 
     /**
+     * GET /categories/public
+     * Returns list of public categories.
+     *
+     * @return list of public categories
+     */
+    @RequestMapping(value = PATH_PUBLIC, method = RequestMethod.GET)
+    public ModelAndView getPublicCategories() {
+
+        List<CategoryVO> categories = categoryService.getAllPublic();
+
+        return wrap(categoryVOToCategoryDataModelListConverter.convert(categories));
+    }
+
+    /**
      * GET /categories/{id}
      * Returns category identified by given ID.
      *
@@ -83,7 +97,7 @@ public class CategoriesController extends BaseController {
      * @return category data if requested category exists
      */
     @RequestMapping(value = PATH_PART_ID, method = RequestMethod.GET)
-    public ModelAndView getCategory(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public ModelAndView getCategory(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             CategoryVO category = categoryService.getOne(id);
@@ -134,7 +148,7 @@ public class CategoriesController extends BaseController {
      */
     @RequestMapping(value = PATH_PART_ID, method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView updateCategory(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id,
+    public ModelAndView updateCategory(@PathVariable(PATH_VARIABLE_ID) Long id,
                                        @RequestBody @Valid CategoryCreateRequestModel categoryCreateRequestModel,
                                        BindingResult bindingResult) throws ResourceNotFoundException {
 
@@ -154,6 +168,33 @@ public class CategoriesController extends BaseController {
     }
 
     /**
+     * PUT /categories/{id}/status
+     * Changes status of an existing category.
+     *
+     * @param id ID of an existing category
+     * @return updated category data
+     */
+    @RequestMapping(value = PATH_CHANGE_STATUS, method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ModelAndView changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+
+        try {
+            CategoryVO categoryVO = categoryService.getOne(id);
+            if (categoryVO.isEnabled()) {
+                categoryService.disable(id);
+            } else {
+                categoryService.enable(id);
+            }
+            CategoryVO updatedCategoryVO = categoryService.getOne(id);
+
+            return wrap(categoryVOToExtendedCategoryDataModelEntityConverter.convert(updatedCategoryVO));
+        } catch (ServiceException e) {
+            LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
+            throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
+        }
+    }
+
+    /**
      * DELETE /categories/{id}
      * Deletes an existing category.
      *
@@ -161,7 +202,7 @@ public class CategoriesController extends BaseController {
      */
     @RequestMapping(value = PATH_PART_ID, method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCategory(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public void deleteCategory(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             CategoryVO categoryVO = categoryService.getOne(id);
