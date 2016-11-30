@@ -4,10 +4,13 @@ import hu.psprog.leaflet.persistence.dao.CategoryDAO;
 import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * DAO implementation for {@link CategoryRepository}.
@@ -20,6 +23,11 @@ public class CategoryDAOImpl extends SelfStatusAwareDAOImpl<Category, Long> impl
     @Autowired
     public CategoryDAOImpl(final CategoryRepository categoryRepository) {
         super(categoryRepository);
+    }
+
+    @Override
+    public List<Category> findAll(Specification<Category> specification) {
+        return ((JpaSpecificationExecutor<Category>) jpaRepository).findAll(specification);
     }
 
     @Transactional
