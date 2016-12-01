@@ -158,6 +158,7 @@ public class UsersController extends BaseController {
             return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
         } else {
             try {
+                hashPassword(userInitializeRequestModel);
                 Long userID = userService.initialize(userInitializeRequestModelToUserVOConverter.convert(userInitializeRequestModel));
                 UserVO createdUser = userService.getOne(userID);
 
