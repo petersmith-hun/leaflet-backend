@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.persistence.repository.specification;
 
+import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.Entry_;
@@ -21,4 +22,8 @@ public class EntrySpecification {
      * Filter to list entries marked as enabled.
      */
     public static Specification<Entry> isEnabled = (root, query, builder) -> builder.equal(root.get(Entry_.enabled), true);
+
+    public static Specification<Entry> isUnderCategory(Category category) {
+        return (root, query, builder) -> builder.equal(root.get(Entry_.category), category);
+    }
 }
