@@ -37,9 +37,11 @@ public class ResponseFillerInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
 
-        responseFillers.stream()
-                .filter(ResponseFiller::shouldFill)
-                .forEach(responseFiller -> responseFiller.fill(modelAndView));
+        if (Objects.nonNull(modelAndView)) {
+            responseFillers.stream()
+                    .filter(ResponseFiller::shouldFill)
+                    .forEach(responseFiller -> responseFiller.fill(modelAndView));
+        }
 
         super.postHandle(request, response, handler, modelAndView);
     }
