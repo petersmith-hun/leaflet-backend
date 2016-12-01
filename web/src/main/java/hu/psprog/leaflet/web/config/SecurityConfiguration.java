@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.config;
 
 import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationProvider;
 import hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter;
+import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.web.rest.handler.RESTAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,12 +32,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final String PATH_USERS_CLAIM = "/users/claim";
     private static final String PATH_USERS_REGISTER = "/users/register";
+    private static final String PATH_USERS_INIT = "/users/init";
+    private static final String INIT_ACCESS_FILTER_EXPRESSION = "@runLevel == T(hu.psprog.leaflet.service.common.RunLevel).INIT";
 
     @Autowired
     private UserDetailsService userDetailsService;
 
     @Autowired
     private JWTAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private RunLevel runLevel;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -88,6 +94,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .antMatchers(PATH_USERS_CLAIM, PATH_USERS_REGISTER)
                     .anonymous()
+                .antMatchers(PATH_USERS_INIT)
+                    .access(INIT_ACCESS_FILTER_EXPRESSION)
                 .anyRequest()
                     .authenticated()
                 .and()
