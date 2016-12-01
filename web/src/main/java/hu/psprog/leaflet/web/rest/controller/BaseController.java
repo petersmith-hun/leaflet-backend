@@ -28,6 +28,7 @@ public class BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
     private static final String BODY = "body";
+    private static final String ERROR = "error";
     private static final String REQUEST_PARAMETER_PAGINATION = "pagination";
 
     static final String BASE_PATH_USERS = "/users";
@@ -129,6 +130,21 @@ public class BaseController {
                 .build();
 
         httpServletRequest.setAttribute(REQUEST_PARAMETER_PAGINATION, paginationDataModel);
+    }
+
+    /**
+     * Wraps controllers validation/request error answer into {@link ModelAndView} object.
+     * Answer will be stored under ERROR key.
+     *
+     * @param answer raw answer of controller
+     * @return wrapped answer
+     */
+    protected ModelAndView wrap(ErrorMessageDataModel answer) {
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(ERROR, answer);
+
+        return modelAndView;
     }
 
     /**
