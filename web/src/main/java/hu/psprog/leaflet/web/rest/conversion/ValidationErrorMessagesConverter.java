@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 public class ValidationErrorMessagesConverter implements Converter<List<ObjectError>, BaseBodyDataModel> {
 
-    private static final String LIST_NODE_NAME = "errors";
+    private static final String LIST_NODE_NAME = "validation";
 
     @Override
     public BaseBodyDataModel convert(List<ObjectError> objectErrors) {
