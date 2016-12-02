@@ -8,6 +8,7 @@ import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
 import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 
@@ -39,7 +40,19 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @param limit maximum number of items on a page
      * @param direction order direction
      * @param orderBy order by field
-     * @return
+     * @return page of public entries
      */
     public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
+
+    /**
+     * Returns a page of public entries under given category.
+     *
+     * @param categoryVO category to filter entries by
+     * @param page page number
+     * @param limit maximum number of items on a page
+     * @param direction order direction
+     * @param orderBy order by field
+     * @return page of public entries under given category
+     */
+    public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
 }

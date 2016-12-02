@@ -5,6 +5,7 @@ import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.repository.specification.EntrySpecification;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
+import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
@@ -12,6 +13,7 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.util.PageableUtil;
+import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class EntryServiceImpl implements EntryService {
 
     @Autowired
     private EntryVOToEntryConverter entryVOToEntryConverter;
+
+    @Autowired
+    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
 
     @Override
     public void deleteByEntity(EntryVO entity) throws ServiceException {
@@ -178,6 +183,19 @@ public class EntryServiceImpl implements EntryService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Specifications<Entry> specs = Specifications
                 .where(EntrySpecification.isPublic)
+                .and(EntrySpecification.isEnabled);
+        Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
+
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+    }
+
+    @Override
+    public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
+
+        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
+        Specifications<Entry> specs = Specifications
+                .where(EntrySpecification.isUnderCategory(categoryVOToCategoryConverter.convert(categoryVO)))
+                .and(EntrySpecification.isPublic)
                 .and(EntrySpecification.isEnabled);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
