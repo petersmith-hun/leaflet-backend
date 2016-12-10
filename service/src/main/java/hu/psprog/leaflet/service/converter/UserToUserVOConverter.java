@@ -2,12 +2,11 @@ package hu.psprog.leaflet.service.converter;
 
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -18,13 +17,10 @@ import java.util.List;
 @Component
 public class UserToUserVOConverter implements Converter<User, UserVO> {
 
-    @Autowired
-    private RoleToAuthorityConverter roleToAuthorityConverter;
-
     @Override
     public UserVO convert(User source) {
 
-        List<GrantedAuthority> authorities = Arrays.asList(roleToAuthorityConverter.convert(source.getRole()));
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(source.getRole().name());
 
         return new UserVO.Builder()
                 .withAuthorities(authorities)

@@ -6,7 +6,6 @@ import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
-import hu.psprog.leaflet.service.converter.RoleToAuthorityConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -52,9 +51,6 @@ public class UserServiceImplTest {
 
     @Mock
     private AuthorityToRoleConverter authorityToRoleConverter;
-
-    @Mock
-    private RoleToAuthorityConverter roleToAuthorityConverter;
 
     @InjectMocks
     private UserServiceImpl userService;

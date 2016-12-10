@@ -2,14 +2,13 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.service.converter.RoleToAuthorityConverter;
+import hu.psprog.leaflet.security.jwt.model.ExtendedUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
 
 /**
  * Implementation of {UserDetailsService} for Spring Security.
@@ -23,9 +22,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserDAO userDAO;
-
-    @Autowired
-    private RoleToAuthorityConverter roleToAuthorityConverter;
 
     /**
      * Loads a user by its email address (instead of username).
@@ -43,14 +39,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE_PATTERN, email));
         }
 
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                user.isEnabled(),
-                user.isEnabled(),
-                user.isEnabled(),
-                user.isEnabled(),
-                Arrays.asList(roleToAuthorityConverter.convert(user.getRole()))
-        );
+        return new ExtendedUserDetails.Builder()
+                .withUsername(user.getEmail())
+                .withPassword(user.getPassword())
+                .withEnabled(user.isEnabled())
+                .withAuthorities(AuthorityUtils.createAuthorityList(user.getRole().name()))
+                .withID(user.getId())
+                .withName(user.getUsername())
+                .build();
     }
 }

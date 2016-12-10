@@ -9,7 +9,6 @@ import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
-import hu.psprog.leaflet.service.converter.RoleToAuthorityConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
@@ -64,9 +63,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private AuthorityToRoleConverter authorityToRoleConverter;
-
-    @Autowired
-    private RoleToAuthorityConverter roleToAuthorityConverter;
 
     @Autowired
     private AuthenticationManager authenticationManager;
