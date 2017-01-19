@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.web.rest.conversion.category;
 
 import hu.psprog.leaflet.api.rest.response.category.ExtendedCategoryDataModel;
-import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Peter Smith
  */
 @Component
-public class CategoryVOToExtendedCategoryDataModelEntityConverter implements Converter<CategoryVO, BaseBodyDataModel> {
+public class CategoryVOToExtendedCategoryDataModelEntityConverter implements Converter<CategoryVO, ExtendedCategoryDataModel> {
 
     @Autowired
     private CommonFormatter commonFormatter;
@@ -25,7 +24,7 @@ public class CategoryVOToExtendedCategoryDataModelEntityConverter implements Con
     private HttpServletRequest httpServletRequest;
 
     @Override
-    public BaseBodyDataModel convert(CategoryVO source) {
+    public ExtendedCategoryDataModel convert(CategoryVO source) {
 
         return new ExtendedCategoryDataModel.Builder()
                 .withDescription(source.getDescription())

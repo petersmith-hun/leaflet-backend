@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.web.rest.conversion.category;
 
 import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
-import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -12,10 +11,10 @@ import org.springframework.stereotype.Component;
  * @author Peter Smith
  */
 @Component
-public class CategoryVOToCategoryDataModelEntityConverter implements Converter<CategoryVO, BaseBodyDataModel> {
+public class CategoryVOToCategoryDataModelEntityConverter implements Converter<CategoryVO, CategoryDataModel> {
 
     @Override
-    public BaseBodyDataModel convert(CategoryVO source) {
+    public CategoryDataModel convert(CategoryVO source) {
 
         return new CategoryDataModel.Builder()
                 .withID(source.getId())

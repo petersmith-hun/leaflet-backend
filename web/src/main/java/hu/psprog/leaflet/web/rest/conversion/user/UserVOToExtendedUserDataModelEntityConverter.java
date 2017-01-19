@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.conversion.user;
 
-import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
@@ -16,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Peter Smith
  */
 @Component
-public class UserVOToExtendedUserDataModelEntityConverter implements Converter<UserVO, BaseBodyDataModel> {
+public class UserVOToExtendedUserDataModelEntityConverter implements Converter<UserVO, ExtendedUserDataModel> {
 
     @Autowired
     private CommonFormatter commonFormatter;
@@ -25,12 +24,12 @@ public class UserVOToExtendedUserDataModelEntityConverter implements Converter<U
     private HttpServletRequest httpServletRequest;
 
     @Override
-    public BaseBodyDataModel convert(UserVO userVO) {
+    public ExtendedUserDataModel convert(UserVO userVO) {
 
         return convertEntity(userVO);
     }
 
-    private BaseBodyDataModel convertEntity(UserVO userVO) {
+    private ExtendedUserDataModel convertEntity(UserVO userVO) {
 
         return new ExtendedUserDataModel.Builder()
                 .withLocale(userVO.getLocale().name())
