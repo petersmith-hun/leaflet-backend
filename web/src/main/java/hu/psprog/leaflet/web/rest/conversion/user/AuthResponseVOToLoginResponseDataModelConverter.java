@@ -16,8 +16,11 @@ public class AuthResponseVOToLoginResponseDataModelConverter implements Converte
     @Override
     public LoginResponseDataModel convert(AuthResponseVO authResponseVO) {
 
+        LoginResponseDataModel.AuthenticationResult authenticationResult =
+                LoginResponseDataModel.AuthenticationResult.valueOf(authResponseVO.getAuthenticationResult().name());
+        
         LoginResponseDataModel.Builder builder = new LoginResponseDataModel.Builder()
-                .withStatus(authResponseVO.getAuthenticationResult().name());
+                .withStatus(authenticationResult);
 
         if (authResponseVO.getAuthenticationResult() == AuthResponseVO.AuthenticationResult.AUTH_SUCCESS) {
             builder.withToken(authResponseVO.getToken());
