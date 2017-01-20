@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.web.rest.conversion.entry;
 
 import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
-import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -18,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Peter Smith
  */
 @Component
-public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO, BaseBodyDataModel> {
+public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO, EntryDataModel> {
 
     @Autowired
     private CommonFormatter commonFormatter;
@@ -27,7 +26,7 @@ public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO
     private HttpServletRequest httpServletRequest;
 
     @Override
-    public BaseBodyDataModel convert(EntryVO entryVO) {
+    public EntryDataModel convert(EntryVO entryVO) {
 
         EntryDataModel.Builder builder = new EntryDataModel.Builder()
                 .withID(entryVO.getId())

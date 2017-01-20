@@ -2,7 +2,7 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.dcp.DCPRequestModel;
 import hu.psprog.leaflet.api.rest.response.dcp.DCPDataModel;
-import hu.psprog.leaflet.api.rest.response.layout.DefaultListLayoutDataModel;
+import hu.psprog.leaflet.api.rest.response.dcp.DCPListDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
@@ -54,8 +54,7 @@ public class DCPStoreController extends BaseController {
     public ModelAndView getAll() {
 
         Map<String, String> dcpStore = dynamicConfigurationPropertyService.getAll();
-        DefaultListLayoutDataModel.Builder builder = new DefaultListLayoutDataModel.Builder();
-        builder.setNodeName(DCP_STORE);
+        DCPListDataModel.Builder builder = new DCPListDataModel.Builder();
         dcpStore.entrySet().forEach(entry -> builder.withItem(createDataModel(entry)));
 
         return wrap(builder.build());
