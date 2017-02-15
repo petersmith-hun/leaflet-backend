@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 
@@ -22,6 +23,7 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(ApplicationContextConfig.COMPONENT_SCAN)
+@EnableAspectJAutoProxy
 public class ApplicationContextConfig {
 
     private static final String APPLICATION_CONFIG_PROPERTY_SOURCE = "applicationConfigPropertySource";
