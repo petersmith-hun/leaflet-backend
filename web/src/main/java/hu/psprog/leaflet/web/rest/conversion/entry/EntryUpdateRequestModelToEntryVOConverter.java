@@ -5,6 +5,8 @@ import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import hu.psprog.leaflet.web.rest.conversion.JULocaleToLeafletLocaleConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class EntryUpdateRequestModelToEntryVOConverter implements Converter<EntryUpdateRequestModel, EntryVO> {
+
+    @Autowired
+    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Override
     public EntryVO convert(EntryUpdateRequestModel entryUpdateRequestModel) {
@@ -30,11 +35,11 @@ public class EntryUpdateRequestModelToEntryVOConverter implements Converter<Entr
                 .withSeoTitle(entryUpdateRequestModel.getMetaTitle())
                 .withSeoDescription(entryUpdateRequestModel.getMetaDescription())
                 .withSeoKeywords(entryUpdateRequestModel.getMetaKeywords())
-                .withEntryStatus(entryUpdateRequestModel.getStatus().name());
+                .withEntryStatus(entryUpdateRequestModel.getStatus().name())
+                .withLocale(juLocaleToLeafletLocaleConverter.convert(entryUpdateRequestModel.getLocale()));
 
         if (entryUpdateRequestModel instanceof EntryCreateRequestModel) {
-            builder.withOwner(UserVO.wrapMinimumVO(((EntryCreateRequestModel) entryUpdateRequestModel).getUserID()))
-                    .withEntryStatus(((EntryCreateRequestModel) entryUpdateRequestModel).getStatus().name());
+            builder.withOwner(UserVO.wrapMinimumVO(((EntryCreateRequestModel) entryUpdateRequestModel).getUserID()));
         }
 
         return builder.createEntryVO();

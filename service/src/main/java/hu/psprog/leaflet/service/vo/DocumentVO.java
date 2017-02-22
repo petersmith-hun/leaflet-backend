@@ -34,7 +34,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
     private String seoTitle;
     private String seoDescription;
     private String seoKeywords;
-    private String entryStatus;
     private UserVO owner;
     private Locale locale;
 
@@ -44,7 +43,7 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
 
     public DocumentVO(Long id, Date created, Date lastModified, boolean enabled, String title, String link,
                       String content, String rawContent, String seoTitle, String seoDescription, String seoKeywords,
-                      String entryStatus, UserVO owner, Locale locale) {
+                      UserVO owner, Locale locale) {
         super(id, created, lastModified, enabled);
         this.title = title;
         this.link = link;
@@ -53,7 +52,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
         this.seoTitle = seoTitle;
         this.seoDescription = seoDescription;
         this.seoKeywords = seoKeywords;
-        this.entryStatus = entryStatus;
         this.owner = owner;
         this.locale = locale;
     }
@@ -114,14 +112,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
         this.seoKeywords = seoKeywords;
     }
 
-    public String getEntryStatus() {
-        return entryStatus;
-    }
-
-    public void setEntryStatus(String entryStatus) {
-        this.entryStatus = entryStatus;
-    }
-
     public UserVO getOwner() {
         return owner;
     }
@@ -160,7 +150,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
         private String seoTitle;
         private String seoDescription;
         private String seoKeywords;
-        private String entryStatus;
         private UserVO owner;
         private Locale locale;
 
@@ -219,11 +208,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
             return this;
         }
 
-        public Builder withEntryStatus(String entryStatus) {
-            this.entryStatus = entryStatus;
-            return this;
-        }
-
         public Builder withOwner(UserVO owner) {
             this.owner = owner;
             return this;
@@ -236,7 +220,7 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
 
         public DocumentVO createDocumentVO() {
             return new DocumentVO(id, created, lastModified, enabled, title, link, content, rawContent,
-                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, locale);
+                    seoTitle, seoDescription, seoKeywords, owner, locale);
         }
     }
 }
