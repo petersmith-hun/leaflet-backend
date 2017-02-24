@@ -12,7 +12,6 @@ import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import hu.psprog.leaflet.web.processor.ResponseProcessor;
 import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryUpdateRequestModelToEntryVOConverter;
 import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEditEntryDataModelEntityConverter;
@@ -60,9 +59,6 @@ public class EntriesController extends BaseController {
     private EntryService entryService;
 
     @Autowired
-    private ResponseProcessor responseProcessor;
-
-    @Autowired
     private ValidationErrorMessagesConverter validationErrorMessagesConverter;
 
     @Autowired
@@ -108,7 +104,7 @@ public class EntriesController extends BaseController {
                                                     @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<EntryVO> entryPage =
-                responseProcessor.process(entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy)));
+                entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
 
         return wrap(entryVOToEntryDataModelListConverter.convert(entryPage.getEntitiesOnPage()));
     }
@@ -132,8 +128,8 @@ public class EntriesController extends BaseController {
                                                     @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<EntryVO> entryPage =
-                responseProcessor.process(entryService.getPageOfPublicEntriesUnderCategory(CategoryVO.wrapMinimumVO(id),
-                        page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy)));
+                entryService.getPageOfPublicEntriesUnderCategory(CategoryVO.wrapMinimumVO(id),
+                        page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
 
         return wrap(entryVOToEntryDataModelListConverter.convert(entryPage.getEntitiesOnPage()));
     }
@@ -149,7 +145,7 @@ public class EntriesController extends BaseController {
     public ModelAndView getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
 
         try {
-            EntryVO entryVO = responseProcessor.process(entryService.findByLink(link));
+            EntryVO entryVO = entryService.findByLink(link);
 
             return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
         } catch (EntityNotFoundException e) {

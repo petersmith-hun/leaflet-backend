@@ -1,11 +1,16 @@
 package hu.psprog.leaflet.service.vo;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
  * @author Peter Smith
  */
 public class EntityPageVO<T extends BaseVO> {
+
+    private static final String ENTITIES_ON_PAGE_FIELD = "entitiesOnPage";
 
     private long entityCount;
     private int pageCount;
@@ -72,6 +77,18 @@ public class EntityPageVO<T extends BaseVO> {
 
     public boolean hasPrevious() {
         return hasPrevious;
+    }
+
+    @Override
+    public String toString() {
+        return (new ReflectionToStringBuilder(this) {
+
+            @Override
+            protected boolean accept(Field field) {
+                return super.accept(field) && !field.getName().equals(ENTITIES_ON_PAGE_FIELD);
+            }
+
+        }).toString();
     }
 
     public static class Builder {

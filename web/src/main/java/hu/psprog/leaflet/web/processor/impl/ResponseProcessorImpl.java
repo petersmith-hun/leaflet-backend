@@ -23,7 +23,7 @@ public class ResponseProcessorImpl implements ResponseProcessor {
     private HttpServletRequest httpServletRequest;
 
     @Override
-    public <T extends BaseVO> EntityPageVO<T> process(EntityPageVO<T> response) {
+    public <T extends BaseVO> void process(EntityPageVO<T> response) {
 
         httpServletRequest.setAttribute(RequestParameter.PAGINATION_ENTITY_COUNT, response.getEntityCount());
         httpServletRequest.setAttribute(RequestParameter.PAGINATION_ENTITY_COUNT_ON_PAGE, response.getEntityCountOnPage());
@@ -33,17 +33,13 @@ public class ResponseProcessorImpl implements ResponseProcessor {
         httpServletRequest.setAttribute(RequestParameter.PAGINATION_IS_LAST, response.isLast());
         httpServletRequest.setAttribute(RequestParameter.PAGINATION_HAS_NEXT, response.hasNext());
         httpServletRequest.setAttribute(RequestParameter.PAGINATION_HAS_PREVIOUS, response.hasPrevious());
-
-        return response;
     }
 
     @Override
-    public <T extends BaseVO> T process(CustomSEODataProviderVO<T> response) {
+    public <T extends BaseVO> void process(CustomSEODataProviderVO<T> response) {
 
         httpServletRequest.setAttribute(RequestParameter.SEO_META_TITLE, response.getSEOTitle());
         httpServletRequest.setAttribute(RequestParameter.SEO_META_DESCRIPTION, response.getSEODescription());
         httpServletRequest.setAttribute(RequestParameter.SEO_META_KEYWORDS, response.getSEOKeywords());
-
-        return response.getEntity();
     }
 }

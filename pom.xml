@@ -37,6 +37,7 @@
         <hibernate.version>5.2.3.Final</hibernate.version>
         <hibernate.validator.version>5.2.4.Final</hibernate.validator.version>
         <commons.lang.version>3.4</commons.lang.version>
+        <aspectj.weaver.version>1.8.9</aspectj.weaver.version>
         
         <!-- compiler settings -->
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -216,6 +217,11 @@
                 <groupId>javax.el</groupId>
                 <artifactId>javax.el-api</artifactId>
                 <version>${javax.el-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.weaver.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
