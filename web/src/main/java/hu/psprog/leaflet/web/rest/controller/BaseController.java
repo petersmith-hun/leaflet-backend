@@ -33,6 +33,7 @@ public class BaseController {
     static final String BASE_PATH_ENTRIES = "/entries";
     static final String BASE_PATH_CATEGORIES = "/categories";
     static final String BASE_PATH_DCP = "/dcp";
+    static final String BASE_PATH_DOCUMENTS = "/documents";
 
     static final String PATH_VARIABLE_ID = "id";
     static final String PATH_VARIABLE_PAGE = "page";
