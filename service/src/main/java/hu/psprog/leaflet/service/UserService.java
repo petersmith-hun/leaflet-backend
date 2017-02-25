@@ -59,4 +59,12 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
      * @return claim result (status and token if successful)
      */
     public AuthResponseVO claimToken(AuthRequestVO authRequestVO);
+
+    /**
+     * Updates given user's last login field.
+     *
+     * @param email email of user to update last login for
+     * @throws EntityNotFoundException if no user found associated with given username
+     */
+    public void updateLastLogin(String email) throws EntityNotFoundException;
 }

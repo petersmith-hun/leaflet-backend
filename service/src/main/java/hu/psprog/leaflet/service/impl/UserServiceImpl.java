@@ -284,4 +284,14 @@ public class UserServiceImpl implements UserService {
                     .createAuthResponseVO();
         }
     }
+
+    @Override
+    public void updateLastLogin(String email) throws EntityNotFoundException {
+
+        User user = userDAO.findByEmail(email);
+        if(user == null) {
+            throw new EntityNotFoundException(User.class, email);
+        }
+        userDAO.updateLastLogin(email);
+    }
 }
