@@ -31,6 +31,7 @@ public class CommentVOToCommentConverter implements Converter<CommentVO, Comment
                 .withEntry(entryVOToEntryConverter.convert(source.getEntryVO()))
                 .withUser(userVOToUserConverter.convert(source.getOwner()))
                 .isEnabled(source.isEnabled())
+                .isDeleted(source.isDeleted())
                 .createComment();
     }
 }

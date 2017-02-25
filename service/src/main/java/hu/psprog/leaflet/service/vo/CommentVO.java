@@ -9,7 +9,7 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-public class CommentVO extends SelfStatusAwareIdentifiableVO<Long, Comment> {
+public class CommentVO extends LogicallyDeletableSelfStatusAwareIdentifiableVO<Long, Comment> {
 
     public enum OrderBy {
         ID("id"),
@@ -34,8 +34,8 @@ public class CommentVO extends SelfStatusAwareIdentifiableVO<Long, Comment> {
         // Serializable
     }
 
-    public CommentVO(Long id, Date created, Date lastModified, boolean enabled, UserVO owner, EntryVO entryVO, String content) {
-        super(id, created, lastModified, enabled);
+    public CommentVO(Long id, Date created, Date lastModified, boolean enabled, boolean deleted, UserVO owner, EntryVO entryVO, String content) {
+        super(id, created, lastModified, enabled, deleted);
         this.owner = owner;
         this.entryVO = entryVO;
         this.content = content;
@@ -80,6 +80,7 @@ public class CommentVO extends SelfStatusAwareIdentifiableVO<Long, Comment> {
         private Date created;
         private Date lastModified;
         private boolean enabled;
+        private boolean deleted;
         private UserVO owner;
         private EntryVO entryVO;
         private String content;
@@ -104,6 +105,11 @@ public class CommentVO extends SelfStatusAwareIdentifiableVO<Long, Comment> {
             return this;
         }
 
+        public Builder withDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
+
         public Builder withOwner(UserVO owner) {
             this.owner = owner;
             return this;
@@ -120,7 +126,7 @@ public class CommentVO extends SelfStatusAwareIdentifiableVO<Long, Comment> {
         }
 
         public CommentVO createCommentVO() {
-            return new CommentVO(id, created, lastModified, enabled, owner, entryVO, content);
+            return new CommentVO(id, created, lastModified, enabled, deleted, owner, entryVO, content);
         }
     }
 }

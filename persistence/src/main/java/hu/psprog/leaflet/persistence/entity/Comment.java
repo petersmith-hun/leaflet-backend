@@ -19,7 +19,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = DatabaseConstants.TABLE_COMMENTS)
-public class Comment extends SelfStatusAwareIdentifiableEntity<Long> {
+public class Comment extends LogicallyDeletableSelfStatusAwareIdentifiableEntity<Long> {
 
     @ManyToOne
     @JoinColumn(name = DatabaseConstants.COLUMN_USER_ID,
@@ -38,8 +38,8 @@ public class Comment extends SelfStatusAwareIdentifiableEntity<Long> {
         // Serializable
     }
 
-    public Comment(Long id, Date created, Date lastModified, boolean enabled, User user, Entry entry, String content) {
-        super(id, created, lastModified, enabled);
+    public Comment(Long id, Date created, Date lastModified, boolean enabled, boolean deleted, User user, Entry entry, String content) {
+        super(id, created, lastModified, enabled, deleted);
         this.user = user;
         this.entry = entry;
         this.content = content;
@@ -83,6 +83,7 @@ public class Comment extends SelfStatusAwareIdentifiableEntity<Long> {
         private Date created;
         private Date lastModified;
         private boolean enabled;
+        private boolean deleted;
         private User user;
         private Entry entry;
         private String content;
@@ -107,6 +108,11 @@ public class Comment extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
+        public Builder isDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
+
         public Builder withUser(User user) {
             this.user = user;
             return this;
@@ -123,7 +129,7 @@ public class Comment extends SelfStatusAwareIdentifiableEntity<Long> {
         }
 
         public Comment createComment() {
-            return new Comment(id, created, lastModified, enabled, user, entry, content);
+            return new Comment(id, created, lastModified, enabled, deleted, user, entry, content);
         }
     }
 }

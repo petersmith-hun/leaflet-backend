@@ -26,12 +26,6 @@ public class SelfStatusAwareIdentifiableEntity<T extends Serializable> extends I
         // Serializable
     }
 
-    public SelfStatusAwareIdentifiableEntity(Date created, Date lastModified, boolean enabled) {
-        this.created = created;
-        this.lastModified = lastModified;
-        this.enabled = enabled;
-    }
-
     public SelfStatusAwareIdentifiableEntity(T id, Date created, Date lastModified, boolean enabled) {
         super(id);
         this.created = created;

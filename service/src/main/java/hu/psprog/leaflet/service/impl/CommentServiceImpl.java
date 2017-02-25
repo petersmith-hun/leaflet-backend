@@ -22,6 +22,7 @@ import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -90,7 +91,10 @@ public class CommentServiceImpl implements CommentService {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Entry entry = entryVOToEntryConverter.convert(entryVO);
-        Page<Comment> commentPage = commentDAO.findByEntry(CommentSpecification.isEnabled, pageable, entry);
+        Specifications<Comment> specifications = Specifications
+                .where(CommentSpecification.isEnabled)
+                .and(CommentSpecification.isNotDeleted);
+        Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
         return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
     }
@@ -211,4 +215,25 @@ public class CommentServiceImpl implements CommentService {
 
         commentDAO.disable(id);
     }
+
+    @Override
+    public void deleteLogicallyByEntity(CommentVO entity) throws ServiceException {
+
+        if (!commentDAO.exists(entity.getId())) {
+            throw new EntityNotFoundException(Comment.class, entity.getId());
+        }
+
+        commentDAO.markAsDeleted(entity.getId());
+    }
+
+    @Override
+    public void restoreEntity(CommentVO entity) throws ServiceException {
+
+        if (!commentDAO.exists(entity.getId())) {
+            throw new EntityNotFoundException(Comment.class, entity.getId());
+        }
+
+        commentDAO.revertLogicalDeletion(entity.getId());
+    }
+
 }

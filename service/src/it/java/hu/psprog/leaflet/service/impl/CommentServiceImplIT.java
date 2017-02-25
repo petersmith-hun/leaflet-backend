@@ -137,12 +137,13 @@ public class CommentServiceImplIT {
 
         // then
         assertThat(result.getEntityCountOnPage(), equalTo(itemNumber));
-        assertThat(result.getEntityCount(), equalTo(7L));
+        assertThat(result.getEntityCount(), equalTo(6L));
         assertThat(result.getPageCount(), equalTo(2));
         assertThat(result.getPageSize(), equalTo(limit));
         assertThat(result.getEntitiesOnPage(), notNullValue());
         assertThat(result.getEntitiesOnPage().stream().allMatch(e -> e != null), equalTo(true));
         assertThat(result.getEntitiesOnPage().size(), equalTo(itemNumber));
+        assertThat(result.getEntitiesOnPage().stream().noneMatch(CommentVO::isDeleted), equalTo(true));
     }
 
     @Test
@@ -277,6 +278,38 @@ public class CommentServiceImplIT {
         assertThat(commentService.getOne(id).isEnabled(), equalTo(false));
     }
 
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
+    public void testLogicalDeletion() throws ServiceException {
+
+        // given
+        Long id = 1L;
+        assertThat(commentService.getOne(id).isDeleted(), equalTo(false));
+
+        // when
+        commentService.deleteLogicallyByEntity(CommentVO.wrapMinimumVO(id));
+
+        // then
+        assertThat(commentService.getOne(id).isDeleted(), equalTo(true));
+    }
+
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
+    public void testRestoreEntity() throws ServiceException {
+
+        // given
+        Long id = 10L;
+        assertThat(commentService.getOne(id).isDeleted(), equalTo(true));
+
+        // when
+        commentService.restoreEntity(CommentVO.wrapMinimumVO(id));
+
+        // then
+        assertThat(commentService.getOne(id).isDeleted(), equalTo(false));
+    }
+
     public static class PagingParameterProvider {
 
         public static Object[] pageOfCommentsForEntry() {
@@ -289,7 +322,7 @@ public class CommentServiceImplIT {
         public static Object[] pageOfPublicCommentsForEntry() {
             return new Object[] {
                     new Object[] {1, 4},
-                    new Object[] {2, 3}
+                    new Object[] {2, 2}
             };
         }
 

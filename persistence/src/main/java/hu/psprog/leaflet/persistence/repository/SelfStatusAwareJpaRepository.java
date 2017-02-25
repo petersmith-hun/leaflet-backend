@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.persistence.repository;
 
-import hu.psprog.leaflet.persistence.entity.SerializableEntity;
+import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +17,7 @@ import java.io.Serializable;
  * @author Peter Smith
  */
 @NoRepositoryBean
-public interface SelfStatusAwareJpaRepository<T extends SerializableEntity, ID extends Serializable> extends JpaRepository<T, ID> {
+public interface SelfStatusAwareJpaRepository<T extends SelfStatusAwareIdentifiableEntity<ID>, ID extends Serializable> extends JpaRepository<T, ID> {
 
     /**
      * Enables given entity.

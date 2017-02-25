@@ -244,6 +244,64 @@ public class CommentServiceImplTest {
         verify(commentDAO, never()).delete(anyLong());
     }
 
+    @Test
+    public void testDeleteLogicallyByEntityWithExistingComment() throws ServiceException {
+
+        // given
+        given(commentDAO.exists(commentVO.getId())).willReturn(true);
+
+        // when
+        commentService.deleteLogicallyByEntity(commentVO);
+
+        // then
+        verify(commentDAO).markAsDeleted(commentVO.getId());
+    }
+
+    @Test
+    public void testRestoreEntityWithExistingComment() throws ServiceException {
+
+        // given
+        given(commentDAO.exists(commentVO.getId())).willReturn(true);
+
+        // when
+        commentService.restoreEntity(commentVO);
+
+        // then
+        verify(commentDAO).revertLogicalDeletion(commentVO.getId());
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void testDeleteLogicallyByEntityWithNonExistingComment() throws ServiceException {
+
+        // given
+        Long id = 1L;
+        given(commentDAO.exists(commentVO.getId())).willReturn(false);
+        given(commentVO.getId()).willReturn(id);
+
+        // when
+        commentService.deleteLogicallyByEntity(commentVO);
+
+        // then
+        // expected exception
+        verify(commentDAO, never()).markAsDeleted(commentVO.getId());
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void testRestoreEntityWithExistingNonComment() throws ServiceException {
+
+        // given
+        Long id = 1L;
+        given(commentDAO.exists(commentVO.getId())).willReturn(false);
+        given(commentVO.getId()).willReturn(id);
+
+        // when
+        commentService.restoreEntity(commentVO);
+
+        // then
+        // expected exception
+        verify(commentDAO, never()).revertLogicalDeletion(commentVO.getId());
+    }
+
     @Test(expected = EntityNotFoundException.class)
     public void testDeleteByIdWithNonExistingComment() throws ServiceException {
 

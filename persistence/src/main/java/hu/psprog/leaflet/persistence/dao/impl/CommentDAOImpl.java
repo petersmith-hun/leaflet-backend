@@ -22,7 +22,7 @@ import java.util.Date;
  * @author Peter Smith
  */
 @Component
-public class CommentDAOImpl extends SelfStatusAwareDAOImpl<Comment, Long> implements CommentDAO {
+public class CommentDAOImpl extends LogicallyDeletableSelfStatusAwareDAOImpl<Comment, Long> implements CommentDAO {
 
     @Autowired
     public CommentDAOImpl(final CommentRepository commentRepository) {

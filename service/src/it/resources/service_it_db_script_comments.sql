@@ -32,15 +32,15 @@ values
 
 -- add some test comments
 insert into leaflet_comments
-    (id, date_created, is_enabled, date_last_modified, content, entry_id, user_id)
+    (id, date_created, is_enabled, is_deleted, date_last_modified, content, entry_id, user_id)
 values
-    (1, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Test comment 1', @ENTRY_ID, @USER_ID),
-    (2, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Test comment 2', @ENTRY_ID, @USER_ID),
-    (3, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Test comment 3', @ENTRY_ID, @USER_ID_OTHER),
-    (4, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Test comment 4', @ENTRY_ID, @USER_ID),
-    (5, @DEFAULT_DATE, false, @DEFAULT_DATE, 'Test comment 5', @ENTRY_ID, @USER_ID_OTHER),
-    (6, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Test comment 6', @ENTRY_ID, @USER_ID),
-    (7, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Test comment 7', @ENTRY_ID, @USER_ID),
-    (8, @DEFAULT_DATE, false, @DEFAULT_DATE, 'Test comment 8', @ENTRY_ID, @USER_ID_OTHER),
-    (9, @DEFAULT_DATE, false, @DEFAULT_DATE, 'Test comment 9', @ENTRY_ID, @USER_ID_OTHER),
-    (10, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Test comment 10', @ENTRY_ID, @USER_ID);
+    (1, @DEFAULT_DATE, true, false, @DEFAULT_DATE, 'Test comment 1', @ENTRY_ID, @USER_ID),
+    (2, @DEFAULT_DATE, true, false, @DEFAULT_DATE, 'Test comment 2', @ENTRY_ID, @USER_ID),
+    (3, @DEFAULT_DATE, true, false, @DEFAULT_DATE, 'Test comment 3', @ENTRY_ID, @USER_ID_OTHER),
+    (4, @DEFAULT_DATE, true, false, @DEFAULT_DATE, 'Test comment 4', @ENTRY_ID, @USER_ID),
+    (5, @DEFAULT_DATE, false, false, @DEFAULT_DATE, 'Test comment 5', @ENTRY_ID, @USER_ID_OTHER),
+    (6, @DEFAULT_DATE, true, false, @DEFAULT_DATE, 'Test comment 6', @ENTRY_ID, @USER_ID),
+    (7, @DEFAULT_DATE, true, false, @DEFAULT_DATE, 'Test comment 7', @ENTRY_ID, @USER_ID),
+    (8, @DEFAULT_DATE, false, false, @DEFAULT_DATE, 'Test comment 8', @ENTRY_ID, @USER_ID_OTHER),
+    (9, @DEFAULT_DATE, false, false, @DEFAULT_DATE, 'Test comment 9', @ENTRY_ID, @USER_ID_OTHER),
+    (10, @DEFAULT_DATE, true, true, @DEFAULT_DATE, 'Test comment 10', @ENTRY_ID, @USER_ID);
