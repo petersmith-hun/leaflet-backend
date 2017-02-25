@@ -6,6 +6,10 @@ import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserPasswordRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
+import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
+import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
+import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
@@ -19,13 +23,6 @@ import hu.psprog.leaflet.web.annotation.AJAXRequest;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.exception.TokenClaimException;
-import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
-import hu.psprog.leaflet.web.rest.conversion.user.AuthResponseVOToLoginResponseDataModelConverter;
-import hu.psprog.leaflet.web.rest.conversion.user.LoginRequestModelToAuthenticationRequestVOConverter;
-import hu.psprog.leaflet.web.rest.conversion.user.UpdateProfileRequestModelToUserVOConverter;
-import hu.psprog.leaflet.web.rest.conversion.user.UserInitializeRequestModelToUserVOConverter;
-import hu.psprog.leaflet.web.rest.conversion.user.UserVOToExtendedUserDataModelEntityConverter;
-import hu.psprog.leaflet.web.rest.conversion.user.UserVOToExtendedUserDataModelListConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,27 +71,6 @@ public class UsersController extends BaseController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserVOToExtendedUserDataModelListConverter userVOToExtendedUserDataModelListConverter;
-
-    @Autowired
-    private UserVOToExtendedUserDataModelEntityConverter userVOToExtendedUserDataModelEntityConverter;
-
-    @Autowired
-    private UserInitializeRequestModelToUserVOConverter userInitializeRequestModelToUserVOConverter;
-
-    @Autowired
-    private UpdateProfileRequestModelToUserVOConverter updateProfileRequestModelToUserVOConverter;
-
-    @Autowired
-    private LoginRequestModelToAuthenticationRequestVOConverter loginRequestModelToAuthenticationRequestVOConverter;
-
-    @Autowired
-    private AuthResponseVOToLoginResponseDataModelConverter authResponseVOToLoginResponseDataModelConverter;
-
-    @Autowired
-    private ValidationErrorMessagesConverter validationErrorMessagesConverter;
-
     /**
      * GET /users
      * Returns basic information of all existing users.
@@ -104,7 +80,7 @@ public class UsersController extends BaseController {
     @RequestMapping(method = RequestMethod.GET)
     public ModelAndView getAllUsers() {
 
-        return wrap(userVOToExtendedUserDataModelListConverter.convert(userService.getAll()));
+        return wrap(conversionService.convert(userService.getAll(), UserListDataModel.class));
     }
 
     /**
@@ -122,14 +98,14 @@ public class UsersController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 hashPassword(userCreateRequestModel);
-                Long userID = userService.createOne(userInitializeRequestModelToUserVOConverter.convert(userCreateRequestModel));
+                Long userID = userService.createOne(conversionService.convert(userCreateRequestModel, UserVO.class));
                 UserVO createdUser = userService.getOne(userID);
 
-                return wrap(userVOToExtendedUserDataModelEntityConverter.convert(createdUser));
+                return wrap(conversionService.convert(createdUser, ExtendedUserDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);
@@ -155,14 +131,14 @@ public class UsersController extends BaseController {
             throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 hashPassword(userInitializeRequestModel);
-                Long userID = userService.initialize(userInitializeRequestModelToUserVOConverter.convert(userInitializeRequestModel));
+                Long userID = userService.initialize(conversionService.convert(userInitializeRequestModel, UserVO.class));
                 UserVO createdUser = userService.getOne(userID);
 
-                return wrap(userVOToExtendedUserDataModelEntityConverter.convert(createdUser));
+                return wrap(conversionService.convert(createdUser, ExtendedUserDataModel.class));
             } catch (UserInitializationException e) {
                 LOGGER.error(SERVICE_HAS_THROWN_AN_EXCEPTION, e);
                 throw new RequestCouldNotBeFulfilledException(INITIALIZATION_IS_NOT_AVAILABLE_NOW, e);
@@ -190,7 +166,7 @@ public class UsersController extends BaseController {
         try {
             UserVO userVO = userService.getOne(id);
 
-            return wrap(userVOToExtendedUserDataModelEntityConverter.convert(userVO));
+            return wrap(conversionService.convert(userVO, ExtendedUserDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
             throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
@@ -227,17 +203,22 @@ public class UsersController extends BaseController {
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_ROLE)
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView updateRole(@PathVariable(PATH_VARIABLE_ID) Long id,
-                                        @RequestBody @Valid UpdateRoleRequestModel updateRoleRequestModel)
+                                   @RequestBody @Valid UpdateRoleRequestModel updateRoleRequestModel,
+                                   BindingResult bindingResult)
             throws ResourceNotFoundException {
 
-        try {
-            userService.changeAuthority(id, Authority.getAuthorityByName(updateRoleRequestModel.getRole()));
-            UserVO userVO = userService.getOne(id);
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            try {
+                userService.changeAuthority(id, Authority.getAuthorityByName(updateRoleRequestModel.getRole()));
+                UserVO userVO = userService.getOne(id);
 
-            return wrap(userVOToExtendedUserDataModelEntityConverter.convert(userVO));
-        } catch (ServiceException e) {
-            LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
-            throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
+                return wrap(conversionService.convert(userVO, ExtendedUserDataModel.class));
+            } catch (ServiceException e) {
+                LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
+                throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
+            }
         }
     }
 
@@ -252,20 +233,25 @@ public class UsersController extends BaseController {
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PROFILE)
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView updateProfile(@PathVariable(PATH_VARIABLE_ID) Long id,
-                                           @RequestBody @Valid UpdateProfileRequestModel updateProfileRequestModel)
+                                      @RequestBody @Valid UpdateProfileRequestModel updateProfileRequestModel,
+                                      BindingResult bindingResult)
             throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
-        try {
-            userService.updateOne(id, updateProfileRequestModelToUserVOConverter.convert(updateProfileRequestModel));
-            UserVO userVO = userService.getOne(id);
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            try {
+                userService.updateOne(id, conversionService.convert(updateProfileRequestModel, UserVO.class));
+                UserVO userVO = userService.getOne(id);
 
-            return wrap(userVOToExtendedUserDataModelEntityConverter.convert(userVO));
-        } catch (ConstraintViolationException e) {
-            LOGGER.error(CONSTRAINT_VIOLATION, e);
-            throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);
-        } catch (ServiceException e) {
-            LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
-            throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
+                return wrap(conversionService.convert(userVO, ExtendedUserDataModel.class));
+            } catch (ConstraintViolationException e) {
+                LOGGER.error(CONSTRAINT_VIOLATION, e);
+                throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);
+            } catch (ServiceException e) {
+                LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
+                throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
+            }
         }
     }
 
@@ -280,18 +266,23 @@ public class UsersController extends BaseController {
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PASSWORD)
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView updatePassword(@PathVariable(PATH_VARIABLE_ID) Long id,
-                                            @RequestBody @Valid UserPasswordRequestModel userPasswordRequestModel)
+                                       @RequestBody @Valid UserPasswordRequestModel userPasswordRequestModel,
+                                       BindingResult bindingResult)
             throws ResourceNotFoundException {
 
-        try {
-            hashPassword(userPasswordRequestModel);
-            userService.changePassword(id, userPasswordRequestModel.getPassword());
-            UserVO userVO = userService.getOne(id);
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            try {
+                hashPassword(userPasswordRequestModel);
+                userService.changePassword(id, userPasswordRequestModel.getPassword());
+                UserVO userVO = userService.getOne(id);
 
-            return wrap(userVOToExtendedUserDataModelEntityConverter.convert(userVO));
-        } catch (ServiceException e) {
-            LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
-            throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
+                return wrap(conversionService.convert(userVO, ExtendedUserDataModel.class));
+            } catch (ServiceException e) {
+                LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
+                throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
+            }
         }
     }
 
@@ -303,16 +294,20 @@ public class UsersController extends BaseController {
      * @return process status and if "sign-in" is successful, the generated token
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_CLAIM_TOKEN)
-    public ModelAndView claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel) throws TokenClaimException {
+    public ModelAndView claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel, BindingResult bindingResult) throws TokenClaimException {
 
-        AuthRequestVO requestModel = loginRequestModelToAuthenticationRequestVOConverter.convert(loginRequestModel);
-        AuthResponseVO authenticationAnswer = userService.claimToken(requestModel);
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            AuthRequestVO requestModel = conversionService.convert(loginRequestModel, AuthRequestVO.class);
+            AuthResponseVO authenticationAnswer = userService.claimToken(requestModel);
 
-        if (authenticationAnswer.getAuthenticationResult() == AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS) {
-            throw new TokenClaimException();
+            if (authenticationAnswer.getAuthenticationResult() == AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS) {
+                throw new TokenClaimException();
+            }
+
+            return wrap(conversionService.convert(authenticationAnswer, LoginResponseDataModel.class));
         }
-
-        return wrap(authResponseVOToLoginResponseDataModelConverter.convert(authenticationAnswer));
     }
 
     /**
@@ -328,14 +323,14 @@ public class UsersController extends BaseController {
                                     BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 hashPassword(userInitializeRequestModel);
-                Long userID = userService.createOne(userInitializeRequestModelToUserVOConverter.convert(userInitializeRequestModel));
+                Long userID = userService.createOne(conversionService.convert(userInitializeRequestModel, UserVO.class));
                 UserVO createdUser = userService.getOne(userID);
 
-                return wrap(userVOToExtendedUserDataModelEntityConverter.convert(createdUser));
+                return wrap(conversionService.convert(createdUser, ExtendedUserDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(USER_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(USER_ACCOUNT_COULD_NOT_BE_CREATED);

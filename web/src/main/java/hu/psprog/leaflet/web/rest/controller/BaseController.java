@@ -8,6 +8,7 @@ import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -57,7 +58,7 @@ public class BaseController {
     static final String CONSTRAINT_VIOLATION = "Constraint violation";
 
     @Autowired
-    protected HttpServletRequest httpServletRequest;
+    ConversionService conversionService;
 
     /**
      * HTTP 404 exception handler.

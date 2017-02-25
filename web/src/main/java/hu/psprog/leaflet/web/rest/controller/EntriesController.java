@@ -2,6 +2,10 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
@@ -12,11 +16,6 @@ import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
-import hu.psprog.leaflet.web.rest.conversion.entry.EntryUpdateRequestModelToEntryVOConverter;
-import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEditEntryDataModelEntityConverter;
-import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToEntryDataModelListConverter;
-import hu.psprog.leaflet.web.rest.conversion.entry.EntryVOToExtendedEntryDataModelEntityConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,21 +57,6 @@ public class EntriesController extends BaseController {
     @Autowired
     private EntryService entryService;
 
-    @Autowired
-    private ValidationErrorMessagesConverter validationErrorMessagesConverter;
-
-    @Autowired
-    private EntryUpdateRequestModelToEntryVOConverter entryUpdateRequestModelToEntryVOConverter;
-
-    @Autowired
-    private EntryVOToExtendedEntryDataModelEntityConverter entryVOToExtendedEntryDataModelEntityConverter;
-
-    @Autowired
-    private EntryVOToEditEntryDataModelEntityConverter entryVOToEditEntryDataModelEntityConverter;
-
-    @Autowired
-    private EntryVOToEntryDataModelListConverter entryVOToEntryDataModelListConverter;
-
     /**
      * GET /entries
      * Returns basic information of all existing entry.
@@ -84,7 +68,7 @@ public class EntriesController extends BaseController {
 
         List<EntryVO> entries = entryService.getAll();
 
-        return wrap(entryVOToEntryDataModelListConverter.convert(entries));
+        return wrap(conversionService.convert(entries, EntryListDataModel.class));
     }
 
     /**
@@ -106,7 +90,7 @@ public class EntriesController extends BaseController {
         EntityPageVO<EntryVO> entryPage =
                 entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
 
-        return wrap(entryVOToEntryDataModelListConverter.convert(entryPage.getEntitiesOnPage()));
+        return wrap(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
     }
 
     /**
@@ -131,7 +115,7 @@ public class EntriesController extends BaseController {
                 entryService.getPageOfPublicEntriesUnderCategory(CategoryVO.wrapMinimumVO(id),
                         page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
 
-        return wrap(entryVOToEntryDataModelListConverter.convert(entryPage.getEntitiesOnPage()));
+        return wrap(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
     }
 
     /**
@@ -147,7 +131,7 @@ public class EntriesController extends BaseController {
         try {
             EntryVO entryVO = entryService.findByLink(link);
 
-            return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
+            return wrap(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
         } catch (EntityNotFoundException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -167,7 +151,7 @@ public class EntriesController extends BaseController {
         try {
             EntryVO entryVO = entryService.getOne(id);
 
-            return wrap(entryVOToEditEntryDataModelEntityConverter.convert(entryVO));
+            return wrap(conversionService.convert(entryVO, EditEntryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -188,13 +172,13 @@ public class EntriesController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
-                Long entryID = entryService.createOne(entryUpdateRequestModelToEntryVOConverter.convert(entryCreateRequestModel));
+                Long entryID = entryService.createOne(conversionService.convert(entryCreateRequestModel, EntryVO.class));
                 EntryVO createdEntry = entryService.getOne(entryID);
 
-                return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(createdEntry));
+                return wrap(conversionService.convert(createdEntry, ExtendedEntryDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -221,13 +205,13 @@ public class EntriesController extends BaseController {
             throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
-                entryService.updateOne(id, entryUpdateRequestModelToEntryVOConverter.convert(entryUpdateRequestModel));
+                entryService.updateOne(id, conversionService.convert(entryUpdateRequestModel, EntryVO.class));
                 EntryVO entryVO = entryService.getOne(id);
 
-                return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(entryVO));
+                return wrap(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -258,7 +242,7 @@ public class EntriesController extends BaseController {
             }
             EntryVO updatedEntryVO = entryService.getOne(id);
 
-            return wrap(entryVOToExtendedEntryDataModelEntityConverter.convert(updatedEntryVO));
+            return wrap(conversionService.convert(updatedEntryVO, ExtendedEntryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

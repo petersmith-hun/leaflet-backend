@@ -39,9 +39,7 @@ public class ResponseProcessorAspect {
     @AfterReturning(
             value = POINTCUT_ENTITY_PAGE,
             returning = RETURNING_ENTITY_PAGE_VO)
-    public void aspectToAutoHandleEntityPageParameters(EntityPageVO entityPageVO) {
-
-        LOGGER.info("Aspect activated for entityPageVO={}", entityPageVO);
+    public void aspectToAutoHandleEntityPageParameters(EntityPageVO<?> entityPageVO) {
         responseProcessor.process(entityPageVO);
     }
 
@@ -54,9 +52,7 @@ public class ResponseProcessorAspect {
     @AfterReturning(
             value = POINTCUT_CUSTOM_SEO_PROVIDER,
             returning = RETURNING_CUSTOM_SEO_PROVIDER)
-    public void aspectToHandleCustomSEODataProviders(CustomSEODataProviderVO customSEODataProviderVO) {
-
+    public void aspectToHandleCustomSEODataProviders(CustomSEODataProviderVO<?> customSEODataProviderVO) {
         responseProcessor.process(customSEODataProviderVO);
-        LOGGER.info("Aspect activated for customSEODataProvider");
     }
 }

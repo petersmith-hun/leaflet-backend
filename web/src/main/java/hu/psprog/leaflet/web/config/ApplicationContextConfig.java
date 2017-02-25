@@ -4,13 +4,16 @@ import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.web.exception.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.support.ConversionServiceFactoryBean;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.naming.InitialContext;
@@ -20,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Set;
 
 @Configuration
 @ComponentScan(ApplicationContextConfig.COMPONENT_SCAN)
@@ -37,6 +41,16 @@ public class ApplicationContextConfig {
 
     @Value(ConfigurationProperty.RUN_LEVEL)
     private String runLevelName;
+
+    @Bean
+    @Autowired
+    public ConversionServiceFactoryBean conversionService(final Set<Converter> converters) {
+
+        ConversionServiceFactoryBean conversionServiceFactoryBean = new ConversionServiceFactoryBean();
+        conversionServiceFactoryBean.setConverters(converters);
+
+        return conversionServiceFactoryBean;
+    }
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer applicationConfigPropertySource() throws InitializationException {
