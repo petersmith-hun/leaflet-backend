@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.conversion.entry;
 
+import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -35,6 +36,10 @@ public class EntryVOToExtendedEntryDataModelEntityConverter implements Converter
                 .withPrologue(entryVO.getPrologue())
                 .withCreated(commonFormatter.formatDate(entryVO.getCreated(), httpServletRequest.getLocale()))
                 .withID(entryVO.getId())
+                .withCategory(new CategoryDataModel.Builder()
+                        .withTitle(entryVO.getCategory().getTitle())
+                        .withID(entryVO.getCategory().getId())
+                        .build())
                 .withOwner(new UserDataModel.Builder()
                         .withID(entryVO.getOwner().getId())
                         .withUsername(entryVO.getOwner().getUsername())

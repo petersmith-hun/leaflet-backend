@@ -1,15 +1,16 @@
 package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.dcp.DCPRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.dcp.DCPDataModel;
 import hu.psprog.leaflet.api.rest.response.dcp.DCPListDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
-import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +43,7 @@ public class DCPStoreController extends BaseController {
     private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
 
     @Autowired
-    private ValidationErrorMessagesConverter validationErrorMessagesConverter;
+    private ConversionService conversionService;
 
     /**
      * GET /dcp
@@ -73,7 +74,7 @@ public class DCPStoreController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 dynamicConfigurationPropertyService.add(dcpRequestModel.getKey(), dcpRequestModel.getValue());
@@ -98,7 +99,7 @@ public class DCPStoreController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 dynamicConfigurationPropertyService.update(dcpRequestModel.getKey(), dcpRequestModel.getValue());
@@ -123,7 +124,7 @@ public class DCPStoreController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 dynamicConfigurationPropertyService.delete(dcpRequestModel.getKey());

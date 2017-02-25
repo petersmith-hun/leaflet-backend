@@ -1,16 +1,14 @@
 package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
+import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
+import hu.psprog.leaflet.api.rest.response.category.ExtendedCategoryDataModel;
+import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.service.CategoryService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
-import hu.psprog.leaflet.web.rest.conversion.category.CategoryCreateRequestModelToCategoryVOConverter;
-import hu.psprog.leaflet.web.rest.conversion.category.CategoryVOToCategoryDataModelEntityConverter;
-import hu.psprog.leaflet.web.rest.conversion.category.CategoryVOToCategoryDataModelListConverter;
-import hu.psprog.leaflet.web.rest.conversion.category.CategoryVOToExtendedCategoryDataModelEntityConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,21 +44,6 @@ public class CategoriesController extends BaseController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private CategoryVOToCategoryDataModelEntityConverter categoryVOToCategoryDataModelEntityConverter;
-
-    @Autowired
-    private CategoryVOToCategoryDataModelListConverter categoryVOToCategoryDataModelListConverter;
-
-    @Autowired
-    private CategoryCreateRequestModelToCategoryVOConverter categoryCreateRequestModelToCategoryVOConverter;
-
-    @Autowired
-    private CategoryVOToExtendedCategoryDataModelEntityConverter categoryVOToExtendedCategoryDataModelEntityConverter;
-
-    @Autowired
-    private ValidationErrorMessagesConverter validationErrorMessagesConverter;
-
     /**
      * GET /categories
      * Returns list of all existing categories.
@@ -72,7 +55,7 @@ public class CategoriesController extends BaseController {
 
         List<CategoryVO> categories = categoryService.getAll();
 
-        return wrap(categoryVOToCategoryDataModelListConverter.convert(categories));
+        return wrap(conversionService.convert(categories, CategoryListDataModel.class));
     }
 
     /**
@@ -86,7 +69,7 @@ public class CategoriesController extends BaseController {
 
         List<CategoryVO> categories = categoryService.getAllPublic();
 
-        return wrap(categoryVOToCategoryDataModelListConverter.convert(categories));
+        return wrap(conversionService.convert(categories, CategoryListDataModel.class));
     }
 
     /**
@@ -102,7 +85,7 @@ public class CategoriesController extends BaseController {
         try {
             CategoryVO category = categoryService.getOne(id);
 
-            return wrap(categoryVOToExtendedCategoryDataModelEntityConverter.convert(category));
+            return wrap(conversionService.convert(category, ExtendedCategoryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -123,13 +106,13 @@ public class CategoriesController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
-                Long categoryID = categoryService.createOne(categoryCreateRequestModelToCategoryVOConverter.convert(categoryCreateRequestModel));
+                Long categoryID = categoryService.createOne(conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
                 CategoryVO createdCategory = categoryService.getOne(categoryID);
 
-                return wrap(categoryVOToExtendedCategoryDataModelEntityConverter.convert(createdCategory));
+                return wrap(conversionService.convert(createdCategory, ExtendedCategoryDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(CATEGORY_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(CATEGORY_COULD_NOT_BE_CREATED_TRY_AGAIN);
@@ -153,13 +136,13 @@ public class CategoriesController extends BaseController {
                                        BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
-                categoryService.updateOne(id, categoryCreateRequestModelToCategoryVOConverter.convert(categoryCreateRequestModel));
+                categoryService.updateOne(id, conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
                 CategoryVO updatedCategory = categoryService.getOne(id);
 
-                return wrap(categoryVOToExtendedCategoryDataModelEntityConverter.convert(updatedCategory));
+                return wrap(conversionService.convert(updatedCategory, ExtendedCategoryDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
                 throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -187,7 +170,7 @@ public class CategoriesController extends BaseController {
             }
             CategoryVO updatedCategoryVO = categoryService.getOne(id);
 
-            return wrap(categoryVOToExtendedCategoryDataModelEntityConverter.convert(updatedCategoryVO));
+            return wrap(conversionService.convert(updatedCategoryVO, ExtendedCategoryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

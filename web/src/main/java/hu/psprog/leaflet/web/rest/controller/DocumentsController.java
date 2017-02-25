@@ -2,17 +2,16 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
+import hu.psprog.leaflet.api.rest.response.document.DocumentDataModel;
+import hu.psprog.leaflet.api.rest.response.document.DocumentListDataModel;
+import hu.psprog.leaflet.api.rest.response.document.EditDocumentDataModel;
 import hu.psprog.leaflet.service.DocumentService;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import hu.psprog.leaflet.web.rest.conversion.ValidationErrorMessagesConverter;
-import hu.psprog.leaflet.web.rest.conversion.document.DocumentUpdateRequestModelToDocumentVOConverter;
-import hu.psprog.leaflet.web.rest.conversion.document.DocumentVOToDocumentDataModelEntityConverter;
-import hu.psprog.leaflet.web.rest.conversion.document.DocumentVOToEditDocumentDataModelEntityConverter;
-import hu.psprog.leaflet.web.rest.conversion.document.DocumentVOToEditDocumentDataModelListConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,21 +50,6 @@ public class DocumentsController extends BaseController {
     @Autowired
     private DocumentService documentService;
 
-    @Autowired
-    private DocumentUpdateRequestModelToDocumentVOConverter documentUpdateRequestModelToDocumentVOConverter;
-
-    @Autowired
-    private DocumentVOToDocumentDataModelEntityConverter documentVOToDocumentDataModelEntityConverter;
-
-    @Autowired
-    private DocumentVOToEditDocumentDataModelEntityConverter documentVOToEditDocumentDataModelEntityConverter;
-
-    @Autowired
-    private DocumentVOToEditDocumentDataModelListConverter documentVOToEditDocumentDataModelListConverter;
-
-    @Autowired
-    private ValidationErrorMessagesConverter validationErrorMessagesConverter;
-
     /**
      * GET /documents
      * Returns basic information of all existing document.
@@ -77,7 +61,7 @@ public class DocumentsController extends BaseController {
 
         List<DocumentVO> documentVOList = documentService.getAll();
 
-        return wrap(documentVOToEditDocumentDataModelListConverter.convert(documentVOList));
+        return wrap(conversionService.convert(documentVOList, DocumentListDataModel.class));
     }
 
     /**
@@ -94,7 +78,7 @@ public class DocumentsController extends BaseController {
         try {
             DocumentVO documentVO = documentService.getOne(id);
 
-            return wrap(documentVOToEditDocumentDataModelEntityConverter.convert(documentVO));
+            return wrap(conversionService.convert(documentVO, EditDocumentDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -115,7 +99,7 @@ public class DocumentsController extends BaseController {
         try {
             DocumentVO documentVO = documentService.getByLink(link);
 
-            return wrap(documentVOToEditDocumentDataModelEntityConverter.convert(documentVO));
+            return wrap(conversionService.convert(documentVO, DocumentDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -138,13 +122,13 @@ public class DocumentsController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
-                Long documentID = documentService.createOne(documentUpdateRequestModelToDocumentVOConverter.convert(documentCreateRequestModel));
+                Long documentID = documentService.createOne(conversionService.convert(documentCreateRequestModel, DocumentVO.class));
                 DocumentVO createdDocument = documentService.getOne(documentID);
 
-                return wrap(documentVOToEditDocumentDataModelEntityConverter.convert(createdDocument));
+                return wrap(conversionService.convert(createdDocument, EditDocumentDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(A_DOCUMENT_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -174,13 +158,13 @@ public class DocumentsController extends BaseController {
             throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(validationErrorMessagesConverter.convert(bindingResult.getAllErrors()));
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
-                documentService.updateOne(id, documentUpdateRequestModelToDocumentVOConverter.convert(documentUpdateRequestModel));
+                documentService.updateOne(id, conversionService.convert(documentUpdateRequestModel, DocumentVO.class));
                 DocumentVO updatedDocument = documentService.getOne(id);
 
-                return wrap(documentVOToEditDocumentDataModelEntityConverter.convert(updatedDocument));
+                return wrap(conversionService.convert(updatedDocument, EditDocumentDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(A_DOCUMENT_WITH_THE_SAME_LINK_ALREADY_EXISTS);
