@@ -16,7 +16,7 @@ import java.util.List;
  * @author Peter Smith
  */
 @Repository
-public interface CommentRepository extends SelfStatusAwareJpaRepository<Comment, Long>, JpaSpecificationExecutor<Comment> {
+public interface CommentRepository extends SelfStatusAwareJpaRepository<Comment, Long>, LogicallyDeletableJpaRepository<Comment, Long>, JpaSpecificationExecutor<Comment> {
 
     /**
      * Returns {@link List} of {@link Comment} objects associated with given {@link Entry}.

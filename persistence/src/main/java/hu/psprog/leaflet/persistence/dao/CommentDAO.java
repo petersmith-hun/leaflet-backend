@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
  *
  * @author Peter Smith
  */
-public interface CommentDAO extends BaseDAO<Comment, Long>, SelfStatusAwareDAO<Long> {
+public interface CommentDAO extends BaseDAO<Comment, Long>, SelfStatusAwareDAO<Long>, LogicallyDeletableDAO<Long> {
 
     public Page<Comment> findByEntry(Pageable pageable, Entry entry);
 

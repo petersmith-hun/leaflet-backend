@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.service.vo;
 
-import hu.psprog.leaflet.persistence.entity.SerializableEntity;
+import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -10,7 +10,7 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-public class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SerializableEntity>
+public class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SelfStatusAwareIdentifiableEntity<ID>>
         extends IdentifiableVO<ID, T> {
 
     private Date created;

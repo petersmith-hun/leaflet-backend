@@ -48,6 +48,7 @@ public final class DatabaseConstants {
     static final String COLUMN_STATUS = "status";
     static final String COLUMN_KEY = "dcp_key";
     static final String COLUMN_VALUE = "dcp_value";
+    static final String COLUMN_DELETED = "is_deleted";
 
     static final String FK_ATTACHMENT_ENTRY = "FK_ATTACHMENT_ENTRY";
     static final String FK_DOCUMENT_USER = "FK_DOCUMENT_USER";
