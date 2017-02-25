@@ -45,4 +45,14 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.role = :role WHERE u.id = :id")
     public void updateRole(@Param("id") Long id, @Param("role") Role role);
+
+    /**
+     * Updates last login date of given user.
+     *
+     * @param email email address of {@link User}
+     */
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE User u SET u.lastLogin = now() WHERE u.email = :email")
+    void updateLastLogin(@Param("email") String email);
 }

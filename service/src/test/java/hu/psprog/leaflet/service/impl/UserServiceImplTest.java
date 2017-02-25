@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -367,5 +368,36 @@ public class UserServiceImplTest {
         // then
         verify(userDAO).exists(id);
         verify(userDAO, never()).disable(id);
+    }
+
+    @Test
+    public void testUpdateLastLoginWithSuccess() throws EntityNotFoundException {
+
+        // given
+        String email = "lflt66test@leaflet.dev";
+        given(userDAO.findByEmail(email)).willReturn(new User());
+
+        // when
+        userService.updateLastLogin(email);
+
+        // then
+        verify(userDAO).findByEmail(email);
+        verify(userDAO).updateLastLogin(email);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void testUpdateLastLoginWithNonExistingUser() throws EntityNotFoundException {
+
+        // given
+        String email = "lflt66test@leaflet.dev";
+        given(userDAO.findByEmail(email)).willReturn(null);
+
+        // when
+        userService.updateLastLogin(email);
+
+        // then
+        // expected exception
+        verify(userDAO).findByEmail(email);
+        verify(userDAO, never()).updateLastLogin(anyString());
     }
 }

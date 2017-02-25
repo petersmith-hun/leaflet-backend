@@ -10,6 +10,7 @@ import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
+import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.vo.AuthRequestVO;
@@ -67,6 +68,7 @@ public class UsersController extends BaseController {
     private static final String USER_COULD_NOT_BE_CREATED = "User could not be created. See details:";
     private static final String USER_ACCOUNT_COULD_NOT_BE_CREATED = "Your user account could not be created. Please try again later!";
     private static final String PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Provided email address is already in use.";
+    private static final String LAST_LOGIN_COULD_NOT_BE_UPDATED_FOR_THIS_USER = "Last login could not be updated for this user.";
 
     @Autowired
     private UserService userService;
@@ -303,13 +305,20 @@ public class UsersController extends BaseController {
      * @return process status and if "sign-in" is successful, the generated token
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_CLAIM_TOKEN)
-    public ModelAndView claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel) throws TokenClaimException {
+    public ModelAndView claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel) throws TokenClaimException, ResourceNotFoundException {
 
         AuthRequestVO requestModel = loginRequestModelToAuthenticationRequestVOConverter.convert(loginRequestModel);
         AuthResponseVO authenticationAnswer = userService.claimToken(requestModel);
 
         if (authenticationAnswer.getAuthenticationResult() == AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS) {
             throw new TokenClaimException();
+        }
+
+        try {
+            userService.updateLastLogin(loginRequestModel.getEmail());
+        } catch (EntityNotFoundException e) {
+            LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
+            throw new ResourceNotFoundException(LAST_LOGIN_COULD_NOT_BE_UPDATED_FOR_THIS_USER);
         }
 
         return wrap(authResponseVOToLoginResponseDataModelConverter.convert(authenticationAnswer));

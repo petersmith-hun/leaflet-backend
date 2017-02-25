@@ -10,9 +10,11 @@ import hu.psprog.leaflet.persistence.entity.User;
  */
 public interface UserDAO extends BaseDAO<User, Long>, SelfStatusAwareDAO<Long> {
 
-    public User findByEmail(String email);
+    User findByEmail(String email);
 
-    public void updatePassword(Long id, String password);
+    void updatePassword(Long id, String password);
 
-    public void updateRole(Long id, Role role);
+    void updateRole(Long id, Role role);
+
+    void updateLastLogin(String email);
 }
