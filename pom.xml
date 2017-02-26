@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>0.4-alpha</version>
+    <version>0.4.1-dev</version>
     
     <modules>
         <module>web</module>
