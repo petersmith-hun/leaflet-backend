@@ -25,5 +25,11 @@ public enum Role {
     /**
      * Virtual users used by external services, like CBFS.
      */
-    SERVICE;
+    SERVICE,
+
+    /**
+     * Non-registered user type, which is created when a user comments without registration.
+     * These users are not allowed to login, though their role can be elevated to USER.
+     */
+    NO_LOGIN
 }
