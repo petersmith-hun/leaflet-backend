@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.helper.UserEntityTestDataGenerator;
+import hu.psprog.leaflet.service.validation.user.UserValidatorChain;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,9 @@ public class UserDetailsServiceImplTest {
     @Mock
     private UserDAO userDAO;
 
+    @Mock
+    private UserValidatorChain userValidatorChain;
+
     @InjectMocks
     private UserDetailsServiceImpl userDetailsService;
 
@@ -42,6 +46,7 @@ public class UserDetailsServiceImplTest {
         // given
         String email = user.getEmail();
         given(userDAO.findByEmail(email)).willReturn(user);
+        given(userValidatorChain.runChain(user)).willReturn(true);
 
         // when
         userDetailsService.loadUserByUsername(email);
@@ -56,6 +61,7 @@ public class UserDetailsServiceImplTest {
         // given
         String email = user.getEmail();
         given(userDAO.findByEmail(email)).willReturn(null);
+        given(userValidatorChain.runChain(user)).willReturn(false);
 
         // when
         userDetailsService.loadUserByUsername(email);

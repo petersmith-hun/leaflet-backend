@@ -18,6 +18,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -57,6 +58,7 @@ public class CommentServiceImplIT {
     private static final String ENTRY_1 = "entry_1";
 
     @Autowired
+    @Qualifier("commentServiceImpl")
     private CommentService commentService;
 
     @Autowired

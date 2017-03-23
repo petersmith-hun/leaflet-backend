@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -293,5 +294,13 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException(User.class, email);
         }
         userDAO.updateLastLogin(email);
+    }
+
+    @Override
+    public UserVO silentGetUserByEmail(String email) {
+
+        return Optional.ofNullable(userDAO.findByEmail(email))
+                .map(userToUserVOConverter::convert)
+                .orElse(null);
     }
 }
