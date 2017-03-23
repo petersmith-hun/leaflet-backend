@@ -67,4 +67,13 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
      * @throws EntityNotFoundException if no user found associated with given username
      */
     public void updateLastLogin(String email) throws EntityNotFoundException;
+
+    /**
+     * Retrieves user identified by given email address.
+     * Does NOT throw exception if entity not found, instead returns null!
+     *
+     * @param email email of user to find
+     * @return identified user as {@link UserVO} object or null if not exists
+     */
+    public UserVO silentGetUserByEmail(String email);
 }

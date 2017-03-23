@@ -26,6 +26,8 @@ import java.lang.reflect.Field;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
@@ -399,5 +401,40 @@ public class UserServiceImplTest {
         // expected exception
         verify(userDAO).findByEmail(email);
         verify(userDAO, never()).updateLastLogin(anyString());
+    }
+
+    @Test
+    public void testSilentGetUserByEmailWithExistingUser() {
+
+        // given
+        String email = "lflt123test@leaflet.dev";
+        User user = new User();
+        UserVO userVO = new UserVO();
+        given(userDAO.findByEmail(email)).willReturn(user);
+        given(userToUserVOConverter.convert(user)).willReturn(userVO);
+
+        // when
+        UserVO result = userService.silentGetUserByEmail(email);
+
+        // then
+        assertThat(result, notNullValue());
+        verify(userDAO).findByEmail(email);
+        verify(userToUserVOConverter).convert(user);
+    }
+
+    @Test
+    public void testSilentGetUserByEmailWithNonExistingUser() {
+
+        // given
+        String email = "lflt123test@leaflet.dev";
+        given(userDAO.findByEmail(email)).willReturn(null);
+
+        // when
+        UserVO result = userService.silentGetUserByEmail(email);
+
+        // then
+        assertThat(result, nullValue());
+        verify(userDAO).findByEmail(email);
+        verify(userToUserVOConverter, never()).convert(any(User.class));
     }
 }
