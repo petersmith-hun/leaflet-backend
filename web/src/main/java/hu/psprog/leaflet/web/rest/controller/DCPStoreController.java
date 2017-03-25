@@ -10,7 +10,6 @@ import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,16 +33,12 @@ public class DCPStoreController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCPStoreController.class);
 
-    private static final String DCP_STORE = "DCP_STORE";
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_CREATED = "New configuration entry could not be created.";
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_UPDATED = "Configuration entry could not be updated.";
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED = "Configuration entry could not be deleted.";
 
     @Autowired
     private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
-
-    @Autowired
-    private ConversionService conversionService;
 
     /**
      * GET /dcp

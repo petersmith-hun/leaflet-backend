@@ -5,6 +5,7 @@ import hu.psprog.leaflet.web.interceptor.ResponseFillerInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -30,6 +31,11 @@ public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
     public ObjectMapper objectMapper() {
 
         return new ObjectMapper();
+    }
+
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
     }
 
     @Override

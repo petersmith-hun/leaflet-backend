@@ -30,7 +30,6 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
                 .withCreated(source.getCreated())
                 .isEnabled(source.isEnabled())
                 .withLastModified(source.getLastModified())
-                .withStatus(EntryStatus.valueOf(source.getEntryStatus()))
                 .withLocale(source.getLocale())
                 .withId(source.getId())
                 .withLink(source.getLink())
