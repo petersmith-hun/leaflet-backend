@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
+import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -24,6 +27,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -36,7 +41,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = LeafletITContextConfig.COMPONENT_SCAN_PACKAGE)
 @EnableJpaRepositories(basePackages = LeafletITContextConfig.REPOSITORY_PACKAGE)
-public class LeafletITContextConfig {
+public class LeafletITContextConfig implements ApplicationListener<ContextClosedEvent> {
 
     public static final String INTEGRATION_TEST_DB_SCRIPT_USERS = "classpath:/service_it_db_script_users.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_ENTRIES = "classpath:/service_it_db_script_entries.sql";
@@ -54,6 +59,8 @@ public class LeafletITContextConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    private TemporaryFolder temporaryFolder;
 
     @Bean
     public DataSource dataSource() {
@@ -127,5 +134,17 @@ public class LeafletITContextConfig {
     public AuthenticationManager authenticationManager() {
 
         return new ProviderManager(Arrays.asList(authenticationProvider()));
+    }
+
+    @Bean
+    public File fileStorage() throws IOException {
+        temporaryFolder = new TemporaryFolder();
+        temporaryFolder.create();
+        return temporaryFolder.getRoot();
+    }
+
+    @Override
+    public void onApplicationEvent(ContextClosedEvent event) {
+        temporaryFolder.delete();
     }
 }
