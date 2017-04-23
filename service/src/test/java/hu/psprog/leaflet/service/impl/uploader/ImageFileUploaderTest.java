@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.impl.uploader;
 
 import hu.psprog.leaflet.service.exception.DirectoryCreationException;
 import hu.psprog.leaflet.service.exception.FileUploadException;
+import hu.psprog.leaflet.service.util.FilenameGeneratorUtil;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.junit.After;
@@ -18,7 +19,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,6 +30,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 
 /**
  * Unit tests for {@link ImageUploadAcceptor}.
@@ -36,6 +41,7 @@ import static org.mockito.BDDMockito.given;
 public class ImageFileUploaderTest {
 
     private static final String ORIGINAL_FILENAME = "test.jpg";
+    private static final String DESTINATION_FILENAME = "destination_filename.jpg";
     private static final String ACCEPTED_MIME_TYPE = "image/jpg";
     private static final String UNACCEPTED_MIME_TYPE = "application/pdf";
     private static final String SUBFOLDER = "test";
@@ -48,6 +54,9 @@ public class ImageFileUploaderTest {
     @Mock
     private File fileStorage;
 
+    @Mock
+    private FilenameGeneratorUtil filenameGeneratorUtil;
+
     @InjectMocks
     private ImageUploadAcceptor imageFileUploader;
 
@@ -57,7 +66,8 @@ public class ImageFileUploaderTest {
     public void setup() throws IOException, DirectoryCreationException {
         prepareTemporaryStorage();
         imageFileUploader.initializeAcceptorRoot();
-        fileInputStream = new FileInputStream(temporaryFolder.newFile());
+        fileInputStream = new FileInputStream(prepareTempFile());
+        given(filenameGeneratorUtil.cleanFilename(any(FileInputVO.class))).willReturn(DESTINATION_FILENAME);
     }
 
     @After
@@ -79,9 +89,8 @@ public class ImageFileUploaderTest {
         // then
         assertThat(result, notNullValue());
         assertThat(result.getOriginalFilename(), equalTo(ORIGINAL_FILENAME));
-        assertThat(result.getStoredFilename(), equalTo(ORIGINAL_FILENAME));
         assertThat(result.getAcceptedAs(), equalTo(ACCEPTED_AS_IMAGE));
-        assertThat(result.getPath(), equalTo(Paths.get(temporaryFolder.getRoot().getAbsolutePath(), IMAGES_FOLDER).toString()));
+        assertThat(result.getPath(), equalTo(Paths.get(IMAGES_FOLDER, DESTINATION_FILENAME).toString()));
     }
 
     @Test
@@ -96,9 +105,8 @@ public class ImageFileUploaderTest {
         // then
         assertThat(result, notNullValue());
         assertThat(result.getOriginalFilename(), equalTo(ORIGINAL_FILENAME));
-        assertThat(result.getStoredFilename(), equalTo(ORIGINAL_FILENAME));
         assertThat(result.getAcceptedAs(), equalTo(ACCEPTED_AS_IMAGE));
-        assertThat(result.getPath(), equalTo(Paths.get(temporaryFolder.getRoot().getAbsolutePath(), IMAGES_FOLDER, SUBFOLDER).toString()));
+        assertThat(result.getPath(), equalTo(Paths.get(IMAGES_FOLDER, SUBFOLDER, DESTINATION_FILENAME).toString()));
     }
 
     @Test
@@ -136,5 +144,14 @@ public class ImageFileUploaderTest {
         return FileInputVO.Builder.getBuilder()
                 .withContentType(UNACCEPTED_MIME_TYPE)
                 .build();
+    }
+
+    private File prepareTempFile() throws IOException {
+
+        File tempFile = temporaryFolder.newFile();
+        List<String> lines = Arrays.asList("Line #1", "Line #2", "Line #3");
+        Files.write(tempFile.toPath(), lines);
+
+        return tempFile;
     }
 }

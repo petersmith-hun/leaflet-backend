@@ -4,7 +4,7 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 
-import java.io.OutputStream;
+import java.io.File;
 
 /**
  * Service to handle file operations.
@@ -26,20 +26,21 @@ public interface FileManagementService {
 
     /**
      * Downloads an existing file by its stored filename.
+     * Path should be relative to the storage root.
      *
-     * @param filename filename of the file to download
-     * @return uploaded file as {@link OutputStream}
+     * @param path path of the file to download
+     * @return uploaded file as {@link File}
      * @throws ServiceException if there's no existing file by the given filename
      */
-    OutputStream download(String filename) throws ServiceException;
+    File download(String path) throws ServiceException;
 
     /**
      * Removes an existing file by its stored filename.
      *
-     * @param filename filename of the file to remove
+     * @param path filename of the file to remove
      * @throws ServiceException if there's no existing file by the given filename
      */
-    void remove(String filename) throws ServiceException;
+    void remove(String path) throws ServiceException;
 
     /**
      * Creates a new directory under given parent directory.
@@ -47,5 +48,5 @@ public interface FileManagementService {
      * @param parent parent directory name (must be already existing)
      * @param directoryName name of the directory to create
      */
-    void createDirectory(String parent, String directoryName);
+    void createDirectory(String parent, String directoryName) throws ServiceException;
 }

@@ -53,7 +53,7 @@ public class ServiceConfiguration {
     }
 
     private void createStorageRoot(File storageRootDirectory) throws IOException {
-        LOGGER.info("File storage root is not existing. Trying to create...");
+        LOGGER.info("File storage root does not exist. Trying to create...");
         if (storageRootDirectory.mkdirs()) {
             LOGGER.info("Storage root created at [{}].", storageRootDirectoryPath);
         } else {

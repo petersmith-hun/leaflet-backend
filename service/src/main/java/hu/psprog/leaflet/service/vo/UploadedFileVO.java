@@ -1,27 +1,25 @@
 package hu.psprog.leaflet.service.vo;
 
+import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Date;
 
 /**
  * Value object for uploaded files.
  *
  * @author Peter Smith
  */
-public class UploadedFileVO {
+public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, UploadedFile> {
 
     private String originalFilename;
-    private String storedFilename;
     private String path;
     private String acceptedAs;
 
     public String getOriginalFilename() {
         return originalFilename;
-    }
-
-    public String getStoredFilename() {
-        return storedFilename;
     }
 
     public String getPath() {
@@ -42,7 +40,6 @@ public class UploadedFileVO {
 
         return new EqualsBuilder()
                 .append(originalFilename, that.originalFilename)
-                .append(storedFilename, that.storedFilename)
                 .append(path, that.path)
                 .append(acceptedAs, that.acceptedAs)
                 .isEquals();
@@ -52,7 +49,6 @@ public class UploadedFileVO {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(originalFilename)
-                .append(storedFilename)
                 .append(path)
                 .append(acceptedAs)
                 .toHashCode();
@@ -62,18 +58,22 @@ public class UploadedFileVO {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("originalFilename", originalFilename)
-                .append("storedFilename", storedFilename)
                 .append("path", path)
                 .append("acceptedAs", acceptedAs)
                 .toString();
     }
 
-
+    /**
+     * Builder for {@link UploadedFileVO}.
+     */
     public static final class Builder {
+        private Long id;
         private String originalFilename;
-        private String storedFilename;
+        private Date created;
         private String path;
+        private Date lastModified;
         private String acceptedAs;
+        private boolean enabled;
 
         private Builder() {
         }
@@ -82,13 +82,18 @@ public class UploadedFileVO {
             return new Builder();
         }
 
+        public Builder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
         public Builder withOriginalFilename(String originalFilename) {
             this.originalFilename = originalFilename;
             return this;
         }
 
-        public Builder withStoredFilename(String storedFilename) {
-            this.storedFilename = storedFilename;
+        public Builder withCreated(Date created) {
+            this.created = created;
             return this;
         }
 
@@ -97,17 +102,30 @@ public class UploadedFileVO {
             return this;
         }
 
+        public Builder withLastModified(Date lastModified) {
+            this.lastModified = lastModified;
+            return this;
+        }
+
         public Builder withAcceptedAs(String acceptedAs) {
             this.acceptedAs = acceptedAs;
             return this;
         }
 
+        public Builder withEnabled(boolean enabled) {
+            this.enabled = enabled;
+            return this;
+        }
+
         public UploadedFileVO build() {
             UploadedFileVO uploadedFileVO = new UploadedFileVO();
+            uploadedFileVO.setId(id);
+            uploadedFileVO.setCreated(created);
+            uploadedFileVO.setLastModified(lastModified);
+            uploadedFileVO.setEnabled(enabled);
             uploadedFileVO.acceptedAs = this.acceptedAs;
-            uploadedFileVO.storedFilename = this.storedFilename;
-            uploadedFileVO.path = this.path;
             uploadedFileVO.originalFilename = this.originalFilename;
+            uploadedFileVO.path = this.path;
             return uploadedFileVO;
         }
     }

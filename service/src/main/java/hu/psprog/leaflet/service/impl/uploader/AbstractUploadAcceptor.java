@@ -2,9 +2,9 @@ package hu.psprog.leaflet.service.impl.uploader;
 
 import hu.psprog.leaflet.service.exception.DirectoryCreationException;
 import hu.psprog.leaflet.service.exception.FileUploadException;
+import hu.psprog.leaflet.service.util.FilenameGeneratorUtil;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,9 @@ public abstract class AbstractUploadAcceptor {
     @Autowired
     private File fileStorage;
 
+    @Autowired
+    private FilenameGeneratorUtil filenameGeneratorUtil;
+
     private String fileGroupDirectory;
     private File acceptorRoot;
 
@@ -58,12 +61,11 @@ public abstract class AbstractUploadAcceptor {
 
     public UploadedFileVO upload(FileInputVO fileInputVO) throws FileUploadException {
 
+        UploadedFileVO uploadedFileVO = null;
         try {
-            UploadedFileVO uploadedFileVO = null;
             if (isAccepted(fileInputVO)) {
                 uploadedFileVO = doUpload(fileInputVO);
             }
-            return uploadedFileVO;
         } catch (IOException exc) {
             LOGGER.error("Could not move uploaded file [{}] to destination location", fileInputVO.getOriginalFilename());
             throw new FileUploadException("Could not move uploaded file to destination location", exc);
@@ -71,6 +73,7 @@ public abstract class AbstractUploadAcceptor {
             LOGGER.error("Given path is invalid", exc);
             throw new FileUploadException("Given path is invalid", exc);
         }
+        return uploadedFileVO;
     }
 
     private boolean isAccepted(FileInputVO fileInputVO) {
@@ -79,22 +82,14 @@ public abstract class AbstractUploadAcceptor {
 
     private UploadedFileVO doUpload(FileInputVO fileInputVO) throws IOException {
         Path path = buildPath(fileInputVO);
-        String targetFilename = cleanFilename(fileInputVO);
+        String targetFilename = filenameGeneratorUtil.cleanFilename(fileInputVO);
         Files.copy(fileInputVO.getFileContentStream(), path.resolve(targetFilename));
 
         return UploadedFileVO.Builder.getBuilder()
                 .withOriginalFilename(fileInputVO.getOriginalFilename())
-                .withStoredFilename(targetFilename)
-                .withPath(path.toAbsolutePath().toString())
+                .withPath(buildFileRelatePath(fileInputVO, targetFilename).toString())
                 .withAcceptedAs(acceptedAs())
                 .build();
-    }
-
-    private String cleanFilename(FileInputVO fileInputVO) {
-        return StringUtils.stripAccents(fileInputVO.getOriginalFilename())
-                .toLowerCase()
-                .replace(' ', '_')
-                .trim();
     }
 
     private Path buildPath(FileInputVO fileInputVO) throws InvalidPathException {
@@ -103,6 +98,16 @@ public abstract class AbstractUploadAcceptor {
             path = Paths.get(acceptorRoot.getAbsolutePath(), fileInputVO.getRelativePath());
         } else {
             path = Paths.get(acceptorRoot.getAbsolutePath());
+        }
+        return path;
+    }
+
+    private Path buildFileRelatePath(FileInputVO fileInputVO, String filename) {
+        Path path;
+        if (Objects.nonNull(fileInputVO.getRelativePath())) {
+            path = Paths.get(acceptorRoot.getName(), fileInputVO.getRelativePath(), filename);
+        } else {
+            path = Paths.get(acceptorRoot.getName(), filename);
         }
         return path;
     }
