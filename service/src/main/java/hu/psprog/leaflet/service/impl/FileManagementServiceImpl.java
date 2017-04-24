@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.nio.file.InvalidPathException;
@@ -37,6 +38,8 @@ public class FileManagementServiceImpl implements FileManagementService {
 
     @Override
     public UploadedFileVO upload(FileInputVO fileInputVO) throws ServiceException {
+
+        Assert.state(fileInputVO.getSize() > 0, "File size must be greater than 0!");
 
         UploadedFileVO uploadedFileVO = null;
         Iterator<AbstractUploadAcceptor> uploaderIterator = uploaders.iterator();

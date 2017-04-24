@@ -3,9 +3,9 @@ package hu.psprog.leaflet.service.vo;
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Value object for uploaded files.
@@ -17,6 +17,9 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
     private String originalFilename;
     private String path;
     private String acceptedAs;
+    private String storedFilename;
+    private UUID pathUUID;
+    private String description;
 
     public String getOriginalFilename() {
         return originalFilename;
@@ -30,6 +33,18 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
         return acceptedAs;
     }
 
+    public String getStoredFilename() {
+        return storedFilename;
+    }
+
+    public UUID getPathUUID() {
+        return pathUUID;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,9 +54,13 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
         UploadedFileVO that = (UploadedFileVO) o;
 
         return new EqualsBuilder()
+                .appendSuper(super.equals(o))
                 .append(originalFilename, that.originalFilename)
                 .append(path, that.path)
                 .append(acceptedAs, that.acceptedAs)
+                .append(storedFilename, that.storedFilename)
+                .append(pathUUID, that.pathUUID)
+                .append(description, that.description)
                 .isEquals();
     }
 
@@ -51,29 +70,27 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
                 .append(originalFilename)
                 .append(path)
                 .append(acceptedAs)
+                .append(storedFilename)
+                .append(pathUUID)
+                .append(description)
                 .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("originalFilename", originalFilename)
-                .append("path", path)
-                .append("acceptedAs", acceptedAs)
-                .toString();
     }
 
     /**
      * Builder for {@link UploadedFileVO}.
      */
     public static final class Builder {
+        private static String PASSWORD_FIELD = "password";
         private Long id;
         private String originalFilename;
-        private Date created;
         private String path;
-        private Date lastModified;
+        private Date created;
         private String acceptedAs;
+        private Date lastModified;
+        private String storedFilename;
         private boolean enabled;
+        private UUID pathUUID;
+        private String description;
 
         private Builder() {
         }
@@ -92,18 +109,13 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
             return this;
         }
 
-        public Builder withCreated(Date created) {
-            this.created = created;
-            return this;
-        }
-
         public Builder withPath(String path) {
             this.path = path;
             return this;
         }
 
-        public Builder withLastModified(Date lastModified) {
-            this.lastModified = lastModified;
+        public Builder withCreated(Date created) {
+            this.created = created;
             return this;
         }
 
@@ -112,8 +124,28 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
             return this;
         }
 
+        public Builder withLastModified(Date lastModified) {
+            this.lastModified = lastModified;
+            return this;
+        }
+
+        public Builder withStoredFilename(String storedFilename) {
+            this.storedFilename = storedFilename;
+            return this;
+        }
+
         public Builder withEnabled(boolean enabled) {
             this.enabled = enabled;
+            return this;
+        }
+
+        public Builder withPathUUID(UUID pathUUID) {
+            this.pathUUID = pathUUID;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            this.description = description;
             return this;
         }
 
@@ -123,9 +155,12 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
             uploadedFileVO.setCreated(created);
             uploadedFileVO.setLastModified(lastModified);
             uploadedFileVO.setEnabled(enabled);
-            uploadedFileVO.acceptedAs = this.acceptedAs;
             uploadedFileVO.originalFilename = this.originalFilename;
+            uploadedFileVO.acceptedAs = this.acceptedAs;
+            uploadedFileVO.pathUUID = this.pathUUID;
             uploadedFileVO.path = this.path;
+            uploadedFileVO.storedFilename = this.storedFilename;
+            uploadedFileVO.description = this.description;
             return uploadedFileVO;
         }
     }

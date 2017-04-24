@@ -53,6 +53,8 @@ public final class DatabaseConstants {
     static final String COLUMN_PATH = "path";
     static final String COLUMN_ORIGINAL_FILENAME = "original_filename";
     static final String COLUMN_MIME = "mime";
+    static final String COLUMN_PATH_UUID = "path_uuid";
+    static final String COLUMN_STORED_FILENAME = "stored_filename";
 
     static final String FK_ATTACHMENT_ENTRY = "FK_ATTACHMENT_ENTRY";
     static final String FK_DOCUMENT_USER = "FK_DOCUMENT_USER";

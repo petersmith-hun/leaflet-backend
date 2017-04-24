@@ -6,6 +6,7 @@ import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Facade for file management operations, including info storage.
@@ -27,19 +28,19 @@ public interface FileManagementFacade {
      * Downloads an existing file by its stored filename.
      * Path should be relative to the storage root.
      *
-     * @param path path of the file to download
+     * @param pathUUID pathUUID of the file to download
      * @return uploaded file and its meta information as {@link DownloadableFileWrapperVO}
      * @throws ServiceException if there's no existing file by the given filename
      */
-    DownloadableFileWrapperVO download(String path) throws ServiceException;
+    DownloadableFileWrapperVO download(UUID pathUUID) throws ServiceException;
 
     /**
      * Removes an existing file by its stored filename.
      *
-     * @param path filename of the file to remove
+     * @param pathUUID filename of the file to remove
      * @throws ServiceException if there's no existing file by the given filename
      */
-    void remove(String path) throws ServiceException;
+    void remove(UUID pathUUID) throws ServiceException;
 
     /**
      * Creates a new directory under given parent directory.

@@ -24,6 +24,9 @@ public class UploadedFileToUploadedFileVOConverter implements Converter<Uploaded
                 .withOriginalFilename(source.getOriginalFilename())
                 .withPath(source.getPath())
                 .withAcceptedAs(source.getMime())
+                .withPathUUID(source.getPathUUID())
+                .withStoredFilename(source.getStoredFilename())
+                .withDescription(source.getDescription())
                 .build();
     }
 }

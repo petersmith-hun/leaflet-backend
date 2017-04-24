@@ -17,6 +17,7 @@ public class FileInputVO {
     private long size;
     private InputStream fileContentStream;
     private String relativePath;
+    private String description;
 
     public String getOriginalFilename() {
         return originalFilename;
@@ -38,6 +39,10 @@ public class FileInputVO {
         return relativePath;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,6 +57,7 @@ public class FileInputVO {
                 .append(contentType, that.contentType)
                 .append(fileContentStream, that.fileContentStream)
                 .append(relativePath, that.relativePath)
+                .append(description, that.description)
                 .isEquals();
     }
 
@@ -63,6 +69,7 @@ public class FileInputVO {
                 .append(size)
                 .append(fileContentStream)
                 .append(relativePath)
+                .append(description)
                 .toHashCode();
     }
 
@@ -75,6 +82,7 @@ public class FileInputVO {
         private long size;
         private InputStream fileContentStream;
         private String relativePath;
+        private String description;
 
         private Builder() {
         }
@@ -108,6 +116,11 @@ public class FileInputVO {
             return this;
         }
 
+        public Builder withDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
         public FileInputVO build() {
             FileInputVO fileInputVO = new FileInputVO();
             fileInputVO.originalFilename = this.originalFilename;
@@ -115,6 +128,7 @@ public class FileInputVO {
             fileInputVO.size = this.size;
             fileInputVO.fileContentStream = this.fileContentStream;
             fileInputVO.relativePath = this.relativePath;
+            fileInputVO.description = this.description;
             return fileInputVO;
         }
     }

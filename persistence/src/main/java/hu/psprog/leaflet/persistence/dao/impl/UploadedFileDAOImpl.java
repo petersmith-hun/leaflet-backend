@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * DAO implementation of {@link UploadedFileRepository}.
@@ -26,6 +27,11 @@ public class UploadedFileDAOImpl extends SelfStatusAwareDAOImpl<UploadedFile, Lo
     @Override
     public UploadedFile findByPath(String path) {
         return ((UploadedFileRepository) jpaRepository).findByPath(path);
+    }
+
+    @Override
+    public UploadedFile findByPathUUID(UUID pathUUID) {
+        return ((UploadedFileRepository) jpaRepository).findByPathUUID(pathUUID);
     }
 
     @Transactional

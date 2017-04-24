@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Abstract file upload handler.
@@ -83,12 +84,16 @@ public abstract class AbstractUploadAcceptor {
     private UploadedFileVO doUpload(FileInputVO fileInputVO) throws IOException {
         Path path = buildPath(fileInputVO);
         String targetFilename = filenameGeneratorUtil.cleanFilename(fileInputVO);
+        String fileRelativePath = buildFileRelatePath(fileInputVO, targetFilename).toString();
         Files.copy(fileInputVO.getFileContentStream(), path.resolve(targetFilename));
 
         return UploadedFileVO.Builder.getBuilder()
                 .withOriginalFilename(fileInputVO.getOriginalFilename())
-                .withPath(buildFileRelatePath(fileInputVO, targetFilename).toString())
+                .withPath(fileRelativePath)
                 .withAcceptedAs(acceptedAs())
+                .withStoredFilename(targetFilename)
+                .withPathUUID(UUID.fromString(fileRelativePath))
+                .withDescription(fileInputVO.getDescription())
                 .build();
     }
 

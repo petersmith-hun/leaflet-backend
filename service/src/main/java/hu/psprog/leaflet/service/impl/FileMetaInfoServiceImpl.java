@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -36,11 +37,11 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     private UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
 
     @Override
-    public UploadedFileVO retrieveMetaInfo(String path) throws ServiceException {
+    public UploadedFileVO retrieveMetaInfo(UUID pathUUID) throws ServiceException {
 
-        UploadedFile uploadedFile = uploadedFileDAO.findByPath(path);
+        UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
         if (Objects.isNull(uploadedFile)) {
-            throw new EntityNotFoundException(UploadedFile.class, path);
+            throw new EntityNotFoundException(UploadedFile.class, pathUUID);
         }
 
         return uploadedFileToUploadedFileVOConverter.convert(uploadedFile);
@@ -65,22 +66,22 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
-    public void removeMetaInfo(String path) throws ServiceException  {
+    public void removeMetaInfo(UUID pathUUID) throws ServiceException  {
 
-        UploadedFile uploadedFile = uploadedFileDAO.findByPath(path);
+        UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
         if (Objects.isNull(uploadedFile)) {
-            throw new EntityNotFoundException(UploadedFile.class, path);
+            throw new EntityNotFoundException(UploadedFile.class, pathUUID);
         }
 
         uploadedFileDAO.delete(uploadedFile.getId());
     }
 
     @Override
-    public void rename(String path, String newFilename) throws ServiceException  {
+    public void rename(UUID pathUUID, String newFilename) throws ServiceException  {
 
-        UploadedFile uploadedFile = uploadedFileDAO.findByPath(path);
+        UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
         if (Objects.isNull(uploadedFile)) {
-            throw new EntityNotFoundException(UploadedFile.class, path);
+            throw new EntityNotFoundException(UploadedFile.class, pathUUID);
         }
 
         uploadedFile.setOriginalFilename(newFilename);

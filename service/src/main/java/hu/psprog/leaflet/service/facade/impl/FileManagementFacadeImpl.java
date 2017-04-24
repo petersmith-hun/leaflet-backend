@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Implementation of {@link FileManagementFacade}.
@@ -46,23 +47,24 @@ public class FileManagementFacadeImpl implements FileManagementFacade {
     }
 
     @Override
-    public DownloadableFileWrapperVO download(String path) throws ServiceException {
+    public DownloadableFileWrapperVO download(UUID pathUUID) throws ServiceException {
 
-        UploadedFileVO uploadedFileVO = fileMetaInfoService.retrieveMetaInfo(path);
-        File file = fileManagementService.download(path);
+        UploadedFileVO uploadedFileVO = fileMetaInfoService.retrieveMetaInfo(pathUUID);
+        File file = fileManagementService.download(uploadedFileVO.getPath());
 
         try {
             return wrapFile(uploadedFileVO, file);
         } catch (IOException e) {
-            LOGGER.error("Failed to retrieve stored file [{}] for download.", path);
+            LOGGER.error("Failed to retrieve stored file [{}] for download.", uploadedFileVO.getPath());
             throw new ServiceException("Failed to retrieve stored file for download.", e);
         }
     }
 
     @Override
-    public void remove(String path) throws ServiceException {
-        fileManagementService.remove(path);
-        fileMetaInfoService.removeMetaInfo(path);
+    public void remove(UUID pathUUID) throws ServiceException {
+        UploadedFileVO uploadedFileVO = fileMetaInfoService.retrieveMetaInfo(pathUUID);
+        fileManagementService.remove(uploadedFileVO.getPath());
+        fileMetaInfoService.removeMetaInfo(pathUUID);
     }
 
     @Override
