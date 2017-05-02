@@ -1,4 +1,4 @@
-package hu.psprog.leaflet.service.impl.uploader;
+package hu.psprog.leaflet.service.impl.uploader.acceptor;
 
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.util.List;
  * @author Peter Smith
  */
 @Component
-public class ImageUploadAcceptor extends AbstractUploadAcceptor {
+public class ImageUploadAcceptor extends AbstractUploadAcceptor implements UploadAcceptor {
 
     private static final String IMAGE_ROOT_DIRECTORY = "images";
     private static final String ACCEPTOR = "IMAGE";
@@ -27,17 +27,18 @@ public class ImageUploadAcceptor extends AbstractUploadAcceptor {
     private static final String MIME_IMAGE_PNG = "image/png";
     private static final String MIME_IMAGE_GIF = "image/gif";
 
-    public ImageUploadAcceptor() {
-        super(IMAGE_ROOT_DIRECTORY);
+    @Override
+    public String acceptedAs() {
+        return ACCEPTOR;
+    }
+
+    @Override
+    public String groupRootDirectory() {
+        return IMAGE_ROOT_DIRECTORY;
     }
 
     @Override
     protected List<String> getAcceptedMIMETypes() {
         return Collections.unmodifiableList(Arrays.asList(MIME_IMAGE_JPG, MIME_IMAGE_JPEG, MIME_IMAGE_PNG, MIME_IMAGE_GIF));
-    }
-
-    @Override
-    protected String acceptedAs() {
-        return ACCEPTOR;
     }
 }

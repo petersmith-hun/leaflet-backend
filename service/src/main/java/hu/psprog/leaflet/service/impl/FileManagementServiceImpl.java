@@ -3,7 +3,7 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.service.FileManagementService;
 import hu.psprog.leaflet.service.exception.FileUploadException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.impl.uploader.AbstractUploadAcceptor;
+import hu.psprog.leaflet.service.impl.uploader.FileUploader;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.slf4j.Logger;
@@ -16,8 +16,6 @@ import java.io.File;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -30,23 +28,23 @@ public class FileManagementServiceImpl implements FileManagementService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileManagementServiceImpl.class);
 
-    @Autowired
-    private List<AbstractUploadAcceptor> uploaders;
+    private File fileStorage;
+    private FileUploader fileUploader;
 
     @Autowired
-    private File fileStorage;
+    public FileManagementServiceImpl(File fileStorage, FileUploader fileUploader) {
+        this.fileStorage = fileStorage;
+        this.fileUploader = fileUploader;
+    }
 
     @Override
     public UploadedFileVO upload(FileInputVO fileInputVO) throws ServiceException {
 
         Assert.state(fileInputVO.getSize() > 0, "File size must be greater than 0!");
 
-        UploadedFileVO uploadedFileVO = null;
-        Iterator<AbstractUploadAcceptor> uploaderIterator = uploaders.iterator();
+        UploadedFileVO uploadedFileVO;
         try {
-            while (Objects.isNull(uploadedFileVO) && uploaderIterator.hasNext()) {
-                uploadedFileVO = uploaderIterator.next().upload(fileInputVO);
-            }
+            uploadedFileVO = fileUploader.upload(fileInputVO);
         } catch (FileUploadException exc) {
             LOGGER.error("Failed to upload file", exc);
             throw new ServiceException("Failed to upload file", exc);
@@ -54,7 +52,7 @@ public class FileManagementServiceImpl implements FileManagementService {
 
         if (Objects.isNull(uploadedFileVO)) {
             LOGGER.error("No acceptor for MIME [{}] found to upload file [{}]",
-                    fileInputVO.getOriginalFilename(), fileInputVO.getContentType());
+                    fileInputVO.getContentType(), fileInputVO.getOriginalFilename());
             throw new ServiceException("No acceptor found to upload file");
         }
 

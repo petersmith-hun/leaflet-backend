@@ -5,7 +5,7 @@ package hu.psprog.leaflet.service.exception;
  *
  * @author Peter Smith
  */
-public class DirectoryCreationException extends Exception {
+public class DirectoryCreationException extends RuntimeException {
 
     public DirectoryCreationException(String message) {
         super(message);

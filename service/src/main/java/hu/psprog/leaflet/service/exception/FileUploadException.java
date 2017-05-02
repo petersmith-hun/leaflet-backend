@@ -5,7 +5,7 @@ package hu.psprog.leaflet.service.exception;
  *
  * @author Peter Smith
  */
-public class FileUploadException extends Exception {
+public class FileUploadException extends RuntimeException {
 
     public FileUploadException(String message, Exception exception) {
         super(message, exception);

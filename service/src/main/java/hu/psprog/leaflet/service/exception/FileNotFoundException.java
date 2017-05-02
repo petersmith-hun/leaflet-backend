@@ -5,7 +5,7 @@ package hu.psprog.leaflet.service.exception;
  *
  * @author Peter Smith
  */
-public class FileNotFoundException extends Exception {
+public class FileNotFoundException extends RuntimeException {
 
     public FileNotFoundException(String message, Exception exception) {
         super(message, exception);
