@@ -36,14 +36,19 @@ public class BaseController {
     static final String BASE_PATH_DCP = "/dcp";
     static final String BASE_PATH_DOCUMENTS = "/documents";
     static final String BASE_PATH_COMMENTS = "/comments";
+    static final String BASE_PATH_FILES = "/files";
 
     static final String PATH_VARIABLE_ID = "id";
     static final String PATH_VARIABLE_PAGE = "page";
     static final String PATH_VARIABLE_LINK = "link";
+    static final String PATH_VARIABLE_FILENAME = "storedFilename";
+    static final String PATH_VARIABLE_FILE_IDENTIFIER = "fileIdentifier";
 
     static final String PATH_PART_ID = "/{id}";
     static final String PATH_PART_PAGE = "/{page}";
     static final String PATH_PART_LINK = "/{link}";
+    static final String PATH_PART_FILENAME = "/{storedFilename}";
+    static final String PATH_PART_FILE_IDENTIFIER = "/{fileIdentifier}";
 
     static final String PATH_CHANGE_STATUS = PATH_PART_ID + "/status";
     static final String PATH_PUBLIC = "/public";

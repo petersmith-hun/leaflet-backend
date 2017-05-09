@@ -5,6 +5,7 @@ import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.service.converter.UploadedFileToUploadedFileVOConverter;
 import hu.psprog.leaflet.service.converter.UploadedFileVOToUploadedFileConverter;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -107,7 +108,7 @@ public class FileMetaInfoServiceImplTest {
     }
 
     @Test
-    public void shouldRename() throws ServiceException {
+    public void shouldUpdateMetaInfo() throws ServiceException {
 
         // given
         UUID pathUUID = UUID.randomUUID();
@@ -115,27 +116,28 @@ public class FileMetaInfoServiceImplTest {
                 .withId(1L)
                 .build();
         given(uploadedFileDAO.findByPathUUID(any(UUID.class))).willReturn(expectedUploadedFile);
-        String newFilename = "renamed_image.jpg";
+        UpdateFileMetaInfoVO updateFileMetaInfoVO = prepareUpdateFileMetaInfoVO();
 
         // when
-        fileMetaInfoService.rename(pathUUID, newFilename);
+        fileMetaInfoService.updateMetaInfo(pathUUID, updateFileMetaInfoVO);
 
         // then
-        assertThat(expectedUploadedFile.getOriginalFilename(), equalTo(newFilename));
+        assertThat(expectedUploadedFile.getOriginalFilename(), equalTo(updateFileMetaInfoVO.getOriginalFilename()));
+        assertThat(expectedUploadedFile.getDescription(), equalTo(updateFileMetaInfoVO.getDescription()));
         verify(uploadedFileDAO).findByPathUUID(pathUUID);
         verify(uploadedFileDAO).updateOne(1L, expectedUploadedFile);
     }
 
     @Test(expected = ServiceException.class)
-    public void shouldThrowExceptionOnRenameWhenUUIDIsNotExisting() throws ServiceException {
+    public void shouldThrowExceptionOnUpdateMetaInfoWhenUUIDIsNotExisting() throws ServiceException {
 
         // given
         UUID pathUUID = UUID.randomUUID();
         given(uploadedFileDAO.findByPathUUID(any(UUID.class))).willReturn(null);
-        String newFilename = "renamed_image.jpg";
+        UpdateFileMetaInfoVO updateFileMetaInfoVO = prepareUpdateFileMetaInfoVO();
 
         // when
-        fileMetaInfoService.rename(pathUUID, newFilename);
+        fileMetaInfoService.updateMetaInfo(pathUUID, updateFileMetaInfoVO);
 
         // then
         // expected exception
@@ -157,5 +159,12 @@ public class FileMetaInfoServiceImplTest {
         assertThat(result.size(), equalTo(3));
         verify(uploadedFileDAO).findAll();
         verify(uploadedFileToUploadedFileVOConverter, times(3)).convert(any(UploadedFile.class));
+    }
+
+    private UpdateFileMetaInfoVO prepareUpdateFileMetaInfoVO() {
+        return UpdateFileMetaInfoVO.Builder.getBuilder()
+                .withDescription("Updated description")
+                .withOriginalFilename("renamed_image.jpg")
+                .build();
     }
 }

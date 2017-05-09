@@ -2,6 +2,7 @@ package hu.psprog.leaflet.persistence.entity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +28,7 @@ public class UploadedFile extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_MIME)
     private String mime;
 
+    @Type(type = "uuid-char")
     @Column(name = DatabaseConstants.COLUMN_PATH_UUID, unique = true)
     private UUID pathUUID;
 

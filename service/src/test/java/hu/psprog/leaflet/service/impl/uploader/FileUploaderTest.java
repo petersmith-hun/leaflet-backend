@@ -86,7 +86,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         // then
         assertThat(result, notNullValue());
         assertThat(result.getOriginalFilename(), equalTo(ORIGINAL_FILENAME));
-        assertThat(result.getAcceptedAs(), equalTo(ACCEPTED_AS_IMAGE));
+        assertThat(result.getAcceptedAs(), equalTo(MIME_TYPE));
         assertThat(result.getPath(), equalTo(Paths.get(IMAGES_FOLDER, DESTINATION_FILENAME).toString()));
         assertThat(result.getPathUUID(), equalTo(PATH_UUID_NO_SUBFOLDER));
     }
@@ -104,7 +104,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         // then
         assertThat(result, notNullValue());
         assertThat(result.getOriginalFilename(), equalTo(ORIGINAL_FILENAME));
-        assertThat(result.getAcceptedAs(), equalTo(ACCEPTED_AS_IMAGE));
+        assertThat(result.getAcceptedAs(), equalTo(MIME_TYPE));
         assertThat(result.getPath(), equalTo(Paths.get(IMAGES_FOLDER, SUBFOLDER, DESTINATION_FILENAME).toString()));
         assertThat(result.getPathUUID(), equalTo(PATH_UUID_SUBFOLDER));
     }
