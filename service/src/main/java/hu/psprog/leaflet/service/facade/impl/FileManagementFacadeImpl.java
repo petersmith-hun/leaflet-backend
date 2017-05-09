@@ -6,6 +6,7 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.FileManagementFacade;
 import hu.psprog.leaflet.service.vo.DownloadableFileWrapperVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
+import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,11 @@ public class FileManagementFacadeImpl implements FileManagementFacade {
     @Override
     public List<UploadedFileVO> retrieveStoredFileList() {
         return fileMetaInfoService.getUploadedFiles();
+    }
+
+    @Override
+    public void updateMetaInfo(UUID pathUUID, UpdateFileMetaInfoVO updateFileMetaInfoVO) throws ServiceException {
+        fileMetaInfoService.updateMetaInfo(pathUUID, updateFileMetaInfoVO);
     }
 
     private DownloadableFileWrapperVO wrapFile(UploadedFileVO metaInfo, File fileToDownload) throws IOException {

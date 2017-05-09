@@ -41,6 +41,7 @@ public class UploadedFileDAOImpl extends SelfStatusAwareDAOImpl<UploadedFile, Lo
         UploadedFile currentUploadedFile = jpaRepository.getOne(id);
         if (Objects.nonNull(currentUploadedFile)) {
             currentUploadedFile.setOriginalFilename(updatedEntity.getOriginalFilename());
+            currentUploadedFile.setDescription(updatedEntity.getDescription());
             currentUploadedFile.setLastModified(new Date());
             jpaRepository.flush();
         }

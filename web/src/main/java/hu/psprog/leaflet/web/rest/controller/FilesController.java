@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.file.DirectoryCreationRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.FileUploadRequestModel;
+import hu.psprog.leaflet.api.rest.request.file.UpdateFileMetaInfoRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileListDataModel;
@@ -9,6 +10,7 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.FileManagementFacade;
 import hu.psprog.leaflet.service.vo.DownloadableFileWrapperVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
+import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
@@ -159,6 +161,37 @@ public class FilesController extends BaseController {
                 throw new RequestCouldNotBeFulfilledException("Failed to create directory.", e);
             }
             return null;
+        }
+    }
+
+    /**
+     * Updates given file's meta information.
+     *
+     * @param fileIdentifier UUID of the uploaded file
+     * @param storedFilename stored filename of the uploaded file (currently only the fileIdentifier is used for identification)
+     * @param updateFileMetaInfoRequestModel updated meta information
+     * @param bindingResult validation result
+     * @return validation result on validation error, {@code null} otherwise
+     * @throws ResourceNotFoundException if no existing file is found for given fileIdentifier
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = PATH_FULLY_IDENTIFIED_FILE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ModelAndView updateFileMetaInfo(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier,
+                                           @PathVariable(PATH_VARIABLE_FILENAME) String storedFilename,
+                                           @RequestBody @Valid UpdateFileMetaInfoRequestModel updateFileMetaInfoRequestModel,
+                                           BindingResult bindingResult) throws ResourceNotFoundException {
+
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            UpdateFileMetaInfoVO updateFileMetaInfoVO = conversionService.convert(updateFileMetaInfoRequestModel, UpdateFileMetaInfoVO.class);
+            try {
+                fileManagementFacade.updateMetaInfo(fileIdentifier, updateFileMetaInfoVO);
+                return null;
+            } catch (ServiceException e) {
+                LOGGER.error("Failed to update given file.", e);
+                throw new ResourceNotFoundException("Requested file can not be updated, probably not existing.");
+            }
         }
     }
 }

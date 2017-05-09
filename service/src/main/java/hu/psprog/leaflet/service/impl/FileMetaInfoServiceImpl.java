@@ -9,6 +9,7 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,14 +78,15 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
-    public void rename(UUID pathUUID, String newFilename) throws ServiceException  {
+    public void updateMetaInfo(UUID pathUUID, UpdateFileMetaInfoVO updateFileMetaInfoVO) throws ServiceException  {
 
         UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
         if (Objects.isNull(uploadedFile)) {
             throw new EntityNotFoundException(UploadedFile.class, pathUUID);
         }
 
-        uploadedFile.setOriginalFilename(newFilename);
+        uploadedFile.setOriginalFilename(updateFileMetaInfoVO.getOriginalFilename());
+        uploadedFile.setDescription(updateFileMetaInfoVO.getDescription());
         uploadedFileDAO.updateOne(uploadedFile.getId(), uploadedFile);
     }
 

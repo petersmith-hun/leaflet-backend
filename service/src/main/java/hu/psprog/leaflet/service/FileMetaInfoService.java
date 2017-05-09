@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.service;
 
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 
 import java.util.List;
@@ -37,12 +38,12 @@ public interface FileMetaInfoService {
     void removeMetaInfo(UUID pathUUID) throws ServiceException;
 
     /**
-     * Changes original filename.
+     * Updates file meta information.
      *
-     * @param pathUUID pathUUID of existing file to rename
-     * @param newFilename new filename as string
+     * @param pathUUID pathUUID of existing file to update meta info of
+     * @param updateFileMetaInfoVO updated meta information
      */
-    void rename(UUID pathUUID, String newFilename) throws ServiceException;
+    void updateMetaInfo(UUID pathUUID, UpdateFileMetaInfoVO updateFileMetaInfoVO) throws ServiceException;
 
     /**
      * Retrieves meta information for all uploaded files.
