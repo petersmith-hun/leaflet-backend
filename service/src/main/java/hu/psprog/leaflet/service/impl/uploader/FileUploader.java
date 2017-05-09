@@ -91,7 +91,7 @@ public class FileUploader {
         return UploadedFileVO.Builder.getBuilder()
                 .withOriginalFilename(fileInputVO.getOriginalFilename())
                 .withPath(fileRelativePath)
-                .withAcceptedAs(uploadAcceptor.acceptedAs())
+                .withAcceptedAs(fileInputVO.getContentType())
                 .withStoredFilename(targetFilename)
                 .withPathUUID(UUID.nameUUIDFromBytes(fileRelativePath.getBytes()))
                 .withDescription(fileInputVO.getDescription())

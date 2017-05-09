@@ -10,6 +10,7 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.FilterRegistration;
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
@@ -31,6 +32,8 @@ public class MainInitializer implements WebApplicationInitializer {
 
         AnnotationConfigWebApplicationContext applicationContext = new AnnotationConfigWebApplicationContext();
         applicationContext.register(ApplicationContextConfig.class);
+        applicationContext.setServletContext(servletContext);
+        applicationContext.refresh();
 
         DispatcherServlet dispatcherServlet = new DispatcherServlet(applicationContext);
         ServletRegistration.Dynamic servlet = servletContext.addServlet(SERVLET_NAME, dispatcherServlet);
@@ -38,6 +41,7 @@ public class MainInitializer implements WebApplicationInitializer {
         servlet.addMapping(SERVLET_MAPPING);
         servlet.setAsyncSupported(true);
         servlet.setLoadOnStartup(1);
+        servlet.setMultipartConfig(applicationContext.getBean(MultipartConfigElement.class));
 
         FilterRegistration characterEncodingFilter = servletContext.addFilter(FILTER_CHARACTER_ENCODING, new CharacterEncodingFilter());
         characterEncodingFilter.setInitParameter("encoding", "UTF-8");
