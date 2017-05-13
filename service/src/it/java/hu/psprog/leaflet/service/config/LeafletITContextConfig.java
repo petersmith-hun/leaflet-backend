@@ -1,6 +1,8 @@
 package hu.psprog.leaflet.service.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
@@ -30,6 +32,7 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -112,8 +115,11 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
 
     @Bean
     public ObjectMapper objectMapper() {
-
-        return new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule timestampDeserialization = new SimpleModule();
+        timestampDeserialization.addDeserializer(Date.class, new DateDeserializers.TimestampDeserializer());
+        objectMapper.registerModule(timestampDeserialization);
+        return objectMapper;
     }
 
     @Bean

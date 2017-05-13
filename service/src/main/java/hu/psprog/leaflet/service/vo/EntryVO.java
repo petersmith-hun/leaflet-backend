@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Locale;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Value object for {@link Entry} entity.
@@ -40,6 +41,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     private UserVO owner;
     private CategoryVO category;
     private Locale locale;
+    private List<UploadedFileVO> attachments;
 
     public EntryVO() {
         // Serializable
@@ -47,7 +49,8 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
 
     public EntryVO(Long id, Date created, Date lastModified, boolean enabled, String title, String link,
                    String prologue, String content, String rawContent, String seoTitle, String seoDescription,
-                   String seoKeywords, String entryStatus, UserVO owner, CategoryVO categoryVO, Locale locale) {
+                   String seoKeywords, String entryStatus, UserVO owner, CategoryVO categoryVO, Locale locale,
+                   List<UploadedFileVO> attachments) {
         super(id, created, lastModified, enabled);
         this.title = title;
         this.link = link;
@@ -61,6 +64,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         this.owner = owner;
         this.category = categoryVO;
         this.locale = locale;
+        this.attachments = attachments;
     }
 
     public String getTitle() {
@@ -159,6 +163,14 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         this.category = categoryVO;
     }
 
+    public List<UploadedFileVO> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<UploadedFileVO> attachments) {
+        this.attachments = attachments;
+    }
+
     @Override
     public String getSEOTitle() {
         return seoTitle;
@@ -206,6 +218,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         private UserVO owner;
         private CategoryVO category;
         private Locale locale;
+        private List<UploadedFileVO> attachments;
 
         public Builder withId(Long id) {
             this.id = id;
@@ -287,9 +300,14 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
             return this;
         }
 
+        public Builder withAttachments(List<UploadedFileVO> attachments) {
+            this.attachments = attachments;
+            return this;
+        }
+
         public EntryVO createEntryVO() {
             return new EntryVO(id, created, lastModified, enabled, title, link, prologue, content, rawContent,
-                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, category, locale);
+                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, category, locale, attachments);
         }
     }
 }

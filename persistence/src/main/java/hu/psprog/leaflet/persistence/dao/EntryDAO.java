@@ -3,6 +3,7 @@ package hu.psprog.leaflet.persistence.dao;
 import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Tag;
+import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.persistence.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,4 +27,6 @@ public interface EntryDAO extends BaseDAO<Entry, Long>, SelfStatusAwareDAO<Long>
     public List<Entry> findByTags(Tag tag);
 
     public Page<Entry> findAll(Specification<Entry> specification, Pageable pageable);
+
+    public void updateAttachments(Long id, List<UploadedFile> attachments);
 }

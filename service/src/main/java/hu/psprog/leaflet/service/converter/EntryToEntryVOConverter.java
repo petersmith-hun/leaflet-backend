@@ -1,12 +1,18 @@
 package hu.psprog.leaflet.service.converter;
 
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Converts {@link Entry} to {@link EntryVO} object.
@@ -21,6 +27,9 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
 
     @Autowired
     private CategoryToCategoryVOConverter categoryToCategoryVOConverter;
+
+    @Autowired
+    private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
 
     @Override
     public EntryVO convert(Entry source) {
@@ -39,7 +48,8 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
                 .withSeoTitle(source.getSeoTitle())
                 .withSeoDescription(source.getSeoDescription())
                 .withSeoKeywords(source.getSeoKeywords())
-                .withTitle(source.getTitle());
+                .withTitle(source.getTitle())
+                .withAttachments(mapAttachments(source.getAttachments()));
 
         if (Objects.nonNull(source.getCategory())) {
             builder.withCategory(categoryToCategoryVOConverter.convert(source.getCategory()));
@@ -50,5 +60,12 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
         }
 
         return builder.createEntryVO();
+    }
+
+    private List<UploadedFileVO> mapAttachments(List<UploadedFile> uploadedFiles) {
+        return Optional.ofNullable(uploadedFiles)
+                .orElse(Collections.emptyList()).stream()
+                .map(uploadedFileToUploadedFileVOConverter::convert)
+                .collect(Collectors.toList());
     }
 }

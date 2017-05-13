@@ -18,10 +18,10 @@ import java.util.List;
  * Blog entry entity class.
  *
  * Relations:
- *  - {@link Entry} 1:N {@link Attachment}
  *  - {@link Entry} 1:N {@link Comment}
  *  - {@link Entry} N:1 {@link Category}
  *  - {@link Entry} N:1 {@link User}
+ *  - {@link Entry} N:M {@link UploadedFile}
  *  - {@link Entry} N:M {@link Tag}
  *
  * @author Peter Smith
@@ -47,6 +47,14 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             inverseJoinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_TAG_ID,
                     foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_TAG)))
     private List<Tag> tags;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = DatabaseConstants.TABLE_ENTRIES_UPLOADED_FILES,
+            joinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_ENTRY_ID,
+                    foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_UPLOADED_FILES_ENTRY)),
+            inverseJoinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_UPLOADED_FILE_ID,
+                    foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_UPLOADED_FILES_UPLOADED_FILE)))
+    private List<UploadedFile> attachments;
 
     @Column(name = DatabaseConstants.COLUMN_TITLE)
     private String title;
@@ -84,25 +92,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         // Serializable
     }
 
-    public Entry(Long id, Date created, Date lastModified, boolean enabled, User user, Category category,
-                 List<Tag> tags, String title, String link, String prologue, String content, String rawContent,
-                 String seoTitle, String seoDescription, String seoKeywords, Locale locale, EntryStatus status) {
-        super(id, created, lastModified, enabled);
-        this.user = user;
-        this.category = category;
-        this.tags = tags;
-        this.title = title;
-        this.link = link;
-        this.prologue = prologue;
-        this.content = content;
-        this.rawContent = rawContent;
-        this.seoTitle = seoTitle;
-        this.seoDescription = seoDescription;
-        this.seoKeywords = seoKeywords;
-        this.locale = locale;
-        this.status = status;
-    }
-
     public User getUser() {
         return user;
     }
@@ -117,6 +106,22 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    public List<UploadedFile> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<UploadedFile> attachments) {
+        this.attachments = attachments;
     }
 
     public String getTitle() {
@@ -191,14 +196,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.locale = locale;
     }
 
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
     public EntryStatus getStatus() {
         return status;
     }
@@ -207,22 +204,18 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
-
     /**
-     * Entry entity builder.
+     * Builder for {@link Entry} entity.
      */
-    public static class Builder {
-        private Long id;
+    public static final class Builder {
         private Date created;
         private Date lastModified;
         private boolean enabled;
+        private Long id;
         private User user;
         private Category category;
         private List<Tag> tags;
+        private List<UploadedFile> attachments;
         private String title;
         private String link;
         private String prologue;
@@ -234,9 +227,11 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         private Locale locale;
         private EntryStatus status;
 
-        public Builder withId(Long id) {
-            this.id = id;
-            return this;
+        private Builder() {
+        }
+
+        public static Builder getBuilder() {
+            return new Builder();
         }
 
         public Builder withCreated(Date created) {
@@ -249,8 +244,13 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
-        public Builder isEnabled(boolean enabled) {
+        public Builder withEnabled(boolean enabled) {
             this.enabled = enabled;
+            return this;
+        }
+
+        public Builder withId(Long id) {
+            this.id = id;
             return this;
         }
 
@@ -266,6 +266,11 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
         public Builder withTags(List<Tag> tags) {
             this.tags = tags;
+            return this;
+        }
+
+        public Builder withAttachments(List<UploadedFile> attachments) {
+            this.attachments = attachments;
             return this;
         }
 
@@ -319,9 +324,27 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
-        public Entry createEntry() {
-            return new Entry(id, created, lastModified, enabled, user, category, tags, title, link, prologue, content,
-                    rawContent, seoTitle, seoDescription, seoKeywords, locale, status);
+        public Entry build() {
+            Entry entry = new Entry();
+            entry.setCreated(created);
+            entry.setLastModified(lastModified);
+            entry.setEnabled(enabled);
+            entry.setId(id);
+            entry.setUser(user);
+            entry.setCategory(category);
+            entry.setTags(tags);
+            entry.setAttachments(attachments);
+            entry.setTitle(title);
+            entry.setLink(link);
+            entry.setPrologue(prologue);
+            entry.setContent(content);
+            entry.setRawContent(rawContent);
+            entry.setSeoTitle(seoTitle);
+            entry.setSeoDescription(seoDescription);
+            entry.setSeoKeywords(seoKeywords);
+            entry.setLocale(locale);
+            entry.setStatus(status);
+            return entry;
         }
     }
 }

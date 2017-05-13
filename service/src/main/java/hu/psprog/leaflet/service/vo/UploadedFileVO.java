@@ -80,7 +80,6 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
      * Builder for {@link UploadedFileVO}.
      */
     public static final class Builder {
-        private static String PASSWORD_FIELD = "password";
         private Long id;
         private String originalFilename;
         private String path;

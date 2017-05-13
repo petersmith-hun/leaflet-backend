@@ -24,11 +24,11 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
     @Override
     public Entry convert(EntryVO source) {
 
-        Entry.Builder builder = new Entry.Builder();
+        Entry.Builder builder = Entry.Builder.getBuilder();
         builder.withContent(source.getContent())
                 .withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
-                .isEnabled(source.isEnabled())
+                .withEnabled(source.isEnabled())
                 .withLastModified(source.getLastModified())
                 .withLocale(source.getLocale())
                 .withId(source.getId())
@@ -50,6 +50,6 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
             builder.withUser(user);
         }
 
-        return builder.createEntry();
+        return builder.build();
     }
 }

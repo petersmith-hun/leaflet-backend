@@ -24,4 +24,5 @@ public class Entry_ extends SelfStatusAwareIdentifiableEntity_ {
     public static volatile SingularAttribute<Entry, User> user;
     public static volatile SingularAttribute<Entry, Category> category;
     public static volatile ListAttribute<Entry, Tag> tags;
+    public static volatile ListAttribute<Entry, UploadedFile> attachments;
 }
