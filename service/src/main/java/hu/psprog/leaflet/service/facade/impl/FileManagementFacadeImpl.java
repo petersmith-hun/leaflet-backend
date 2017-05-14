@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -81,6 +82,20 @@ public class FileManagementFacadeImpl implements FileManagementFacade {
     @Override
     public void updateMetaInfo(UUID pathUUID, UpdateFileMetaInfoVO updateFileMetaInfoVO) throws ServiceException {
         fileMetaInfoService.updateMetaInfo(pathUUID, updateFileMetaInfoVO);
+    }
+
+    @Override
+    public Optional<UploadedFileVO> getCheckedMetaInfo(UUID pathUUID) {
+        Optional<UploadedFileVO> uploadedFileVOOptional = Optional.empty();
+        try {
+            UploadedFileVO uploadedFileVO = fileMetaInfoService.retrieveMetaInfo(pathUUID);
+            if (fileManagementService.exists(uploadedFileVO.getPath())) {
+                uploadedFileVOOptional = Optional.of(uploadedFileVO);
+            }
+        } catch (ServiceException e) {
+            LOGGER.error("Requested file does not exist", e);
+        }
+        return uploadedFileVOOptional;
     }
 
     private DownloadableFileWrapperVO wrapFile(UploadedFileVO metaInfo, File fileToDownload) throws IOException {

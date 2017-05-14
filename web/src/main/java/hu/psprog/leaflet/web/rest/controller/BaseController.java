@@ -37,6 +37,7 @@ public class BaseController {
     static final String BASE_PATH_DOCUMENTS = "/documents";
     static final String BASE_PATH_COMMENTS = "/comments";
     static final String BASE_PATH_FILES = "/files";
+    static final String BASE_PATH_ATTACHMENTS = "/attachments";
 
     static final String PATH_VARIABLE_ID = "id";
     static final String PATH_VARIABLE_PAGE = "page";

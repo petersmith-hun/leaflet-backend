@@ -214,6 +214,33 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         // expected exception
     }
 
+    @Test
+    public void shouldExistsReturnTrue() throws IOException, ServiceException {
+
+        // given
+        prepareTemporaryStorage();
+        prepareFileForDownload();
+
+        // when
+        boolean result = fileManagementService.exists(PATH);
+
+        // then
+        assertThat(result, is(true));
+    }
+
+    @Test
+    public void shouldExistsReturnFalse() throws IOException, ServiceException {
+
+        // given
+        prepareTemporaryStorage();
+
+        // when
+        boolean result = fileManagementService.exists(PATH);
+
+        // then
+        assertThat(result, is(false));
+    }
+
     private void prepareFileInputVo() {
         given(fileInputVO.getContentType()).willReturn(MIME_TYPE);
         given(fileInputVO.getOriginalFilename()).willReturn(ORIGINAL_FILENAME);
