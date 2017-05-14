@@ -1,34 +1,32 @@
 package hu.psprog.leaflet.service.impl;
 
-import hu.psprog.leaflet.persistence.dao.AttachmentDAO;
-import hu.psprog.leaflet.persistence.entity.Attachment;
-import hu.psprog.leaflet.service.converter.AttachmentToAttachmentVOConverter;
-import hu.psprog.leaflet.service.converter.AttachmentVOToAttachmentConverter;
-import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
+import hu.psprog.leaflet.persistence.dao.EntryDAO;
+import hu.psprog.leaflet.persistence.dao.UploadedFileDAO;
+import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.UploadedFile;
+import hu.psprog.leaflet.service.converter.UploadedFileVOToUploadedFileConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.vo.AttachmentVO;
+import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.UploadedFileVO;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -39,220 +37,190 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class AttachmentServiceImplTest {
 
-    @Mock
-    private AttachmentDAO attachmentDAO;
+    private static final Long ENTRY_ID = 1L;
+    private static final Long UPLOADED_FILE_ID = 15L;
 
     @Mock
-    private AttachmentToAttachmentVOConverter attachmentToAttachmentVOConverter;
+    private EntryDAO entryDAO;
 
     @Mock
-    private AttachmentVOToAttachmentConverter attachmentVOToAttachmentConverter;
+    private UploadedFileDAO uploadedFileDAO;
 
     @Mock
-    private EntryVOToEntryConverter entryVOToEntryConverter;
+    private UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
 
     @Mock
-    private Attachment attachment;
-
-    @Mock
-    private AttachmentVO attachmentVO;
+    private Entry mockedEntry;
 
     @InjectMocks
     private AttachmentServiceImpl attachmentService;
 
+    private EntryVO entryVO;
+    private UploadedFileVO uploadedFileVO;
+    private UploadedFile controlUploadedFile;
+    private List<UploadedFile> attachments;
+
+    @Before
+    public void setup() {
+        entryVO = new EntryVO.Builder()
+                .withId(ENTRY_ID)
+                .withTitle("Test entry")
+                .createEntryVO();
+        uploadedFileVO = UploadedFileVO.Builder.getBuilder()
+                .withId(UPLOADED_FILE_ID)
+                .withPath("images/stored_control_15.jpg")
+                .build();
+        controlUploadedFile = UploadedFile.Builder.getBuilder()
+                .withStoredFilename("stored_control_15.jpg")
+                .withOriginalFilename("original_control_15.jpg")
+                .withPathUUID(UUID.randomUUID())
+                .withId(UPLOADED_FILE_ID)
+                .build();
+        given(entryDAO.findOne(ENTRY_ID)).willReturn(mockedEntry);
+    }
+
     @Test
-    public void testGetOneWithExistingAttachment() throws ServiceException {
+    public void shouldNotAttachIfAlreadyAttached() throws ServiceException {
 
         // given
-        Long id = 1L;
-        given(attachmentDAO.findOne(id)).willReturn(attachment);
-        given(attachmentToAttachmentVOConverter.convert(attachment)).willReturn(attachmentVO);
+        prepareMocks(true);
 
         // when
-        AttachmentVO result = attachmentService.getOne(id);
+        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
 
         // then
-        assertThat(result, equalTo(attachmentVO));
-        verify(attachmentDAO).findOne(id);
-        verify(attachmentToAttachmentVOConverter).convert(attachment);
+        assertResults(6, true, false);
+    }
+
+    @Test
+    public void shouldAttachIfNotAlreadyAttached() throws ServiceException {
+
+        // given
+        prepareMocks(false);
+
+        // when
+        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
+
+        // then
+        assertResults(6, true, true);
+    }
+
+    @Test
+    public void shouldNotDetachIfNotAttached() throws ServiceException {
+
+        // given
+        prepareMocks(false);
+
+        // when
+        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
+
+        // then
+        assertResults(5, false, false);
+    }
+
+    @Test
+    public void shouldDetachIfAttached() throws ServiceException {
+
+        // given
+        prepareMocks(true);
+
+        // when
+        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
+
+        // then
+        assertResults(5, false, true);
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testGetOneWithNonExistingAttachment() throws ServiceException {
+    public void shouldThrowExceptionOnAttachIfUploadedFileDoesNotExist() throws EntityNotFoundException {
 
         // given
-        Long id = 1L;
-        given(attachmentDAO.findOne(id)).willReturn(null);
+        prepareMocks(false);
+        given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(false);
 
         // when
-        AttachmentVO result = attachmentService.getOne(id);
+        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
 
         // then
         // expected exception
-        assertThat(result, equalTo(attachmentVO));
-        verify(attachmentDAO).findOne(id);
-        verify(attachmentToAttachmentVOConverter, never()).convert(any(Attachment.class));
-    }
-
-    @Test
-    public void testGetAllWithPopulatedList() throws ServiceException {
-
-        // given
-        List<AttachmentVO> commentVOList = Arrays.asList(attachmentVO, attachmentVO, attachmentVO);
-        given(attachmentDAO.findAll()).willReturn(Arrays.asList(attachment, attachment, attachment));
-        given(attachmentToAttachmentVOConverter.convert(attachment)).willReturn(attachmentVO);
-
-        // when
-        List<AttachmentVO> result = attachmentService.getAll();
-
-        // then
-        assertThat(result, equalTo(commentVOList));
-        verify(attachmentDAO).findAll();
-        verify(attachmentToAttachmentVOConverter, times(3)).convert(attachment);
-    }
-
-    @Test
-    public void testGetAllWithEmptyList() throws ServiceException {
-
-        // given
-        given(attachmentDAO.findAll()).willReturn(new LinkedList<>());
-
-        // when
-        List<AttachmentVO> result = attachmentService.getAll();
-
-        // then
-        assertThat(result, empty());
-        verify(attachmentDAO).findAll();
-        verify(attachmentToAttachmentVOConverter, never()).convert(any(Attachment.class));
-    }
-
-    @Test
-    public void testCreateOneWithSuccess() throws ServiceException {
-
-        // given
-        given(attachmentVOToAttachmentConverter.convert(attachmentVO)).willReturn(attachment);
-        given(attachmentDAO.save(attachment)).willReturn(attachment);
-        given(attachment.getId()).willReturn(1L);
-
-        // when
-        Long result = attachmentService.createOne(attachmentVO);
-
-        // then
-        assertThat(result, equalTo(attachment.getId()));
-        verify(attachmentVOToAttachmentConverter).convert(attachmentVO);
-        verify(attachmentDAO).save(attachment);
-        verify(attachment, atLeastOnce()).getId();
-    }
-
-    @Test(expected = EntityCreationException.class)
-    public void testCreateOneWithFailure() throws ServiceException {
-
-        // given
-        given(attachmentVOToAttachmentConverter.convert(attachmentVO)).willReturn(attachment);
-        given(attachmentDAO.save(attachment)).willReturn(null);
-        given(attachment.getId()).willReturn(1L);
-
-        // when
-        attachmentService.createOne(attachmentVO);
-
-        // then
-        // expected exception
-        verify(attachmentVOToAttachmentConverter).convert(attachmentVO);
-        verify(attachmentDAO.save(attachment));
-        verify(attachment, never()).getId();
-    }
-
-    @Test
-    public void testUpdateOneWithSuccess() throws ServiceException {
-
-        // given
-        Long id = 1L;
-        given(attachmentVOToAttachmentConverter.convert(attachmentVO)).willReturn(attachment);
-        given(attachmentDAO.updateOne(id, attachment)).willReturn(attachment);
-        given(attachmentToAttachmentVOConverter.convert(attachment)).willReturn(attachmentVO);
-
-        // when
-        AttachmentVO result = attachmentService.updateOne(id, attachmentVO);
-
-        // then
-        assertThat(result, equalTo(attachmentVO));
-        verify(attachmentToAttachmentVOConverter).convert(attachment);
-        verify(attachmentVOToAttachmentConverter).convert(attachmentVO);
-        verify(attachmentDAO).updateOne(id, attachment);
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testUpdateOneWithFailure() throws ServiceException {
+    public void shouldThrowExceptionOnAttachIfEntryDoesNotExist() throws EntityNotFoundException {
 
         // given
-        Long id = 1L;
-        given(attachmentVOToAttachmentConverter.convert(attachmentVO)).willReturn(attachment);
-        given(attachmentDAO.updateOne(id, attachment)).willReturn(null);
+        prepareMocks(false);
+        given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        attachmentService.updateOne(id, attachmentVO);
+        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
 
         // then
         // expected exception
-        verify(attachmentToAttachmentVOConverter, never()).convert(attachment);
-        verify(attachmentVOToAttachmentConverter).convert(attachmentVO);
-        verify(attachmentDAO).updateOne(id, attachment);
-    }
-
-    @Test
-    public void testDeleteByEntityWithExistingComment() throws ServiceException {
-
-        // given
-        given(attachmentDAO.exists(attachmentVO.getId())).willReturn(true);
-
-        // when
-        attachmentService.deleteByEntity(attachmentVO);
-
-        // then
-        verify(attachmentDAO).delete(attachmentVO.getId());
-    }
-
-    @Test
-    public void testDeleteByIdWithExistingComment() throws ServiceException {
-
-        // given
-        Long id = 1L;
-
-        // when
-        attachmentService.deleteByID(id);
-
-        // then
-        verify(attachmentDAO).delete(id);
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByEntityWithNonExistingComment() throws ServiceException {
+    public void shouldThrowExceptionOnDetachIfUploadedFileDoesNotExist() throws EntityNotFoundException {
 
         // given
-        Long id = 1L;
-        given(attachmentDAO.exists(attachmentVO.getId())).willReturn(false);
-        given(attachmentVO.getId()).willReturn(id);
+        prepareMocks(false);
+        given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(false);
 
         // when
-        attachmentService.deleteByEntity(attachmentVO);
+        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
 
         // then
         // expected exception
-        verify(attachmentDAO, never()).delete(anyLong());
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByIdWithNonExistingComment() throws ServiceException {
+    public void shouldThrowExceptionOnDetachIfEntryDoesNotExist() throws EntityNotFoundException {
 
         // given
-        Long id = 1L;
-        doThrow(IllegalArgumentException.class).when(attachmentDAO).delete(id);
+        prepareMocks(false);
+        given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        attachmentService.deleteByID(id);
+        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
 
         // then
         // expected exception
-        verify(attachmentDAO).delete(id);
+    }
+
+    private void prepareMocks(boolean includeControlVO) {
+        prepareAttachments(includeControlVO);
+        given(mockedEntry.getAttachments()).willReturn(attachments);
+        given(uploadedFileVOToUploadedFileConverter.convert(uploadedFileVO)).willReturn(controlUploadedFile);
+        given(entryDAO.exists(ENTRY_ID)).willReturn(true);
+        given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(true);
+    }
+
+    private void prepareAttachments(boolean includeControlVO) {
+
+        attachments = new ArrayList<>();
+        for (int cnt = 1; cnt <= 5; cnt++) {
+            attachments.add(UploadedFile.Builder.getBuilder()
+                    .withId((long) cnt)
+                    .withPathUUID(UUID.randomUUID())
+                    .withStoredFilename("stored_filename_" + cnt + ".jpg")
+                    .withStoredFilename("original_filename_" + cnt + ".jpg")
+                    .build());
+        }
+
+        if (includeControlVO) {
+            attachments.add(controlUploadedFile);
+        }
+    }
+
+    private void assertResults(int numberOfAttachments, boolean controlIncluded, boolean updateCalled) {
+        assertThat(attachments.size(), equalTo(numberOfAttachments));
+        assertThat(attachments.contains(controlUploadedFile), is(controlIncluded));
+        verify(entryDAO).findOne(ENTRY_ID);
+        verify(uploadedFileVOToUploadedFileConverter).convert(uploadedFileVO);
+        if (updateCalled) {
+            verify(entryDAO).updateAttachments(ENTRY_ID, attachments);
+        } else {
+            verify(entryDAO, never()).updateAttachments(anyLong(), anyList());
+        }
     }
 }

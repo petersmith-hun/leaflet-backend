@@ -4,18 +4,19 @@ import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Tag;
+import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.repository.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * DAO implementation for {@link EntryRepository}.
@@ -52,7 +53,17 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
 
     @Override
     public Page<Entry> findAll(Specification<Entry> specification, Pageable pageable) {
-        return ((JpaSpecificationExecutor<Entry>) jpaRepository).findAll(specification, pageable);
+        return ((EntryRepository) jpaRepository).findAll(specification, pageable);
+    }
+
+    @Override
+    public void updateAttachments(Long id, List<UploadedFile> attachments) {
+
+        Entry currentEntry = jpaRepository.getOne(id);
+        if (Objects.nonNull(currentEntry)) {
+            currentEntry.setAttachments(attachments);
+            jpaRepository.flush();
+        }
     }
 
     @Transactional

@@ -36,9 +36,9 @@ public class CommentVOToCommentConverter implements Converter<CommentVO, Comment
                 .isDeleted(source.isDeleted());
 
         if (Objects.nonNull(source.getEntryVO())) {
-            builder.withEntry(new Entry.Builder()
+            builder.withEntry(Entry.Builder.getBuilder()
                     .withId(source.getEntryVO().getId())
-                    .createEntry());
+                    .build());
         }
 
         if (Objects.nonNull(source.getOwner())) {
