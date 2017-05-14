@@ -1,5 +1,8 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -40,7 +43,8 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             foreignKey = @ForeignKey(name = DatabaseConstants.FK_ENTRY_CATEGORY))
     private Category category;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SELECT)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = DatabaseConstants.TABLE_ENTRIES_TAGS,
             joinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_ENTRY_ID,
                     foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_ENTRY)),
@@ -48,7 +52,8 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                     foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_TAGS_TAG)))
     private List<Tag> tags;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SELECT)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = DatabaseConstants.TABLE_ENTRIES_UPLOADED_FILES,
             joinColumns = @JoinColumn(name = DatabaseConstants.COLUMN_ENTRY_ID,
                     foreignKey = @ForeignKey(name = DatabaseConstants.FK_NM_ENTRIES_UPLOADED_FILES_ENTRY)),

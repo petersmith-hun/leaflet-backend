@@ -56,6 +56,7 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
         return ((EntryRepository) jpaRepository).findAll(specification, pageable);
     }
 
+    @Transactional
     @Override
     public void updateAttachments(Long id, List<UploadedFile> attachments) {
 

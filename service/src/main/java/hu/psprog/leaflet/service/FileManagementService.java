@@ -49,4 +49,13 @@ public interface FileManagementService {
      * @param directoryName name of the directory to create
      */
     void createDirectory(String parent, String directoryName) throws ServiceException;
+
+    /**
+     * Checks if given file exists.
+     *
+     * @param path path of the file
+     * @return {@true} if file exists, {@false} otherwise
+     * @throws ServiceException if there's no existing file by the given filename
+     */
+    boolean exists(String path) throws ServiceException;
 }

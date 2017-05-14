@@ -107,6 +107,17 @@ public class FileManagementServiceImpl implements FileManagementService {
         }
     }
 
+    @Override
+    public boolean exists(String path) throws ServiceException {
+        try {
+            File file = buildAbsolutePath(path).toFile();
+            return isAccessible(file);
+        } catch (InvalidPathException exc) {
+            LOGGER.error("Given path [{}] is invalid", path);
+            throw new ServiceException("Given path is invalid", exc);
+        }
+    }
+
     private boolean isAccessible(File file) {
         return file.exists() && file.canRead();
     }

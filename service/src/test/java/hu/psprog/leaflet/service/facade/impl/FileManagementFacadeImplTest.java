@@ -15,13 +15,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -140,6 +143,53 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
 
         // then
         verify(fileMetaInfoService).getUploadedFiles();
+    }
+
+    @Test
+    public void shouldReturnCheckedMetaInfo() throws IOException, ServiceException {
+
+        // given
+        UUID pathUUID = UUID.randomUUID();
+        UploadedFileVO uploadedFileVO = prepareUploadedFileVO();
+        given(fileMetaInfoService.retrieveMetaInfo(pathUUID)).willReturn(uploadedFileVO);
+        given(fileManagementService.exists(uploadedFileVO.getPath())).willReturn(true);
+
+        // when
+        Optional<UploadedFileVO> result = fileManagementFacade.getCheckedMetaInfo(pathUUID);
+
+        // then
+        assertThat(result.isPresent(), is(true));
+        assertThat(result.get(), equalTo(uploadedFileVO));
+    }
+
+    @Test
+    public void shouldReturnEmptyOptionalIfMetaInfoDoesNotExist() throws IOException, ServiceException {
+
+        // given
+        UUID pathUUID = UUID.randomUUID();
+        doThrow(ServiceException.class).when(fileMetaInfoService).retrieveMetaInfo(pathUUID);
+
+        // when
+        Optional<UploadedFileVO> result = fileManagementFacade.getCheckedMetaInfo(pathUUID);
+
+        // then
+        assertThat(result.isPresent(), is(false));
+    }
+
+    @Test
+    public void shouldReturnEmptyOptionalIfFileDoesNotExist() throws IOException, ServiceException {
+
+        // given
+        UUID pathUUID = UUID.randomUUID();
+        UploadedFileVO uploadedFileVO = prepareUploadedFileVO();
+        given(fileMetaInfoService.retrieveMetaInfo(pathUUID)).willReturn(uploadedFileVO);
+        given(fileManagementService.exists(uploadedFileVO.getPath())).willReturn(false);
+
+        // when
+        Optional<UploadedFileVO> result = fileManagementFacade.getCheckedMetaInfo(pathUUID);
+
+        // then
+        assertThat(result.isPresent(), is(false));
     }
 
     private UploadedFileVO prepareUploadedFileVO() {

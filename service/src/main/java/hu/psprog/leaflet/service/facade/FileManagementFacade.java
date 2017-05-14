@@ -7,6 +7,7 @@ import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -66,4 +67,12 @@ public interface FileManagementFacade {
      * @throws ServiceException if there's no existing file by the given filename
      */
     void updateMetaInfo(UUID pathUUID, UpdateFileMetaInfoVO updateFileMetaInfoVO) throws ServiceException;
+
+    /**
+     * Retrieves given file's meta info only if the file exists.
+     *
+     * @param pathUUID pathUUID of the file to get meta info of
+     * @return UploadedFileVO wrapped in Optional if the file exists, empty Optional otherwise
+     */
+    Optional<UploadedFileVO> getCheckedMetaInfo(UUID pathUUID);
 }
