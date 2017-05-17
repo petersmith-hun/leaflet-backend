@@ -31,10 +31,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
@@ -49,6 +51,7 @@ public class CommentServiceImplIT {
 
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+    static final String DELETED_COMMENT = "DELETED_COMMENT";
 
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
@@ -94,7 +97,7 @@ public class CommentServiceImplIT {
         List<CommentVO> result = commentService.getAll();
 
         // then
-        assertThat(result.stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.size(), equalTo(10));
         assertThat(result.get(0).getContent(), equalTo(controlCommentVO.getContent()));
     }
@@ -119,7 +122,7 @@ public class CommentServiceImplIT {
         assertThat(result.getPageCount(), equalTo(2));
         assertThat(result.getPageSize(), equalTo(limit));
         assertThat(result.getEntitiesOnPage(), notNullValue());
-        assertThat(result.getEntitiesOnPage().stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.getEntitiesOnPage().stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.getEntitiesOnPage().size(), equalTo(itemNumber));
     }
 
@@ -127,7 +130,7 @@ public class CommentServiceImplIT {
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
     @Parameters(method = "pageOfPublicCommentsForEntry", source = PagingParameterProvider.class)
-    public void testGetPageOfPublicCommentsForEntry(int page, int itemNumber) {
+    public void testGetPageOfPublicCommentsForEntry(int page, int itemNumber, long numberOfDeletedComments) {
 
         // given
         int limit = 4;
@@ -139,13 +142,18 @@ public class CommentServiceImplIT {
 
         // then
         assertThat(result.getEntityCountOnPage(), equalTo(itemNumber));
-        assertThat(result.getEntityCount(), equalTo(6L));
+        assertThat(result.getEntityCount(), equalTo(7L));
         assertThat(result.getPageCount(), equalTo(2));
         assertThat(result.getPageSize(), equalTo(limit));
         assertThat(result.getEntitiesOnPage(), notNullValue());
-        assertThat(result.getEntitiesOnPage().stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.getEntitiesOnPage().stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.getEntitiesOnPage().size(), equalTo(itemNumber));
-        assertThat(result.getEntitiesOnPage().stream().noneMatch(CommentVO::isDeleted), equalTo(true));
+        assertThat(result.getEntitiesOnPage().stream()
+                .filter(CommentVO::isDeleted)
+                .count(), equalTo(numberOfDeletedComments));
+        assertThat(result.getEntitiesOnPage().stream()
+                .filter(CommentVO::isDeleted)
+                .allMatch(commentVO -> commentVO.getContent().equals(DELETED_COMMENT)), is(true));
     }
 
     @Test
@@ -179,7 +187,7 @@ public class CommentServiceImplIT {
         assertThat(result.getPageCount(), equalTo(2));
         assertThat(result.getPageSize(), equalTo(limit));
         assertThat(result.getEntitiesOnPage(), notNullValue());
-        assertThat(result.getEntitiesOnPage().stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.getEntitiesOnPage().stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.getEntitiesOnPage().size(), equalTo(itemNumber));
     }
 
@@ -247,7 +255,7 @@ public class CommentServiceImplIT {
 
         // then
         assertThat(commentService.count(), equalTo(9L));
-        assertThat(commentService.getAll().stream().noneMatch(e -> commentToDelete.equals(e)), equalTo(true));
+        assertThat(commentService.getAll().stream().noneMatch(commentToDelete::equals), equalTo(true));
     }
 
     @Test
@@ -323,8 +331,8 @@ public class CommentServiceImplIT {
 
         public static Object[] pageOfPublicCommentsForEntry() {
             return new Object[] {
-                    new Object[] {1, 4},
-                    new Object[] {2, 2}
+                    new Object[] {1, 4, 1L},
+                    new Object[] {2, 3, 0L}
             };
         }
 
