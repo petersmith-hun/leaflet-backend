@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentToCommentVOConverter implements Converter<Comment, CommentVO> {
 
+    private static final String DELETED_COMMENT = "DELETED_COMMENT";
+
     @Autowired
     private UserToUserVOConverter userToUserVOConverter;
 
@@ -25,7 +27,7 @@ public class CommentToCommentVOConverter implements Converter<Comment, CommentVO
 
         return new CommentVO.Builder()
                 .withId(source.getId())
-                .withContent(source.getContent())
+                .withContent(extractContent(source))
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())
                 .withEntryVO(entryToEntryVOConverter.convert(source.getEntry()))
@@ -33,5 +35,11 @@ public class CommentToCommentVOConverter implements Converter<Comment, CommentVO
                 .withEnabled(source.isEnabled())
                 .withDeleted(source.isDeleted())
                 .createCommentVO();
+    }
+
+    private String extractContent(Comment source) {
+        return source.isDeleted()
+                ? DELETED_COMMENT
+                : source.getContent();
     }
 }

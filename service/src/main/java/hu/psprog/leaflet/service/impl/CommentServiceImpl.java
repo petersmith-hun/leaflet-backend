@@ -92,8 +92,7 @@ public class CommentServiceImpl implements CommentService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Entry entry = entryVOToEntryConverter.convert(entryVO);
         Specifications<Comment> specifications = Specifications
-                .where(CommentSpecification.isEnabled)
-                .and(CommentSpecification.isNotDeleted);
+                .where(CommentSpecification.isEnabled);
         Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
         return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
