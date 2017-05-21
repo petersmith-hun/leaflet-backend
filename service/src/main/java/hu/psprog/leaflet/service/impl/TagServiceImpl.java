@@ -1,6 +1,8 @@
 package hu.psprog.leaflet.service.impl;
 
+import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.dao.TagDAO;
+import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.repository.specification.TagSpecification;
 import hu.psprog.leaflet.service.TagService;
@@ -11,6 +13,8 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,15 +32,21 @@ import java.util.stream.Collectors;
 @Service
 public class TagServiceImpl implements TagService {
 
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
+
     private TagDAO tagDAO;
-    
-    @Autowired
+    private EntryDAO entryDAO;
     private TagToTagVOConverter tagToTagVOConverter;
-    
-    @Autowired
     private TagVOToTagConverter tagVOToTagConverter;
-    
+
+    @Autowired
+    public TagServiceImpl(TagDAO tagDAO, EntryDAO entryDAO, TagToTagVOConverter tagToTagVOConverter, TagVOToTagConverter tagVOToTagConverter) {
+        this.tagDAO = tagDAO;
+        this.entryDAO = entryDAO;
+        this.tagToTagVOConverter = tagToTagVOConverter;
+        this.tagVOToTagConverter = tagVOToTagConverter;
+    }
+
     @Override
     public TagVO getOne(Long id) throws ServiceException {
 
@@ -97,9 +107,35 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void connectTagToEntry(TagVO tagVO, EntryVO entryVO) {
+    public void attachTagToEntry(TagVO tagVO, EntryVO entryVO) throws EntityNotFoundException {
 
-        // TODO implement method later
+        assertState(tagVO, entryVO);
+
+        List<Tag> currentTags = getCurrentTags(entryVO);
+        Tag tagToAttach = tagVOToTagConverter.convert(tagVO);
+        if (!currentTags.contains(tagToAttach)) {
+            currentTags.add(tagToAttach);
+            entryDAO.updateTags(entryVO.getId(), currentTags);
+            LOGGER.info("Tag [{}] attached to entry [{}]", tagVO.getTitle(), entryVO.getTitle());
+        } else {
+            LOGGER.warn("Tag [{}] is already attached to entry [{}]", tagVO.getTitle(), entryVO.getTitle());
+        }
+    }
+
+    @Override
+    public void detachTagFromEntry(TagVO tagVO, EntryVO entryVO) throws EntityNotFoundException {
+
+        assertState(tagVO, entryVO);
+
+        List<Tag> currentTags = getCurrentTags(entryVO);
+        Tag tagToDetach = tagVOToTagConverter.convert(tagVO);
+        if (currentTags.contains(tagToDetach)) {
+            currentTags.remove(tagToDetach);
+            entryDAO.updateTags(entryVO.getId(), currentTags);
+            LOGGER.info("Tag [{}] detached from entry [{}]", tagVO.getTitle(), entryVO.getTitle());
+        } else {
+            LOGGER.warn("Tag [{}] is not attached to entry [{}]", tagVO.getTitle(), entryVO.getTitle());
+        }
     }
 
     @Override
@@ -175,5 +211,21 @@ public class TagServiceImpl implements TagService {
         }
 
         tagDAO.disable(id);
+    }
+
+    private List<Tag> getCurrentTags(EntryVO entryVO) {
+        return entryDAO.findOne(entryVO.getId()).getTags();
+    }
+
+    private void assertState(TagVO tagVO, EntryVO entryVO) throws EntityNotFoundException {
+        if (!entryDAO.exists(entryVO.getId())) {
+            LOGGER.error("Entry identified by [{}] not found", entryVO.getId());
+            throw new EntityNotFoundException(Entry.class, entryVO.getId());
+        }
+
+        if (!tagDAO.exists(tagVO.getId())) {
+            LOGGER.error("Tag identified by [{}] not found", tagVO.getId());
+            throw new EntityNotFoundException(Tag.class, tagVO.getId());
+        }
     }
 }

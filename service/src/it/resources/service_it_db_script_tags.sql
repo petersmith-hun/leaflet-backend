@@ -1,5 +1,5 @@
 -- constants
-set @DEFAULT_DATE = '2016-08-18 10:00:00';
+set @DEFAULT_DATE = '2016-08-18T10:00:00Z';
 
 -- add some tags
 insert into leaflet_tags
@@ -25,3 +25,8 @@ values
     (18, @DEFAULT_DATE, false, @DEFAULT_DATE, 'Tag #18'),
     (19, @DEFAULT_DATE, false, @DEFAULT_DATE, 'Tag #19'),
     (20, @DEFAULT_DATE, true, @DEFAULT_DATE, 'Tag #20');
+
+insert into leaflet_entries_tags
+    (entry_id, tag_id)
+values
+    (1, 20);

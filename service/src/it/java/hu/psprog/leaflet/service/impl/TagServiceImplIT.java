@@ -1,9 +1,12 @@
 package hu.psprog.leaflet.service.impl;
 
+import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.TagService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
+import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +24,7 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
@@ -35,23 +39,35 @@ public class TagServiceImplIT {
 
     private static final String TAG_1 = "tag_1";
     private static final String TAG_NEW = "tag_new";
+    private static final String ENTRY_1 = "entry_1";
+    private static final String TAG_TO_ATTACH = "tag_to_attach";
+    private static final String ALREADY_ATTACHED_TAG = "tag_already_attached";
 
     @Autowired
     private TagService tagService;
 
     @Autowired
+    private EntryService entryService;
+
+    @Autowired
     private TestObjectReader testObjectReader;
 
     private TagVO controlTagVO;
+    private TagVO alreadyAttachedTag;
+    private TagVO tagToAttach;
+    private EntryVO controlEntryVO;
 
     @Before
     public void setup() throws IOException {
         controlTagVO = testObjectReader.read(TAG_1, TestObjectReader.ObjectDirectory.VO, TagVO.class);
+        controlEntryVO = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
+        alreadyAttachedTag = testObjectReader.read(ALREADY_ATTACHED_TAG, TestObjectReader.ObjectDirectory.VO, TagVO.class);
+        tagToAttach = testObjectReader.read(TAG_TO_ATTACH, TestObjectReader.ObjectDirectory.VO, TagVO.class);
     }
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testGetOne() throws ServiceException {
 
         // when
@@ -63,7 +79,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testGetAll() throws ServiceException {
 
         // when
@@ -77,7 +93,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testGetPublicTags() {
 
         // when
@@ -91,7 +107,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testCount() {
 
         // when
@@ -103,7 +119,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testCreateOne() throws ServiceException, IOException {
 
         // given
@@ -120,7 +136,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testUpdateOne() throws ServiceException {
 
         // given
@@ -141,7 +157,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testDeleteByEntity() throws ServiceException {
 
         // given
@@ -158,7 +174,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testEnable() throws ServiceException {
 
         // given
@@ -173,7 +189,7 @@ public class TagServiceImplIT {
 
     @Test
     @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS)
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
     public void testDisable() throws ServiceException {
 
         // given
@@ -184,5 +200,34 @@ public class TagServiceImplIT {
 
         // then
         assertThat(tagService.getOne(id).isEnabled(), equalTo(false));
+    }
+
+    @Test
+    @Transactional
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
+    public void shouldAttachTagToEntry() throws EntityNotFoundException {
+
+        // when
+        tagService.attachTagToEntry(tagToAttach, controlEntryVO);
+
+        // then
+        EntryVO result = entryService.findByLink(controlEntryVO.getLink());
+        assertThat(result.getTags().isEmpty(), is(false));
+        assertThat(result.getTags().size(), equalTo(2));
+        assertThat(result.getTags().contains(alreadyAttachedTag), is(true));
+        assertThat(result.getTags().contains(tagToAttach), is(true));
+    }
+
+    @Test
+    @Transactional
+    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
+    public void shouldDetachTagFromEntry() throws EntityNotFoundException {
+
+        // when
+        tagService.detachTagFromEntry(alreadyAttachedTag, controlEntryVO);
+
+        // then
+        EntryVO result = entryService.findByLink(controlEntryVO.getLink());
+        assertThat(result.getTags().isEmpty(), is(true));
     }
 }
