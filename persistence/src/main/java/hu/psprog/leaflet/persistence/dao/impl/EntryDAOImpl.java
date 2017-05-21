@@ -69,6 +69,17 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
 
     @Transactional
     @Override
+    public void updateTags(Long id, List<Tag> tags) {
+
+        Entry currentEntry = jpaRepository.getOne(id);
+        if (Objects.nonNull(currentEntry)) {
+            currentEntry.setTags(tags);
+            jpaRepository.flush();
+        }
+    }
+
+    @Transactional
+    @Override
     public Entry updateOne(Long id, Entry updatedEntity) {
 
         Entry currentEntry = jpaRepository.getOne(id);

@@ -1,8 +1,10 @@
 package hu.psprog.leaflet.service.converter;
 
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.TagVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
@@ -22,14 +24,19 @@ import java.util.stream.Collectors;
 @Component
 public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
 
-    @Autowired
     private UserToUserVOConverter userToUserVOConverter;
-
-    @Autowired
     private CategoryToCategoryVOConverter categoryToCategoryVOConverter;
+    private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
+    private TagToTagVOConverter tagToTagVOConverter;
 
     @Autowired
-    private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
+    public EntryToEntryVOConverter(UserToUserVOConverter userToUserVOConverter, CategoryToCategoryVOConverter categoryToCategoryVOConverter,
+                                   UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter, TagToTagVOConverter tagToTagVOConverter) {
+        this.userToUserVOConverter = userToUserVOConverter;
+        this.categoryToCategoryVOConverter = categoryToCategoryVOConverter;
+        this.uploadedFileToUploadedFileVOConverter = uploadedFileToUploadedFileVOConverter;
+        this.tagToTagVOConverter = tagToTagVOConverter;
+    }
 
     @Override
     public EntryVO convert(Entry source) {
@@ -49,7 +56,8 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
                 .withSeoDescription(source.getSeoDescription())
                 .withSeoKeywords(source.getSeoKeywords())
                 .withTitle(source.getTitle())
-                .withAttachments(mapAttachments(source.getAttachments()));
+                .withAttachments(mapAttachments(source.getAttachments()))
+                .withTags(mapTags(source.getTags()));
 
         if (Objects.nonNull(source.getCategory())) {
             builder.withCategory(categoryToCategoryVOConverter.convert(source.getCategory()));
@@ -66,6 +74,13 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
         return Optional.ofNullable(uploadedFiles)
                 .orElse(Collections.emptyList()).stream()
                 .map(uploadedFileToUploadedFileVOConverter::convert)
+                .collect(Collectors.toList());
+    }
+
+    private List<TagVO> mapTags(List<Tag> tags) {
+        return Optional.ofNullable(tags)
+                .orElse(Collections.emptyList()).stream()
+                .map(tagToTagVOConverter::convert)
                 .collect(Collectors.toList());
     }
 }

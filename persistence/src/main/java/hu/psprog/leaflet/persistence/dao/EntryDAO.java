@@ -18,15 +18,17 @@ import java.util.List;
  */
 public interface EntryDAO extends BaseDAO<Entry, Long>, SelfStatusAwareDAO<Long> {
 
-    public Entry findByLink(String link);
+    Entry findByLink(String link);
 
-    public List<Entry> findByUser(User user);
+    List<Entry> findByUser(User user);
 
-    public List<Entry> findByCategory(Category category);
+    List<Entry> findByCategory(Category category);
 
-    public List<Entry> findByTags(Tag tag);
+    List<Entry> findByTags(Tag tag);
 
-    public Page<Entry> findAll(Specification<Entry> specification, Pageable pageable);
+    Page<Entry> findAll(Specification<Entry> specification, Pageable pageable);
 
-    public void updateAttachments(Long id, List<UploadedFile> attachments);
+    void updateAttachments(Long id, List<UploadedFile> attachments);
+
+    void updateTags(Long id, List<Tag> tags);
 }

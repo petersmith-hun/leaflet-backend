@@ -42,6 +42,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     private CategoryVO category;
     private Locale locale;
     private List<UploadedFileVO> attachments;
+    private List<TagVO> tags;
 
     public EntryVO() {
         // Serializable
@@ -50,7 +51,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     public EntryVO(Long id, Date created, Date lastModified, boolean enabled, String title, String link,
                    String prologue, String content, String rawContent, String seoTitle, String seoDescription,
                    String seoKeywords, String entryStatus, UserVO owner, CategoryVO categoryVO, Locale locale,
-                   List<UploadedFileVO> attachments) {
+                   List<UploadedFileVO> attachments, List<TagVO> tags) {
         super(id, created, lastModified, enabled);
         this.title = title;
         this.link = link;
@@ -65,6 +66,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         this.category = categoryVO;
         this.locale = locale;
         this.attachments = attachments;
+        this.tags = tags;
     }
 
     public String getTitle() {
@@ -171,6 +173,14 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         this.attachments = attachments;
     }
 
+    public List<TagVO> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagVO> tags) {
+        this.tags = tags;
+    }
+
     @Override
     public String getSEOTitle() {
         return seoTitle;
@@ -219,6 +229,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         private CategoryVO category;
         private Locale locale;
         private List<UploadedFileVO> attachments;
+        private List<TagVO> tags;
 
         public Builder withId(Long id) {
             this.id = id;
@@ -305,9 +316,14 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
             return this;
         }
 
+        public Builder withTags(List<TagVO> tags) {
+            this.tags = tags;
+            return this;
+        }
+
         public EntryVO createEntryVO() {
             return new EntryVO(id, created, lastModified, enabled, title, link, prologue, content, rawContent,
-                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, category, locale, attachments);
+                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, category, locale, attachments, tags);
         }
     }
 }

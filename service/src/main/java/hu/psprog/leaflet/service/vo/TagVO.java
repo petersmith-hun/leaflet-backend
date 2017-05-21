@@ -1,6 +1,8 @@
 package hu.psprog.leaflet.service.vo;
 
 import hu.psprog.leaflet.persistence.entity.Tag;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Date;
 
@@ -50,6 +52,28 @@ public class TagVO extends SelfStatusAwareIdentifiableVO<Long, Tag> {
         return new Builder()
                 .withId(id)
                 .createTagVO();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof TagVO)) return false;
+
+        TagVO tagVO = (TagVO) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(title, tagVO.title)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(title)
+                .toHashCode();
     }
 
     /**

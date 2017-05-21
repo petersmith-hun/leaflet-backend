@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.dao.UploadedFileDAO;
+import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.service.AttachmentService;
 import hu.psprog.leaflet.service.converter.UploadedFileVOToUploadedFileConverter;
@@ -77,12 +78,12 @@ public class AttachmentServiceImpl implements AttachmentService {
     private void assertState(UploadedFileVO uploadedFileVO, EntryVO entryVO) throws EntityNotFoundException {
         if (!entryDAO.exists(entryVO.getId())) {
             LOGGER.error("Entry identified by [{}] not found", entryVO.getId());
-            throw new EntityNotFoundException(EntryVO.class, entryVO.getId());
+            throw new EntityNotFoundException(Entry.class, entryVO.getId());
         }
 
         if (!uploadedFileDAO.exists(uploadedFileVO.getId())) {
             LOGGER.error("Uploaded file identified by [{}] not found", uploadedFileVO.getId());
-            throw new EntityNotFoundException(UploadedFileVO.class, uploadedFileVO.getId());
+            throw new EntityNotFoundException(UploadedFile.class, uploadedFileVO.getId());
         }
     }
 }
