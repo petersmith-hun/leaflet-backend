@@ -332,7 +332,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void shouldNotAttachTagIfAlreadyAttached() throws EntityNotFoundException {
+    public void shouldNotAttachTagIfAlreadyAttached() throws ServiceException {
 
         // given
         prepareMocks(true);
@@ -345,7 +345,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void shouldAttachTagIfNotAlreadyAttached() throws EntityNotFoundException {
+    public void shouldAttachTagIfNotAlreadyAttached() throws ServiceException {
 
         // given
         prepareMocks(false);
@@ -358,7 +358,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void shouldNotDetachTagIfNotAttached() throws EntityNotFoundException {
+    public void shouldNotDetachTagIfNotAttached() throws ServiceException {
 
         // given
         prepareMocks(false);
@@ -371,7 +371,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void shouldDetachTagIfAttached() throws EntityNotFoundException {
+    public void shouldDetachTagIfAttached() throws ServiceException {
 
         // given
         prepareMocks(true);
@@ -384,7 +384,7 @@ public class TagServiceImplTest {
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnAttachIfTagDoesNotExist() throws EntityNotFoundException {
+    public void shouldThrowExceptionOnAttachIfTagDoesNotExist() throws ServiceException {
 
         // given
         prepareMocks(false);
@@ -398,7 +398,7 @@ public class TagServiceImplTest {
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnAttachIfEntryDoesNotExist() throws EntityNotFoundException {
+    public void shouldThrowExceptionOnAttachIfEntryDoesNotExist() throws ServiceException {
 
         // given
         prepareMocks(false);
@@ -412,7 +412,7 @@ public class TagServiceImplTest {
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnDetachIfTagDoesNotExist() throws EntityNotFoundException {
+    public void shouldThrowExceptionOnDetachIfTagDoesNotExist() throws ServiceException {
 
         // given
         prepareMocks(false);
@@ -426,7 +426,7 @@ public class TagServiceImplTest {
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnDetachIfEntryDoesNotExist() throws EntityNotFoundException {
+    public void shouldThrowExceptionOnDetachIfEntryDoesNotExist() throws ServiceException {
 
         // given
         prepareMocks(false);

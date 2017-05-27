@@ -1,0 +1,250 @@
+package hu.psprog.leaflet.web.rest.controller;
+
+import hu.psprog.leaflet.api.rest.request.tag.TagAssignmentRequestModel;
+import hu.psprog.leaflet.api.rest.request.tag.TagCreateRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
+import hu.psprog.leaflet.api.rest.response.tag.TagDataModel;
+import hu.psprog.leaflet.api.rest.response.tag.TagListDataModel;
+import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.facade.TagFacade;
+import hu.psprog.leaflet.service.vo.TagAssignmentVO;
+import hu.psprog.leaflet.service.vo.TagVO;
+import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
+import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
+
+/**
+ * REST controller for tag related endpoints.
+ *
+ * @author Peter Smith
+ */
+@RestController
+@RequestMapping(BaseController.BASE_PATH_TAGS)
+public class TagsController extends BaseController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TagsController.class);
+
+    private static final String PATH_ASSIGN_TAG = "/assign";
+    private static final String PATH_PUBLIC_TAGS = "/public";
+
+    private static final String TAG_COULD_NOT_BE_CREATED = "Tag could not be created.";
+    private static final String TAG_COULD_NOT_BE_UPDATED_WITH_ID = "Tag [{}] could not be updated";
+    private static final String TAG_COULD_NOT_BE_UPDATED = "Tag could not be updated";
+    private static final String TAG_COULD_NOT_BE_DELETED = "Tag [{}] could not be deleted";
+    private static final String TAG_COULD_NOT_BE_FOUND = "Tag could not be found";
+    private static final String STATUS_OF_TAG_COULD_NOT_BE_CHANGED = "Status of tag [{}] could not be changed";
+    private static final String FAILED_TO_ASSIGN_TAG_TO_ENTRY = "Failed to assign tag to entry";
+    private static final String FAILED_TO_UN_ASSIGN_TAG_FROM_ENTRY = "Failed to un-assign tag from entry";
+    private static final String CANNOT_ASSIGN_NON_EXISTING_ENTITIES_TO_EACH_OTHER = "Cannot assign non-existing entities to each other.";
+    private static final String CANNOT_UN_ASSIGN_NON_EXISTING_ENTITIES_TO_EACH_OTHER = "Cannot un-assign non-existing entities to each other.";
+
+    private TagFacade tagFacade;
+
+    @Autowired
+    public TagsController(TagFacade tagFacade) {
+        this.tagFacade = tagFacade;
+    }
+
+    /**
+     * GET /tags
+     * Retrieves all existing tags.
+     *
+     * @return list of tags
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView getAllTags() {
+
+        List<TagVO> tags = tagFacade.getAll();
+
+        return wrap(conversionService.convert(tags, TagListDataModel.class));
+    }
+
+    /**
+     * GET /tags/public
+     * Retrieves existing public tags.
+     *
+     * @return list of public tags
+     */
+    @RequestMapping(method = RequestMethod.GET, value = PATH_PUBLIC_TAGS)
+    public ModelAndView getAllPublicTags() {
+
+        List<TagVO> tags = tagFacade.getPublicTags();
+
+        return wrap(conversionService.convert(tags, TagListDataModel.class));
+    }
+
+    /**
+     * POST /tags
+     * Creates a new tag.
+     *
+     * @param tagCreateRequestModel tag data as {@link TagCreateRequestModel}.
+     * @param bindingResult validation result
+     * @return created tag's data
+     * @throws RequestCouldNotBeFulfilledException if the tag could not be created
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ModelAndView createTag(@RequestBody TagCreateRequestModel tagCreateRequestModel,
+                                  BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
+
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            try {
+                Long id = tagFacade.createOne(conversionService.convert(tagCreateRequestModel, TagVO.class));
+                TagVO tagVO = tagFacade.getOne(id);
+
+                return wrap(conversionService.convert(tagVO, TagDataModel.class));
+            } catch (ServiceException e) {
+                LOGGER.error(TAG_COULD_NOT_BE_CREATED, e);
+                throw new RequestCouldNotBeFulfilledException(TAG_COULD_NOT_BE_CREATED, e);
+            }
+        }
+    }
+
+    /**
+     * PUT /tags/{id}
+     * Updates an existing tag.
+     *
+     * @param id ID of an existing tag
+     * @param tagCreateRequestModel tag data as {@link TagCreateRequestModel}.
+     * @param bindingResult validation result
+     * @return updated tag's data
+     * @throws RequestCouldNotBeFulfilledException if the tag could not be created
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = PATH_PART_ID)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ModelAndView updateTag(@PathVariable(PATH_VARIABLE_ID) Long id,
+                                  @RequestBody TagCreateRequestModel tagCreateRequestModel,
+                                  BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
+
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            try {
+                tagFacade.updateOne(id, conversionService.convert(tagCreateRequestModel, TagVO.class));
+                TagVO tagVO = tagFacade.getOne(id);
+
+                return wrap(conversionService.convert(tagVO, TagDataModel.class));
+            } catch (ServiceException e) {
+                LOGGER.error(TAG_COULD_NOT_BE_UPDATED_WITH_ID, id);
+                throw new RequestCouldNotBeFulfilledException(TAG_COULD_NOT_BE_UPDATED, e);
+            }
+        }
+    }
+
+    /**
+     * DELETE /tags/{id}
+     * Deletes an existing tag.
+     *
+     * @param id ID of an existing tag
+     * @throws ResourceNotFoundException if no tag found under given ID
+     */
+    @RequestMapping(method = RequestMethod.DELETE, value = PATH_PART_ID)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTag(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+
+        try {
+            TagVO tagVO = tagFacade.getOne(id);
+            tagFacade.deleteByEntity(tagVO);
+        } catch (ServiceException e) {
+            LOGGER.error(TAG_COULD_NOT_BE_DELETED, id);
+            throw new ResourceNotFoundException(TAG_COULD_NOT_BE_FOUND, e);
+        }
+    }
+
+    /**
+     * PUT /tags/{id}/status
+     * Changes given tag's status (enabled/disabled).
+     *
+     * @param id ID of an existing tag
+     * @return updated tag's data
+     * @throws ResourceNotFoundException if no tag found under given ID
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = PATH_CHANGE_STATUS)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ModelAndView changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+
+        try {
+            TagVO tagVO = tagFacade.getOne(id);
+            if (tagVO.isEnabled()) {
+                tagFacade.disable(id);
+            } else {
+                tagFacade.enable(id);
+            }
+            TagVO updatedTagVO = tagFacade.getOne(id);
+
+            return wrap(conversionService.convert(updatedTagVO, TagDataModel.class));
+        } catch (ServiceException e) {
+            LOGGER.error(STATUS_OF_TAG_COULD_NOT_BE_CHANGED, id);
+            throw new ResourceNotFoundException(TAG_COULD_NOT_BE_FOUND, e);
+        }
+    }
+
+    /**
+     * POST /tags/assign
+     * Assigns a tag to an entry.
+     *
+     * @param tagAssignmentRequestModel IDs of the entry and the tag to assign as {@link TagAssignmentRequestModel}
+     * @param bindingResult validation result
+     * @return validation information on failed validation, null otherwise
+     * @throws ResourceNotFoundException if no tag or entry found under given IDs
+     */
+    @RequestMapping(method = RequestMethod.POST, value = PATH_ASSIGN_TAG)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ModelAndView attachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
+                                  BindingResult bindingResult) throws ResourceNotFoundException {
+
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            try {
+                tagFacade.attachTagToEntry(conversionService.convert(tagAssignmentRequestModel, TagAssignmentVO.class));
+                return null;
+            } catch (ServiceException e) {
+                LOGGER.error(FAILED_TO_ASSIGN_TAG_TO_ENTRY, e);
+                throw new ResourceNotFoundException(CANNOT_ASSIGN_NON_EXISTING_ENTITIES_TO_EACH_OTHER, e);
+            }
+        }
+    }
+
+    /**
+     * DELETE /tags/assign
+     * Un-assigns a tag from an entry.
+     *
+     * @param tagAssignmentRequestModel IDs of the entry and the tag to un-assign as {@link TagAssignmentRequestModel}
+     * @param bindingResult validation result
+     * @return validation information on failed validation, null otherwise
+     * @throws ResourceNotFoundException if no tag or entry found under given IDs
+     */
+    @RequestMapping(method = RequestMethod.DELETE, value = PATH_ASSIGN_TAG)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ModelAndView detachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
+                                  BindingResult bindingResult) throws ResourceNotFoundException {
+
+        if (bindingResult.hasErrors()) {
+            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            try {
+                tagFacade.detachTagFromEntry(conversionService.convert(tagAssignmentRequestModel, TagAssignmentVO.class));
+                return null;
+            } catch (ServiceException e) {
+                LOGGER.error(FAILED_TO_UN_ASSIGN_TAG_FROM_ENTRY, e);
+                throw new ResourceNotFoundException(CANNOT_UN_ASSIGN_NON_EXISTING_ENTITIES_TO_EACH_OTHER, e);
+            }
+        }
+    }
+}

@@ -55,6 +55,7 @@ public class FilesController extends BaseController {
     }
 
     /**
+     * GET /files
      * Returns list of uploaded files.
      *
      * @return list of uploaded files as {@link FileDataModel} objects wrapped in ModelAndView
@@ -66,6 +67,7 @@ public class FilesController extends BaseController {
     }
 
     /**
+     * GET /files/{fileIdentifier}/{storedFilename}
      * Downloads given file.
      *
      * @param fileIdentifier UUID of the uploaded file
@@ -91,6 +93,7 @@ public class FilesController extends BaseController {
     }
 
     /**
+     * POST /files
      * Uploads a new file.
      *
      * @param fileUploadRequestModel file to upload and additional data wrapped as {@link FileUploadRequestModel}
@@ -118,6 +121,7 @@ public class FilesController extends BaseController {
     }
 
     /**
+     * DELETE /files/{fileIdentifier}/{storedFilename}
      * Deletes an existing file.
      *
      * @param fileIdentifier UUID of the uploaded file
@@ -139,6 +143,7 @@ public class FilesController extends BaseController {
     }
 
     /**
+     * POST /files/directory
      * Creates a new directory under given parent directory.
      *
      * @param directoryCreationRequestModel model holding directory information
@@ -165,6 +170,7 @@ public class FilesController extends BaseController {
     }
 
     /**
+     * PUT /files/{fileIdentifier}/{storedFilename}
      * Updates given file's meta information.
      *
      * @param fileIdentifier UUID of the uploaded file

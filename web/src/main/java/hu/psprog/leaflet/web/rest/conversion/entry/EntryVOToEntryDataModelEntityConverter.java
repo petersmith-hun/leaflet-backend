@@ -6,6 +6,7 @@ import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
 import hu.psprog.leaflet.web.rest.conversion.file.UploadedFileVOToFileDataModelConverter;
+import hu.psprog.leaflet.web.rest.conversion.tag.TagVOToTagDataModelEntityConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -24,13 +25,16 @@ public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO
     private CommonFormatter commonFormatter;
     private HttpServletRequest httpServletRequest;
     private UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter;
+    private TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter;
 
     @Autowired
     public EntryVOToEntryDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest,
-                                                  UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter) {
+                                                  UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter,
+                                                  TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter) {
         this.commonFormatter = commonFormatter;
         this.httpServletRequest = httpServletRequest;
         this.uploadedFileVOToFileDataModelConverter = uploadedFileVOToFileDataModelConverter;
+        this.tagVOToTagDataModelEntityConverter = tagVOToTagDataModelEntityConverter;
     }
 
     @Override
@@ -53,9 +57,10 @@ public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO
                         .build())
                 .withAttachments(entryVO.getAttachments().stream()
                         .map(uploadedFileVOToFileDataModelConverter::convert)
+                        .collect(Collectors.toList()))
+                .withTags(entryVO.getTags().stream()
+                        .map(tagVOToTagDataModelEntityConverter::convert)
                         .collect(Collectors.toList()));
-
-        // TODO add tags
 
         return builder.build();
     }
