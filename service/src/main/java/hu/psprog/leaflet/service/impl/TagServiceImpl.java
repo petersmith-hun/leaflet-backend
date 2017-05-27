@@ -107,7 +107,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void attachTagToEntry(TagVO tagVO, EntryVO entryVO) throws EntityNotFoundException {
+    public void attachTagToEntry(TagVO tagVO, EntryVO entryVO) throws ServiceException {
 
         assertState(tagVO, entryVO);
 
@@ -123,7 +123,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void detachTagFromEntry(TagVO tagVO, EntryVO entryVO) throws EntityNotFoundException {
+    public void detachTagFromEntry(TagVO tagVO, EntryVO entryVO) throws ServiceException {
 
         assertState(tagVO, entryVO);
 

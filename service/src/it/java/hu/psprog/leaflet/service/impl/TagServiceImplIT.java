@@ -3,7 +3,6 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.TagService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
-import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -205,7 +204,7 @@ public class TagServiceImplIT {
     @Test
     @Transactional
     @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
-    public void shouldAttachTagToEntry() throws EntityNotFoundException {
+    public void shouldAttachTagToEntry() throws ServiceException {
 
         // when
         tagService.attachTagToEntry(tagToAttach, controlEntryVO);
@@ -221,7 +220,7 @@ public class TagServiceImplIT {
     @Test
     @Transactional
     @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
-    public void shouldDetachTagFromEntry() throws EntityNotFoundException {
+    public void shouldDetachTagFromEntry() throws ServiceException {
 
         // when
         tagService.detachTagFromEntry(alreadyAttachedTag, controlEntryVO);
