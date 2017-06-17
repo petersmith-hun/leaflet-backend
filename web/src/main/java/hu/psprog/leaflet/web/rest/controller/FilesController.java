@@ -3,6 +3,7 @@ package hu.psprog.leaflet.web.rest.controller;
 import hu.psprog.leaflet.api.rest.request.file.DirectoryCreationRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.FileUploadRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.UpdateFileMetaInfoRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileListDataModel;
@@ -28,9 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,9 +62,11 @@ public class FilesController extends BaseController {
      * @return list of uploaded files as {@link FileDataModel} objects wrapped in ModelAndView
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView getUploadedFiles() {
+    public ResponseEntity<FileListDataModel> getUploadedFiles() {
         List<UploadedFileVO> uploadedFiles = fileManagementFacade.retrieveStoredFileList();
-        return wrap(conversionService.convert(uploadedFiles, FileListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(uploadedFiles, FileListDataModel.class));
     }
 
     /**
@@ -102,17 +105,21 @@ public class FilesController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if file can not be uploaded
      */
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView uploadFile(@Valid final FileUploadRequestModel fileUploadRequestModel,
-                                   BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
+    public ResponseEntity<BaseBodyDataModel> uploadFile(@Valid final FileUploadRequestModel fileUploadRequestModel,
+                                                        BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             FileInputVO fileInputVO = conversionService.convert(fileUploadRequestModel, FileInputVO.class);
             try {
                 UploadedFileVO uploadedFile = fileManagementFacade.upload(fileInputVO);
-                return wrap(conversionService.convert(uploadedFile, FileDataModel.class));
+                FileDataModel fileData = conversionService.convert(uploadedFile, FileDataModel.class);
+                return ResponseEntity
+                        .created(buildLocation(fileData))
+                        .body(fileData);
             } catch (ServiceException e) {
                 LOGGER.error("Failed to upload file.", e);
                 throw new RequestCouldNotBeFulfilledException("Failed to upload file.");
@@ -152,12 +159,13 @@ public class FilesController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if directory cannot be created
      */
     @RequestMapping(method = RequestMethod.POST, value = PATH_CREATE_DIRECTORY)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView createDirectory(@RequestBody @Valid DirectoryCreationRequestModel directoryCreationRequestModel,
+    public ResponseEntity<BaseBodyDataModel> createDirectory(@RequestBody @Valid DirectoryCreationRequestModel directoryCreationRequestModel,
                                         BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 fileManagementFacade.createDirectory(directoryCreationRequestModel.getParent(), directoryCreationRequestModel.getName());
@@ -165,7 +173,9 @@ public class FilesController extends BaseController {
                 LOGGER.error("Failed to create directory.", e);
                 throw new RequestCouldNotBeFulfilledException("Failed to create directory.", e);
             }
-            return null;
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(null);
         }
     }
 
@@ -181,23 +191,34 @@ public class FilesController extends BaseController {
      * @throws ResourceNotFoundException if no existing file is found for given fileIdentifier
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_FULLY_IDENTIFIED_FILE)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView updateFileMetaInfo(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier,
+    public ResponseEntity<BaseBodyDataModel> updateFileMetaInfo(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier,
                                            @PathVariable(PATH_VARIABLE_FILENAME) String storedFilename,
                                            @RequestBody @Valid UpdateFileMetaInfoRequestModel updateFileMetaInfoRequestModel,
                                            BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             UpdateFileMetaInfoVO updateFileMetaInfoVO = conversionService.convert(updateFileMetaInfoRequestModel, UpdateFileMetaInfoVO.class);
             try {
                 fileManagementFacade.updateMetaInfo(fileIdentifier, updateFileMetaInfoVO);
-                return null;
+                return ResponseEntity
+                        .created(buildLocation(fileIdentifier, storedFilename))
+                        .body(null);
             } catch (ServiceException e) {
                 LOGGER.error("Failed to update given file.", e);
                 throw new ResourceNotFoundException("Requested file can not be updated, probably not existing.");
             }
         }
+    }
+
+    private URI buildLocation(FileDataModel fileDataModel) {
+        return URI.create(BASE_PATH_FILES + "/" + fileDataModel.getReference());
+    }
+
+    private URI buildLocation(UUID fileIdentifier, String storedFilename) {
+        return URI.create(BASE_PATH_FILES + "/" + fileIdentifier + "/" + storedFilename);
     }
 }

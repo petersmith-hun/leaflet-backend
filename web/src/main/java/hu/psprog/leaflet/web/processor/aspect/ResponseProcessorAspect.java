@@ -1,12 +1,12 @@
 package hu.psprog.leaflet.web.processor.aspect;
 
+import hu.psprog.leaflet.service.vo.BaseVO;
 import hu.psprog.leaflet.service.vo.CustomSEODataProviderVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
-import hu.psprog.leaflet.web.processor.ResponseProcessor;
+import hu.psprog.leaflet.web.processor.impl.CustomSEODataProviderResponseProcessor;
+import hu.psprog.leaflet.web.processor.impl.EntityPageResponseProcessor;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +17,7 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
-public class ResponseProcessorAspect {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseProcessorAspect.class);
+class ResponseProcessorAspect {
 
     private static final String POINTCUT_ENTITY_PAGE = "execution(hu.psprog.leaflet.service.vo.EntityPageVO+ hu.psprog.leaflet.service.*.*(..))";
     private static final String POINTCUT_CUSTOM_SEO_PROVIDER = "execution(hu.psprog.leaflet.service.vo.CustomSEODataProviderVO+ hu.psprog.leaflet.service.*.*(..))";
@@ -27,8 +25,15 @@ public class ResponseProcessorAspect {
     private static final String RETURNING_ENTITY_PAGE_VO = "entityPageVO";
     private static final String RETURNING_CUSTOM_SEO_PROVIDER = "customSEODataProviderVO";
 
+    private CustomSEODataProviderResponseProcessor customSEODataProviderResponseProcessor;
+    private EntityPageResponseProcessor entityPageResponseProcessor;
+
     @Autowired
-    private ResponseProcessor responseProcessor;
+    public ResponseProcessorAspect(CustomSEODataProviderResponseProcessor customSEODataProviderResponseProcessor,
+                                   EntityPageResponseProcessor entityPageResponseProcessor) {
+        this.customSEODataProviderResponseProcessor = customSEODataProviderResponseProcessor;
+        this.entityPageResponseProcessor = entityPageResponseProcessor;
+    }
 
     /**
      * Aspect to handle entity page parameters.
@@ -39,8 +44,8 @@ public class ResponseProcessorAspect {
     @AfterReturning(
             value = POINTCUT_ENTITY_PAGE,
             returning = RETURNING_ENTITY_PAGE_VO)
-    public void aspectToAutoHandleEntityPageParameters(EntityPageVO<?> entityPageVO) {
-        responseProcessor.process(entityPageVO);
+    void aspectToAutoHandleEntityPageParameters(EntityPageVO<? extends BaseVO> entityPageVO) {
+        entityPageResponseProcessor.process(entityPageVO);
     }
 
     /**
@@ -52,7 +57,7 @@ public class ResponseProcessorAspect {
     @AfterReturning(
             value = POINTCUT_CUSTOM_SEO_PROVIDER,
             returning = RETURNING_CUSTOM_SEO_PROVIDER)
-    public void aspectToHandleCustomSEODataProviders(CustomSEODataProviderVO<?> customSEODataProviderVO) {
-        responseProcessor.process(customSEODataProviderVO);
+    void aspectToHandleCustomSEODataProviders(CustomSEODataProviderVO<? extends BaseVO> customSEODataProviderVO) {
+        customSEODataProviderResponseProcessor.process(customSEODataProviderVO);
     }
 }

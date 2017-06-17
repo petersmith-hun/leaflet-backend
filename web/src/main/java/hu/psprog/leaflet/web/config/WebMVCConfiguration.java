@@ -8,17 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import javax.servlet.MultipartConfigElement;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Spring MVC configuration for REST web interface.
@@ -29,17 +23,12 @@ import java.util.Set;
 @EnableWebMvc
 public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
 
-    public static final String IS_AJAX_REQUEST = "isAjax";
-
     @Autowired
     private ResponseFillerInterceptor responseFillerInterceptor;
 
-    private ObjectMapper objectMapper;
-
     @Bean
     public ObjectMapper objectMapper() {
-        objectMapper = new ObjectMapper();
-        return objectMapper;
+        return new ObjectMapper();
     }
 
     @Bean
@@ -59,26 +48,8 @@ public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-
-        MappingJackson2JsonView mappingJackson2JsonView = new MappingJackson2JsonView();
-        mappingJackson2JsonView.setObjectMapper(objectMapper);
-        mappingJackson2JsonView.setModelKeys(getModelKeys());
-        ViewResolver jsonViewResolver = (viewName, locale) -> mappingJackson2JsonView;
-        registry.viewResolver(jsonViewResolver);
-
-        super.configureViewResolvers(registry);
-    }
-
-    @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(responseFillerInterceptor);
         super.addInterceptors(registry);
-    }
-
-    private Set<String> getModelKeys() {
-        Set<String> modelKeys = new HashSet<>();
-        modelKeys.addAll(Arrays.asList("body", "seo", "pagination", "error"));
-        return modelKeys;
     }
 }

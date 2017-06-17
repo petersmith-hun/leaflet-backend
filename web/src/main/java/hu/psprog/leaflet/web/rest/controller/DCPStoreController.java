@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.dcp.DCPRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.dcp.DCPDataModel;
 import hu.psprog.leaflet.api.rest.response.dcp.DCPListDataModel;
@@ -11,13 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -47,13 +47,15 @@ public class DCPStoreController extends BaseController {
      * @return list of existing DCP entries
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView getAll() {
+    public ResponseEntity<DCPListDataModel> getAll() {
 
         Map<String, String> dcpStore = dynamicConfigurationPropertyService.getAll();
         DCPListDataModel.Builder builder = new DCPListDataModel.Builder();
         dcpStore.entrySet().forEach(entry -> builder.withItem(createDataModel(entry)));
 
-        return wrap(builder.build());
+        return ResponseEntity
+                .ok()
+                .body(builder.build());
     }
 
     /**
@@ -64,16 +66,19 @@ public class DCPStoreController extends BaseController {
      * @param bindingResult validation results
      */
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView create(@RequestBody @Valid DCPRequestModel dcpRequestModel, BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> create(@RequestBody @Valid DCPRequestModel dcpRequestModel, BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 dynamicConfigurationPropertyService.add(dcpRequestModel.getKey(), dcpRequestModel.getValue());
-                return null;
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(null);
             } catch (ServiceException e) {
                 LOGGER.error(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_CREATED);
@@ -89,16 +94,19 @@ public class DCPStoreController extends BaseController {
      * @param bindingResult validation results
      */
     @RequestMapping(method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView update(@RequestBody @Valid DCPRequestModel dcpRequestModel, BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> update(@RequestBody @Valid DCPRequestModel dcpRequestModel, BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 dynamicConfigurationPropertyService.update(dcpRequestModel.getKey(), dcpRequestModel.getValue());
-                return null;
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(null);
             } catch (ServiceException e) {
                 LOGGER.error(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_UPDATED, e);
                 throw new RequestCouldNotBeFulfilledException(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_UPDATED);
@@ -114,16 +122,19 @@ public class DCPStoreController extends BaseController {
      * @param bindingResult validation results
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ModelAndView remove(@RequestBody @Valid DCPRequestModel dcpRequestModel, BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> remove(@RequestBody @Valid DCPRequestModel dcpRequestModel, BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 dynamicConfigurationPropertyService.delete(dcpRequestModel.getKey());
-                return null;
+                return ResponseEntity
+                        .status(HttpStatus.NO_CONTENT)
+                        .body(null);
             } catch (ServiceException e) {
                 LOGGER.error(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED, e);
                 throw new RequestCouldNotBeFulfilledException(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED);

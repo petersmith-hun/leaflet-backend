@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service.converter;
 
+import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.User;
@@ -41,6 +42,13 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
 
         if (Objects.nonNull(source.getEntryStatus())) {
             builder.withStatus(EntryStatus.valueOf(source.getEntryStatus()));
+        }
+
+        if (Objects.nonNull(source.getCategory())) {
+            Category category = new Category.Builder()
+                    .withId(source.getCategory().getId())
+                    .createCategory();
+            builder.withCategory(category);
         }
 
         if (source.getOwner() != null) {

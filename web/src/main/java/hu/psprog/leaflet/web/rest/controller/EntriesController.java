@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
@@ -14,12 +15,14 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,9 +31,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -64,11 +67,13 @@ public class EntriesController extends BaseController {
      * @return list of existing entries
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView getAllEntries() {
+    public ResponseEntity<EntryListDataModel> getAllEntries() {
 
         List<EntryVO> entries = entryService.getAll();
 
-        return wrap(conversionService.convert(entries, EntryListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(entries, EntryListDataModel.class));
     }
 
     /**
@@ -81,16 +86,20 @@ public class EntriesController extends BaseController {
      * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
      * @return page of public entries
      */
+    @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES)
-    public ModelAndView getPageOfPublicEntries(@PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
-                                                    @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
-                                                    @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
-                                                    @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
+    public ResponseEntity<EntryListDataModel> getPageOfPublicEntries(
+            @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
+            @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<EntryVO> entryPage =
                 entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
 
-        return wrap(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
     }
 
     /**
@@ -104,18 +113,22 @@ public class EntriesController extends BaseController {
      * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
      * @return page of public entries
      */
+    @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_BY_CATEGORY)
-    public ModelAndView getPageOfPublicEntriesByCategory(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id,
-                                                    @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
-                                                    @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
-                                                    @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
-                                                    @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
+    public ResponseEntity<EntryListDataModel> getPageOfPublicEntriesByCategory(
+            @PathVariable(BaseController.PATH_VARIABLE_ID) Long id,
+            @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
+            @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<EntryVO> entryPage =
                 entryService.getPageOfPublicEntriesUnderCategory(CategoryVO.wrapMinimumVO(id),
                         page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
 
-        return wrap(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
     }
 
     /**
@@ -125,13 +138,14 @@ public class EntriesController extends BaseController {
      * @param link link to identify entry
      * @return identified entry
      */
+    @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_ENTRY_BY_LINK)
-    public ModelAndView getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
-
+    public ResponseEntity<ExtendedEntryDataModel> getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link)
+            throws ResourceNotFoundException {
         try {
             EntryVO entryVO = entryService.findByLink(link);
 
-            return wrap(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
+            return ResponseEntity.ok(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
         } catch (EntityNotFoundException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -145,13 +159,16 @@ public class EntriesController extends BaseController {
      * @param id ID of an existing entry
      * @return identified entry
      */
+    @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PART_ID)
-    public ModelAndView getEntryByID(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public ResponseEntity<EditEntryDataModel> getEntryByID(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             EntryVO entryVO = entryService.getOne(id);
 
-            return wrap(conversionService.convert(entryVO, EditEntryDataModel.class));
+            return ResponseEntity
+                    .ok()
+                    .body(conversionService.convert(entryVO, EditEntryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -167,18 +184,21 @@ public class EntriesController extends BaseController {
      * @return created entry data
      */
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView createEntry(@RequestBody @Valid EntryCreateRequestModel entryCreateRequestModel, BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> createEntry(@RequestBody @Valid EntryCreateRequestModel entryCreateRequestModel, BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 Long entryID = entryService.createOne(conversionService.convert(entryCreateRequestModel, EntryVO.class));
                 EntryVO createdEntry = entryService.getOne(entryID);
 
-                return wrap(conversionService.convert(createdEntry, ExtendedEntryDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(entryID))
+                        .body(conversionService.convert(createdEntry, ExtendedEntryDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -199,19 +219,22 @@ public class EntriesController extends BaseController {
      * @return updated entry data
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_PART_ID)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView updateEntry(@PathVariable(PATH_VARIABLE_ID) Long id,
+    public ResponseEntity<BaseBodyDataModel> updateEntry(@PathVariable(PATH_VARIABLE_ID) Long id,
                                     @RequestBody @Valid EntryUpdateRequestModel entryUpdateRequestModel, BindingResult bindingResult)
             throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 entryService.updateOne(id, conversionService.convert(entryUpdateRequestModel, EntryVO.class));
                 EntryVO entryVO = entryService.getOne(id);
 
-                return wrap(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(id))
+                        .body(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -230,8 +253,7 @@ public class EntriesController extends BaseController {
      * @return updated entry data
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_CHANGE_STATUS)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public ResponseEntity<ExtendedEntryDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             EntryVO entryVO = entryService.getOne(id);
@@ -242,7 +264,9 @@ public class EntriesController extends BaseController {
             }
             EntryVO updatedEntryVO = entryService.getOne(id);
 
-            return wrap(conversionService.convert(updatedEntryVO, ExtendedEntryDataModel.class));
+            return ResponseEntity
+                    .created(buildLocation(id))
+                    .body(conversionService.convert(updatedEntryVO, ExtendedEntryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -266,5 +290,9 @@ public class EntriesController extends BaseController {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
         }
+    }
+
+    private URI buildLocation(Long id) {
+        return URI.create(BASE_PATH_ENTRIES + "/" + id);
     }
 }

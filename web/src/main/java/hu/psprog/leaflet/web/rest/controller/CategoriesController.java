@@ -3,16 +3,19 @@ package hu.psprog.leaflet.web.rest.controller;
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.category.ExtendedCategoryDataModel;
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.service.CategoryService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
+import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,9 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -51,11 +54,13 @@ public class CategoriesController extends BaseController {
      * @return list of categories
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView getAllCategories() {
+    public ResponseEntity<CategoryListDataModel> getAllCategories() {
 
         List<CategoryVO> categories = categoryService.getAll();
 
-        return wrap(conversionService.convert(categories, CategoryListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(categories, CategoryListDataModel.class));
     }
 
     /**
@@ -64,12 +69,15 @@ public class CategoriesController extends BaseController {
      *
      * @return list of public categories
      */
+    @FillResponse
     @RequestMapping(value = PATH_PUBLIC, method = RequestMethod.GET)
-    public ModelAndView getPublicCategories() {
+    public ResponseEntity<CategoryListDataModel> getPublicCategories() {
 
         List<CategoryVO> categories = categoryService.getAllPublic();
 
-        return wrap(conversionService.convert(categories, CategoryListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(categories, CategoryListDataModel.class));
     }
 
     /**
@@ -80,12 +88,14 @@ public class CategoriesController extends BaseController {
      * @return category data if requested category exists
      */
     @RequestMapping(value = PATH_PART_ID, method = RequestMethod.GET)
-    public ModelAndView getCategory(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public ResponseEntity<ExtendedCategoryDataModel> getCategory(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             CategoryVO category = categoryService.getOne(id);
 
-            return wrap(conversionService.convert(category, ExtendedCategoryDataModel.class));
+            return ResponseEntity
+                    .ok()
+                    .body(conversionService.convert(category, ExtendedCategoryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -101,18 +111,21 @@ public class CategoriesController extends BaseController {
      * @return created category data
      */
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView createCategory(@RequestBody @Valid CategoryCreateRequestModel categoryCreateRequestModel, BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> createCategory(@RequestBody @Valid CategoryCreateRequestModel categoryCreateRequestModel, BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 Long categoryID = categoryService.createOne(conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
                 CategoryVO createdCategory = categoryService.getOne(categoryID);
 
-                return wrap(conversionService.convert(createdCategory, ExtendedCategoryDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(categoryID))
+                        .body(conversionService.convert(createdCategory, ExtendedCategoryDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(CATEGORY_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(CATEGORY_COULD_NOT_BE_CREATED_TRY_AGAIN);
@@ -130,19 +143,22 @@ public class CategoriesController extends BaseController {
      * @return updated category data
      */
     @RequestMapping(value = PATH_PART_ID, method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView updateCategory(@PathVariable(PATH_VARIABLE_ID) Long id,
+    public ResponseEntity<BaseBodyDataModel> updateCategory(@PathVariable(PATH_VARIABLE_ID) Long id,
                                        @RequestBody @Valid CategoryCreateRequestModel categoryCreateRequestModel,
                                        BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 categoryService.updateOne(id, conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
                 CategoryVO updatedCategory = categoryService.getOne(id);
 
-                return wrap(conversionService.convert(updatedCategory, ExtendedCategoryDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(id))
+                        .body(conversionService.convert(updatedCategory, ExtendedCategoryDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
                 throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -158,8 +174,7 @@ public class CategoriesController extends BaseController {
      * @return updated category data
      */
     @RequestMapping(value = PATH_CHANGE_STATUS, method = RequestMethod.PUT)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public ResponseEntity<ExtendedCategoryDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             CategoryVO categoryVO = categoryService.getOne(id);
@@ -170,7 +185,9 @@ public class CategoriesController extends BaseController {
             }
             CategoryVO updatedCategoryVO = categoryService.getOne(id);
 
-            return wrap(conversionService.convert(updatedCategoryVO, ExtendedCategoryDataModel.class));
+            return ResponseEntity
+                    .created(buildLocation(id))
+                    .body(conversionService.convert(updatedCategoryVO, ExtendedCategoryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -194,5 +211,9 @@ public class CategoriesController extends BaseController {
             LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
         }
+    }
+
+    private URI buildLocation(Long id) {
+        return URI.create(BASE_PATH_CATEGORIES + "/" + id);
     }
 }
