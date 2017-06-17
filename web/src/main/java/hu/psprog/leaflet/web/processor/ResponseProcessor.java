@@ -1,29 +1,17 @@
 package hu.psprog.leaflet.web.processor;
 
-import hu.psprog.leaflet.service.vo.BaseVO;
-import hu.psprog.leaflet.service.vo.CustomSEODataProviderVO;
-import hu.psprog.leaflet.service.vo.EntityPageVO;
-
 /**
  * Handles special service answers, extracts and populates corresponding data into request.
  *
+ * @param <S> source response type to process
  * @author Peter Smith
  */
-public interface ResponseProcessor {
+public interface ResponseProcessor<S> {
 
     /**
-     * Extracts pagination information from {@link EntityPageVO} value object.
+     * Extracts required information from response object of type S
      *
-     * @param response service response of type {@link EntityPageVO}
-     * @param <T> type of wrapped value object
+     * @param response service response of type S
      */
-    <T extends BaseVO> void process(EntityPageVO<T> response);
-
-    /**
-     * Extracts custom SEO values from {@link CustomSEODataProviderVO} value object.
-     *
-     * @param response service response of type {@link CustomSEODataProviderVO}
-     * @param <T> type of wrapped value object
-     */
-    <T extends BaseVO> void process(CustomSEODataProviderVO<T> response);
+    void process(S response);
 }

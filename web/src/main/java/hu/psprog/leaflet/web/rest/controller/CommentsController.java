@@ -5,6 +5,7 @@ import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentDataModel;
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
@@ -13,8 +14,9 @@ import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import hu.psprog.leaflet.web.annotation.AJAXRequest;
 import hu.psprog.leaflet.web.annotation.AuthenticatedRequest;
+import hu.psprog.leaflet.web.annotation.FillResponse;
+import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +34,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 /**
  * REST controller for comment related entry points.
@@ -74,18 +77,21 @@ public class CommentsController extends BaseController {
      * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
      * @return list of comments
      */
-    @AJAXRequest
+    @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_PUBLIC_COMMENTS_FOR_ENTRY)
-    public ModelAndView getPageOfPublicCommentsForEntry(@PathVariable(PATH_VARIABLE_ID) Long entryID,
-                                                        @PathVariable(PATH_VARIABLE_PAGE) int page,
-                                                        @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
-                                                        @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
-                                                        @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
+    public ResponseEntity<CommentListDataModel> getPageOfPublicCommentsForEntry(
+            @PathVariable(PATH_VARIABLE_ID) Long entryID,
+            @PathVariable(PATH_VARIABLE_PAGE) int page,
+            @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<CommentVO> comments = commentFacade.getPageOfPublicCommentsForEntry(page, limit,
                 OrderDirection.valueOf(orderDirection), CommentVO.OrderBy.valueOf(orderBy), EntryVO.wrapMinimumVO(entryID));
 
-        return wrap(conversionService.convert(comments.getEntitiesOnPage(), CommentListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(comments.getEntitiesOnPage(), CommentListDataModel.class));
     }
 
     /**
@@ -100,17 +106,21 @@ public class CommentsController extends BaseController {
      * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
      * @return list of comments
      */
+    @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_ALL_COMMENTS_FOR_ENTRY)
-    public ModelAndView getPageOfCommentsForEntry(@PathVariable(PATH_VARIABLE_ID) Long entryID,
-                                                  @PathVariable(PATH_VARIABLE_PAGE) int page,
-                                                  @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
-                                                  @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
-                                                  @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
+    public ResponseEntity<CommentListDataModel> getPageOfCommentsForEntry(
+            @PathVariable(PATH_VARIABLE_ID) Long entryID,
+            @PathVariable(PATH_VARIABLE_PAGE) int page,
+            @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<CommentVO> comments = commentFacade.getPageOfCommentsForEntry(page, limit,
                 OrderDirection.valueOf(orderDirection), CommentVO.OrderBy.valueOf(orderBy), EntryVO.wrapMinimumVO(entryID));
 
-        return wrap(conversionService.convert(comments.getEntitiesOnPage(), CommentListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(comments.getEntitiesOnPage(), CommentListDataModel.class));
     }
 
     /**
@@ -122,13 +132,15 @@ public class CommentsController extends BaseController {
      * @throws ResourceNotFoundException if no comment found associated with given ID
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
-    public ModelAndView getCommentById(@PathVariable(PATH_VARIABLE_ID) Long commentID)
+    public ResponseEntity<ExtendedCommentDataModel> getCommentById(@PathVariable(PATH_VARIABLE_ID) Long commentID)
             throws ResourceNotFoundException {
 
         try {
             CommentVO commentVO = commentFacade.getOne(commentID);
 
-            return wrap(conversionService.convert(commentVO, ExtendedCommentDataModel.class));
+            return ResponseEntity
+                    .ok()
+                    .body(conversionService.convert(commentVO, ExtendedCommentDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_COMMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -144,21 +156,23 @@ public class CommentsController extends BaseController {
      * @return created comment data
      * @throws RequestCouldNotBeFulfilledException if a service exception occurred
      */
-    @AJAXRequest
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView createComment(@RequestBody @AuthenticatedRequest @Valid CommentCreateRequestModel commentCreateRequestModel,
-                                      BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> createComment(@RequestBody @AuthenticatedRequest @Valid CommentCreateRequestModel commentCreateRequestModel,
+                                                           BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 Long commentID = commentFacade.createOne(conversionService.convert(commentCreateRequestModel, CommentVO.class));
                 CommentVO commentVO = commentFacade.getOne(commentID);
 
-                return wrap(conversionService.convert(commentVO, CommentDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(commentID))
+                        .body(conversionService.convert(commentVO, CommentDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(ENTRY_TO_ASSOCIATE_COMMENT_WITH_COULD_NOT_BE_FOUND, e);
                 throw new RequestCouldNotBeFulfilledException(YOUR_COMMENT_COULD_NOT_BE_CREATED);
@@ -181,20 +195,23 @@ public class CommentsController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if a service exception occurred
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_PART_ID)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView updateComment(@PathVariable(PATH_VARIABLE_ID) Long commentID,
+    public ResponseEntity<BaseBodyDataModel> updateComment(@PathVariable(PATH_VARIABLE_ID) Long commentID,
                                       @RequestBody @Valid CommentUpdateRequestModel commentUpdateRequestModel,
                                       BindingResult bindingResult)
             throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 commentFacade.updateOne(commentID, conversionService.convert(commentUpdateRequestModel, CommentVO.class));
                 CommentVO commentVO = commentFacade.getOne(commentID);
 
-                return wrap(conversionService.convert(commentVO, CommentDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(commentID))
+                        .body(conversionService.convert(commentVO, CommentDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(REQUESTED_COMMENT_NOT_FOUND, e);
                 throw new ResourceNotFoundException(THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -212,7 +229,7 @@ public class CommentsController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_CHANGE_STATUS)
     @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView changeCommentStatus(@PathVariable(PATH_VARIABLE_ID) Long commentID)
+    public ResponseEntity<ExtendedCommentDataModel> changeCommentStatus(@PathVariable(PATH_VARIABLE_ID) Long commentID)
             throws ResourceNotFoundException {
 
         try {
@@ -224,7 +241,9 @@ public class CommentsController extends BaseController {
             }
             CommentVO updatedCommentVO = commentFacade.getOne(commentID);
 
-            return wrap(conversionService.convert(updatedCommentVO, ExtendedCommentDataModel.class));
+            return ResponseEntity
+                    .created(buildLocation(commentID))
+                    .body(conversionService.convert(updatedCommentVO, ExtendedCommentDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_COMMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -271,5 +290,9 @@ public class CommentsController extends BaseController {
             LOGGER.error(REQUESTED_COMMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
         }
+    }
+
+    private URI buildLocation(Long id) {
+        return URI.create(BASE_PATH_COMMENTS + "/" + id);
     }
 }

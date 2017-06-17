@@ -1,15 +1,15 @@
 package hu.psprog.leaflet.web.rest.filler.impl;
 
+import hu.psprog.leaflet.api.rest.response.common.SEODataModel;
+import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
 import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -21,27 +21,26 @@ import java.util.stream.Stream;
 @Component
 public class SEOResponseFiller implements ResponseFiller {
 
-    private static final String RESPONSE_NODE_SEO = "seo";
-    private static final String RESPONSE_PARAMETER_PAGE_TITLE = "pageTitle";
-    private static final String RESPONSE_PARAMETER_META_TITLE = "metaTitle";
-    private static final String RESPONSE_PARAMETER_META_DESCRIPTION = "metaDescription";
-    private static final String RESPONSE_PARAMETER_META_KEYWORDS = "metaKeywords";
-    private static final String EMPTY_STRING = "";
-
-    @Autowired
     private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
-
-    @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @Autowired
+    public SEOResponseFiller(DynamicConfigurationPropertyService dynamicConfigurationPropertyService, HttpServletRequest httpServletRequest) {
+        this.dynamicConfigurationPropertyService = dynamicConfigurationPropertyService;
+        this.httpServletRequest = httpServletRequest;
+    }
+
     @Override
-    public void fill(ModelAndView modelAndView) {
-        Map<String, String> seoParameters = new HashMap<>();
-        seoParameters.put(RESPONSE_PARAMETER_PAGE_TITLE, getParameter(RequestParameter.SEO_PAGE_TITLE));
-        seoParameters.put(RESPONSE_PARAMETER_META_TITLE, getParameter(RequestParameter.SEO_META_TITLE));
-        seoParameters.put(RESPONSE_PARAMETER_META_DESCRIPTION, getParameter(RequestParameter.SEO_META_DESCRIPTION));
-        seoParameters.put(RESPONSE_PARAMETER_META_KEYWORDS, getParameter(RequestParameter.SEO_META_KEYWORDS));
-        modelAndView.addObject(RESPONSE_NODE_SEO, seoParameters);
+    public void fill(WrapperBodyDataModel.Builder wrapperBodyDataModelBuilder) {
+
+        SEODataModel seoDataModel = new SEODataModel.Builder()
+                .withPageTitle(getParameter(RequestParameter.SEO_PAGE_TITLE))
+                .withMetaTitle(getParameter(RequestParameter.SEO_META_TITLE))
+                .withMetaDescription(getParameter(RequestParameter.SEO_META_DESCRIPTION))
+                .withMetaKeywords(getParameter(RequestParameter.SEO_META_KEYWORDS))
+                .build();
+
+        wrapperBodyDataModelBuilder.withSeo(seoDataModel);
     }
 
     @Override
@@ -55,6 +54,6 @@ public class SEOResponseFiller implements ResponseFiller {
                 .filter(Objects::nonNull)
                 .findFirst()
                     .map(String::valueOf)
-                    .orElse(EMPTY_STRING);
+                    .orElse(StringUtils.EMPTY);
     }
 }

@@ -1,11 +1,11 @@
 package hu.psprog.leaflet.web.rest.filler.impl;
 
 import hu.psprog.leaflet.api.rest.response.common.PaginationDataModel;
+import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
 import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
@@ -18,13 +18,15 @@ import java.util.Objects;
 @Component
 public class PaginationResponseFiller implements ResponseFiller {
 
-    private static final String PAGINATION = "pagination";
-
-    @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @Autowired
+    public PaginationResponseFiller(HttpServletRequest httpServletRequest) {
+        this.httpServletRequest = httpServletRequest;
+    }
+
     @Override
-    public void fill(ModelAndView modelAndView) {
+    public void fill(WrapperBodyDataModel.Builder wrapperBodyDataModelBuilder) {
 
         PaginationDataModel paginationDataModel = new PaginationDataModel.Builder()
                 .withEntityCount((long) httpServletRequest.getAttribute(RequestParameter.PAGINATION_ENTITY_COUNT))
@@ -37,7 +39,7 @@ public class PaginationResponseFiller implements ResponseFiller {
                 .withHasPrevious((boolean) httpServletRequest.getAttribute(RequestParameter.PAGINATION_HAS_PREVIOUS))
                 .build();
 
-        modelAndView.addObject(PAGINATION, paginationDataModel);
+        wrapperBodyDataModelBuilder.withPagination(paginationDataModel);
     }
 
     @Override

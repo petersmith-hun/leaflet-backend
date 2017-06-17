@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.document.DocumentDataModel;
 import hu.psprog.leaflet.api.rest.response.document.DocumentListDataModel;
@@ -10,12 +11,14 @@ import hu.psprog.leaflet.service.DocumentService;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.DocumentVO;
+import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,9 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -57,11 +60,13 @@ public class DocumentsController extends BaseController {
      * @return list of existing documents
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ModelAndView getAllDocuments() {
+    public ResponseEntity<DocumentListDataModel> getAllDocuments() {
 
         List<DocumentVO> documentVOList = documentService.getAll();
 
-        return wrap(conversionService.convert(documentVOList, DocumentListDataModel.class));
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(documentVOList, DocumentListDataModel.class));
     }
 
     /**
@@ -73,12 +78,14 @@ public class DocumentsController extends BaseController {
      * @throws ResourceNotFoundException if no document associated with given ID exists
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
-    public ModelAndView getDocumentByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public ResponseEntity<EditDocumentDataModel> getDocumentByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             DocumentVO documentVO = documentService.getOne(id);
 
-            return wrap(conversionService.convert(documentVO, EditDocumentDataModel.class));
+            return ResponseEntity
+                    .ok()
+                    .body(conversionService.convert(documentVO, EditDocumentDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -93,13 +100,16 @@ public class DocumentsController extends BaseController {
      * @return identified document
      * @throws ResourceNotFoundException if no document associated with given link exists
      */
+    @FillResponse
     @RequestMapping(method = RequestMethod.GET, path = PATH_DOCUMENT_BY_LINK)
-    public ModelAndView getDocumentByLink(@PathVariable(PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
+    public ResponseEntity<DocumentDataModel> getDocumentByLink(@PathVariable(PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
 
         try {
             DocumentVO documentVO = documentService.getByLink(link);
 
-            return wrap(conversionService.convert(documentVO, DocumentDataModel.class));
+            return ResponseEntity
+                    .ok()
+                    .body(conversionService.convert(documentVO, DocumentDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -116,19 +126,22 @@ public class DocumentsController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if a constraint violation or any other service error happens during processing the request
      */
     @RequestMapping(method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView createDocument(@RequestBody @Valid DocumentCreateRequestModel documentCreateRequestModel,
-                                       BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> createDocument(@RequestBody @Valid DocumentCreateRequestModel documentCreateRequestModel,
+                                                            BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 Long documentID = documentService.createOne(conversionService.convert(documentCreateRequestModel, DocumentVO.class));
                 DocumentVO createdDocument = documentService.getOne(documentID);
 
-                return wrap(conversionService.convert(createdDocument, EditDocumentDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(documentID))
+                        .body(conversionService.convert(createdDocument, EditDocumentDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(A_DOCUMENT_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -151,20 +164,23 @@ public class DocumentsController extends BaseController {
      * @throws ResourceNotFoundException if no document associated with given id exists
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_PART_ID)
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView updateDocument(@PathVariable(PATH_VARIABLE_ID) Long id,
+    public ResponseEntity<BaseBodyDataModel> updateDocument(@PathVariable(PATH_VARIABLE_ID) Long id,
                                        @RequestBody @Valid DocumentUpdateRequestModel documentUpdateRequestModel,
                                        BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 documentService.updateOne(id, conversionService.convert(documentUpdateRequestModel, DocumentVO.class));
                 DocumentVO updatedDocument = documentService.getOne(id);
 
-                return wrap(conversionService.convert(updatedDocument, EditDocumentDataModel.class));
+                return ResponseEntity
+                        .created(buildLocation(id))
+                        .body(conversionService.convert(updatedDocument, EditDocumentDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(A_DOCUMENT_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -193,5 +209,9 @@ public class DocumentsController extends BaseController {
             LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
         }
+    }
+
+    private URI buildLocation(Long id) {
+        return URI.create(BASE_PATH_DOCUMENTS + "/" + id);
     }
 }

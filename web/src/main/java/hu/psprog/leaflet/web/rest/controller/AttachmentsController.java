@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.attachment.AttachmentRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.AttachmentFacade;
@@ -9,12 +10,12 @@ import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 
@@ -46,11 +47,13 @@ public class AttachmentsController extends BaseController {
      * @throws ResourceNotFoundException if one of or both entities are not found
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ModelAndView attach(@RequestBody @Valid AttachmentRequestModel attachmentRequestModel, BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> attach(@RequestBody @Valid AttachmentRequestModel attachmentRequestModel, BindingResult bindingResult)
             throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 attachmentFacade.attachFileToEntry(conversionService.convert(attachmentRequestModel, AttachmentRequestVO.class));
@@ -58,7 +61,9 @@ public class AttachmentsController extends BaseController {
                 LOGGER.error("Failed to attach file to entry", e);
                 throw new ResourceNotFoundException("Cannot attach non-existing entities to each other.", e);
             }
-            return null;
+            return ResponseEntity
+                    .ok()
+                    .body(null);
         }
     }
 
@@ -72,11 +77,13 @@ public class AttachmentsController extends BaseController {
      * @throws ResourceNotFoundException if one of or both entities are not found
      */
     @RequestMapping(method = RequestMethod.DELETE)
-    public ModelAndView detach(@RequestBody @Valid AttachmentRequestModel attachmentRequestModel, BindingResult bindingResult)
+    public ResponseEntity<BaseBodyDataModel> detach(@RequestBody @Valid AttachmentRequestModel attachmentRequestModel, BindingResult bindingResult)
             throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return wrap(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
             try {
                 attachmentFacade.detachFileFromEntry(conversionService.convert(attachmentRequestModel, AttachmentRequestVO.class));
@@ -84,7 +91,9 @@ public class AttachmentsController extends BaseController {
                 LOGGER.error("Failed to detach file from entry", e);
                 throw new ResourceNotFoundException("Cannot detach non-existing entities to each other.", e);
             }
-            return null;
+            return ResponseEntity
+                    .ok()
+                    .body(null);
         }
     }
 }
