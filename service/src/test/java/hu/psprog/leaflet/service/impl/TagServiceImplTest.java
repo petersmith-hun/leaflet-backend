@@ -453,10 +453,10 @@ public class TagServiceImplTest {
 
         attachedTags = new ArrayList<>();
         for (int cnt = 1; cnt <= 5; cnt++) {
-            attachedTags.add(new Tag.Builder()
+            attachedTags.add(Tag.getBuilder()
                     .withId((long) cnt)
                     .withTitle("Tag #" + cnt)
-                    .createTag());
+                    .build());
         }
 
         if (includeControlVO) {
@@ -465,18 +465,18 @@ public class TagServiceImplTest {
     }
 
     private void prepareTestEntities() {
-        inputTagVO = new TagVO.Builder()
+        inputTagVO = TagVO.getBuilder()
                 .withId(TAG_ID)
                 .withTitle(CONTROL_TAG_TITLE)
-                .createTagVO();
-        inputEntryVO = new EntryVO.Builder()
+                .build();
+        inputEntryVO = EntryVO.getBuilder()
                 .withId(ENTRY_ID)
                 .withTitle("Test entry")
-                .createEntryVO();
-        controlTag = new Tag.Builder()
+                .build();
+        controlTag = Tag.getBuilder()
                 .withId(TAG_ID)
                 .withTitle(CONTROL_TAG_TITLE)
-                .createTag();
+                .build();
     }
 
     private void assertResults(int numberOfTags, boolean controlIncluded, boolean updateCalled) {

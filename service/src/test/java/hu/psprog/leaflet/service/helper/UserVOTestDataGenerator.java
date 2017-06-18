@@ -22,7 +22,7 @@ public class UserVOTestDataGenerator implements TestDataGenerator<UserVO> {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("USER"));
 
-        return new UserVO.Builder()
+        return UserVO.getBuilder()
                 .withAuthorities(authorities)
                 .withEmail(RandomDataGenerator.email())
                 .withCreated(RandomDataGenerator.randomDate(RandomDataGenerator.DateType.PAST))
@@ -32,7 +32,7 @@ public class UserVOTestDataGenerator implements TestDataGenerator<UserVO> {
                 .withPassword(RandomDataGenerator.randomString(12))
                 .withId(RandomDataGenerator.randomLong())
                 .withUsername(RandomDataGenerator.sequentialString())
-                .createUserVO();
+                .build();
     }
 
     @Override

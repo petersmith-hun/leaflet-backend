@@ -110,15 +110,21 @@ public class EntryServiceImplIT {
         String updatedEntryTitle = "Entry updated title";
         Long id = 2L;
         EntryVO entryToUpdate = entryService.getOne(id);
-        entryToUpdate.setTitle(updatedEntryTitle);
+        EntryVO updateVO = EntryVO.getBuilder()
+                .withId(id)
+                .withTitle(updatedEntryTitle)
+                .withEntryStatus(entryToUpdate.getEntryStatus())
+                .withContent(entryToUpdate.getContent())
+                .build();
 
         // when
-        EntryVO result = entryService.updateOne(id, entryToUpdate);
+        EntryVO result = entryService.updateOne(id, updateVO);
 
         // then
         EntryVO updatedEntryVO = entryService.getOne(id);
         assertThat(result.getTitle(), equalTo(updatedEntryVO.getTitle()));
         assertThat(result.getTitle(), equalTo(updatedEntryTitle));
+        assertThat(updatedEntryVO.getContent(), equalTo(entryToUpdate.getContent()));
     }
 
     @Test

@@ -50,7 +50,7 @@ public class PageableUtil {
         return EntityPageVO.getBuilder()
                 .withPageCount(remappedPage.getTotalPages())
                 .withPageSize(remappedPage.getSize())
-                .withPageNumber(remappedPage.getNumber())
+                .withPageNumber(remappedPage.getNumber() + 1) // Page would count page number from 0, so let's increase by 1
                 .withEntityCount(remappedPage.getTotalElements())
                 .withEntityCountOnPage(remappedPage.getNumberOfElements())
                 .withFirst(remappedPage.isFirst())

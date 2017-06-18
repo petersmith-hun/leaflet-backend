@@ -31,8 +31,8 @@ public class CustomSEODataProviderResponseProcessor implements ResponseProcessor
      */
     @Override
     public void process(CustomSEODataProviderVO<? extends BaseVO> response) {
-        httpServletRequest.setAttribute(RequestParameter.SEO_META_TITLE, response.getSEOTitle());
-        httpServletRequest.setAttribute(RequestParameter.SEO_META_DESCRIPTION, response.getSEODescription());
-        httpServletRequest.setAttribute(RequestParameter.SEO_META_KEYWORDS, response.getSEOKeywords());
+        httpServletRequest.setAttribute(RequestParameter.SEO_META_TITLE, response.getSeoTitle());
+        httpServletRequest.setAttribute(RequestParameter.SEO_META_DESCRIPTION, response.getSeoDescription());
+        httpServletRequest.setAttribute(RequestParameter.SEO_META_KEYWORDS, response.getSeoKeywords());
     }
 }

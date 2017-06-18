@@ -124,7 +124,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
     }
 
     private FileInputVO prepareValidFileInputVO(boolean withSubfolder) throws IOException {
-        return FileInputVO.Builder.getBuilder()
+        return FileInputVO.getBuilder()
                 .withContentType(MIME_TYPE)
                 .withOriginalFilename(ORIGINAL_FILENAME)
                 .withFileContentStream(fileInputStream)

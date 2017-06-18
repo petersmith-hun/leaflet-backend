@@ -8,7 +8,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -39,7 +38,6 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
                 .withPassword(source.getPassword())
                 .withUsername(source.getUsername())
                 .withDefaultLocale(source.getLocale())
-                .withLastModified(new Date())
                 .withEmail(source.getEmail())
                 .withLastLogin(source.getLastLogin())
                 .withRole(role)
