@@ -12,21 +12,21 @@ public interface CustomSEODataProviderVO<T extends BaseVO> {
      *
      * @return SEO title
      */
-    String getSEOTitle();
+    String getSeoTitle();
 
     /**
      * Returns custom SEO description provided by the entity.
      *
      * @return SEO description
      */
-    String getSEODescription();
+    String getSeoDescription();
 
     /**
      * Returns custom SEO keywords provided by the entity.
      *
      * @return SEO keywords
      */
-    String getSEOKeywords();
+    String getSeoKeywords();
 
     /**
      * Returns parent entity.

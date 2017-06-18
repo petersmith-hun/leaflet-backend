@@ -68,38 +68,38 @@ public class DownloadableFileWrapperVO {
                 .toString();
     }
 
+    public static DownloadableFileWrapperVOBuilder getBuilder() {
+        return new DownloadableFileWrapperVOBuilder();
+    }
+
     /**
      * Builder for {@link DownloadableFileWrapperVO}.
      */
-    public static final class Builder {
+    public static final class DownloadableFileWrapperVOBuilder {
         private ByteArrayResource fileContent;
         private String originalFilename;
         private String mimeType;
         private long length;
 
-        private Builder() {
+        private DownloadableFileWrapperVOBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withFileContent(ByteArrayResource fileContent) {
+        public DownloadableFileWrapperVOBuilder withFileContent(ByteArrayResource fileContent) {
             this.fileContent = fileContent;
             return this;
         }
 
-        public Builder withOriginalFilename(String originalFilename) {
+        public DownloadableFileWrapperVOBuilder withOriginalFilename(String originalFilename) {
             this.originalFilename = originalFilename;
             return this;
         }
 
-        public Builder withMimeType(String mimeType) {
+        public DownloadableFileWrapperVOBuilder withMimeType(String mimeType) {
             this.mimeType = mimeType;
             return this;
         }
 
-        public Builder withLength(long length) {
+        public DownloadableFileWrapperVOBuilder withLength(long length) {
             this.length = length;
             return this;
         }

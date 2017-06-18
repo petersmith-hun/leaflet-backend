@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service.vo;
 import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,46 +13,23 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-public class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SelfStatusAwareIdentifiableEntity<ID>>
+public abstract class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SelfStatusAwareIdentifiableEntity<ID>>
         extends IdentifiableVO<ID, T> {
 
-    private Date created;
-    private Date lastModified;
-    private boolean enabled;
-
-    public SelfStatusAwareIdentifiableVO() {
-        // Serializable
-    }
-
-    public SelfStatusAwareIdentifiableVO(ID id, Date created, Date lastModified, boolean enabled) {
-        super(id);
-        this.created = created;
-        this.lastModified = lastModified;
-        this.enabled = enabled;
-    }
+    protected Date created;
+    protected Date lastModified;
+    protected boolean enabled;
 
     public Date getCreated() {
         return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
     }
 
     public Date getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
-        this.lastModified = lastModified;
-    }
-
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 
     @Override
@@ -77,5 +55,15 @@ public class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends Se
                 .append(lastModified)
                 .append(enabled)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", getId())
+                .append("created", created)
+                .append("lastModified", lastModified)
+                .append("enabled", enabled)
+                .toString();
     }
 }

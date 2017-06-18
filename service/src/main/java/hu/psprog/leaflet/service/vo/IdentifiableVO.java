@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service.vo;
 import hu.psprog.leaflet.persistence.entity.SerializableEntity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
@@ -11,24 +12,12 @@ import java.io.Serializable;
  *
  * @author Peter Smith
  */
-public class IdentifiableVO<ID extends Serializable, T extends SerializableEntity> extends BaseVO<T> {
+public abstract class IdentifiableVO<ID extends Serializable, T extends SerializableEntity> extends BaseVO<T> {
 
-    private ID id;
-
-    public IdentifiableVO() {
-        // Serializable
-    }
-
-    public IdentifiableVO(ID id) {
-        this.id = id;
-    }
+    protected ID id;
 
     public ID getId() {
         return id;
-    }
-
-    public void setId(ID id) {
-        this.id = id;
     }
 
     @Override
@@ -49,5 +38,12 @@ public class IdentifiableVO<ID extends Serializable, T extends SerializableEntit
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .toString();
     }
 }

@@ -1,16 +1,18 @@
 package hu.psprog.leaflet.service.vo;
 
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.lang.reflect.Field;
+import java.io.Serializable;
 import java.util.List;
 
 /**
+ * Pagination information wrapper.
+ *
  * @author Peter Smith
  */
-public class EntityPageVO<T extends BaseVO> {
-
-    private static final String ENTITIES_ON_PAGE_FIELD = "entitiesOnPage";
+public class EntityPageVO<T extends BaseVO> implements Serializable {
 
     private long entityCount;
     private int pageCount;
@@ -22,22 +24,6 @@ public class EntityPageVO<T extends BaseVO> {
     private boolean last;
     private boolean hasNext;
     private boolean hasPrevious;
-
-    public EntityPageVO() {}
-
-    public EntityPageVO(long entityCount, int pageCount, int pageNumber, int pageSize, int entityCountOnPage,
-                        List<T> entitiesOnPage, boolean first, boolean last, boolean hasNext, boolean hasPrevious) {
-        this.entityCount = entityCount;
-        this.pageCount = pageCount;
-        this.pageNumber = pageNumber + 1;
-        this.pageSize = pageSize;
-        this.entityCountOnPage = entityCountOnPage;
-        this.entitiesOnPage = entitiesOnPage;
-        this.first = first;
-        this.last = last;
-        this.hasNext = hasNext;
-        this.hasPrevious = hasPrevious;
-    }
 
     public long getEntityCount() {
         return entityCount;
@@ -80,83 +66,143 @@ public class EntityPageVO<T extends BaseVO> {
     }
 
     @Override
-    public String toString() {
-        return (new ReflectionToStringBuilder(this) {
+    public boolean equals(Object o) {
+        if (this == o) return true;
 
-            @Override
-            protected boolean accept(Field field) {
-                return super.accept(field) && !field.getName().equals(ENTITIES_ON_PAGE_FIELD);
-            }
+        if (!(o instanceof EntityPageVO)) return false;
 
-        }).toString();
+        EntityPageVO<?> that = (EntityPageVO<?>) o;
+
+        return new EqualsBuilder()
+                .append(entityCount, that.entityCount)
+                .append(pageCount, that.pageCount)
+                .append(pageNumber, that.pageNumber)
+                .append(pageSize, that.pageSize)
+                .append(entityCountOnPage, that.entityCountOnPage)
+                .append(first, that.first)
+                .append(last, that.last)
+                .append(hasNext, that.hasNext)
+                .append(hasPrevious, that.hasPrevious)
+                .append(entitiesOnPage, that.entitiesOnPage)
+                .isEquals();
     }
 
-    public static class Builder {
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(entityCount)
+                .append(pageCount)
+                .append(pageNumber)
+                .append(pageSize)
+                .append(entityCountOnPage)
+                .append(entitiesOnPage)
+                .append(first)
+                .append(last)
+                .append(hasNext)
+                .append(hasPrevious)
+                .toHashCode();
+    }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("entityCount", entityCount)
+                .append("pageCount", pageCount)
+                .append("pageNumber", pageNumber)
+                .append("pageSize", pageSize)
+                .append("entityCountOnPage", entityCountOnPage)
+                .append("first", first)
+                .append("last", last)
+                .append("hasNext", hasNext)
+                .append("hasPrevious", hasPrevious)
+                .toString();
+    }
+
+    public static EntityPageVOBuilder getBuilder() {
+        return new EntityPageVOBuilder();
+    }
+
+    /**
+     * Builder for {@link EntityPageVO}.
+     */
+    public static final class EntityPageVOBuilder {
         private long entityCount;
         private int pageCount;
         private int pageNumber;
         private int pageSize;
         private int entityCountOnPage;
-        private List<?> entitiesOnPage;
+        private List<? extends BaseVO> entitiesOnPage;
         private boolean first;
         private boolean last;
         private boolean hasNext;
         private boolean hasPrevious;
 
-        public Builder withEntityCount(long entityCount) {
+        private EntityPageVOBuilder() {
+        }
+
+        public EntityPageVOBuilder withEntityCount(long entityCount) {
             this.entityCount = entityCount;
             return this;
         }
 
-        public Builder withPageCount(int pageCount) {
+        public EntityPageVOBuilder withPageCount(int pageCount) {
             this.pageCount = pageCount;
             return this;
         }
 
-        public Builder withPageNumber(int pageNumber) {
+        public EntityPageVOBuilder withPageNumber(int pageNumber) {
             this.pageNumber = pageNumber;
             return this;
         }
 
-        public Builder withPageSize(int pageSize) {
+        public EntityPageVOBuilder withPageSize(int pageSize) {
             this.pageSize = pageSize;
             return this;
         }
 
-        public Builder withEntityCountOnPage(int entityCountOnPage) {
+        public EntityPageVOBuilder withEntityCountOnPage(int entityCountOnPage) {
             this.entityCountOnPage = entityCountOnPage;
             return this;
         }
 
-        public Builder withEntitiesOnPage(List<?> entitiesOnPage) {
+        public EntityPageVOBuilder withEntitiesOnPage(List<? extends BaseVO> entitiesOnPage) {
             this.entitiesOnPage = entitiesOnPage;
             return this;
         }
 
-        public Builder isFirst(boolean first) {
+        public EntityPageVOBuilder withFirst(boolean first) {
             this.first = first;
             return this;
         }
 
-        public Builder isLast(boolean last) {
+        public EntityPageVOBuilder withLast(boolean last) {
             this.last = last;
             return this;
         }
 
-        public Builder hasNext(boolean hasNext) {
+        public EntityPageVOBuilder withHasNext(boolean hasNext) {
             this.hasNext = hasNext;
             return this;
         }
 
-        public Builder hasPrevious(boolean hasPrevious) {
+        public EntityPageVOBuilder withHasPrevious(boolean hasPrevious) {
             this.hasPrevious = hasPrevious;
             return this;
         }
 
-        public EntityPageVO createEntityPageVO() {
-            return new EntityPageVO(entityCount, pageCount, pageNumber, pageSize, entityCountOnPage, entitiesOnPage,
-                    first, last, hasNext, hasPrevious);
+        public EntityPageVO build() {
+            EntityPageVO entityPageVO = new EntityPageVO();
+            entityPageVO.entityCount = this.entityCount;
+            entityPageVO.pageSize = this.pageSize;
+            entityPageVO.last = this.last;
+            entityPageVO.pageNumber = this.pageNumber;
+            entityPageVO.entitiesOnPage = this.entitiesOnPage;
+            entityPageVO.hasPrevious = this.hasPrevious;
+            entityPageVO.pageCount = this.pageCount;
+            entityPageVO.entityCountOnPage = this.entityCountOnPage;
+            entityPageVO.hasNext = this.hasNext;
+            entityPageVO.first = this.first;
+            return entityPageVO;
         }
     }
 }

@@ -52,26 +52,26 @@ public class TagAssignmentVO {
                 .toString();
     }
 
+    public static TagAssignmentVOBuilder getBuilder() {
+        return new TagAssignmentVOBuilder();
+    }
+
     /**
      * Builder for {@link TagAssignmentVO}.
      */
-    public static final class Builder {
+    public static final class TagAssignmentVOBuilder {
         private Long entryID;
         private Long tagID;
 
-        private Builder() {
+        private TagAssignmentVOBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withEntryID(Long entryID) {
+        public TagAssignmentVOBuilder withEntryID(Long entryID) {
             this.entryID = entryID;
             return this;
         }
 
-        public Builder withTagID(Long tagID) {
+        public TagAssignmentVOBuilder withTagID(Long tagID) {
             this.tagID = tagID;
             return this;
         }

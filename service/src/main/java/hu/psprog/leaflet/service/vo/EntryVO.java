@@ -2,6 +2,9 @@ package hu.psprog.leaflet.service.vo;
 
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Locale;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Date;
 import java.util.List;
@@ -44,156 +47,63 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     private List<UploadedFileVO> attachments;
     private List<TagVO> tags;
 
-    public EntryVO() {
-        // Serializable
-    }
-
-    public EntryVO(Long id, Date created, Date lastModified, boolean enabled, String title, String link,
-                   String prologue, String content, String rawContent, String seoTitle, String seoDescription,
-                   String seoKeywords, String entryStatus, UserVO owner, CategoryVO categoryVO, Locale locale,
-                   List<UploadedFileVO> attachments, List<TagVO> tags) {
-        super(id, created, lastModified, enabled);
-        this.title = title;
-        this.link = link;
-        this.prologue = prologue;
-        this.content = content;
-        this.rawContent = rawContent;
-        this.seoTitle = seoTitle;
-        this.seoDescription = seoDescription;
-        this.seoKeywords = seoKeywords;
-        this.entryStatus = entryStatus;
-        this.owner = owner;
-        this.category = categoryVO;
-        this.locale = locale;
-        this.attachments = attachments;
-        this.tags = tags;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getLink() {
         return link;
     }
 
-    public void setLink(String link) {
-        this.link = link;
-    }
-
     public String getPrologue() {
         return prologue;
-    }
-
-    public void setPrologue(String prologue) {
-        this.prologue = prologue;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getRawContent() {
         return rawContent;
     }
 
-    public void setRawContent(String rawContent) {
-        this.rawContent = rawContent;
-    }
-
+    @Override
     public String getSeoTitle() {
         return seoTitle;
     }
 
-    public void setSeoTitle(String seoTitle) {
-        this.seoTitle = seoTitle;
-    }
-
+    @Override
     public String getSeoDescription() {
         return seoDescription;
     }
 
-    public void setSeoDescription(String seoDescription) {
-        this.seoDescription = seoDescription;
-    }
-
+    @Override
     public String getSeoKeywords() {
         return seoKeywords;
-    }
-
-    public void setSeoKeywords(String seoKeywords) {
-        this.seoKeywords = seoKeywords;
     }
 
     public String getEntryStatus() {
         return entryStatus;
     }
 
-    public void setEntryStatus(String entryStatus) {
-        this.entryStatus = entryStatus;
-    }
-
     public UserVO getOwner() {
         return owner;
-    }
-
-    public void setOwner(UserVO owner) {
-        this.owner = owner;
-    }
-
-    public Locale getLocale() {
-        return locale;
-    }
-
-    public void setLocale(Locale locale) {
-        this.locale = locale;
     }
 
     public CategoryVO getCategory() {
         return category;
     }
 
-    public void setCategory(CategoryVO categoryVO) {
-        this.category = categoryVO;
+    public Locale getLocale() {
+        return locale;
     }
 
     public List<UploadedFileVO> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(List<UploadedFileVO> attachments) {
-        this.attachments = attachments;
-    }
-
     public List<TagVO> getTags() {
         return tags;
-    }
-
-    public void setTags(List<TagVO> tags) {
-        this.tags = tags;
-    }
-
-    @Override
-    public String getSEOTitle() {
-        return seoTitle;
-    }
-
-    @Override
-    public String getSEODescription() {
-        return seoDescription;
-    }
-
-    @Override
-    public String getSEOKeywords() {
-        return seoKeywords;
     }
 
     @Override
@@ -201,17 +111,92 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         return this;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof EntryVO)) return false;
+
+        EntryVO entryVO = (EntryVO) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(title, entryVO.title)
+                .append(link, entryVO.link)
+                .append(prologue, entryVO.prologue)
+                .append(content, entryVO.content)
+                .append(rawContent, entryVO.rawContent)
+                .append(seoTitle, entryVO.seoTitle)
+                .append(seoDescription, entryVO.seoDescription)
+                .append(seoKeywords, entryVO.seoKeywords)
+                .append(entryStatus, entryVO.entryStatus)
+                .append(owner, entryVO.owner)
+                .append(category, entryVO.category)
+                .append(locale, entryVO.locale)
+                .append(attachments, entryVO.attachments)
+                .append(tags, entryVO.tags)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(title)
+                .append(link)
+                .append(prologue)
+                .append(content)
+                .append(rawContent)
+                .append(seoTitle)
+                .append(seoDescription)
+                .append(seoKeywords)
+                .append(entryStatus)
+                .append(owner)
+                .append(category)
+                .append(locale)
+                .append(attachments)
+                .append(tags)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("created", created)
+                .append("lastModified", lastModified)
+                .append("enabled", enabled)
+                .append("title", title)
+                .append("link", link)
+                .append("prologue", prologue)
+                .append("content", content)
+                .append("rawContent", rawContent)
+                .append("seoTitle", seoTitle)
+                .append("seoDescription", seoDescription)
+                .append("seoKeywords", seoKeywords)
+                .append("entryStatus", entryStatus)
+                .append("owner", owner)
+                .append("category", category)
+                .append("locale", locale)
+                .append("attachments", attachments)
+                .append("tags", tags)
+                .toString();
+    }
+
     public static EntryVO wrapMinimumVO(Long id) {
-        return new Builder()
+        return getBuilder()
                 .withId(id)
-                .createEntryVO();
+                .build();
+    }
+
+    public static EntryVOBuilder getBuilder() {
+        return new EntryVOBuilder();
     }
 
     /**
      * EntryVO builder.
      */
-    public static class Builder {
-
+    public static final class EntryVOBuilder {
         private Long id;
         private Date created;
         private Date lastModified;
@@ -231,99 +216,120 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         private List<UploadedFileVO> attachments;
         private List<TagVO> tags;
 
-        public Builder withId(Long id) {
+        private EntryVOBuilder() {
+        }
+
+        public EntryVOBuilder withId(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder withCreated(Date created) {
+        public EntryVOBuilder withCreated(Date created) {
             this.created = created;
             return this;
         }
 
-        public Builder withLastModified(Date lastModified) {
+        public EntryVOBuilder withLastModified(Date lastModified) {
             this.lastModified = lastModified;
             return this;
         }
 
-        public Builder withEnabled(boolean enabled) {
+        public EntryVOBuilder withEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder withTitle(String title) {
+        public EntryVOBuilder withTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder withLink(String link) {
+        public EntryVOBuilder withLink(String link) {
             this.link = link;
             return this;
         }
 
-        public Builder withPrologue(String prologue) {
+        public EntryVOBuilder withPrologue(String prologue) {
             this.prologue = prologue;
             return this;
         }
 
-        public Builder withContent(String content) {
+        public EntryVOBuilder withContent(String content) {
             this.content = content;
             return this;
         }
 
-        public Builder withRawContent(String rawContent) {
+        public EntryVOBuilder withRawContent(String rawContent) {
             this.rawContent = rawContent;
             return this;
         }
 
-        public Builder withSeoTitle(String seoTitle) {
+        public EntryVOBuilder withSeoTitle(String seoTitle) {
             this.seoTitle = seoTitle;
             return this;
         }
 
-        public Builder withSeoDescription(String seoDescription) {
+        public EntryVOBuilder withSeoDescription(String seoDescription) {
             this.seoDescription = seoDescription;
             return this;
         }
 
-        public Builder withSeoKeywords(String seoKeywords) {
+        public EntryVOBuilder withSeoKeywords(String seoKeywords) {
             this.seoKeywords = seoKeywords;
             return this;
         }
 
-        public Builder withEntryStatus(String entryStatus) {
+        public EntryVOBuilder withEntryStatus(String entryStatus) {
             this.entryStatus = entryStatus;
             return this;
         }
 
-        public Builder withOwner(UserVO owner) {
+        public EntryVOBuilder withOwner(UserVO owner) {
             this.owner = owner;
             return this;
         }
 
-        public Builder withCategory(CategoryVO category) {
+        public EntryVOBuilder withCategory(CategoryVO category) {
             this.category = category;
             return this;
         }
 
-        public Builder withLocale(Locale locale) {
+        public EntryVOBuilder withLocale(Locale locale) {
             this.locale = locale;
             return this;
         }
 
-        public Builder withAttachments(List<UploadedFileVO> attachments) {
+        public EntryVOBuilder withAttachments(List<UploadedFileVO> attachments) {
             this.attachments = attachments;
             return this;
         }
 
-        public Builder withTags(List<TagVO> tags) {
+        public EntryVOBuilder withTags(List<TagVO> tags) {
             this.tags = tags;
             return this;
         }
 
-        public EntryVO createEntryVO() {
-            return new EntryVO(id, created, lastModified, enabled, title, link, prologue, content, rawContent,
-                    seoTitle, seoDescription, seoKeywords, entryStatus, owner, category, locale, attachments, tags);
+        public EntryVO build() {
+            EntryVO entryVO = new EntryVO();
+            entryVO.seoDescription = this.seoDescription;
+            entryVO.locale = this.locale;
+            entryVO.tags = this.tags;
+            entryVO.title = this.title;
+            entryVO.seoKeywords = this.seoKeywords;
+            entryVO.content = this.content;
+            entryVO.category = this.category;
+            entryVO.link = this.link;
+            entryVO.prologue = this.prologue;
+            entryVO.id = this.id;
+            entryVO.lastModified = this.lastModified;
+            entryVO.enabled = this.enabled;
+            entryVO.entryStatus = this.entryStatus;
+            entryVO.created = this.created;
+            entryVO.seoTitle = this.seoTitle;
+            entryVO.rawContent = this.rawContent;
+            entryVO.owner = this.owner;
+            entryVO.attachments = this.attachments;
+            return entryVO;
         }
     }
 }

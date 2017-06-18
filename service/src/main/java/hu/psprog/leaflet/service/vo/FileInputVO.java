@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.vo;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.InputStream;
 
@@ -73,10 +74,26 @@ public class FileInputVO {
                 .toHashCode();
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("originalFilename", originalFilename)
+                .append("contentType", contentType)
+                .append("size", size)
+                .append("fileContentStream", fileContentStream)
+                .append("relativePath", relativePath)
+                .append("description", description)
+                .toString();
+    }
+
+    public static FileInputVOBuilder getBuilder() {
+        return new FileInputVOBuilder();
+    }
+
     /**
      * Builder for {@link FileInputVO}.
      */
-    public static final class Builder {
+    public static final class FileInputVOBuilder {
         private String originalFilename;
         private String contentType;
         private long size;
@@ -84,39 +101,35 @@ public class FileInputVO {
         private String relativePath;
         private String description;
 
-        private Builder() {
+        private FileInputVOBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withOriginalFilename(String originalFilename) {
+        public FileInputVOBuilder withOriginalFilename(String originalFilename) {
             this.originalFilename = originalFilename;
             return this;
         }
 
-        public Builder withContentType(String contentType) {
+        public FileInputVOBuilder withContentType(String contentType) {
             this.contentType = contentType;
             return this;
         }
 
-        public Builder withSize(long size) {
+        public FileInputVOBuilder withSize(long size) {
             this.size = size;
             return this;
         }
 
-        public Builder withFileContentStream(InputStream fileContentStream) {
+        public FileInputVOBuilder withFileContentStream(InputStream fileContentStream) {
             this.fileContentStream = fileContentStream;
             return this;
         }
 
-        public Builder withRelativePath(String relativePath) {
+        public FileInputVOBuilder withRelativePath(String relativePath) {
             this.relativePath = relativePath;
             return this;
         }
 
-        public Builder withDescription(String description) {
+        public FileInputVOBuilder withDescription(String description) {
             this.description = description;
             return this;
         }
