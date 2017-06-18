@@ -31,7 +31,7 @@ public class UserVOToExtendedUserDataModelEntityConverter implements Converter<U
 
     private ExtendedUserDataModel convertEntity(UserVO userVO) {
 
-        return new ExtendedUserDataModel.Builder()
+        return ExtendedUserDataModel.getExtendedBuilder()
                 .withLocale(userVO.getLocale().name())
                 .withRole(extractRole(userVO))
                 .withCreated(commonFormatter.formatDate(userVO.getCreated(), httpServletRequest.getLocale()))
@@ -39,7 +39,7 @@ public class UserVOToExtendedUserDataModelEntityConverter implements Converter<U
                 .withEmail(userVO.getEmail())
                 .withLastModified(commonFormatter.formatDate(userVO.getLastModified(), httpServletRequest.getLocale()))
                 .withUsername(userVO.getUsername())
-                .withID(userVO.getId())
+                .withId(userVO.getId())
                 .build();
     }
 

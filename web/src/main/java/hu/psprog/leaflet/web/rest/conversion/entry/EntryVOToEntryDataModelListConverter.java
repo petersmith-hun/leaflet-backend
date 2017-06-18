@@ -22,7 +22,7 @@ public class EntryVOToEntryDataModelListConverter implements Converter<List<Entr
     @Override
     public EntryListDataModel convert(List<EntryVO> entryVOList) {
 
-        EntryListDataModel.Builder builder = new EntryListDataModel.Builder();
+        EntryListDataModel.EntryListDataModelBuilder builder = EntryListDataModel.getBuilder();
         entryVOList.forEach(entryVO -> builder.withItem(entryVOToEntryDataModelEntityConverter.convert(entryVO)));
 
         return builder.build();

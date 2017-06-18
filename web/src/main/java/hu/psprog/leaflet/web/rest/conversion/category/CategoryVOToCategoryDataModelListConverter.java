@@ -24,7 +24,7 @@ public class CategoryVOToCategoryDataModelListConverter implements Converter<Lis
     @Override
     public CategoryListDataModel convert(List<CategoryVO> source) {
 
-        CategoryListDataModel.Builder builder = new CategoryListDataModel.Builder();
+        CategoryListDataModel.CategoryListDataModelBuilder builder = CategoryListDataModel.getBuilder();
         source.forEach(category -> builder.withItem(categoryVOToCategoryDataModelEntityConverter.convert(category)));
 
         return builder.build();

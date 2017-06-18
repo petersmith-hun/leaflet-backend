@@ -26,11 +26,11 @@ public class CategoryVOToExtendedCategoryDataModelEntityConverter implements Con
     @Override
     public ExtendedCategoryDataModel convert(CategoryVO source) {
 
-        return new ExtendedCategoryDataModel.Builder()
+        return ExtendedCategoryDataModel.getExtendedBuilder()
                 .withDescription(source.getDescription())
                 .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
                 .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
-                .withID(source.getId())
+                .withId(source.getId())
                 .withTitle(source.getTitle())
                 .build();
     }

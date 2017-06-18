@@ -26,10 +26,10 @@ public class CommentVOToCommentDataModelConverter implements Converter<CommentVO
 
     @Override
     public CommentDataModel convert(CommentVO source) {
-        return new CommentDataModel.Builder()
+        return CommentDataModel.getBuilder()
                 .withId(source.getId())
-                .withOwner(new UserDataModel.Builder()
-                        .withID(source.getOwner().getId())
+                .withOwner(UserDataModel.getBuilder()
+                        .withId(source.getOwner().getId())
                         .withUsername(source.getOwner().getUsername())
                         .build())
                 .withContent(source.getContent())

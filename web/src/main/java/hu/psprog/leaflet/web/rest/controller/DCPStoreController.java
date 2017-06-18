@@ -50,7 +50,7 @@ public class DCPStoreController extends BaseController {
     public ResponseEntity<DCPListDataModel> getAll() {
 
         Map<String, String> dcpStore = dynamicConfigurationPropertyService.getAll();
-        DCPListDataModel.Builder builder = new DCPListDataModel.Builder();
+        DCPListDataModel.DCPListDataModelBuilder builder = DCPListDataModel.getBuilder();
         dcpStore.entrySet().forEach(entry -> builder.withItem(createDataModel(entry)));
 
         return ResponseEntity
@@ -144,7 +144,7 @@ public class DCPStoreController extends BaseController {
 
     private DCPDataModel createDataModel(Map.Entry<String, String> dcpEntry) {
 
-        return new DCPDataModel.Builder()
+        return DCPDataModel.getBuilder()
                 .withKey(dcpEntry.getKey())
                 .withValue(dcpEntry.getValue())
                 .build();

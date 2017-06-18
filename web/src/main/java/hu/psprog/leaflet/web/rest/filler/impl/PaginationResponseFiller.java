@@ -26,9 +26,9 @@ public class PaginationResponseFiller implements ResponseFiller {
     }
 
     @Override
-    public void fill(WrapperBodyDataModel.Builder wrapperBodyDataModelBuilder) {
+    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder wrapperBodyDataModelBuilder) {
 
-        PaginationDataModel paginationDataModel = new PaginationDataModel.Builder()
+        PaginationDataModel paginationDataModel = PaginationDataModel.getBuilder()
                 .withEntityCount((long) httpServletRequest.getAttribute(RequestParameter.PAGINATION_ENTITY_COUNT))
                 .withEntityCountOnPage((int) httpServletRequest.getAttribute(RequestParameter.PAGINATION_ENTITY_COUNT_ON_PAGE))
                 .withPageCount((int) httpServletRequest.getAttribute(RequestParameter.PAGINATION_PAGE_COUNT))

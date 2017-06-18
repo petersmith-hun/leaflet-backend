@@ -58,7 +58,7 @@ public class ResponseFillerAspect {
             return methodResponse;
         }
 
-        WrapperBodyDataModel.Builder<BaseBodyDataModel> builder = WrapperBodyDataModel.Builder.getBuilder();
+        WrapperBodyDataModel.WrapperBodyDataModelBuilder<BaseBodyDataModel> builder = WrapperBodyDataModel.getBuilder();
         addBody(responseBody, builder);
         callFillers(builder);
 
@@ -67,7 +67,7 @@ public class ResponseFillerAspect {
                 .body(builder.build());
     }
 
-    private void addBody(BaseBodyDataModel responseBody, WrapperBodyDataModel.Builder<BaseBodyDataModel> builder) {
+    private void addBody(BaseBodyDataModel responseBody, WrapperBodyDataModel.WrapperBodyDataModelBuilder<BaseBodyDataModel> builder) {
         if (responseBody instanceof ErrorMessageDataModel) {
             builder.withError((ErrorMessageDataModel) responseBody);
         } else {
@@ -75,7 +75,7 @@ public class ResponseFillerAspect {
         }
     }
 
-    private void callFillers(WrapperBodyDataModel.Builder<BaseBodyDataModel> builder) {
+    private void callFillers(WrapperBodyDataModel.WrapperBodyDataModelBuilder<BaseBodyDataModel> builder) {
         responseFillers.stream()
                 .filter(ResponseFiller::shouldFill)
                 .forEach(responseFiller -> responseFiller.fill(builder));
