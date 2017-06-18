@@ -2,6 +2,7 @@ package hu.psprog.leaflet.persistence.entity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
@@ -37,21 +38,6 @@ public class UploadedFile extends SelfStatusAwareIdentifiableEntity<Long> {
 
     @Column(name = DatabaseConstants.COLUMN_DESCRIPTION)
     private String description;
-
-    public UploadedFile() {
-        // Serializable
-    }
-
-    public UploadedFile(Long id, Date created, Date lastModified, boolean enabled, String path, String originalFilename,
-                        String mime, UUID pathUUID, String storedFilename, String description) {
-        super(id, created, lastModified, enabled);
-        this.path = path;
-        this.originalFilename = originalFilename;
-        this.mime = mime;
-        this.pathUUID = pathUUID;
-        this.storedFilename = storedFilename;
-        this.description = description;
-    }
 
     public String getPath() {
         return path;
@@ -132,10 +118,30 @@ public class UploadedFile extends SelfStatusAwareIdentifiableEntity<Long> {
                 .toHashCode();
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("path", path)
+                .append("originalFilename", originalFilename)
+                .append("id", getId())
+                .append("mime", mime)
+                .append("created", getCreated())
+                .append("pathUUID", pathUUID)
+                .append("storedFilename", storedFilename)
+                .append("lastModified", getLastModified())
+                .append("description", description)
+                .append("enabled", isEnabled())
+                .toString();
+    }
+
+    public static UploadedFileBuilder getBuilder() {
+        return new UploadedFileBuilder();
+    }
+
     /**
      * Builder for {@link UploadedFile} entity.
      */
-    public static final class Builder {
+    public static final class UploadedFileBuilder {
         private Date created;
         private Date lastModified;
         private String path;
@@ -147,59 +153,55 @@ public class UploadedFile extends SelfStatusAwareIdentifiableEntity<Long> {
         private String storedFilename;
         private String description;
 
-        private Builder() {
+        private UploadedFileBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withCreated(Date created) {
+        public UploadedFileBuilder withCreated(Date created) {
             this.created = created;
             return this;
         }
 
-        public Builder withLastModified(Date lastModified) {
+        public UploadedFileBuilder withLastModified(Date lastModified) {
             this.lastModified = lastModified;
             return this;
         }
 
-        public Builder withPath(String path) {
+        public UploadedFileBuilder withPath(String path) {
             this.path = path;
             return this;
         }
 
-        public Builder withEnabled(boolean enabled) {
+        public UploadedFileBuilder withEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder withOriginalFilename(String originalFilename) {
+        public UploadedFileBuilder withOriginalFilename(String originalFilename) {
             this.originalFilename = originalFilename;
             return this;
         }
 
-        public Builder withId(Long id) {
+        public UploadedFileBuilder withId(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder withMime(String mime) {
+        public UploadedFileBuilder withMime(String mime) {
             this.mime = mime;
             return this;
         }
 
-        public Builder withPathUUID(UUID pathUUID) {
+        public UploadedFileBuilder withPathUUID(UUID pathUUID) {
             this.pathUUID = pathUUID;
             return this;
         }
 
-        public Builder withStoredFilename(String storedFilename) {
+        public UploadedFileBuilder withStoredFilename(String storedFilename) {
             this.storedFilename = storedFilename;
             return this;
         }
 
-        public Builder withDescription(String description) {
+        public UploadedFileBuilder withDescription(String description) {
             this.description = description;
             return this;
         }

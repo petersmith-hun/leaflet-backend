@@ -1,14 +1,14 @@
 package hu.psprog.leaflet.persistence.entity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
-import java.lang.reflect.Field;
 
 /**
  * Generic base entity class for entities having ID field.
@@ -17,19 +17,11 @@ import java.lang.reflect.Field;
  * @author Peter Smith
  */
 @MappedSuperclass
-public class IdentifiableEntity<T extends Serializable> implements SerializableEntity {
+public abstract class IdentifiableEntity<T extends Serializable> implements SerializableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private T id;
-
-    public IdentifiableEntity() {
-        // Serializable
-    }
-
-    public IdentifiableEntity(T id) {
-        this.id = id;
-    }
 
     public T getId() {
         return id;
@@ -40,20 +32,29 @@ public class IdentifiableEntity<T extends Serializable> implements SerializableE
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return EqualsBuilder.reflectionEquals(this, obj);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof IdentifiableEntity)) return false;
+
+        IdentifiableEntity<?> that = (IdentifiableEntity<?>) o;
+
+        return new EqualsBuilder()
+                .append(id, that.id)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
-        return (new ReflectionToStringBuilder(this) {
-
-            @Override
-            protected boolean accept(Field field) {
-
-                // do NOT include "password" fields in toString
-                return super.accept(field) && !field.getName().equals(DatabaseConstants.COLUMN_PASSWORD);
-            }
-        }).toString();
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .toString();
     }
 }
