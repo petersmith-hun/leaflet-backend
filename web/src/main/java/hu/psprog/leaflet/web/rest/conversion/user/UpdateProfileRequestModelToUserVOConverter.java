@@ -21,10 +21,10 @@ public class UpdateProfileRequestModelToUserVOConverter implements Converter<Upd
     @Override
     public UserVO convert(UpdateProfileRequestModel updateProfileRequestModel) {
 
-        return new UserVO.Builder()
+        return UserVO.getBuilder()
                 .withUsername(updateProfileRequestModel.getUsername())
                 .withEmail(updateProfileRequestModel.getEmail())
                 .withLocale(juLocaleToLeafletLocaleConverter.convert(updateProfileRequestModel.getDefaultLocale()))
-                .createUserVO();
+                .build();
     }
 }

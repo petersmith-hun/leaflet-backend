@@ -16,9 +16,9 @@ public class LoginRequestModelToAuthenticationRequestVOConverter implements Conv
     @Override
     public AuthRequestVO convert(LoginRequestModel loginRequestModel) {
 
-        return new AuthRequestVO.Builder()
+        return AuthRequestVO.getBuilder()
                 .withUsername(loginRequestModel.getEmail())
                 .withPassword(loginRequestModel.getPassword())
-                .createAuthRequestVO();
+                .build();
     }
 }

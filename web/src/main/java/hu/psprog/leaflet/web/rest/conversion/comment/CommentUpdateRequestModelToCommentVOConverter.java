@@ -19,19 +19,19 @@ public class CommentUpdateRequestModelToCommentVOConverter implements Converter<
     @Override
     public CommentVO convert(CommentUpdateRequestModel source) {
 
-        CommentVO.Builder builder = new CommentVO.Builder()
+        CommentVO.CommentVOBuilder builder = CommentVO.getBuilder()
                 .withContent(source.getContent());
 
         if (source instanceof CommentCreateRequestModel) {
             CommentCreateRequestModel createRequestModel = (CommentCreateRequestModel) source;
-            builder.withOwner(new UserVO.Builder()
+            builder.withOwner(UserVO.getBuilder()
                     .withId(createRequestModel.getAuthenticatedUserId())
                     .withEmail(createRequestModel.getEmail())
                     .withUsername(createRequestModel.getUsername())
-                    .createUserVO());
+                    .build());
             builder.withEntryVO(EntryVO.wrapMinimumVO(createRequestModel.getEntryId()));
         }
 
-        return builder.createCommentVO();
+        return builder.build();
     }
 }

@@ -24,7 +24,7 @@ public class EntryUpdateRequestModelToEntryVOConverter implements Converter<Entr
     @Override
     public EntryVO convert(EntryUpdateRequestModel entryUpdateRequestModel) {
 
-        EntryVO.Builder builder = new EntryVO.Builder()
+        EntryVO.EntryVOBuilder builder = EntryVO.getBuilder()
                 .withTitle(entryUpdateRequestModel.getTitle())
                 .withLink(entryUpdateRequestModel.getLink())
                 .withPrologue(entryUpdateRequestModel.getPrologue())
@@ -42,6 +42,6 @@ public class EntryUpdateRequestModelToEntryVOConverter implements Converter<Entr
             builder.withOwner(UserVO.wrapMinimumVO(((EntryCreateRequestModel) entryUpdateRequestModel).getUserID()));
         }
 
-        return builder.createEntryVO();
+        return builder.build();
     }
 }
