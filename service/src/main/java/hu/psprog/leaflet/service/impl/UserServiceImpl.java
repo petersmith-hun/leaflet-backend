@@ -1,11 +1,11 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.UserDAO;
+import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
 import hu.psprog.leaflet.service.UserService;
-import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
@@ -34,7 +34,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.PersistenceException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -202,8 +201,8 @@ public class UserServiceImpl implements UserService {
             throw new UserInitializationException("Application already initialized");
         }
 
-        userVO.setAuthorities(Arrays.asList(Authority.ADMIN));
         User user = userVOToUserConverter.convert(userVO);
+        user.setRole(Role.ADMIN);
         User savedUser = userDAO.save(user);
 
         if (savedUser == null) {
@@ -239,7 +238,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Page<User> entityPage = userDAO.findAll(pageable);
 
-        return PageableUtil.convertPage(entityPage, userToUserVOConverter);
+        return PageableUtil.convertPage(entityPage, userToUserVOConverter, UserVO.class);
     }
 
     @Override
@@ -266,7 +265,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public AuthResponseVO claimToken(AuthRequestVO authRequestVO) {
 
-        AuthResponseVO.Builder builder = new AuthResponseVO.Builder();
+        AuthResponseVO.AuthResponseVOBuilder builder = AuthResponseVO.getBuilder();
         try {
             Authentication authentication = new UsernamePasswordAuthenticationToken(authRequestVO.getUsername(), authRequestVO.getPassword());
             authenticationManager.authenticate(authentication);
@@ -276,13 +275,13 @@ public class UserServiceImpl implements UserService {
             return builder
                     .withAuthenticationResult(AuthResponseVO.AuthenticationResult.AUTH_SUCCESS)
                     .withToken(authenticationAnswer.getToken())
-                    .createAuthResponseVO();
+                    .build();
 
         } catch (AuthenticationException exception) {
 
             return builder
                     .withAuthenticationResult(AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS)
-                    .createAuthResponseVO();
+                    .build();
         }
     }
 

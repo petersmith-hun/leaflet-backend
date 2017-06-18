@@ -82,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
         Entry entry = entryVOToEntryConverter.convert(entryVO);
         Page<Comment> commentPage = commentDAO.findByEntry(pageable, entry);
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter, CommentVO.class);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class CommentServiceImpl implements CommentService {
                 .where(CommentSpecification.isEnabled);
         Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter, CommentVO.class);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class CommentServiceImpl implements CommentService {
         User user = userVOToUserConverter.convert(userVO);
         Page<Comment> commentPage = commentDAO.findByUser(pageable, user);
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter, CommentVO.class);
     }
 
     @Override

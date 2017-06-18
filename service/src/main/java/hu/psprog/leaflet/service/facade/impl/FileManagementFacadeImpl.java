@@ -100,7 +100,7 @@ public class FileManagementFacadeImpl implements FileManagementFacade {
 
     private DownloadableFileWrapperVO wrapFile(UploadedFileVO metaInfo, File fileToDownload) throws IOException {
 
-        return DownloadableFileWrapperVO.Builder.getBuilder()
+        return DownloadableFileWrapperVO.getBuilder()
                 .withOriginalFilename(metaInfo.getOriginalFilename())
                 .withMimeType(metaInfo.getAcceptedAs())
                 .withLength(fileToDownload.length())

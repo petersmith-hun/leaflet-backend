@@ -33,7 +33,7 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
             }
         }
 
-        return new User.Builder()
+        return User.getBuilder()
                 .withId(source.getId())
                 .withCreated(source.getCreated())
                 .withPassword(source.getPassword())
@@ -43,7 +43,7 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
                 .withEmail(source.getEmail())
                 .withLastLogin(source.getLastLogin())
                 .withRole(role)
-                .isEnabled(source.isEnabled())
-                .createUser();
+                .withEnabled(source.isEnabled())
+                .build();
     }
 }

@@ -16,12 +16,12 @@ public class TagToTagVOConverter implements Converter<Tag, TagVO> {
     @Override
     public TagVO convert(Tag source) {
 
-        return new TagVO.Builder()
+        return TagVO.getBuilder()
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withEnabled(source.isEnabled())
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())
-                .createTagVO();
+                .build();
     }
 }

@@ -41,7 +41,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     @Override
     public EntryVO convert(Entry source) {
 
-        EntryVO.Builder builder = new EntryVO.Builder();
+        EntryVO.EntryVOBuilder builder = EntryVO.getBuilder();
         builder.withContent(source.getContent())
                 .withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
@@ -67,7 +67,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
             builder.withOwner(userToUserVOConverter.convert(source.getUser()));
         }
 
-        return builder.createEntryVO();
+        return builder.build();
     }
 
     private List<UploadedFileVO> mapAttachments(List<UploadedFile> uploadedFiles) {

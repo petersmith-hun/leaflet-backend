@@ -131,7 +131,7 @@ public class EntityPageVO<T extends BaseVO> implements Serializable {
         private int pageNumber;
         private int pageSize;
         private int entityCountOnPage;
-        private List<? extends BaseVO> entitiesOnPage;
+        private List entitiesOnPage;
         private boolean first;
         private boolean last;
         private boolean hasNext;
@@ -190,8 +190,8 @@ public class EntityPageVO<T extends BaseVO> implements Serializable {
             return this;
         }
 
-        public EntityPageVO build() {
-            EntityPageVO entityPageVO = new EntityPageVO();
+        public <S extends BaseVO> EntityPageVO<S> build(Class<S> targetClass) {
+            EntityPageVO<S> entityPageVO = new EntityPageVO<>();
             entityPageVO.entityCount = this.entityCount;
             entityPageVO.pageSize = this.pageSize;
             entityPageVO.last = this.last;

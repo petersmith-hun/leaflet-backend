@@ -88,7 +88,7 @@ public class FileUploader {
         String fileRelativePath = buildFileRelatePath(fileInputVO, targetFilename, uploadAcceptor).toString();
         Files.copy(fileInputVO.getFileContentStream(), path.resolve(targetFilename));
 
-        return UploadedFileVO.Builder.getBuilder()
+        return UploadedFileVO.getBuilder()
                 .withOriginalFilename(fileInputVO.getOriginalFilename())
                 .withPath(fileRelativePath)
                 .withAcceptedAs(fileInputVO.getContentType())

@@ -186,7 +186,7 @@ public class EntryServiceImpl implements EntryService {
                 .and(EntrySpecification.isEnabled);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class EntryServiceImpl implements EntryService {
                 .and(EntrySpecification.isEnabled);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);
     }
 
     @Override
@@ -228,6 +228,6 @@ public class EntryServiceImpl implements EntryService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Page<Entry> entityPage = entryDAO.findAll(pageable);
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);
     }
 }

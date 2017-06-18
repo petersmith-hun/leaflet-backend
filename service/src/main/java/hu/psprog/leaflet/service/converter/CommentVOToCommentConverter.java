@@ -27,26 +27,26 @@ public class CommentVOToCommentConverter implements Converter<CommentVO, Comment
     @Override
     public Comment convert(CommentVO source) {
 
-        Comment.Builder builder = new Comment.Builder()
+        Comment.CommentBuilder builder = Comment.getBuilder()
                 .withId(source.getId())
                 .withContent(source.getContent())
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())
-                .isEnabled(source.isEnabled())
-                .isDeleted(source.isDeleted());
+                .withEnabled(source.isEnabled())
+                .withDeleted(source.isDeleted());
 
         if (Objects.nonNull(source.getEntryVO())) {
-            builder.withEntry(Entry.Builder.getBuilder()
+            builder.withEntry(Entry.getBuilder()
                     .withId(source.getEntryVO().getId())
                     .build());
         }
 
         if (Objects.nonNull(source.getOwner())) {
-            builder.withUser(new User.Builder()
+            builder.withUser(User.getBuilder()
                     .withId(source.getOwner().getId())
-                    .createUser());
+                    .build());
         }
 
-        return builder.createComment();
+        return builder.build();
     }
 }

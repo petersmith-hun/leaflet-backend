@@ -25,7 +25,7 @@ public class CommentToCommentVOConverter implements Converter<Comment, CommentVO
     @Override
     public CommentVO convert(Comment source) {
 
-        return new CommentVO.Builder()
+        return CommentVO.getBuilder()
                 .withId(source.getId())
                 .withContent(extractContent(source))
                 .withCreated(source.getCreated())
@@ -34,7 +34,7 @@ public class CommentToCommentVOConverter implements Converter<Comment, CommentVO
                 .withOwner(userToUserVOConverter.convert(source.getUser()))
                 .withEnabled(source.isEnabled())
                 .withDeleted(source.isDeleted())
-                .createCommentVO();
+                .build();
     }
 
     private String extractContent(Comment source) {

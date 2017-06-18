@@ -20,11 +20,11 @@ public class DocumentVOToDocumentConverter implements Converter<DocumentVO, Docu
     @Override
     public Document convert(DocumentVO source) {
 
-        Document.Builder builder = new Document.Builder();
+        Document.DocumentBuilder builder = Document.getBuilder();
         builder.withContent(source.getContent())
                 .withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
-                .isEnabled(source.isEnabled())
+                .withEnabled(source.isEnabled())
                 .withLastModified(source.getLastModified())
                 .withLocale(source.getLocale())
                 .withId(source.getId())
@@ -38,6 +38,6 @@ public class DocumentVOToDocumentConverter implements Converter<DocumentVO, Docu
             builder.withUser(userVOToUserConverter.convert(source.getOwner()));
         }
 
-        return builder.createDocument();
+        return builder.build();
     }
 }

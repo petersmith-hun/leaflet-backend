@@ -20,7 +20,7 @@ public class DocumentToDocumentVOConverter implements Converter<Document, Docume
     @Override
     public DocumentVO convert(Document source) {
 
-        DocumentVO.Builder builder = new DocumentVO.Builder();
+        DocumentVO.DocumentVOBuilder builder = DocumentVO.getBuilder();
         builder.withContent(source.getContent())
                 .withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
@@ -38,6 +38,6 @@ public class DocumentToDocumentVOConverter implements Converter<Document, Docume
             builder.withOwner(userToUserVOConverter.convert(source.getUser()));
         }
 
-        return builder.createDocumentVO();
+        return builder.build();
     }
 }

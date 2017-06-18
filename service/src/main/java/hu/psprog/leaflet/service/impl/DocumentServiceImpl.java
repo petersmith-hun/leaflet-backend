@@ -69,7 +69,7 @@ public class DocumentServiceImpl implements DocumentService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Page<Document> documentPage = documentDAO.findAll(DocumentSpecification.isEnabled, pageable);
 
-        return PageableUtil.convertPage(documentPage, documentToDocumentVOConverter);
+        return PageableUtil.convertPage(documentPage, documentToDocumentVOConverter, DocumentVO.class);
     }
 
     @Override
