@@ -8,24 +8,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
  *
  * @author Peter Smith
  */
-public interface Authority {
+public class Authority {
 
-    enum AuthorityName {
-        ADMIN,
-        USER,
-        EDITOR,
-        SERVICE
-    }
+    public static final GrantedAuthority ADMIN = new SimpleGrantedAuthority(AuthorityName.ADMIN.name());
+    public static final GrantedAuthority USER = new SimpleGrantedAuthority(AuthorityName.USER.name());
+    public static final GrantedAuthority EDITOR = new SimpleGrantedAuthority(AuthorityName.EDITOR.name());
+    public static final GrantedAuthority SERVICE = new SimpleGrantedAuthority(AuthorityName.SERVICE.name());
 
-    GrantedAuthority ADMIN = new SimpleGrantedAuthority(AuthorityName.ADMIN.name());
+    private Authority() {}
 
-    GrantedAuthority USER = new SimpleGrantedAuthority(AuthorityName.USER.name());
-
-    GrantedAuthority EDITOR = new SimpleGrantedAuthority(AuthorityName.EDITOR.name());
-
-    GrantedAuthority SERVICE = new SimpleGrantedAuthority(AuthorityName.SERVICE.name());
-
-    static GrantedAuthority getAuthorityByName(String authorityName) {
+    public static GrantedAuthority getAuthorityByName(String authorityName) {
 
         switch (Authority.AuthorityName.valueOf(authorityName)) {
             case ADMIN:
@@ -38,5 +30,12 @@ public interface Authority {
             default:
                 return Authority.USER;
         }
+    }
+
+    private enum AuthorityName {
+        ADMIN,
+        USER,
+        EDITOR,
+        SERVICE
     }
 }

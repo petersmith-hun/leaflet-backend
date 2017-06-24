@@ -22,6 +22,8 @@ public class CommentSpecification {
      */
     public static final Specification<Comment> IS_NOT_DELETED = (root, query, builder) -> builder.equal(root.get(Comment_.deleted), false);
 
+    private CommentSpecification() {}
+
     /**
      * Filter to list comments by owner entry.
      *

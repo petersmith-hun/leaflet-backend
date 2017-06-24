@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryVO> getAll() {
 
         return categoryDAO.findAll().stream()
-                .map(e -> categoryToCategoryVOConverter.convert(e))
+                .map(categoryToCategoryVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -67,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryVO> getAllPublic() {
 
         return categoryDAO.findAll(CategorySpecification.IS_ENABLED).stream()
-                .map(e -> categoryToCategoryVOConverter.convert(e))
+                .map(categoryToCategoryVOConverter::convert)
                 .collect(Collectors.toList());
     }
 

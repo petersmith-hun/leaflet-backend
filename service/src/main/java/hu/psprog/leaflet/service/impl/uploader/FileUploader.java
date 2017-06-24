@@ -26,8 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Abstract file upload handler.
- * Contains common operations (eg.: the upload itself) and abstract specifications for the concrete handlers to implement.
+ * File upload logic.
  *
  * @author Peter Smith
  */
@@ -35,6 +34,8 @@ import java.util.stream.Collectors;
 public class FileUploader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUploader.class);
+
+    private static final String GIVEN_PATH_IS_INVALID = "Given path is invalid";
 
     private FilenameGeneratorUtil filenameGeneratorUtil;
     private File fileStorage;
@@ -66,7 +67,7 @@ public class FileUploader {
         initializeAcceptorRoots();
     }
 
-    public UploadedFileVO upload(FileInputVO fileInputVO) throws FileUploadException {
+    public UploadedFileVO upload(FileInputVO fileInputVO) {
 
         UploadedFileVO uploadedFileVO = null;
         UploadAcceptor currentAcceptor;
@@ -82,8 +83,8 @@ public class FileUploader {
             LOGGER.error("Could not move uploaded file [{}] to destination location", fileInputVO.getOriginalFilename());
             throw new FileUploadException("Could not move uploaded file to destination location", exc);
         } catch (InvalidPathException exc) {
-            LOGGER.error("Given path is invalid", exc);
-            throw new FileUploadException("Given path is invalid", exc);
+            LOGGER.error(GIVEN_PATH_IS_INVALID, exc);
+            throw new FileUploadException(GIVEN_PATH_IS_INVALID, exc);
         }
         return uploadedFileVO;
     }
@@ -93,7 +94,7 @@ public class FileUploader {
                 .collect(Collectors.toMap(UploadAcceptor::getClass, Function.identity()));
     }
 
-    private void initializeAcceptorRoots() throws DirectoryCreationException {
+    private void initializeAcceptorRoots() {
         acceptorRootMap = uploadAcceptorMap.values().stream()
                 .collect(Collectors.toMap(UploadAcceptor::getClass, mapUploadAcceptorToRootDirectory));
     }
@@ -114,7 +115,7 @@ public class FileUploader {
                 .build();
     }
 
-    private Path buildPath(FileInputVO fileInputVO, UploadAcceptor uploadAcceptor) throws InvalidPathException {
+    private Path buildPath(FileInputVO fileInputVO, UploadAcceptor uploadAcceptor) {
         Path path;
         String acceptorRootPath = getAcceptorRoot(uploadAcceptor).getAbsolutePath();
         if (Objects.nonNull(fileInputVO.getRelativePath())) {

@@ -66,7 +66,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<DocumentVO> getAll() {
 
         return documentDAO.findAll().stream()
-                .map(e -> documentToDocumentVOConverter.convert(e))
+                .map(documentToDocumentVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -76,7 +76,7 @@ public class DocumentServiceImpl implements DocumentService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Page<Document> documentPage = documentDAO.findAll(DocumentSpecification.IS_ENABLED, pageable);
 
-        return PageableUtil.convertPage(documentPage, documentToDocumentVOConverter, DocumentVO.class);
+        return PageableUtil.convertPage(documentPage, documentToDocumentVOConverter);
     }
 
     @Override

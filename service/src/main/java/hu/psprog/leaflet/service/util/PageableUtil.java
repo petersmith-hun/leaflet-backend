@@ -43,7 +43,7 @@ public class PageableUtil {
      * @param <S> source {@link SerializableEntity} type
      * @return converter page
      */
-    public static <T extends BaseVO, S extends SerializableEntity> EntityPageVO<T> convertPage(Page<S> page, Converter<S, T> converter, Class<T> targetClass) {
+    public static <T extends BaseVO, S extends SerializableEntity> EntityPageVO<T> convertPage(Page<S> page, Converter<S, T> converter) {
 
         Page<T> remappedPage = page.map(converter);
 
@@ -58,6 +58,6 @@ public class PageableUtil {
                 .withHasNext(remappedPage.hasNext())
                 .withHasPrevious(remappedPage.hasPrevious())
                 .withEntitiesOnPage(remappedPage.getContent())
-                .build(targetClass);
+                .build();
     }
 }

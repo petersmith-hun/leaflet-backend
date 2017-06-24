@@ -6,6 +6,7 @@ package hu.psprog.leaflet.web.processor;
  * @param <S> source response type to process
  * @author Peter Smith
  */
+@FunctionalInterface
 public interface ResponseProcessor<S> {
 
     /**

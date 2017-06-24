@@ -76,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentVO> getAll() {
 
         return commentDAO.findAll().stream()
-                .map(e -> commentToCommentVOConverter.convert(e))
+                .map(commentToCommentVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -88,7 +88,7 @@ public class CommentServiceImpl implements CommentService {
         Entry entry = entryVOToEntryConverter.convert(entryVO);
         Page<Comment> commentPage = commentDAO.findByEntry(pageable, entry);
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter, CommentVO.class);
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class CommentServiceImpl implements CommentService {
                 .where(CommentSpecification.IS_ENABLED);
         Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter, CommentVO.class);
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class CommentServiceImpl implements CommentService {
         User user = userVOToUserConverter.convert(userVO);
         Page<Comment> commentPage = commentDAO.findByUser(pageable, user);
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter, CommentVO.class);
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
     }
 
     @Override

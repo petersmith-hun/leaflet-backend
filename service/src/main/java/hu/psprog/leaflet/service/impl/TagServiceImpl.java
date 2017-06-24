@@ -63,7 +63,7 @@ public class TagServiceImpl implements TagService {
     public List<TagVO> getAll() {
 
         return tagDAO.findAll().stream()
-                .map(tag -> tagToTagVOConverter.convert(tag))
+                .map(tagToTagVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -71,7 +71,7 @@ public class TagServiceImpl implements TagService {
     public List<TagVO> getPublicTags() {
 
         return tagDAO.findAll(TagSpecification.IS_ENABLED).stream()
-                .map(tag -> tagToTagVOConverter.convert(tag))
+                .map(tagToTagVOConverter::convert)
                 .collect(Collectors.toList());
     }
 

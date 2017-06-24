@@ -190,7 +190,7 @@ public class EntityPageVO<T extends BaseVO> implements Serializable {
             return this;
         }
 
-        public <S extends BaseVO> EntityPageVO<S> build(Class<S> targetClass) {
+        public <S extends BaseVO> EntityPageVO<S> build() {
             EntityPageVO<S> entityPageVO = new EntityPageVO<>();
             entityPageVO.entityCount = this.entityCount;
             entityPageVO.pageSize = this.pageSize;

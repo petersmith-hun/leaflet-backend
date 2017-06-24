@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public List<UserVO> getAll() {
 
         return userDAO.findAll().stream()
-                .map(user -> userToUserVOConverter.convert(user))
+                .map(userToUserVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -242,7 +242,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Page<User> entityPage = userDAO.findAll(pageable);
 
-        return PageableUtil.convertPage(entityPage, userToUserVOConverter, UserVO.class);
+        return PageableUtil.convertPage(entityPage, userToUserVOConverter);
     }
 
     @Override

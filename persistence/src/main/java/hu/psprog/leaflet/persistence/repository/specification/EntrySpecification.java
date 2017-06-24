@@ -23,6 +23,8 @@ public class EntrySpecification {
      */
     public static final Specification<Entry> IS_ENABLED = (root, query, builder) -> builder.equal(root.get(Entry_.enabled), true);
 
+    private EntrySpecification() {}
+
     public static Specification<Entry> isUnderCategory(Category category) {
         return (root, query, builder) -> builder.equal(root.get(Entry_.category), category);
     }

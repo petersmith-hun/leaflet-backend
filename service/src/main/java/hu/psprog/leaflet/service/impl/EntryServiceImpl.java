@@ -100,7 +100,7 @@ public class EntryServiceImpl implements EntryService {
     public List<EntryVO> getAll() {
 
         return entryDAO.findAll().stream()
-                .map(entry -> entryToEntryVOConverter.convert(entry))
+                .map(entryToEntryVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -193,7 +193,7 @@ public class EntryServiceImpl implements EntryService {
                 .and(EntrySpecification.IS_ENABLED);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class EntryServiceImpl implements EntryService {
                 .and(EntrySpecification.IS_ENABLED);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }
 
     @Override
@@ -235,6 +235,6 @@ public class EntryServiceImpl implements EntryService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Page<Entry> entityPage = entryDAO.findAll(pageable);
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }
 }

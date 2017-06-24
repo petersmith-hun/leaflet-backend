@@ -10,7 +10,8 @@ import hu.psprog.leaflet.service.vo.EntityPageVO;
  * @param <T> {@link BaseVO} type of entity
  * @param <O> enumeration of fields the entity can be ordered by
  */
+@FunctionalInterface
 public interface PageableService<T extends BaseVO, O extends Enum> {
 
-    public EntityPageVO<T> getEntityPage(int page, int limit, OrderDirection direction, O orderBy);
+    EntityPageVO<T> getEntityPage(int page, int limit, OrderDirection direction, O orderBy);
 }

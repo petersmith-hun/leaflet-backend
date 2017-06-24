@@ -161,7 +161,7 @@ public class CommentServiceImplTest {
         // then
         // expected exception
         verify(commentVOToCommentConverter).convert(commentVO);
-        verify(commentDAO.save(comment));
+        verify(commentDAO).save(comment);
         verify(comment, never()).getId();
     }
 
