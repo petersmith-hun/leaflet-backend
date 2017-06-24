@@ -17,11 +17,14 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class CategoryVOToExtendedCategoryDataModelEntityConverter implements Converter<CategoryVO, ExtendedCategoryDataModel> {
 
-    @Autowired
     private CommonFormatter commonFormatter;
+    private HttpServletRequest httpServletRequest;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    public CategoryVOToExtendedCategoryDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
+        this.commonFormatter = commonFormatter;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     @Override
     public ExtendedCategoryDataModel convert(CategoryVO source) {

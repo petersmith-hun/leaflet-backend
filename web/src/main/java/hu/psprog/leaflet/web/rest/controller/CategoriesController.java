@@ -44,8 +44,12 @@ public class CategoriesController extends BaseController {
     private static final String CATEGORY_COULD_NOT_BE_CREATED = "Category could not be created. See details:";
     private static final String CATEGORY_COULD_NOT_BE_CREATED_TRY_AGAIN = "Category could not be created, please try again later.";
 
-    @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    public CategoriesController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     /**
      * GET /categories

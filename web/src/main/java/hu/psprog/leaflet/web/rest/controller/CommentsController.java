@@ -22,7 +22,6 @@ import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -59,11 +58,12 @@ public class CommentsController extends BaseController {
     private static final String YOUR_COMMENT_COULD_NOT_BE_CREATED = "Your comment could not be created, please try again later!";
     private static final String ENTRY_TO_ASSOCIATE_COMMENT_WITH_COULD_NOT_BE_FOUND = "Entry to associate comment with could not be found";
 
-    @Autowired
     private CommentFacade commentFacade;
 
     @Autowired
-    private ConversionService conversionService;
+    public CommentsController(CommentFacade commentFacade) {
+        this.commentFacade = commentFacade;
+    }
 
     /**
      * GET /comments/entry/{id}/{page}

@@ -37,8 +37,12 @@ public class DCPStoreController extends BaseController {
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_UPDATED = "Configuration entry could not be updated.";
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED = "Configuration entry could not be deleted.";
 
-    @Autowired
     private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
+
+    @Autowired
+    public DCPStoreController(DynamicConfigurationPropertyService dynamicConfigurationPropertyService) {
+        this.dynamicConfigurationPropertyService = dynamicConfigurationPropertyService;
+    }
 
     /**
      * GET /dcp

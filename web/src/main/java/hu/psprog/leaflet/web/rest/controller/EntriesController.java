@@ -57,8 +57,12 @@ public class EntriesController extends BaseController {
     private static final String REQUESTED_ENTRY_NOT_FOUND = "Requested entry not found";
     private static final String AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS = "An entry with the same 'link' already exists.";
 
-    @Autowired
     private EntryService entryService;
+
+    @Autowired
+    public EntriesController(EntryService entryService) {
+        this.entryService = entryService;
+    }
 
     /**
      * GET /entries

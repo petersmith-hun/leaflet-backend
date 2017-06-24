@@ -33,11 +33,14 @@ public class FileManagementFacadeImpl implements FileManagementFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileManagementFacadeImpl.class);
 
-    @Autowired
     private FileManagementService fileManagementService;
+    private FileMetaInfoService fileMetaInfoService;
 
     @Autowired
-    private FileMetaInfoService fileMetaInfoService;
+    public FileManagementFacadeImpl(FileManagementService fileManagementService, FileMetaInfoService fileMetaInfoService) {
+        this.fileManagementService = fileManagementService;
+        this.fileMetaInfoService = fileMetaInfoService;
+    }
 
     @Override
     public UploadedFileVO upload(FileInputVO fileInputVO) throws ServiceException {

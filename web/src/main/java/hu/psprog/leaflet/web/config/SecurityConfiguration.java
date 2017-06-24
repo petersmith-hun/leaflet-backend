@@ -2,7 +2,6 @@ package hu.psprog.leaflet.web.config;
 
 import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationProvider;
 import hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter;
-import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.web.rest.handler.RESTAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -40,9 +39,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JWTAuthenticationFilter jwtAuthenticationFilter;
-
-    @Autowired
-    private RunLevel runLevel;
 
     @Bean
     public PasswordEncoder passwordEncoder() {

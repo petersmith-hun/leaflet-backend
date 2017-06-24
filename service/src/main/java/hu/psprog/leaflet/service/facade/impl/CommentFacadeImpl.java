@@ -35,12 +35,15 @@ public class CommentFacadeImpl implements CommentFacade {
     private static final List<GrantedAuthority> NO_LOGIN_AUTHORITY = AuthorityUtils.createAuthorityList(Role.NO_LOGIN.name());
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentFacadeImpl.class);
 
-    @Autowired
     private CommentService commentService;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
-    
+    public CommentFacadeImpl(CommentService commentService, UserService userService) {
+        this.commentService = commentService;
+        this.userService = userService;
+    }
+
     @Override
     public void enable(Long id) throws EntityNotFoundException {
         commentService.enable(id);

@@ -17,11 +17,14 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class UserVOToExtendedUserDataModelEntityConverter implements Converter<UserVO, ExtendedUserDataModel> {
 
-    @Autowired
     private CommonFormatter commonFormatter;
+    private HttpServletRequest httpServletRequest;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    public UserVOToExtendedUserDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
+        this.commonFormatter = commonFormatter;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     @Override
     public ExtendedUserDataModel convert(UserVO userVO) {

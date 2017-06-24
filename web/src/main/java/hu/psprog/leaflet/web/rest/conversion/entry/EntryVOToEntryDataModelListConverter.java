@@ -16,8 +16,12 @@ import java.util.List;
 @Component
 public class EntryVOToEntryDataModelListConverter implements Converter<List<EntryVO>, EntryListDataModel> {
 
-    @Autowired
     private EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter;
+
+    @Autowired
+    public EntryVOToEntryDataModelListConverter(EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter) {
+        this.entryVOToEntryDataModelEntityConverter = entryVOToEntryDataModelEntityConverter;
+    }
 
     @Override
     public EntryListDataModel convert(List<EntryVO> entryVOList) {

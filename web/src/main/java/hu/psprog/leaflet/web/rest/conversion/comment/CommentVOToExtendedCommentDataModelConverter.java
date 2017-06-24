@@ -19,14 +19,17 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class CommentVOToExtendedCommentDataModelConverter implements Converter<CommentVO, ExtendedCommentDataModel> {
 
-    @Autowired
     private HttpServletRequest httpServletRequest;
-
-    @Autowired
     private CommonFormatter commonFormatter;
+    private EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter;
 
     @Autowired
-    private EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter;
+    public CommentVOToExtendedCommentDataModelConverter(HttpServletRequest httpServletRequest, CommonFormatter commonFormatter,
+                                                        EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter) {
+        this.httpServletRequest = httpServletRequest;
+        this.commonFormatter = commonFormatter;
+        this.entryVOToEntryDataModelEntityConverter = entryVOToEntryDataModelEntityConverter;
+    }
 
     @Override
     public ExtendedCommentDataModel convert(CommentVO source) {

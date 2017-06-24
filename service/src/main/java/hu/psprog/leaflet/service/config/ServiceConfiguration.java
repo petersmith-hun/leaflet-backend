@@ -18,12 +18,12 @@ import java.io.IOException;
  * @author Peter Smith
  */
 @Configuration
-@ComponentScan(ServiceConfiguration.PERSISTENCE_FACADE_PACKAGE)
+@ComponentScan(ServiceConfiguration.PERSISTENCE_DAO_PACKAGE)
 public class ServiceConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
 
-    public static final String PERSISTENCE_FACADE_PACKAGE = "hu.psprog.leaflet.persistence.dao";
+    public static final String PERSISTENCE_DAO_PACKAGE = "hu.psprog.leaflet.persistence.dao";
 
     @Value("${uploads.directory}")
     @NotNull

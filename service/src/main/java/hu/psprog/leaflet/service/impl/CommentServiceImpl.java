@@ -39,20 +39,22 @@ import java.util.stream.Collectors;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
     private CommentDAO commentDAO;
-
-    @Autowired
     private CommentToCommentVOConverter commentToCommentVOConverter;
-
-    @Autowired
     private CommentVOToCommentConverter commentVOToCommentConverter;
-
-    @Autowired
     private EntryVOToEntryConverter entryVOToEntryConverter;
+    private UserVOToUserConverter userVOToUserConverter;
 
     @Autowired
-    private UserVOToUserConverter userVOToUserConverter;
+    public CommentServiceImpl(CommentDAO commentDAO, CommentToCommentVOConverter commentToCommentVOConverter,
+                              CommentVOToCommentConverter commentVOToCommentConverter, EntryVOToEntryConverter entryVOToEntryConverter,
+                              UserVOToUserConverter userVOToUserConverter) {
+        this.commentDAO = commentDAO;
+        this.commentToCommentVOConverter = commentToCommentVOConverter;
+        this.commentVOToCommentConverter = commentVOToCommentConverter;
+        this.entryVOToEntryConverter = entryVOToEntryConverter;
+        this.userVOToUserConverter = userVOToUserConverter;
+    }
 
     @Override
     public CommentVO getOne(Long id) throws ServiceException {

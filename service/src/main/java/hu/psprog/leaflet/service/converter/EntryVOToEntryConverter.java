@@ -5,7 +5,6 @@ import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +17,6 @@ import java.util.Objects;
  */
 @Component
 public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
-
-    @Autowired
-    private UserVOToUserConverter userVOToUserConverter;
 
     @Override
     public Entry convert(EntryVO source) {

@@ -49,29 +49,28 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private UserDAO userDAO;
-
-    @Autowired
     private UserDetailsService userDetailsService;
-
-    @Autowired
     private UserToUserVOConverter userToUserVOConverter;
-
-    @Autowired
     private UserVOToUserConverter userVOToUserConverter;
-
-    @Autowired
     private AuthorityToRoleConverter authorityToRoleConverter;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
-
-    @Autowired
     private JWTComponent jwtComponent;
+    private RunLevel runLevel;
 
     @Autowired
-    private RunLevel runLevel;
+    public UserServiceImpl(UserDAO userDAO, UserDetailsService userDetailsService, UserToUserVOConverter userToUserVOConverter,
+                           UserVOToUserConverter userVOToUserConverter, AuthorityToRoleConverter authorityToRoleConverter,
+                           AuthenticationManager authenticationManager, JWTComponent jwtComponent, RunLevel runLevel) {
+        this.userDAO = userDAO;
+        this.userDetailsService = userDetailsService;
+        this.userToUserVOConverter = userToUserVOConverter;
+        this.userVOToUserConverter = userVOToUserConverter;
+        this.authorityToRoleConverter = authorityToRoleConverter;
+        this.authenticationManager = authenticationManager;
+        this.jwtComponent = jwtComponent;
+        this.runLevel = runLevel;
+    }
 
     @Override
     public UserVO getOne(Long userID) throws ServiceException {

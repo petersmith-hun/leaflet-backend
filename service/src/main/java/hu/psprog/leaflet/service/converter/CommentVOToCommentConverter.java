@@ -4,7 +4,6 @@ import hu.psprog.leaflet.persistence.entity.Comment;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.CommentVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +16,6 @@ import java.util.Objects;
  */
 @Component
 public class CommentVOToCommentConverter implements Converter<CommentVO, Comment> {
-
-    @Autowired
-    private UserVOToUserConverter userVOToUserConverter;
-
-    @Autowired
-    private EntryVOToEntryConverter entryVOToEntryConverter;
 
     @Override
     public Comment convert(CommentVO source) {

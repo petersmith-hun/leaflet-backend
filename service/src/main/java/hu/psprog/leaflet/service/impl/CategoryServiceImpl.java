@@ -27,14 +27,17 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
     private CategoryDAO categoryDAO;
-
-    @Autowired
     private CategoryToCategoryVOConverter categoryToCategoryVOConverter;
+    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
 
     @Autowired
-    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+    public CategoryServiceImpl(CategoryDAO categoryDAO, CategoryToCategoryVOConverter categoryToCategoryVOConverter,
+                               CategoryVOToCategoryConverter categoryVOToCategoryConverter) {
+        this.categoryDAO = categoryDAO;
+        this.categoryToCategoryVOConverter = categoryToCategoryVOConverter;
+        this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
+    }
 
     @Override
     public CategoryVO getOne(Long id) throws ServiceException {

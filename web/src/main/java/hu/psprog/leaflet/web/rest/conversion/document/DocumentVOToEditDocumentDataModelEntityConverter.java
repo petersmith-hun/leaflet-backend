@@ -18,11 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class DocumentVOToEditDocumentDataModelEntityConverter implements Converter<DocumentVO, EditDocumentDataModel> {
 
-    @Autowired
     private CommonFormatter commonFormatter;
+    private HttpServletRequest httpServletRequest;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    public DocumentVOToEditDocumentDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
+        this.commonFormatter = commonFormatter;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     @Override
     public EditDocumentDataModel convert(DocumentVO source) {

@@ -25,14 +25,17 @@ import java.util.List;
 @Component
 public class UserInitializeRequestModelToUserVOConverter implements Converter<UserInitializeRequestModel, UserVO> {
 
-    @Value(ConfigurationProperty.USERS_ENABLED_BY_DEFAULT)
     private boolean enabled;
-
-    @Autowired
     private RunLevel runLevel;
+    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Autowired
-    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+    public UserInitializeRequestModelToUserVOConverter(@Value(ConfigurationProperty.USERS_ENABLED_BY_DEFAULT) boolean enabled,
+                                                       RunLevel runLevel, JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
+        this.enabled = enabled;
+        this.runLevel = runLevel;
+        this.juLocaleToLeafletLocaleConverter = juLocaleToLeafletLocaleConverter;
+    }
 
     @Override
     public UserVO convert(UserInitializeRequestModel userInitializeRequestModel) {

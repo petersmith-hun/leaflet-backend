@@ -14,8 +14,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentToDocumentVOConverter implements Converter<Document, DocumentVO> {
 
-    @Autowired
     private UserToUserVOConverter userToUserVOConverter;
+
+    @Autowired
+    public DocumentToDocumentVOConverter(UserToUserVOConverter userToUserVOConverter) {
+        this.userToUserVOConverter = userToUserVOConverter;
+    }
 
     @Override
     public DocumentVO convert(Document source) {

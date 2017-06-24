@@ -21,11 +21,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private static final String USERNAME_NOT_FOUND_MESSAGE_PATTERN = "User identified by username [%s] not found";
 
-    @Autowired
     private UserDAO userDAO;
+    private UserValidatorChain userValidatorChain;
 
     @Autowired
-    private UserValidatorChain userValidatorChain;
+    public UserDetailsServiceImpl(UserDAO userDAO, UserValidatorChain userValidatorChain) {
+        this.userDAO = userDAO;
+        this.userValidatorChain = userValidatorChain;
+    }
 
     /**
      * Loads a user by its email address (instead of username).

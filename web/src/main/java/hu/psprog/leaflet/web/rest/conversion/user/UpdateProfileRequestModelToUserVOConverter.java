@@ -15,8 +15,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdateProfileRequestModelToUserVOConverter implements Converter<UpdateProfileRequestModel, UserVO> {
 
-    @Autowired
     private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+
+    @Autowired
+    public UpdateProfileRequestModelToUserVOConverter(JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
+        this.juLocaleToLeafletLocaleConverter = juLocaleToLeafletLocaleConverter;
+    }
 
     @Override
     public UserVO convert(UpdateProfileRequestModel updateProfileRequestModel) {

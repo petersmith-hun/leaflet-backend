@@ -50,8 +50,12 @@ public class DocumentsController extends BaseController {
     private static final String DOCUMENT_COULD_NOT_BE_CREATED_SEE_DETAILS = "Document could not be created, please try again later.";
     private static final String DOCUMENT_COULD_NOT_BE_CREATED = "Document could not be created. See details: ";
 
-    @Autowired
     private DocumentService documentService;
+
+    @Autowired
+    public DocumentsController(DocumentService documentService) {
+        this.documentService = documentService;
+    }
 
     /**
      * GET /documents

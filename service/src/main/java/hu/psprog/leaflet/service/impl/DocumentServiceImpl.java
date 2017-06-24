@@ -34,14 +34,17 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
-    @Autowired
     private DocumentDAO documentDAO;
-
-    @Autowired
     private DocumentToDocumentVOConverter documentToDocumentVOConverter;
+    private DocumentVOToDocumentConverter documentVOToDocumentConverter;
 
     @Autowired
-    private DocumentVOToDocumentConverter documentVOToDocumentConverter;
+    public DocumentServiceImpl(DocumentDAO documentDAO, DocumentToDocumentVOConverter documentToDocumentVOConverter,
+                               DocumentVOToDocumentConverter documentVOToDocumentConverter) {
+        this.documentDAO = documentDAO;
+        this.documentToDocumentVOConverter = documentToDocumentVOConverter;
+        this.documentVOToDocumentConverter = documentVOToDocumentConverter;
+    }
 
     @Override
     public DocumentVO getOne(Long id) throws ServiceException {

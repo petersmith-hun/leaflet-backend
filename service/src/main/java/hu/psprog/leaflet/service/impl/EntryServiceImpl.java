@@ -37,17 +37,19 @@ import java.util.stream.Collectors;
 @Service
 public class EntryServiceImpl implements EntryService {
 
-    @Autowired
     private EntryDAO entryDAO;
-
-    @Autowired
     private EntryToEntryVOConverter entryToEntryVOConverter;
-
-    @Autowired
     private EntryVOToEntryConverter entryVOToEntryConverter;
+    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
 
     @Autowired
-    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+    public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter,
+                            EntryVOToEntryConverter entryVOToEntryConverter, CategoryVOToCategoryConverter categoryVOToCategoryConverter) {
+        this.entryDAO = entryDAO;
+        this.entryToEntryVOConverter = entryToEntryVOConverter;
+        this.entryVOToEntryConverter = entryVOToEntryConverter;
+        this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
+    }
 
     @Override
     public void deleteByEntity(EntryVO entity) throws ServiceException {
