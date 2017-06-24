@@ -11,5 +11,5 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public class TagSpecification {
 
-    public static Specification<Tag> isEnabled = (root, query, builder) -> builder.equal(root.get(Tag_.enabled), true);
+    public static final Specification<Tag> IS_ENABLED = (root, query, builder) -> builder.equal(root.get(Tag_.enabled), true);
 }

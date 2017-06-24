@@ -16,6 +16,8 @@ import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class EntryServiceImpl implements EntryService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryServiceImpl.class);
 
     private EntryDAO entryDAO;
     private EntryToEntryVOConverter entryToEntryVOConverter;
@@ -66,7 +70,8 @@ public class EntryServiceImpl implements EntryService {
 
         try {
             entryDAO.delete(id);
-        } catch (IllegalArgumentException exc){
+        } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Entry.class, id);
         }
     }
@@ -184,8 +189,8 @@ public class EntryServiceImpl implements EntryService {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Specifications<Entry> specs = Specifications
-                .where(EntrySpecification.isPublic)
-                .and(EntrySpecification.isEnabled);
+                .where(EntrySpecification.IS_PUBLIC)
+                .and(EntrySpecification.IS_ENABLED);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);
@@ -197,8 +202,8 @@ public class EntryServiceImpl implements EntryService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Specifications<Entry> specs = Specifications
                 .where(EntrySpecification.isUnderCategory(categoryVOToCategoryConverter.convert(categoryVO)))
-                .and(EntrySpecification.isPublic)
-                .and(EntrySpecification.isEnabled);
+                .and(EntrySpecification.IS_PUBLIC)
+                .and(EntrySpecification.IS_ENABLED);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter, EntryVO.class);

@@ -21,6 +21,8 @@ import hu.psprog.leaflet.service.vo.AuthRequestVO;
 import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +50,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private UserDAO userDAO;
     private UserDetailsService userDetailsService;
@@ -114,6 +118,7 @@ public class UserServiceImpl implements UserService {
         try {
             userDAO.delete(userID);
         } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(User.class, userID);
         }
     }
@@ -277,7 +282,7 @@ public class UserServiceImpl implements UserService {
                     .build();
 
         } catch (AuthenticationException exception) {
-
+            LOGGER.error("Authentication failed.", exception);
             return builder
                     .withAuthenticationResult(AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS)
                     .build();

@@ -15,12 +15,12 @@ public class CommentSpecification {
     /**
      * Filter to list comments marked as enabled.
      */
-    public static Specification<Comment> isEnabled = (root, query, builder) -> builder.equal(root.get(Comment_.enabled), true);
+    public static final Specification<Comment> IS_ENABLED = (root, query, builder) -> builder.equal(root.get(Comment_.enabled), true);
 
     /**
      * Filter to list comments not marked as logically deleted.
      */
-    public static Specification<Comment> isNotDeleted = (root, query, builder) -> builder.equal(root.get(Comment_.deleted), false);
+    public static final Specification<Comment> IS_NOT_DELETED = (root, query, builder) -> builder.equal(root.get(Comment_.deleted), false);
 
     /**
      * Filter to list comments by owner entry.

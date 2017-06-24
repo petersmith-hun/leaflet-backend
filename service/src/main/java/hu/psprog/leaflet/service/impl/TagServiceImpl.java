@@ -70,7 +70,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<TagVO> getPublicTags() {
 
-        return tagDAO.findAll(TagSpecification.isEnabled).stream()
+        return tagDAO.findAll(TagSpecification.IS_ENABLED).stream()
                 .map(tag -> tagToTagVOConverter.convert(tag))
                 .collect(Collectors.toList());
     }
@@ -180,7 +180,8 @@ public class TagServiceImpl implements TagService {
 
         try {
             tagDAO.delete(id);
-        } catch (IllegalArgumentException exc){
+        } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Tag.class, id);
         }
     }

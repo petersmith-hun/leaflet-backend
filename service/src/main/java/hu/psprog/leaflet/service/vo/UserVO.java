@@ -107,7 +107,6 @@ public class UserVO extends SelfStatusAwareIdentifiableVO<Long, User> {
                 .append("username", username)
                 .append("email", email)
                 .append("authorities", authorities)
-                .append("password", "[hidden]")
                 .append("locale", locale)
                 .append("lastLogin", lastLogin)
                 .toString();

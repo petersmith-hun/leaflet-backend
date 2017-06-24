@@ -19,6 +19,8 @@ import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +40,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class CommentServiceImpl implements CommentService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
 
     private CommentDAO commentDAO;
     private CommentToCommentVOConverter commentToCommentVOConverter;
@@ -94,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Entry entry = entryVOToEntryConverter.convert(entryVO);
         Specifications<Comment> specifications = Specifications
-                .where(CommentSpecification.isEnabled);
+                .where(CommentSpecification.IS_ENABLED);
         Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
         return PageableUtil.convertPage(commentPage, commentToCommentVOConverter, CommentVO.class);
@@ -184,7 +188,8 @@ public class CommentServiceImpl implements CommentService {
 
         try {
             commentDAO.delete(id);
-        } catch (IllegalArgumentException exc){
+        } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Comment.class, id);
         }
     }

@@ -30,12 +30,11 @@ public interface Authority {
         switch (Authority.AuthorityName.valueOf(authorityName)) {
             case ADMIN:
                 return Authority.ADMIN;
-            case USER:
-                return Authority.USER;
             case EDITOR:
                 return Authority.EDITOR;
             case SERVICE:
                 return Authority.SERVICE;
+            case USER:
             default:
                 return Authority.USER;
         }

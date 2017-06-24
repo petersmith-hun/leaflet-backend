@@ -41,6 +41,22 @@ public class FileUploader {
     private Map<Class<? extends UploadAcceptor>, UploadAcceptor> uploadAcceptorMap;
     private Map<Class<? extends UploadAcceptor>, File> acceptorRootMap;
 
+    private Function<UploadAcceptor, File> mapUploadAcceptorToRootDirectory = uploadAcceptor -> {
+        Path path = Paths.get(fileStorage.getAbsolutePath(), uploadAcceptor.groupRootDirectory());
+        File acceptorRoot = path.toFile();
+        if (!acceptorRoot.exists()) {
+            if (!acceptorRoot.mkdir()) {
+                LOGGER.error("Acceptor root could not be created at [{}]", path.toAbsolutePath());
+                throw new DirectoryCreationException("Acceptor root could not be created at [{}]");
+            } else {
+                LOGGER.info("Acceptor root created at [{}]", path.toAbsolutePath());
+            }
+        } else {
+            LOGGER.info("Existing acceptor root attached at [{}]", path.toAbsolutePath());
+        }
+        return acceptorRoot;
+    };
+
     @Autowired
     public FileUploader(final File fileStorage, final List<UploadAcceptor> uploadAcceptors,
                         final FilenameGeneratorUtil filenameGeneratorUtil) {
@@ -123,21 +139,4 @@ public class FileUploader {
     private File getAcceptorRoot(UploadAcceptor uploadAcceptor) {
         return acceptorRootMap.get(uploadAcceptor.getClass());
     }
-
-    private Function<UploadAcceptor, File> mapUploadAcceptorToRootDirectory = uploadAcceptor -> {
-        LOGGER.info("Attaching root directory [{}] for registered acceptor [{}]", uploadAcceptor.groupRootDirectory(), uploadAcceptor.acceptedAs());
-        Path path = Paths.get(fileStorage.getAbsolutePath(), uploadAcceptor.groupRootDirectory());
-        File acceptorRoot = path.toFile();
-        if (!acceptorRoot.exists()) {
-            if (!acceptorRoot.mkdir()) {
-                LOGGER.error("Acceptor root could not be created at [{}]", path.toAbsolutePath());
-                throw new DirectoryCreationException("Acceptor root could not be created at [{}]");
-            } else {
-                LOGGER.info("Acceptor root created at [{}]", path.toAbsolutePath());
-            }
-        } else {
-            LOGGER.info("Existing acceptor root attached at [{}]", path.toAbsolutePath());
-        }
-        return acceptorRoot;
-    };
 }

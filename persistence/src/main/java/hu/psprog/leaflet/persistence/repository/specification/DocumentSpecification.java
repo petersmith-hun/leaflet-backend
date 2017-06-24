@@ -14,5 +14,5 @@ public class DocumentSpecification {
     /**
      * Filter to list documents marked as public.
      */
-    public static Specification<Document> isEnabled = (root, query, builder) -> builder.equal(root.get(Document_.enabled), true);
+    public static final Specification<Document> IS_ENABLED = (root, query, builder) -> builder.equal(root.get(Document_.enabled), true);
 }

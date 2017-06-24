@@ -50,7 +50,6 @@ public class AuthRequestVO implements Serializable {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("username", username)
-                .append("password", "[hidden]")
                 .toString();
     }
 

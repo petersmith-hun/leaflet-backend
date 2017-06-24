@@ -142,7 +142,6 @@ public class User extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append("email", email)
                 .append("lastModified", getLastModified())
                 .append("role", role)
-                .append("password", "[hidden]")
                 .append("enabled", isEnabled())
                 .append("defaultLocale", defaultLocale)
                 .append("lastLogin", lastLogin)

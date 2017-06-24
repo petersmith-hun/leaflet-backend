@@ -14,5 +14,5 @@ public class CategorySpecification {
     /**
      * Filter to list categories marked as enabled.
      */
-    public static Specification<Category> isEnabled = (root, query, builder) -> builder.equal(root.get(Category_.enabled), true);
+    public static final Specification<Category> IS_ENABLED = (root, query, builder) -> builder.equal(root.get(Category_.enabled), true);
 }
