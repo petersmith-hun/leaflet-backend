@@ -141,11 +141,13 @@ public class TagServiceImplIT {
         // given
         String updatedTagTitle = "Updated tag title";
         Long id = 1L;
-        TagVO tagToUpdate = tagService.getOne(id);
-        tagToUpdate.setTitle(updatedTagTitle);
+        TagVO updateVO = TagVO.getBuilder()
+                .withId(id)
+                .withTitle(updatedTagTitle)
+                .build();
 
         // when
-        TagVO result = tagService.updateOne(id, tagToUpdate);
+        TagVO result = tagService.updateOne(id, updateVO);
 
         // then
         TagVO updatedTagVO = tagService.getOne(id);

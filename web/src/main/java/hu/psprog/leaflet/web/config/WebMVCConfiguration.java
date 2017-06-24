@@ -23,8 +23,12 @@ import javax.servlet.MultipartConfigElement;
 @EnableWebMvc
 public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
 
-    @Autowired
     private ResponseFillerInterceptor responseFillerInterceptor;
+
+    @Autowired
+    public WebMVCConfiguration(ResponseFillerInterceptor responseFillerInterceptor) {
+        this.responseFillerInterceptor = responseFillerInterceptor;
+    }
 
     @Bean
     public ObjectMapper objectMapper() {

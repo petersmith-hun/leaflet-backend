@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -48,21 +52,6 @@ public class User extends SelfStatusAwareIdentifiableEntity<Long> {
 
     @Column(name = DatabaseConstants.COLUMN_DATE_LAST_LOGIN)
     private Date lastLogin;
-
-    public User() {
-        // Serializable
-    }
-
-    public User(Long id, Date created, Date lastModified, boolean enabled, String username, String email, Role role,
-                String password, Locale defaultLocale, Date lastLogin) {
-        super(id, created, lastModified, enabled);
-        this.username = username;
-        this.email = email;
-        this.role = role;
-        this.password = password;
-        this.defaultLocale = defaultLocale;
-        this.lastLogin = lastLogin;
-    }
 
     public String getUsername() {
         return username;
@@ -113,18 +102,62 @@ public class User extends SelfStatusAwareIdentifiableEntity<Long> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof User)) return false;
+
+        User user = (User) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(username, user.username)
+                .append(email, user.email)
+                .append(role, user.role)
+                .append(password, user.password)
+                .append(defaultLocale, user.defaultLocale)
+                .append(lastLogin, user.lastLogin)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(username)
+                .append(email)
+                .append(role)
+                .append(password)
+                .append(defaultLocale)
+                .append(lastLogin)
+                .toHashCode();
+    }
+
+    @Override
     public String toString() {
-        return super.toString();
+        return new ToStringBuilder(this)
+                .append("id", getId())
+                .append("username", username)
+                .append("created", getCreated())
+                .append("email", email)
+                .append("lastModified", getLastModified())
+                .append("role", role)
+                .append("enabled", isEnabled())
+                .append("defaultLocale", defaultLocale)
+                .append("lastLogin", lastLogin)
+                .toString();
+    }
+
+    public static UserBuilder getBuilder() {
+        return new UserBuilder();
     }
 
     /**
      * User entity builder.
      */
-    public static class Builder {
-
-
-        private Long id;
+    public static final class UserBuilder {
         private Date created;
+        private Long id;
         private Date lastModified;
         private boolean enabled;
         private String username;
@@ -134,59 +167,72 @@ public class User extends SelfStatusAwareIdentifiableEntity<Long> {
         private Locale defaultLocale;
         private Date lastLogin;
 
-        public Builder withId(Long id) {
-            this.id = id;
-            return this;
+        private UserBuilder() {
         }
 
-        public Builder withCreated(Date created) {
+        public UserBuilder withCreated(Date created) {
             this.created = created;
             return this;
         }
 
-        public Builder withLastModified(Date lastModified) {
+        public UserBuilder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public UserBuilder withLastModified(Date lastModified) {
             this.lastModified = lastModified;
             return this;
         }
 
-        public Builder isEnabled(boolean enabled) {
+        public UserBuilder withEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder withUsername(String username) {
+        public UserBuilder withUsername(String username) {
             this.username = username;
             return this;
         }
 
-        public Builder withEmail(String email) {
+        public UserBuilder withEmail(String email) {
             this.email = email;
             return this;
         }
 
-        public Builder withRole(Role role) {
+        public UserBuilder withRole(Role role) {
             this.role = role;
             return this;
         }
 
-        public Builder withPassword(String password) {
+        public UserBuilder withPassword(String password) {
             this.password = password;
             return this;
         }
 
-        public Builder withDefaultLocale(Locale defaultLocale) {
+        public UserBuilder withDefaultLocale(Locale defaultLocale) {
             this.defaultLocale = defaultLocale;
             return this;
         }
 
-        public Builder withLastLogin(Date lastLogin) {
+        public UserBuilder withLastLogin(Date lastLogin) {
             this.lastLogin = lastLogin;
             return this;
         }
 
-        public User createUser() {
-            return new User(id, created, lastModified, enabled, username, email, role, password,
-                    defaultLocale, lastLogin);
+        public User build() {
+            User user = new User();
+            user.setCreated(created);
+            user.setId(id);
+            user.setLastModified(lastModified);
+            user.setEnabled(enabled);
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setRole(role);
+            user.setPassword(password);
+            user.setDefaultLocale(defaultLocale);
+            user.setLastLogin(lastLogin);
+            return user;
         }
     }
 }

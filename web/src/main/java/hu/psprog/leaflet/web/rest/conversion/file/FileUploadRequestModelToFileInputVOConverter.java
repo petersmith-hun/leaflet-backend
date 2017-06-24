@@ -31,7 +31,7 @@ public class FileUploadRequestModelToFileInputVOConverter implements Converter<F
             throw new IllegalStateException(e);
         }
 
-        return FileInputVO.Builder.getBuilder()
+        return FileInputVO.getBuilder()
                 .withContentType(source.getInputFile().getContentType())
                 .withOriginalFilename(source.getInputFile().getOriginalFilename())
                 .withSize(source.getInputFile().getSize())

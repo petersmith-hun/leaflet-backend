@@ -1,11 +1,11 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.UserDAO;
+import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
 import hu.psprog.leaflet.service.UserService;
-import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
@@ -21,6 +21,8 @@ import hu.psprog.leaflet.service.vo.AuthRequestVO;
 import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +36,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.PersistenceException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,29 +51,30 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private UserDAO userDAO;
-
-    @Autowired
     private UserDetailsService userDetailsService;
-
-    @Autowired
     private UserToUserVOConverter userToUserVOConverter;
-
-    @Autowired
     private UserVOToUserConverter userVOToUserConverter;
-
-    @Autowired
     private AuthorityToRoleConverter authorityToRoleConverter;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
-
-    @Autowired
     private JWTComponent jwtComponent;
+    private RunLevel runLevel;
 
     @Autowired
-    private RunLevel runLevel;
+    public UserServiceImpl(UserDAO userDAO, UserDetailsService userDetailsService, UserToUserVOConverter userToUserVOConverter,
+                           UserVOToUserConverter userVOToUserConverter, AuthorityToRoleConverter authorityToRoleConverter,
+                           AuthenticationManager authenticationManager, JWTComponent jwtComponent, RunLevel runLevel) {
+        this.userDAO = userDAO;
+        this.userDetailsService = userDetailsService;
+        this.userToUserVOConverter = userToUserVOConverter;
+        this.userVOToUserConverter = userVOToUserConverter;
+        this.authorityToRoleConverter = authorityToRoleConverter;
+        this.authenticationManager = authenticationManager;
+        this.jwtComponent = jwtComponent;
+        this.runLevel = runLevel;
+    }
 
     @Override
     public UserVO getOne(Long userID) throws ServiceException {
@@ -90,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public List<UserVO> getAll() {
 
         return userDAO.findAll().stream()
-                .map(user -> userToUserVOConverter.convert(user))
+                .map(userToUserVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -116,6 +118,7 @@ public class UserServiceImpl implements UserService {
         try {
             userDAO.delete(userID);
         } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(User.class, userID);
         }
     }
@@ -202,8 +205,8 @@ public class UserServiceImpl implements UserService {
             throw new UserInitializationException("Application already initialized");
         }
 
-        userVO.setAuthorities(Arrays.asList(Authority.ADMIN));
         User user = userVOToUserConverter.convert(userVO);
+        user.setRole(Role.ADMIN);
         User savedUser = userDAO.save(user);
 
         if (savedUser == null) {
@@ -266,7 +269,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public AuthResponseVO claimToken(AuthRequestVO authRequestVO) {
 
-        AuthResponseVO.Builder builder = new AuthResponseVO.Builder();
+        AuthResponseVO.AuthResponseVOBuilder builder = AuthResponseVO.getBuilder();
         try {
             Authentication authentication = new UsernamePasswordAuthenticationToken(authRequestVO.getUsername(), authRequestVO.getPassword());
             authenticationManager.authenticate(authentication);
@@ -276,13 +279,13 @@ public class UserServiceImpl implements UserService {
             return builder
                     .withAuthenticationResult(AuthResponseVO.AuthenticationResult.AUTH_SUCCESS)
                     .withToken(authenticationAnswer.getToken())
-                    .createAuthResponseVO();
+                    .build();
 
         } catch (AuthenticationException exception) {
-
+            LOGGER.error("Authentication failed.", exception);
             return builder
                     .withAuthenticationResult(AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS)
-                    .createAuthResponseVO();
+                    .build();
         }
     }
 

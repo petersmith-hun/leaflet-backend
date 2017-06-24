@@ -17,7 +17,7 @@ public class UploadedFileVOToFileDataModelConverter implements Converter<Uploade
 
     @Override
     public FileDataModel convert(UploadedFileVO source) {
-        return FileDataModel.Builder.getBuilder()
+        return FileDataModel.getBuilder()
                 .withOriginalFilename(source.getOriginalFilename())
                 .withReference(buildReference(source))
                 .withAcceptedAs(source.getAcceptedAs())

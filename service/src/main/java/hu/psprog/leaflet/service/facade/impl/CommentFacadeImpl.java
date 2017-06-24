@@ -35,12 +35,15 @@ public class CommentFacadeImpl implements CommentFacade {
     private static final List<GrantedAuthority> NO_LOGIN_AUTHORITY = AuthorityUtils.createAuthorityList(Role.NO_LOGIN.name());
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentFacadeImpl.class);
 
-    @Autowired
     private CommentService commentService;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
-    
+    public CommentFacadeImpl(CommentService commentService, UserService userService) {
+        this.commentService = commentService;
+        this.userService = userService;
+    }
+
     @Override
     public void enable(Long id) throws EntityNotFoundException {
         commentService.enable(id);
@@ -93,23 +96,23 @@ public class CommentFacadeImpl implements CommentFacade {
 
     @Override
     public Long createOne(CommentVO entity) throws ServiceException {
+        CommentVO commentToBeCreated = entity;
         if (Objects.isNull(entity.getOwner().getId())) {
-            UserVO owner = entity.getOwner();
             UserVO user = userService.silentGetUserByEmail(entity.getOwner().getEmail());
             if (Objects.isNull(user)) {
-                Long id = userService.createOne(createNoLoginUser(owner));
-                entity.getOwner().setId(id);
+                Long id = userService.createOne(createNoLoginUser(entity.getOwner()));
+                commentToBeCreated = updateCommentOwner(entity, id);
             } else {
                 if (user.getAuthorities().containsAll(NO_LOGIN_AUTHORITY)) {
-                    entity.getOwner().setId(user.getId());
+                    commentToBeCreated = updateCommentOwner(entity, user.getId());
                 } else {
-                    LOGGER.error("Login-enabled user already exists with given email={}", owner.getEmail());
+                    LOGGER.error("Login-enabled user already exists with given email={}", entity.getOwner().getEmail());
                     throw new EntityCreationException(Comment.class);
                 }
             }
         }
 
-        return commentService.createOne(entity);
+        return commentService.createOne(commentToBeCreated);
     }
 
     @Override
@@ -142,12 +145,24 @@ public class CommentFacadeImpl implements CommentFacade {
         return commentService.getPageOfCommentsForUser(page, limit, direction, orderBy, userVO);
     }
 
+    private CommentVO updateCommentOwner(CommentVO comment, Long updatedUserID) {
+        return CommentVO.getBuilder()
+                .withContent(comment.getContent())
+                .withOwner(UserVO.getBuilder()
+                        .withId(updatedUserID)
+                        .withEmail(comment.getOwner().getEmail())
+                        .withUsername(comment.getOwner().getUsername())
+                        .build())
+                .withEntryVO(comment.getEntryVO())
+                .build();
+    }
+
     private UserVO createNoLoginUser(UserVO owner) {
-        return new UserVO.Builder()
+        return UserVO.getBuilder()
                 .withEmail(owner.getEmail())
                 .withUsername(owner.getUsername())
                 .withAuthorities(NO_LOGIN_AUTHORITY)
                 .withEnabled(true)
-                .createUserVO();
+                .build();
     }
 }

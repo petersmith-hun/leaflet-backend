@@ -13,7 +13,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -25,19 +25,22 @@ import java.util.List;
 @Component
 public class UserInitializeRequestModelToUserVOConverter implements Converter<UserInitializeRequestModel, UserVO> {
 
-    @Value(ConfigurationProperty.USERS_ENABLED_BY_DEFAULT)
     private boolean enabled;
-
-    @Autowired
     private RunLevel runLevel;
+    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Autowired
-    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+    public UserInitializeRequestModelToUserVOConverter(@Value(ConfigurationProperty.USERS_ENABLED_BY_DEFAULT) boolean enabled,
+                                                       RunLevel runLevel, JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
+        this.enabled = enabled;
+        this.runLevel = runLevel;
+        this.juLocaleToLeafletLocaleConverter = juLocaleToLeafletLocaleConverter;
+    }
 
     @Override
     public UserVO convert(UserInitializeRequestModel userInitializeRequestModel) {
 
-        return new UserVO.Builder()
+        return UserVO.getBuilder()
                 .withUsername(userInitializeRequestModel.getUsername())
                 .withEmail(userInitializeRequestModel.getEmail())
                 .withPassword(userInitializeRequestModel.getPassword())
@@ -45,7 +48,7 @@ public class UserInitializeRequestModelToUserVOConverter implements Converter<Us
                 .withCreated(new Date())
                 .withLocale(juLocaleToLeafletLocaleConverter.convert(userInitializeRequestModel.getDefaultLocale()))
                 .withAuthorities(extractAuthorities(userInitializeRequestModel))
-                .createUserVO();
+                .build();
     }
 
     private List<GrantedAuthority> extractAuthorities(UserInitializeRequestModel userInitializeRequestModel) {
@@ -58,6 +61,6 @@ public class UserInitializeRequestModelToUserVOConverter implements Converter<Us
             authority = Authority.ADMIN;
         }
 
-        return Arrays.asList(authority);
+        return Collections.singletonList(authority);
     }
 }

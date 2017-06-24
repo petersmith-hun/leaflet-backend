@@ -15,7 +15,7 @@ public class UploadedFileToUploadedFileVOConverter implements Converter<Uploaded
 
     @Override
     public UploadedFileVO convert(UploadedFile source) {
-        return UploadedFileVO.Builder.getBuilder()
+        return UploadedFileVO.getBuilder()
                 .withId(source.getId())
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())

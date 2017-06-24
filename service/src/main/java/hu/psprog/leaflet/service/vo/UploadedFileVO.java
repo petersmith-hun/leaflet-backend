@@ -76,10 +76,14 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
                 .toHashCode();
     }
 
+    public static UploadedFileVOBuilder getBuilder() {
+        return new UploadedFileVOBuilder();
+    }
+
     /**
      * Builder for {@link UploadedFileVO}.
      */
-    public static final class Builder {
+    public static final class UploadedFileVOBuilder {
         private Long id;
         private String originalFilename;
         private String path;
@@ -91,69 +95,65 @@ public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, Uploaded
         private UUID pathUUID;
         private String description;
 
-        private Builder() {
+        private UploadedFileVOBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withId(Long id) {
+        public UploadedFileVOBuilder withId(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder withOriginalFilename(String originalFilename) {
+        public UploadedFileVOBuilder withOriginalFilename(String originalFilename) {
             this.originalFilename = originalFilename;
             return this;
         }
 
-        public Builder withPath(String path) {
+        public UploadedFileVOBuilder withPath(String path) {
             this.path = path;
             return this;
         }
 
-        public Builder withCreated(Date created) {
+        public UploadedFileVOBuilder withCreated(Date created) {
             this.created = created;
             return this;
         }
 
-        public Builder withAcceptedAs(String acceptedAs) {
+        public UploadedFileVOBuilder withAcceptedAs(String acceptedAs) {
             this.acceptedAs = acceptedAs;
             return this;
         }
 
-        public Builder withLastModified(Date lastModified) {
+        public UploadedFileVOBuilder withLastModified(Date lastModified) {
             this.lastModified = lastModified;
             return this;
         }
 
-        public Builder withStoredFilename(String storedFilename) {
+        public UploadedFileVOBuilder withStoredFilename(String storedFilename) {
             this.storedFilename = storedFilename;
             return this;
         }
 
-        public Builder withEnabled(boolean enabled) {
+        public UploadedFileVOBuilder withEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder withPathUUID(UUID pathUUID) {
+        public UploadedFileVOBuilder withPathUUID(UUID pathUUID) {
             this.pathUUID = pathUUID;
             return this;
         }
 
-        public Builder withDescription(String description) {
+        public UploadedFileVOBuilder withDescription(String description) {
             this.description = description;
             return this;
         }
 
         public UploadedFileVO build() {
             UploadedFileVO uploadedFileVO = new UploadedFileVO();
-            uploadedFileVO.setId(id);
-            uploadedFileVO.setCreated(created);
-            uploadedFileVO.setLastModified(lastModified);
-            uploadedFileVO.setEnabled(enabled);
+            uploadedFileVO.id = id;
+            uploadedFileVO.created = created;
+            uploadedFileVO.lastModified = lastModified;
+            uploadedFileVO.enabled = enabled;
             uploadedFileVO.originalFilename = this.originalFilename;
             uploadedFileVO.acceptedAs = this.acceptedAs;
             uploadedFileVO.pathUUID = this.pathUUID;

@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
@@ -34,17 +38,6 @@ public class Comment extends LogicallyDeletableSelfStatusAwareIdentifiableEntity
     @Column(name = DatabaseConstants.COLUMN_CONTENT, length = 2000)
     private String content;
 
-    public Comment() {
-        // Serializable
-    }
-
-    public Comment(Long id, Date created, Date lastModified, boolean enabled, boolean deleted, User user, Entry entry, String content) {
-        super(id, created, lastModified, enabled, deleted);
-        this.user = user;
-        this.entry = entry;
-        this.content = content;
-    }
-
     public User getUser() {
         return user;
     }
@@ -70,66 +63,116 @@ public class Comment extends LogicallyDeletableSelfStatusAwareIdentifiableEntity
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Comment)) return false;
+
+        Comment comment = (Comment) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(user, comment.user)
+                .append(entry, comment.entry)
+                .append(content, comment.content)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(user)
+                .append(entry)
+                .append(content)
+                .toHashCode();
+    }
+
+    @Override
     public String toString() {
-        return super.toString();
+        return new ToStringBuilder(this)
+                .append("id", getId())
+                .append("user", user)
+                .append("created", getCreated())
+                .append("deleted", isDeleted())
+                .append("entry", entry)
+                .append("lastModified", getLastModified())
+                .append("content", content)
+                .append("enabled", isEnabled())
+                .toString();
+    }
+
+    public static CommentBuilder getBuilder() {
+        return new CommentBuilder();
     }
 
     /**
      * Comment entity builder.
      */
-    public static class Builder {
-
-        private Long id;
+    public static final class CommentBuilder {
+        private boolean deleted;
         private Date created;
+        private Long id;
         private Date lastModified;
         private boolean enabled;
-        private boolean deleted;
         private User user;
         private Entry entry;
         private String content;
 
-        public Builder withId(Long id) {
-            this.id = id;
-            return this;
+        private CommentBuilder() {
         }
 
-        public Builder withCreated(Date created) {
-            this.created = created;
-            return this;
-        }
-
-        public Builder withLastModified(Date lastModified) {
-            this.lastModified = lastModified;
-            return this;
-        }
-
-        public Builder isEnabled(boolean enabled) {
-            this.enabled = enabled;
-            return this;
-        }
-
-        public Builder isDeleted(boolean deleted) {
+        public CommentBuilder withDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;
         }
 
-        public Builder withUser(User user) {
+        public CommentBuilder withCreated(Date created) {
+            this.created = created;
+            return this;
+        }
+
+        public CommentBuilder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public CommentBuilder withLastModified(Date lastModified) {
+            this.lastModified = lastModified;
+            return this;
+        }
+
+        public CommentBuilder withEnabled(boolean enabled) {
+            this.enabled = enabled;
+            return this;
+        }
+
+        public CommentBuilder withUser(User user) {
             this.user = user;
             return this;
         }
 
-        public Builder withEntry(Entry entry) {
+        public CommentBuilder withEntry(Entry entry) {
             this.entry = entry;
             return this;
         }
 
-        public Builder withContent(String content) {
+        public CommentBuilder withContent(String content) {
             this.content = content;
             return this;
         }
 
-        public Comment createComment() {
-            return new Comment(id, created, lastModified, enabled, deleted, user, entry, content);
+        public Comment build() {
+            Comment comment = new Comment();
+            comment.setDeleted(deleted);
+            comment.setCreated(created);
+            comment.setId(id);
+            comment.setLastModified(lastModified);
+            comment.setEnabled(enabled);
+            comment.setUser(user);
+            comment.setEntry(entry);
+            comment.setContent(content);
+            return comment;
         }
     }
 }

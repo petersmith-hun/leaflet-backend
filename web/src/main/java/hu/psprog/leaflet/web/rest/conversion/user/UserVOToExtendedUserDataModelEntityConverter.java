@@ -17,11 +17,14 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class UserVOToExtendedUserDataModelEntityConverter implements Converter<UserVO, ExtendedUserDataModel> {
 
-    @Autowired
     private CommonFormatter commonFormatter;
+    private HttpServletRequest httpServletRequest;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    public UserVOToExtendedUserDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
+        this.commonFormatter = commonFormatter;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     @Override
     public ExtendedUserDataModel convert(UserVO userVO) {
@@ -31,7 +34,7 @@ public class UserVOToExtendedUserDataModelEntityConverter implements Converter<U
 
     private ExtendedUserDataModel convertEntity(UserVO userVO) {
 
-        return new ExtendedUserDataModel.Builder()
+        return ExtendedUserDataModel.getExtendedBuilder()
                 .withLocale(userVO.getLocale().name())
                 .withRole(extractRole(userVO))
                 .withCreated(commonFormatter.formatDate(userVO.getCreated(), httpServletRequest.getLocale()))
@@ -39,7 +42,7 @@ public class UserVOToExtendedUserDataModelEntityConverter implements Converter<U
                 .withEmail(userVO.getEmail())
                 .withLastModified(commonFormatter.formatDate(userVO.getLastModified(), httpServletRequest.getLocale()))
                 .withUsername(userVO.getUsername())
-                .withID(userVO.getId())
+                .withId(userVO.getId())
                 .build();
     }
 

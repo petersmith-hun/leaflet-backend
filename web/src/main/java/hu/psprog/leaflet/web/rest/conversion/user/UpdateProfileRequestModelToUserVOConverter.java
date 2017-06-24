@@ -15,16 +15,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdateProfileRequestModelToUserVOConverter implements Converter<UpdateProfileRequestModel, UserVO> {
 
-    @Autowired
     private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+
+    @Autowired
+    public UpdateProfileRequestModelToUserVOConverter(JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
+        this.juLocaleToLeafletLocaleConverter = juLocaleToLeafletLocaleConverter;
+    }
 
     @Override
     public UserVO convert(UpdateProfileRequestModel updateProfileRequestModel) {
 
-        return new UserVO.Builder()
+        return UserVO.getBuilder()
                 .withUsername(updateProfileRequestModel.getUsername())
                 .withEmail(updateProfileRequestModel.getEmail())
                 .withLocale(juLocaleToLeafletLocaleConverter.convert(updateProfileRequestModel.getDefaultLocale()))
-                .createUserVO();
+                .build();
     }
 }

@@ -63,15 +63,15 @@ public class TagServiceImpl implements TagService {
     public List<TagVO> getAll() {
 
         return tagDAO.findAll().stream()
-                .map(tag -> tagToTagVOConverter.convert(tag))
+                .map(tagToTagVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<TagVO> getPublicTags() {
 
-        return tagDAO.findAll(TagSpecification.isEnabled).stream()
-                .map(tag -> tagToTagVOConverter.convert(tag))
+        return tagDAO.findAll(TagSpecification.IS_ENABLED).stream()
+                .map(tagToTagVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -180,7 +180,8 @@ public class TagServiceImpl implements TagService {
 
         try {
             tagDAO.delete(id);
-        } catch (IllegalArgumentException exc){
+        } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Tag.class, id);
         }
     }

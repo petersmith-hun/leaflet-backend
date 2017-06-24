@@ -14,6 +14,8 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,14 +36,19 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentServiceImpl.class);
+
     private DocumentDAO documentDAO;
-
-    @Autowired
     private DocumentToDocumentVOConverter documentToDocumentVOConverter;
+    private DocumentVOToDocumentConverter documentVOToDocumentConverter;
 
     @Autowired
-    private DocumentVOToDocumentConverter documentVOToDocumentConverter;
+    public DocumentServiceImpl(DocumentDAO documentDAO, DocumentToDocumentVOConverter documentToDocumentVOConverter,
+                               DocumentVOToDocumentConverter documentVOToDocumentConverter) {
+        this.documentDAO = documentDAO;
+        this.documentToDocumentVOConverter = documentToDocumentVOConverter;
+        this.documentVOToDocumentConverter = documentVOToDocumentConverter;
+    }
 
     @Override
     public DocumentVO getOne(Long id) throws ServiceException {
@@ -59,7 +66,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<DocumentVO> getAll() {
 
         return documentDAO.findAll().stream()
-                .map(e -> documentToDocumentVOConverter.convert(e))
+                .map(documentToDocumentVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -67,7 +74,7 @@ public class DocumentServiceImpl implements DocumentService {
     public EntityPageVO<DocumentVO> getPageOfPublicDocuments(int page, int limit, OrderDirection direction, DocumentVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Page<Document> documentPage = documentDAO.findAll(DocumentSpecification.isEnabled, pageable);
+        Page<Document> documentPage = documentDAO.findAll(DocumentSpecification.IS_ENABLED, pageable);
 
         return PageableUtil.convertPage(documentPage, documentToDocumentVOConverter);
     }
@@ -168,6 +175,7 @@ public class DocumentServiceImpl implements DocumentService {
         try {
             documentDAO.delete(id);
         } catch (IllegalArgumentException exc){
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Document.class, id);
         }
     }

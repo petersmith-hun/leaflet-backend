@@ -16,13 +16,13 @@ public class CategoryToCategoryVOConverter implements Converter<Category, Catego
     @Override
     public CategoryVO convert(Category source) {
 
-        return new CategoryVO.Builder()
+        return CategoryVO.getBuilder()
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withDescription(source.getDescription())
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())
                 .withEnabled(source.isEnabled())
-                .createCategoryVO();
+                .build();
     }
 }

@@ -19,16 +19,19 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class EntryVOToEditEntryDataModelEntityConverter implements Converter<EntryVO, EditEntryDataModel> {
 
-    @Autowired
     private CommonFormatter commonFormatter;
+    private HttpServletRequest httpServletRequest;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    public EntryVOToEditEntryDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
+        this.commonFormatter = commonFormatter;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     @Override
     public EditEntryDataModel convert(EntryVO entryVO) {
 
-        EditEntryDataModel.Builder builder = new EditEntryDataModel.Builder()
+        EditEntryDataModel.EditEntryDataModelBuilder builder = EditEntryDataModel.getExtendedBuilder()
                 .withRawContent(entryVO.getRawContent())
                 .withEnabled(entryVO.isEnabled())
                 .withEntryStatus(entryVO.getEntryStatus())
@@ -37,13 +40,13 @@ public class EntryVOToEditEntryDataModelEntityConverter implements Converter<Ent
                 .withLink(entryVO.getLink())
                 .withPrologue(entryVO.getPrologue())
                 .withCreated(commonFormatter.formatDate(entryVO.getCreated(), httpServletRequest.getLocale()))
-                .withID(entryVO.getId())
-                .withCategory(new CategoryDataModel.Builder()
+                .withId(entryVO.getId())
+                .withCategory(CategoryDataModel.getBuilder()
                         .withTitle(entryVO.getCategory().getTitle())
                         .withID(entryVO.getCategory().getId())
                         .build())
-                .withOwner(new UserDataModel.Builder()
-                        .withID(entryVO.getOwner().getId())
+                .withUser(UserDataModel.getBuilder()
+                        .withId(entryVO.getOwner().getId())
                         .withUsername(entryVO.getOwner().getUsername())
                         .build());
 

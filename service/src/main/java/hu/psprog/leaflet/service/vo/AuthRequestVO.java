@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.service.vo;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -12,48 +16,72 @@ public class AuthRequestVO implements Serializable {
     private String username;
     private String password;
 
-    public AuthRequestVO() {
-        // Serializable
-    }
-
-    public AuthRequestVO(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof AuthRequestVO)) return false;
+
+        AuthRequestVO that = (AuthRequestVO) o;
+
+        return new EqualsBuilder()
+                .append(username, that.username)
+                .append(password, that.password)
+                .isEquals();
     }
 
-    public static class Builder {
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(username)
+                .append(password)
+                .toHashCode();
+    }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("username", username)
+                .toString();
+    }
+
+    public static AuthRequestVOBuilder getBuilder() {
+        return new AuthRequestVOBuilder();
+    }
+
+    /**
+     * Builder for {@link AuthRequestVO}.
+     */
+    public static final class AuthRequestVOBuilder {
         private String username;
         private String password;
 
-        public Builder withUsername(String username) {
+        private AuthRequestVOBuilder() {
+        }
+
+        public AuthRequestVOBuilder withUsername(String username) {
             this.username = username;
             return this;
         }
 
-        public Builder withPassword(String password) {
+        public AuthRequestVOBuilder withPassword(String password) {
             this.password = password;
             return this;
         }
 
-        public AuthRequestVO createAuthRequestVO() {
-            return new AuthRequestVO(username, password);
+        public AuthRequestVO build() {
+            AuthRequestVO authRequestVO = new AuthRequestVO();
+            authRequestVO.password = this.password;
+            authRequestVO.username = this.username;
+            return authRequestVO;
         }
     }
 }

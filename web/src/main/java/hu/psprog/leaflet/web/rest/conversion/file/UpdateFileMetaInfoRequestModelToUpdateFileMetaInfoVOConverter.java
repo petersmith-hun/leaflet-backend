@@ -15,7 +15,7 @@ public class UpdateFileMetaInfoRequestModelToUpdateFileMetaInfoVOConverter imple
 
     @Override
     public UpdateFileMetaInfoVO convert(UpdateFileMetaInfoRequestModel source) {
-        return UpdateFileMetaInfoVO.Builder.getBuilder()
+        return UpdateFileMetaInfoVO.getBuilder()
                 .withOriginalFilename(source.getOriginalFilename())
                 .withDescription(source.getDescription())
                 .build();

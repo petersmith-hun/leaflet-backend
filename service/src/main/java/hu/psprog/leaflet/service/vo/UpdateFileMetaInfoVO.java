@@ -54,26 +54,26 @@ public class UpdateFileMetaInfoVO implements Serializable {
                 .toString();
     }
 
+    public static UpdateFileMetaInfoVOBuilder getBuilder() {
+        return new UpdateFileMetaInfoVOBuilder();
+    }
+
     /**
      * Builder for {@link UpdateFileMetaInfoVO} class.
      */
-    public static final class Builder {
+    public static final class UpdateFileMetaInfoVOBuilder {
         private String originalFilename;
         private String description;
 
-        private Builder() {
+        private UpdateFileMetaInfoVOBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withOriginalFilename(String originalFilename) {
+        public UpdateFileMetaInfoVOBuilder withOriginalFilename(String originalFilename) {
             this.originalFilename = originalFilename;
             return this;
         }
 
-        public Builder withDescription(String description) {
+        public UpdateFileMetaInfoVOBuilder withDescription(String description) {
             this.description = description;
             return this;
         }

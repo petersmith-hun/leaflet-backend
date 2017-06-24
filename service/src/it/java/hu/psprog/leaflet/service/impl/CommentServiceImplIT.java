@@ -166,7 +166,7 @@ public class CommentServiceImplIT {
         int limit = 5;
         OrderDirection direction = OrderDirection.DESC;
         CommentVO.OrderBy orderBy = CommentVO.OrderBy.CREATED;
-        UserVO ownerVO = new UserVO.Builder()
+        UserVO ownerVO = UserVO.getBuilder()
                 .withId(2L)
                 .withUsername("IT Editor")
                 .withEmail("lflt-it-5101@leaflet.dev")
@@ -176,7 +176,7 @@ public class CommentServiceImplIT {
                 .withLocale(Locale.EN)
                 .withCreated(new Date(1471514400000L))
                 .withLastModified(new Date(1471514400000L))
-                .createUserVO();
+                .build();
 
         // when
         EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForUser(page, limit, direction, orderBy, ownerVO);
@@ -228,11 +228,13 @@ public class CommentServiceImplIT {
         // given
         String updatedCommentContent = "Updated comment content";
         Long id = 4L;
-        CommentVO commentToUpdate = commentService.getOne(id);
-        commentToUpdate.setContent(updatedCommentContent);
+        CommentVO updateVO = CommentVO.getBuilder()
+                .withId(id)
+                .withContent(updatedCommentContent)
+                .build();
 
         // when
-        CommentVO result = commentService.updateOne(id, commentToUpdate);
+        CommentVO result = commentService.updateOne(id, updateVO);
 
         // then
         CommentVO updatedCommentVO = commentService.getOne(id);

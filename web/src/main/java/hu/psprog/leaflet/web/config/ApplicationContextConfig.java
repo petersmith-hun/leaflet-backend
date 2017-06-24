@@ -65,10 +65,10 @@ public class ApplicationContextConfig {
             return configurer;
 
         } catch (NamingException exception) {
-            throw new InitializationException("Main application configuration source not found on JNDI. Check server configuration.");
+            throw new InitializationException("Main application configuration source not found on JNDI. Check server configuration.", exception);
 
         } catch (IOException exception) {
-            throw new InitializationException("Main application configuration file specified by JNDI not found or malformed.");
+            throw new InitializationException("Main application configuration file specified by JNDI not found or malformed.", exception);
         }
     }
 

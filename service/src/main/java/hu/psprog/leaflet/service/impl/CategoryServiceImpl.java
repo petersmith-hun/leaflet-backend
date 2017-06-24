@@ -10,6 +10,8 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +29,19 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
-    @Autowired
+     private static final Logger LOGGER = LoggerFactory.getLogger(CategoryServiceImpl.class);
+
     private CategoryDAO categoryDAO;
-
-    @Autowired
     private CategoryToCategoryVOConverter categoryToCategoryVOConverter;
+    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
 
     @Autowired
-    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+    public CategoryServiceImpl(CategoryDAO categoryDAO, CategoryToCategoryVOConverter categoryToCategoryVOConverter,
+                               CategoryVOToCategoryConverter categoryVOToCategoryConverter) {
+        this.categoryDAO = categoryDAO;
+        this.categoryToCategoryVOConverter = categoryToCategoryVOConverter;
+        this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
+    }
 
     @Override
     public CategoryVO getOne(Long id) throws ServiceException {
@@ -52,15 +59,15 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryVO> getAll() {
 
         return categoryDAO.findAll().stream()
-                .map(e -> categoryToCategoryVOConverter.convert(e))
+                .map(categoryToCategoryVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<CategoryVO> getAllPublic() {
 
-        return categoryDAO.findAll(CategorySpecification.isEnabled).stream()
-                .map(e -> categoryToCategoryVOConverter.convert(e))
+        return categoryDAO.findAll(CategorySpecification.IS_ENABLED).stream()
+                .map(categoryToCategoryVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -137,7 +144,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         try {
             categoryDAO.delete(id);
-        } catch (IllegalArgumentException exc){
+        } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Category.class, id);
         }
     }

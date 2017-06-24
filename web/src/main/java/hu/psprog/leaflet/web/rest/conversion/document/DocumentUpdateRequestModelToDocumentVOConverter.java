@@ -18,13 +18,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentUpdateRequestModelToDocumentVOConverter implements Converter<DocumentUpdateRequestModel, DocumentVO> {
 
-    @Autowired
     private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+
+    @Autowired
+    public DocumentUpdateRequestModelToDocumentVOConverter(JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
+        this.juLocaleToLeafletLocaleConverter = juLocaleToLeafletLocaleConverter;
+    }
 
     @Override
     public DocumentVO convert(DocumentUpdateRequestModel source) {
 
-        DocumentVO.Builder builder = new DocumentVO.Builder()
+        DocumentVO.DocumentVOBuilder builder = DocumentVO.getBuilder()
                 .withTitle(source.getTitle())
                 .withContent(source.getContent())
                 .withRawContent(source.getRawContent())
@@ -39,6 +43,6 @@ public class DocumentUpdateRequestModelToDocumentVOConverter implements Converte
             builder.withOwner(UserVO.wrapMinimumVO(((DocumentCreateRequestModel) source).getUserID()));
         }
 
-        return builder.createDocumentVO();
+        return builder.build();
     }
 }

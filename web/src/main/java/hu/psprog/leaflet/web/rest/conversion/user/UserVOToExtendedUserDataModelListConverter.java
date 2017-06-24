@@ -17,13 +17,17 @@ import java.util.List;
 @Component
 public class UserVOToExtendedUserDataModelListConverter implements Converter<List<UserVO>, UserListDataModel> {
 
-    @Autowired
     private UserVOToExtendedUserDataModelEntityConverter userVOToExtendedUserDataModelEntityConverter;
+
+    @Autowired
+    public UserVOToExtendedUserDataModelListConverter(UserVOToExtendedUserDataModelEntityConverter userVOToExtendedUserDataModelEntityConverter) {
+        this.userVOToExtendedUserDataModelEntityConverter = userVOToExtendedUserDataModelEntityConverter;
+    }
 
     @Override
     public UserListDataModel convert(List<UserVO> userVOList) {
 
-        UserListDataModel.Builder builder = new UserListDataModel.Builder();
+        UserListDataModel.UserListDataModelBuilder builder = UserListDataModel.getBuilder();
         userVOList.forEach(userVO -> builder.withItem(userVOToExtendedUserDataModelEntityConverter.convert(userVO)));
 
         return builder.build();

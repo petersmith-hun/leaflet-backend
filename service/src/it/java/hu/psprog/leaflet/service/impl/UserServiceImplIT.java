@@ -25,10 +25,12 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,8 +54,8 @@ public class UserServiceImplIT {
     private static final String USER_ID1_PASSWORD = "lflt1234";
     private static final Locale USER_ID1_LOCALE = Locale.EN;
     private static final boolean USER_ID1_ENABLED = true;
-    private static final Date USER_ID1_CREATED = new Date(1471514400000L);
-    private static final Date USER_ID1_LAST_MODIFIED = new Date(1471514400000L);
+    private static final Date USER_ID1_CREATED = new Timestamp(1471514400000L);
+    private static final Date USER_ID1_LAST_MODIFIED = new Timestamp(1471514400000L);
 
     private static final String USER_ID6_EMAIL = "lflt-it-5106@leaflet.dev";
     private static final String USER_ID6_USERNAME = "User Created";
@@ -61,8 +63,7 @@ public class UserServiceImplIT {
     private static final String USER_ID6_PASSWORD = "lflt1234";
     private static final Locale USER_ID6_LOCALE = Locale.EN;
     private static final boolean USER_ID6_ENABLED = true;
-    private static final Date USER_ID6_CREATED = new Date(1471514400000L);
-    private static final Date USER_ID6_LAST_MODIFIED = new Date(1471514400000L);
+    private static final Date USER_ID6_CREATED = new Timestamp(1471514400000L);
     private static final Collection<GrantedAuthority> ADMIN_AUTHORITY = Arrays.asList(new SimpleGrantedAuthority("ADMIN"));
 
     @Autowired
@@ -74,7 +75,7 @@ public class UserServiceImplIT {
     @Before
     public void setup() {
 
-        controlUserVO = new UserVO.Builder()
+        controlUserVO = UserVO.getBuilder()
                 .withId(USER_ID1_ID)
                 .withUsername(USER_ID1_USERNAME)
                 .withPassword(USER_ID1_PASSWORD)
@@ -84,19 +85,18 @@ public class UserServiceImplIT {
                 .withLastModified(USER_ID1_LAST_MODIFIED)
                 .withEmail(USER_ID1_EMAIL)
                 .withAuthorities(ADMIN_AUTHORITY)
-                .createUserVO();
+                .build();
 
-        createdUserVO = new UserVO.Builder()
+        createdUserVO = UserVO.getBuilder()
                 .withId(USER_ID6_ID)
                 .withUsername(USER_ID6_USERNAME)
                 .withPassword(USER_ID6_PASSWORD)
                 .withLocale(USER_ID6_LOCALE)
                 .withEnabled(USER_ID6_ENABLED)
                 .withCreated(USER_ID6_CREATED)
-                .withLastModified(USER_ID6_LAST_MODIFIED)
                 .withEmail(USER_ID6_EMAIL)
                 .withAuthorities(ADMIN_AUTHORITY)
-                .createUserVO();
+                .build();
     }
 
     @Test
@@ -135,7 +135,7 @@ public class UserServiceImplIT {
         List<UserVO> result = userService.getAll();
 
         // then
-        assertThat(result.stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.get(0), equalTo(controlUserVO));
     }
 
@@ -160,7 +160,15 @@ public class UserServiceImplIT {
         Long result = userService.createOne(createdUserVO);
 
         // then
-        assertThat(userService.getOne(result), equalTo(createdUserVO));
+        UserVO resultUser = userService.getOne(result);
+        assertThat(resultUser.getId(), equalTo(result));
+        assertThat(resultUser.getAuthorities(), equalTo(createdUserVO.getAuthorities()));
+        assertThat(resultUser.getEmail(), equalTo(createdUserVO.getEmail()));
+        assertThat(resultUser.getLastLogin(), nullValue());
+        assertThat(resultUser.getLocale(), equalTo(createdUserVO.getLocale()));
+        assertThat(resultUser.getPassword(), equalTo(createdUserVO.getPassword()));
+        assertThat(resultUser.getUsername(), equalTo(createdUserVO.getUsername()));
+        assertThat(resultUser.getLastModified(), nullValue());
     }
 
     @Test(expected = UserInitializationException.class)
@@ -203,10 +211,14 @@ public class UserServiceImplIT {
         String updatedUsername = "User Beta Updated";
         Long id = 3L;
         UserVO userToUpdate = userService.getOne(id);
-        userToUpdate.setUsername(updatedUsername);
+        UserVO updateVO = UserVO.getBuilder()
+                .withId(id)
+                .withEmail(userToUpdate.getEmail())
+                .withUsername(updatedUsername)
+                .build();
 
         // when
-        UserVO updatedUserVO = userService.updateOne(id, userToUpdate);
+        UserVO updatedUserVO = userService.updateOne(id, updateVO);
 
         // then
         UserVO resultedUserVO = userService.getOne(id);

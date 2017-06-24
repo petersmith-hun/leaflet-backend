@@ -25,10 +25,13 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicConfigurationPropertyServiceImpl.class);
 
-    @Autowired
     private DynamicConfigurationPropertyDAO dynamicConfigurationPropertyDAO;
-
     private Map<String, String> dcpStore;
+
+    @Autowired
+    public DynamicConfigurationPropertyServiceImpl(DynamicConfigurationPropertyDAO dynamicConfigurationPropertyDAO) {
+        this.dynamicConfigurationPropertyDAO = dynamicConfigurationPropertyDAO;
+    }
 
     @PostConstruct
     public void populateStore() {

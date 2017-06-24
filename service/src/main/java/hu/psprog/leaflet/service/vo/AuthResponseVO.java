@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.service.vo;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -20,48 +24,73 @@ public class AuthResponseVO implements Serializable {
     private String token;
     private AuthenticationResult authenticationResult;
 
-    public AuthResponseVO() {
-        // Serializable
-    }
-
-    public AuthResponseVO(String token, AuthenticationResult authenticationResult) {
-        this.token = token;
-        this.authenticationResult = authenticationResult;
-    }
-
     public String getToken() {
         return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public AuthenticationResult getAuthenticationResult() {
         return authenticationResult;
     }
 
-    public void setAuthenticationResult(AuthenticationResult authenticationResult) {
-        this.authenticationResult = authenticationResult;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof AuthResponseVO)) return false;
+
+        AuthResponseVO that = (AuthResponseVO) o;
+
+        return new EqualsBuilder()
+                .append(token, that.token)
+                .append(authenticationResult, that.authenticationResult)
+                .isEquals();
     }
 
-    public static class Builder {
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(token)
+                .append(authenticationResult)
+                .toHashCode();
+    }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("token", token)
+                .append("authenticationResult", authenticationResult)
+                .toString();
+    }
+
+    public static AuthResponseVOBuilder getBuilder() {
+        return new AuthResponseVOBuilder();
+    }
+
+    /**
+     * Builder for {@link AuthResponseVO}.
+     */
+    public static final class AuthResponseVOBuilder {
         private String token;
         private AuthenticationResult authenticationResult;
 
-        public Builder withToken(String token) {
+        private AuthResponseVOBuilder() {
+        }
+
+        public AuthResponseVOBuilder withToken(String token) {
             this.token = token;
             return this;
         }
 
-        public Builder withAuthenticationResult(AuthenticationResult authenticationResult) {
+        public AuthResponseVOBuilder withAuthenticationResult(AuthenticationResult authenticationResult) {
             this.authenticationResult = authenticationResult;
             return this;
         }
 
-        public AuthResponseVO createAuthResponseVO() {
-            return new AuthResponseVO(token, authenticationResult);
+        public AuthResponseVO build() {
+            AuthResponseVO authResponseVO = new AuthResponseVO();
+            authResponseVO.authenticationResult = this.authenticationResult;
+            authResponseVO.token = this.token;
+            return authResponseVO;
         }
     }
 }

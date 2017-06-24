@@ -22,7 +22,7 @@ public class UserToUserVOConverter implements Converter<User, UserVO> {
 
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(source.getRole().name());
 
-        return new UserVO.Builder()
+        return UserVO.getBuilder()
                 .withAuthorities(authorities)
                 .withCreated(source.getCreated())
                 .withEmail(source.getEmail())
@@ -33,6 +33,6 @@ public class UserToUserVOConverter implements Converter<User, UserVO> {
                 .withPassword(source.getPassword())
                 .withUsername(source.getUsername())
                 .withLastLogin(source.getLastLogin())
-                .createUserVO();
+                .build();
     }
 }

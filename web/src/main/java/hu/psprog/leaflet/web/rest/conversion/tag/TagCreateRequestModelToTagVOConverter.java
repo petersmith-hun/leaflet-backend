@@ -15,8 +15,8 @@ public class TagCreateRequestModelToTagVOConverter implements Converter<TagCreat
 
     @Override
     public TagVO convert(TagCreateRequestModel source) {
-        return new TagVO.Builder()
+        return TagVO.getBuilder()
                 .withTitle(source.getName())
-                .createTagVO();
+                .build();
     }
 }

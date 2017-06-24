@@ -72,7 +72,7 @@ public class BaseController {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageDataModel.Builder()
+                .body(ErrorMessageDataModel.getBuilder()
                         .withMessage(exception.getMessage())
                         .build());
     }
@@ -87,7 +87,7 @@ public class BaseController {
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(new ErrorMessageDataModel.Builder()
+                .body(ErrorMessageDataModel.getBuilder()
                         .withMessage(exception.getMessage())
                         .build());
     }
@@ -102,7 +102,7 @@ public class BaseController {
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
-                .body(new ErrorMessageDataModel.Builder()
+                .body(ErrorMessageDataModel.getBuilder()
                         .withMessage(exception.getMessage())
                         .build());
     }
@@ -117,7 +117,7 @@ public class BaseController {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorMessageDataModel.Builder()
+                .body(ErrorMessageDataModel.getBuilder()
                         .withMessage(exception.getMessage())
                         .build());
     }

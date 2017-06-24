@@ -5,7 +5,6 @@ import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -19,13 +18,10 @@ import java.util.Objects;
 @Component
 public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
 
-    @Autowired
-    private UserVOToUserConverter userVOToUserConverter;
-
     @Override
     public Entry convert(EntryVO source) {
 
-        Entry.Builder builder = Entry.Builder.getBuilder();
+        Entry.EntryBuilder builder = Entry.getBuilder();
         builder.withContent(source.getContent())
                 .withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
@@ -45,16 +41,16 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
         }
 
         if (Objects.nonNull(source.getCategory())) {
-            Category category = new Category.Builder()
+            Category category = Category.getBuilder()
                     .withId(source.getCategory().getId())
-                    .createCategory();
+                    .build();
             builder.withCategory(category);
         }
 
         if (source.getOwner() != null) {
-            User user = new User.Builder()
+            User user = User.getBuilder()
                     .withId(source.getOwner().getId())
-                    .createUser();
+                    .build();
             builder.withUser(user);
         }
 

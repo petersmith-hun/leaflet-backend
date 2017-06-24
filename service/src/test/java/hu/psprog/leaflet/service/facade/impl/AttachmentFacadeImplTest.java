@@ -54,7 +54,7 @@ public class AttachmentFacadeImplTest {
 
     @Before
     public void setup() {
-        attachmentRequestVO = AttachmentRequestVO.Builder.getBuilder()
+        attachmentRequestVO = AttachmentRequestVO.getBuilder()
                 .withEntryID(1L)
                 .withPathUUID(UUID.randomUUID())
                 .build();

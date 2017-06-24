@@ -105,7 +105,7 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
         // given
         String path = "images/test.jpg";
         UUID pathUUID = UUID.randomUUID();
-        UploadedFileVO uploadedFileVO = UploadedFileVO.Builder.getBuilder()
+        UploadedFileVO uploadedFileVO = UploadedFileVO.getBuilder()
                 .withPath(path)
                 .build();
         given(fileMetaInfoService.retrieveMetaInfo(pathUUID)).willReturn(uploadedFileVO);
@@ -193,7 +193,7 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
     }
 
     private UploadedFileVO prepareUploadedFileVO() {
-        return UploadedFileVO.Builder.getBuilder()
+        return UploadedFileVO.getBuilder()
                 .withPathUUID(UUID.randomUUID())
                 .withOriginalFilename(ORIGINAL_FILENAME)
                 .withAcceptedAs(ACCEPTED_AS)

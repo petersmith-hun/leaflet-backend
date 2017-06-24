@@ -46,7 +46,7 @@ public class CommentFacadeImplTest {
     public void testCreateOneWithRegisteredUser() throws ServiceException {
 
         // given
-        CommentVO commentVO = prepareCommentVO(true);
+        CommentVO commentVO = prepareCommentVO(REGISTERED_USER_ID);
 
         // when
         commentFacade.createOne(commentVO);
@@ -60,7 +60,7 @@ public class CommentFacadeImplTest {
     public void testCreateOneWithUnknownUser() throws ServiceException {
 
         // given
-        CommentVO commentVO = prepareCommentVO(false);
+        CommentVO commentVO = prepareCommentVO(null);
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(null);
         given(userService.createOne(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
 
@@ -70,15 +70,14 @@ public class CommentFacadeImplTest {
         // then
         verify(userService).silentGetUserByEmail(USER_EMAIL);
         verify(userService).createOne(any(UserVO.class));
-        verify(commentService).createOne(any(CommentVO.class));
-        assertThat(commentVO.getOwner().getId(), equalTo(NEW_NO_LOGIN_USER_ID));
+        verify(commentService).createOne(prepareCommentVO(NEW_NO_LOGIN_USER_ID));
     }
 
     @Test
     public void testCreateOneWithReturningNoLoginUser() throws ServiceException {
 
         // given
-        CommentVO commentVO = prepareCommentVO(false);
+        CommentVO commentVO = prepareCommentVO(null);
         UserVO userVO = prepareUserVO(false);
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(userVO);
         given(userService.createOne(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
@@ -89,15 +88,14 @@ public class CommentFacadeImplTest {
         // then
         verify(userService).silentGetUserByEmail(USER_EMAIL);
         verify(userService, never()).createOne(any(UserVO.class));
-        verify(commentService).createOne(any(CommentVO.class));
-        assertThat(commentVO.getOwner().getId(), equalTo(REGISTERED_USER_ID));
+        verify(commentService).createOne(prepareCommentVO(REGISTERED_USER_ID));
     }
 
     @Test(expected = EntityCreationException.class)
     public void testCreateOneByAnExistingNormalUserWithoutLogin() throws ServiceException {
 
         // given
-        CommentVO commentVO = prepareCommentVO(false);
+        CommentVO commentVO = prepareCommentVO(null);
         UserVO userVO = prepareUserVO(true);
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(userVO);
         given(userService.createOne(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
@@ -113,20 +111,20 @@ public class CommentFacadeImplTest {
         assertThat(commentVO.getOwner().getId(), equalTo(REGISTERED_USER_ID));
     }
 
-    private CommentVO prepareCommentVO(boolean withRegisteredUser) {
-        return new CommentVO.Builder()
-                .withOwner(new UserVO.Builder()
-                        .withId(withRegisteredUser ? REGISTERED_USER_ID : null)
+    private CommentVO prepareCommentVO(Long userID) {
+        return CommentVO.getBuilder()
+                .withOwner(UserVO.getBuilder()
+                        .withId(userID)
                         .withEmail(USER_EMAIL)
-                        .createUserVO())
-                .createCommentVO();
+                        .build())
+                .build();
     }
 
     private UserVO prepareUserVO(boolean canLogin) {
-        return new UserVO.Builder()
+        return UserVO.getBuilder()
                 .withEmail(USER_EMAIL)
                 .withId(REGISTERED_USER_ID)
                 .withAuthorities(AuthorityUtils.createAuthorityList(canLogin ? "USER" : "NO_LOGIN"))
-                .createUserVO();
+                .build();
     }
 }

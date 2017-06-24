@@ -1,5 +1,8 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -92,10 +95,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_STATUS)
     @Enumerated(EnumType.STRING)
     private EntryStatus status;
-
-    public Entry() {
-        // Serializable
-    }
 
     public User getUser() {
         return user;
@@ -209,10 +208,86 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.status = status;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Entry)) return false;
+
+        Entry entry = (Entry) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(user, entry.user)
+                .append(category, entry.category)
+                .append(tags, entry.tags)
+                .append(attachments, entry.attachments)
+                .append(title, entry.title)
+                .append(link, entry.link)
+                .append(prologue, entry.prologue)
+                .append(content, entry.content)
+                .append(rawContent, entry.rawContent)
+                .append(seoTitle, entry.seoTitle)
+                .append(seoDescription, entry.seoDescription)
+                .append(seoKeywords, entry.seoKeywords)
+                .append(locale, entry.locale)
+                .append(status, entry.status)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(user)
+                .append(category)
+                .append(tags)
+                .append(attachments)
+                .append(title)
+                .append(link)
+                .append(prologue)
+                .append(content)
+                .append(rawContent)
+                .append(seoTitle)
+                .append(seoDescription)
+                .append(seoKeywords)
+                .append(locale)
+                .append(status)
+                .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", getId())
+                .append("created", getCreated())
+                .append("lastModified", getLastModified())
+                .append("enabled", isEnabled())
+                .append("user", user)
+                .append("category", category)
+                .append("tags", tags)
+                .append("attachments", attachments)
+                .append("title", title)
+                .append("link", link)
+                .append("prologue", prologue)
+                .append("content", content)
+                .append("rawContent", rawContent)
+                .append("seoTitle", seoTitle)
+                .append("seoDescription", seoDescription)
+                .append("seoKeywords", seoKeywords)
+                .append("locale", locale)
+                .append("status", status)
+                .toString();
+    }
+
+    public static EntryBuilder getBuilder() {
+        return new EntryBuilder();
+    }
+
     /**
      * Builder for {@link Entry} entity.
      */
-    public static final class Builder {
+    public static final class EntryBuilder {
         private Date created;
         private Date lastModified;
         private boolean enabled;
@@ -232,99 +307,95 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         private Locale locale;
         private EntryStatus status;
 
-        private Builder() {
+        private EntryBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withCreated(Date created) {
+        public EntryBuilder withCreated(Date created) {
             this.created = created;
             return this;
         }
 
-        public Builder withLastModified(Date lastModified) {
+        public EntryBuilder withLastModified(Date lastModified) {
             this.lastModified = lastModified;
             return this;
         }
 
-        public Builder withEnabled(boolean enabled) {
+        public EntryBuilder withEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder withId(Long id) {
+        public EntryBuilder withId(Long id) {
             this.id = id;
             return this;
         }
 
-        public Builder withUser(User user) {
+        public EntryBuilder withUser(User user) {
             this.user = user;
             return this;
         }
 
-        public Builder withCategory(Category category) {
+        public EntryBuilder withCategory(Category category) {
             this.category = category;
             return this;
         }
 
-        public Builder withTags(List<Tag> tags) {
+        public EntryBuilder withTags(List<Tag> tags) {
             this.tags = tags;
             return this;
         }
 
-        public Builder withAttachments(List<UploadedFile> attachments) {
+        public EntryBuilder withAttachments(List<UploadedFile> attachments) {
             this.attachments = attachments;
             return this;
         }
 
-        public Builder withTitle(String title) {
+        public EntryBuilder withTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder withLink(String link) {
+        public EntryBuilder withLink(String link) {
             this.link = link;
             return this;
         }
 
-        public Builder withPrologue(String prologue) {
+        public EntryBuilder withPrologue(String prologue) {
             this.prologue = prologue;
             return this;
         }
 
-        public Builder withContent(String content) {
+        public EntryBuilder withContent(String content) {
             this.content = content;
             return this;
         }
 
-        public Builder withRawContent(String rawContent) {
+        public EntryBuilder withRawContent(String rawContent) {
             this.rawContent = rawContent;
             return this;
         }
 
-        public Builder withSeoTitle(String seoTitle) {
+        public EntryBuilder withSeoTitle(String seoTitle) {
             this.seoTitle = seoTitle;
             return this;
         }
 
-        public Builder withSeoDescription(String seoDescription) {
+        public EntryBuilder withSeoDescription(String seoDescription) {
             this.seoDescription = seoDescription;
             return this;
         }
 
-        public Builder withSeoKeywords(String seoKeywords) {
+        public EntryBuilder withSeoKeywords(String seoKeywords) {
             this.seoKeywords = seoKeywords;
             return this;
         }
 
-        public Builder withLocale(Locale locale) {
+        public EntryBuilder withLocale(Locale locale) {
             this.locale = locale;
             return this;
         }
 
-        public Builder withStatus(EntryStatus status) {
+        public EntryBuilder withStatus(EntryStatus status) {
             this.status = status;
             return this;
         }

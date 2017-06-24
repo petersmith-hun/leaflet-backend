@@ -19,7 +19,7 @@ public class AuthResponseVOToLoginResponseDataModelConverter implements Converte
         LoginResponseDataModel.AuthenticationResult authenticationResult =
                 LoginResponseDataModel.AuthenticationResult.valueOf(authResponseVO.getAuthenticationResult().name());
         
-        LoginResponseDataModel.Builder builder = new LoginResponseDataModel.Builder()
+        LoginResponseDataModel.LoginResponseDataModelBuilder builder = LoginResponseDataModel.getBuilder()
                 .withStatus(authenticationResult);
 
         if (authResponseVO.getAuthenticationResult() == AuthResponseVO.AuthenticationResult.AUTH_SUCCESS) {

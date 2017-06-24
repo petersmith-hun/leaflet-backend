@@ -16,6 +16,8 @@ import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,17 +39,21 @@ import java.util.stream.Collectors;
 @Service
 public class EntryServiceImpl implements EntryService {
 
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(EntryServiceImpl.class);
+
     private EntryDAO entryDAO;
-
-    @Autowired
     private EntryToEntryVOConverter entryToEntryVOConverter;
-
-    @Autowired
     private EntryVOToEntryConverter entryVOToEntryConverter;
+    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
 
     @Autowired
-    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+    public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter,
+                            EntryVOToEntryConverter entryVOToEntryConverter, CategoryVOToCategoryConverter categoryVOToCategoryConverter) {
+        this.entryDAO = entryDAO;
+        this.entryToEntryVOConverter = entryToEntryVOConverter;
+        this.entryVOToEntryConverter = entryVOToEntryConverter;
+        this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
+    }
 
     @Override
     public void deleteByEntity(EntryVO entity) throws ServiceException {
@@ -64,7 +70,8 @@ public class EntryServiceImpl implements EntryService {
 
         try {
             entryDAO.delete(id);
-        } catch (IllegalArgumentException exc){
+        } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Entry.class, id);
         }
     }
@@ -93,7 +100,7 @@ public class EntryServiceImpl implements EntryService {
     public List<EntryVO> getAll() {
 
         return entryDAO.findAll().stream()
-                .map(entry -> entryToEntryVOConverter.convert(entry))
+                .map(entryToEntryVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -182,8 +189,8 @@ public class EntryServiceImpl implements EntryService {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Specifications<Entry> specs = Specifications
-                .where(EntrySpecification.isPublic)
-                .and(EntrySpecification.isEnabled);
+                .where(EntrySpecification.IS_PUBLIC)
+                .and(EntrySpecification.IS_ENABLED);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
@@ -195,8 +202,8 @@ public class EntryServiceImpl implements EntryService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Specifications<Entry> specs = Specifications
                 .where(EntrySpecification.isUnderCategory(categoryVOToCategoryConverter.convert(categoryVO)))
-                .and(EntrySpecification.isPublic)
-                .and(EntrySpecification.isEnabled);
+                .and(EntrySpecification.IS_PUBLIC)
+                .and(EntrySpecification.IS_ENABLED);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);

@@ -68,11 +68,14 @@ public class UsersController extends BaseController {
     private static final String PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Provided email address is already in use.";
     private static final String LAST_LOGIN_COULD_NOT_BE_UPDATED_FOR_THIS_USER = "Last login could not be updated for this user.";
 
-    @Autowired
     private UserService userService;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UsersController(UserService userService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     /**
      * GET /users

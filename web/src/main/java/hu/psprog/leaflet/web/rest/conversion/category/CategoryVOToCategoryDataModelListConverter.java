@@ -16,15 +16,17 @@ import java.util.List;
 @Component
 public class CategoryVOToCategoryDataModelListConverter implements Converter<List<CategoryVO>, CategoryListDataModel> {
 
-    private static final String LIST_NODE_NAME = "categories";
+    private CategoryVOToCategoryDataModelEntityConverter categoryVOToCategoryDataModelEntityConverter;
 
     @Autowired
-    private CategoryVOToCategoryDataModelEntityConverter categoryVOToCategoryDataModelEntityConverter;
+    public CategoryVOToCategoryDataModelListConverter(CategoryVOToCategoryDataModelEntityConverter categoryVOToCategoryDataModelEntityConverter) {
+        this.categoryVOToCategoryDataModelEntityConverter = categoryVOToCategoryDataModelEntityConverter;
+    }
 
     @Override
     public CategoryListDataModel convert(List<CategoryVO> source) {
 
-        CategoryListDataModel.Builder builder = new CategoryListDataModel.Builder();
+        CategoryListDataModel.CategoryListDataModelBuilder builder = CategoryListDataModel.getBuilder();
         source.forEach(category -> builder.withItem(categoryVOToCategoryDataModelEntityConverter.convert(category)));
 
         return builder.build();

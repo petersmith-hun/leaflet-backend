@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
@@ -11,7 +15,7 @@ import java.util.Date;
  * @author Peter Smith
  */
 @MappedSuperclass
-public class SelfStatusAwareIdentifiableEntity<T extends Serializable> extends IdentifiableEntity<T> {
+public abstract class SelfStatusAwareIdentifiableEntity<T extends Serializable> extends IdentifiableEntity<T> {
 
     @Column(name = DatabaseConstants.COLUMN_DATE_CREATED)
     private Date created;
@@ -21,17 +25,6 @@ public class SelfStatusAwareIdentifiableEntity<T extends Serializable> extends I
 
     @Column(name = DatabaseConstants.COLUMN_IS_ENABLED)
     private boolean enabled;
-
-    public SelfStatusAwareIdentifiableEntity() {
-        // Serializable
-    }
-
-    public SelfStatusAwareIdentifiableEntity(T id, Date created, Date lastModified, boolean enabled) {
-        super(id);
-        this.created = created;
-        this.lastModified = lastModified;
-        this.enabled = enabled;
-    }
 
     public Date getCreated() {
         return created;
@@ -58,7 +51,38 @@ public class SelfStatusAwareIdentifiableEntity<T extends Serializable> extends I
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof SelfStatusAwareIdentifiableEntity)) return false;
+
+        SelfStatusAwareIdentifiableEntity<?> that = (SelfStatusAwareIdentifiableEntity<?>) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(enabled, that.enabled)
+                .append(created, that.created)
+                .append(lastModified, that.lastModified)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(created)
+                .append(lastModified)
+                .append(enabled)
+                .toHashCode();
+    }
+
+    @Override
     public String toString() {
-        return super.toString();
+        return new ToStringBuilder(this)
+                .append("created", created)
+                .append("lastModified", lastModified)
+                .append("id", getId())
+                .append("enabled", enabled)
+                .toString();
     }
 }

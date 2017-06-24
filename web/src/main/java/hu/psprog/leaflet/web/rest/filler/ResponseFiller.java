@@ -14,7 +14,7 @@ public interface ResponseFiller {
      *
      * @param wrapperBodyDataModelBuilder builder for the wrapper model holding extra information
      */
-    void fill(WrapperBodyDataModel.Builder wrapperBodyDataModelBuilder);
+    void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder wrapperBodyDataModelBuilder);
 
     /**
      * Decides whether this filler can be applied or not.

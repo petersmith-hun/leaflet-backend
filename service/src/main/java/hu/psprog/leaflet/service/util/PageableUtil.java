@@ -45,20 +45,19 @@ public class PageableUtil {
      */
     public static <T extends BaseVO, S extends SerializableEntity> EntityPageVO<T> convertPage(Page<S> page, Converter<S, T> converter) {
 
-        Page remappedPage = page.map(converter);
-        EntityPageVO<T> convertedPage = new EntityPageVO.Builder()
+        Page<T> remappedPage = page.map(converter);
+
+        return EntityPageVO.getBuilder()
                 .withPageCount(remappedPage.getTotalPages())
                 .withPageSize(remappedPage.getSize())
-                .withPageNumber(remappedPage.getNumber())
+                .withPageNumber(remappedPage.getNumber() + 1) // Page would count page number from 0, so let's increase by 1
                 .withEntityCount(remappedPage.getTotalElements())
                 .withEntityCountOnPage(remappedPage.getNumberOfElements())
-                .isFirst(remappedPage.isFirst())
-                .isLast(remappedPage.isLast())
-                .hasNext(remappedPage.hasNext())
-                .hasPrevious(remappedPage.hasPrevious())
+                .withFirst(remappedPage.isFirst())
+                .withLast(remappedPage.isLast())
+                .withHasNext(remappedPage.hasNext())
+                .withHasPrevious(remappedPage.hasPrevious())
                 .withEntitiesOnPage(remappedPage.getContent())
-                .createEntityPageVO();
-
-        return convertedPage;
+                .build();
     }
 }

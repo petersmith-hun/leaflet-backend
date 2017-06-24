@@ -18,23 +18,26 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class DocumentVOToDocumentDataModelEntityConverter implements Converter<DocumentVO, DocumentDataModel> {
 
-    @Autowired
     private CommonFormatter commonFormatter;
+    private HttpServletRequest httpServletRequest;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    public DocumentVOToDocumentDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
+        this.commonFormatter = commonFormatter;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     @Override
     public DocumentDataModel convert(DocumentVO source) {
 
-        DocumentDataModel.Builder builder = new DocumentDataModel.Builder()
+        DocumentDataModel.DocumentDataModelBuilder builder = DocumentDataModel.getBuilder()
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withLink(source.getLink())
                 .withContent(source.getContent())
                 .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
-                .withUser(new UserDataModel.Builder()
-                        .withID(source.getOwner().getId())
+                .withUser(UserDataModel.getBuilder()
+                        .withId(source.getOwner().getId())
                         .withUsername(source.getOwner().getUsername())
                         .build());
 

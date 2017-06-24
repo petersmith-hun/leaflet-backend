@@ -16,17 +16,17 @@ public class UserEntityTestDataGenerator implements TestDataGenerator<User> {
 
     @Override
     public User generate() {
-        return new User.Builder()
+        return User.getBuilder()
                 .withRole(Role.USER)
                 .withEmail(RandomDataGenerator.email())
                 .withCreated(RandomDataGenerator.randomDate(RandomDataGenerator.DateType.PAST))
                 .withLastModified(RandomDataGenerator.randomDate(RandomDataGenerator.DateType.PAST))
-                .isEnabled(true)
+                .withEnabled(true)
                 .withDefaultLocale(Locale.EN)
                 .withPassword(RandomDataGenerator.randomString(12))
                 .withId(RandomDataGenerator.randomLong())
                 .withUsername(RandomDataGenerator.sequentialString())
-                .createUser();
+                .build();
     }
 
     @Override

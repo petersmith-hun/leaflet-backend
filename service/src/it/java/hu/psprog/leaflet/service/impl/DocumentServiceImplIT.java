@@ -154,11 +154,13 @@ public class DocumentServiceImplIT {
         // given
         String updatedDocumentTitle = "Updated document title";
         Long id = 1L;
-        DocumentVO documentToUpdate = documentService.getOne(id);
-        documentToUpdate.setTitle(updatedDocumentTitle);
+        DocumentVO updateVO = DocumentVO.getBuilder()
+                .withId(id)
+                .withTitle(updatedDocumentTitle)
+                .build();
 
         // when
-        DocumentVO result = documentService.updateOne(id, documentToUpdate);
+        DocumentVO result = documentService.updateOne(id, updateVO);
 
         // then
         DocumentVO updatedDocumentVO = documentService.getOne(id);

@@ -19,6 +19,8 @@ import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,20 +41,24 @@ import java.util.stream.Collectors;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
+
     private CommentDAO commentDAO;
-
-    @Autowired
     private CommentToCommentVOConverter commentToCommentVOConverter;
-
-    @Autowired
     private CommentVOToCommentConverter commentVOToCommentConverter;
-
-    @Autowired
     private EntryVOToEntryConverter entryVOToEntryConverter;
+    private UserVOToUserConverter userVOToUserConverter;
 
     @Autowired
-    private UserVOToUserConverter userVOToUserConverter;
+    public CommentServiceImpl(CommentDAO commentDAO, CommentToCommentVOConverter commentToCommentVOConverter,
+                              CommentVOToCommentConverter commentVOToCommentConverter, EntryVOToEntryConverter entryVOToEntryConverter,
+                              UserVOToUserConverter userVOToUserConverter) {
+        this.commentDAO = commentDAO;
+        this.commentToCommentVOConverter = commentToCommentVOConverter;
+        this.commentVOToCommentConverter = commentVOToCommentConverter;
+        this.entryVOToEntryConverter = entryVOToEntryConverter;
+        this.userVOToUserConverter = userVOToUserConverter;
+    }
 
     @Override
     public CommentVO getOne(Long id) throws ServiceException {
@@ -70,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentVO> getAll() {
 
         return commentDAO.findAll().stream()
-                .map(e -> commentToCommentVOConverter.convert(e))
+                .map(commentToCommentVOConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -92,7 +98,7 @@ public class CommentServiceImpl implements CommentService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Entry entry = entryVOToEntryConverter.convert(entryVO);
         Specifications<Comment> specifications = Specifications
-                .where(CommentSpecification.isEnabled);
+                .where(CommentSpecification.IS_ENABLED);
         Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
         return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
@@ -182,7 +188,8 @@ public class CommentServiceImpl implements CommentService {
 
         try {
             commentDAO.delete(id);
-        } catch (IllegalArgumentException exc){
+        } catch (IllegalArgumentException exc) {
+            LOGGER.error("Error occurred during deletion", exc);
             throw new EntityNotFoundException(Comment.class, id);
         }
     }

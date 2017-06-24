@@ -30,7 +30,7 @@ public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException, ServletException {
 
         PrintWriter responseWriter = response.getWriter();
-        ErrorMessageDataModel errorMessageDataModel = new ErrorMessageDataModel.Builder()
+        ErrorMessageDataModel errorMessageDataModel = ErrorMessageDataModel.getBuilder()
                 .withMessage(UNAUTHORIZED_ACCESS)
                 .build();
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

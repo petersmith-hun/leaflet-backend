@@ -16,4 +16,6 @@ public class ConfigurationProperty {
     public static final String USERS_ENABLED_BY_DEFAULT = "${usersEnabledByDefault:true}";
     public static final String UPLOADS_DIRECTORY = "${uploads.directory}";
     public static final String UPLOADS_MAX_SIZE = "${uploads.maxSize}";
+
+    private ConfigurationProperty() {}
 }

@@ -37,8 +37,12 @@ public class DCPStoreController extends BaseController {
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_UPDATED = "Configuration entry could not be updated.";
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED = "Configuration entry could not be deleted.";
 
-    @Autowired
     private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
+
+    @Autowired
+    public DCPStoreController(DynamicConfigurationPropertyService dynamicConfigurationPropertyService) {
+        this.dynamicConfigurationPropertyService = dynamicConfigurationPropertyService;
+    }
 
     /**
      * GET /dcp
@@ -50,7 +54,7 @@ public class DCPStoreController extends BaseController {
     public ResponseEntity<DCPListDataModel> getAll() {
 
         Map<String, String> dcpStore = dynamicConfigurationPropertyService.getAll();
-        DCPListDataModel.Builder builder = new DCPListDataModel.Builder();
+        DCPListDataModel.DCPListDataModelBuilder builder = DCPListDataModel.getBuilder();
         dcpStore.entrySet().forEach(entry -> builder.withItem(createDataModel(entry)));
 
         return ResponseEntity
@@ -144,7 +148,7 @@ public class DCPStoreController extends BaseController {
 
     private DCPDataModel createDataModel(Map.Entry<String, String> dcpEntry) {
 
-        return new DCPDataModel.Builder()
+        return DCPDataModel.getBuilder()
                 .withKey(dcpEntry.getKey())
                 .withValue(dcpEntry.getValue())
                 .build();

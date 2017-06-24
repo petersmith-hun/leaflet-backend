@@ -16,7 +16,7 @@ public class CategoryVOToCategoryDataModelEntityConverter implements Converter<C
     @Override
     public CategoryDataModel convert(CategoryVO source) {
 
-        return new CategoryDataModel.Builder()
+        return CategoryDataModel.getBuilder()
                 .withID(source.getId())
                 .withTitle(source.getTitle())
                 .build();

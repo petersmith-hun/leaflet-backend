@@ -16,13 +16,17 @@ import java.util.List;
 @Component
 public class CommentVOToCommentListDataModelConverter implements Converter<List<CommentVO>, CommentListDataModel> {
 
-    @Autowired
     private CommentVOToCommentDataModelConverter commentVOToCommentDataModelConverter;
+
+    @Autowired
+    public CommentVOToCommentListDataModelConverter(CommentVOToCommentDataModelConverter commentVOToCommentDataModelConverter) {
+        this.commentVOToCommentDataModelConverter = commentVOToCommentDataModelConverter;
+    }
 
     @Override
     public CommentListDataModel convert(List<CommentVO> source) {
 
-        CommentListDataModel.Builder builder = new CommentListDataModel.Builder();
+        CommentListDataModel.CommentListDataModelBuilder builder = CommentListDataModel.getBuilder();
         source.forEach(commentVO -> builder.withItem(commentVOToCommentDataModelConverter.convert(commentVO)));
 
         return builder.build();

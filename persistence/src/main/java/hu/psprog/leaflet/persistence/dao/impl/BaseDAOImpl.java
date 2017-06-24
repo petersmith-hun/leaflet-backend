@@ -63,7 +63,4 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
     public long count() {
         return jpaRepository.count();
     }
-
-    @Override
-    public abstract T updateOne(ID id, T updatedEntity);
 }

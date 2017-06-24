@@ -3,15 +3,12 @@ package hu.psprog.leaflet.web.interceptor;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
-import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,13 +19,6 @@ import java.util.Optional;
  */
 @Component
 public class ResponseFillerInterceptor extends HandlerInterceptorAdapter {
-
-    private List<ResponseFiller> responseFillers;
-
-    @Autowired
-    public ResponseFillerInterceptor(List<ResponseFiller> responseFillers) {
-        this.responseFillers = responseFillers;
-    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

@@ -49,7 +49,7 @@ public class ImageUploadAcceptorTest {
     }
 
     private FileInputVO prepareFileInputVO(String mime) {
-        return FileInputVO.Builder.getBuilder()
+        return FileInputVO.getBuilder()
                 .withContentType(mime)
                 .build();
     }

@@ -107,11 +107,13 @@ public class CategoryServiceImplIT {
         // given
         String updatedCategoryTitle = "Category updated title";
         Long id = 1L;
-        CategoryVO categoryToUpdate = categoryService.getOne(id);
-        categoryToUpdate.setTitle(updatedCategoryTitle);
+        CategoryVO updateVO = CategoryVO.getBuilder()
+                .withId(id)
+                .withTitle(updatedCategoryTitle)
+                .build();
 
         // when
-        CategoryVO result = categoryService.updateOne(id, categoryToUpdate);
+        CategoryVO result = categoryService.updateOne(id, updateVO);
 
         // then
         CategoryVO updatedCategoryVO = categoryService.getOne(id);

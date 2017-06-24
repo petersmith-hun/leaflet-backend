@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -23,16 +27,6 @@ public class Category extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_DESCRIPTION)
     private String description;
 
-    public Category() {
-        // Serializable
-    }
-
-    public Category(Long id, Date created, Date lastModified, boolean enabled, String title, String description) {
-        super(id, created, lastModified, enabled);
-        this.title = title;
-        this.description = description;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -50,54 +44,98 @@ public class Category extends SelfStatusAwareIdentifiableEntity<Long> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Category)) return false;
+
+        Category category = (Category) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(title, category.title)
+                .append(description, category.description)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(title)
+                .append(description)
+                .toHashCode();
+    }
+
+    @Override
     public String toString() {
-        return super.toString();
+        return new ToStringBuilder(this)
+                .append("title", title)
+                .append("description", description)
+                .append("id", getId())
+                .append("created", getCreated())
+                .append("lastModified", getLastModified())
+                .append("enabled", isEnabled())
+                .toString();
+    }
+
+    public static CategoryBuilder getBuilder() {
+        return new CategoryBuilder();
     }
 
     /**
-     * Category entity builder
+     * Builder for {@link Category}.
      */
-    public static class Builder {
-
-        private Long id;
+    public static final class CategoryBuilder {
+        private String title;
         private Date created;
+        private String description;
+        private Long id;
         private Date lastModified;
         private boolean enabled;
-        private String title;
-        private String description;
 
-        public Builder withId(Long id) {
-            this.id = id;
-            return this;
+        private CategoryBuilder() {
         }
 
-        public Builder withCreated(Date created) {
-            this.created = created;
-            return this;
-        }
-
-        public Builder withLastModified(Date lastModified) {
-            this.lastModified = lastModified;
-            return this;
-        }
-
-        public Builder isEnabled(boolean enabled) {
-            this.enabled = enabled;
-            return this;
-        }
-
-        public Builder withTitle(String title) {
+        public CategoryBuilder withTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder withDescription(String description) {
+        public CategoryBuilder withCreated(Date created) {
+            this.created = created;
+            return this;
+        }
+
+        public CategoryBuilder withDescription(String description) {
             this.description = description;
             return this;
         }
 
-        public Category createCategory() {
-            return new Category(id, created, lastModified, enabled, title, description);
+        public CategoryBuilder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public CategoryBuilder withLastModified(Date lastModified) {
+            this.lastModified = lastModified;
+            return this;
+        }
+
+        public CategoryBuilder withEnabled(boolean enabled) {
+            this.enabled = enabled;
+            return this;
+        }
+
+        public Category build() {
+            Category category = new Category();
+            category.setTitle(title);
+            category.setCreated(created);
+            category.setDescription(description);
+            category.setId(id);
+            category.setLastModified(lastModified);
+            category.setEnabled(enabled);
+            return category;
         }
     }
 }

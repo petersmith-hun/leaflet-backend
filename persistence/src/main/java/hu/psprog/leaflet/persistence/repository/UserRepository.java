@@ -22,7 +22,7 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
      * @param email user's email address
      * @return User object identified by given link or {@code null} if no User found
      */
-    public User findByEmail(String email);
+    User findByEmail(String email);
 
     /**
      * Updates given user's current password.
@@ -30,10 +30,9 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
      * @param id identifier of {@link User}
      * @param password new password
      */
-    @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.password = :password WHERE u.id = :id")
-    public void updatePassword(@Param("id") Long id, @Param("password") String password);
+    void updatePassword(@Param("id") Long id, @Param("password") String password);
 
     /**
      * Updates given user's current role.
@@ -41,10 +40,9 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
      * @param id identifier of {@link User}
      * @param role new role
      */
-    @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.role = :role WHERE u.id = :id")
-    public void updateRole(@Param("id") Long id, @Param("role") Role role);
+    void updateRole(@Param("id") Long id, @Param("role") Role role);
 
     /**
      * Updates last login date of given user.
@@ -55,4 +53,8 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.lastLogin = now() WHERE u.email = :email")
     void updateLastLogin(@Param("email") String email);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE User u SET u.lastModified = now() WHERE u.id = :id")
+    void updateLastModified(@Param("id") Long id);
 }

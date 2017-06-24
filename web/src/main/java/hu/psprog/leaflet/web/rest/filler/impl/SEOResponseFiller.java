@@ -31,9 +31,9 @@ public class SEOResponseFiller implements ResponseFiller {
     }
 
     @Override
-    public void fill(WrapperBodyDataModel.Builder wrapperBodyDataModelBuilder) {
+    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder wrapperBodyDataModelBuilder) {
 
-        SEODataModel seoDataModel = new SEODataModel.Builder()
+        SEODataModel seoDataModel = SEODataModel.getBuilder()
                 .withPageTitle(getParameter(RequestParameter.SEO_PAGE_TITLE))
                 .withMetaTitle(getParameter(RequestParameter.SEO_META_TITLE))
                 .withMetaDescription(getParameter(RequestParameter.SEO_META_DESCRIPTION))

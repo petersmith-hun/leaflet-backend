@@ -28,14 +28,17 @@ import java.util.stream.Collectors;
 @Service
 public class FileMetaInfoServiceImpl implements FileMetaInfoService {
 
-    @Autowired
     private UploadedFileDAO uploadedFileDAO;
-
-    @Autowired
     private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
+    private UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
 
     @Autowired
-    private UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
+    public FileMetaInfoServiceImpl(UploadedFileDAO uploadedFileDAO, UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter,
+                                   UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter) {
+        this.uploadedFileDAO = uploadedFileDAO;
+        this.uploadedFileToUploadedFileVOConverter = uploadedFileToUploadedFileVOConverter;
+        this.uploadedFileVOToUploadedFileConverter = uploadedFileVOToUploadedFileConverter;
+    }
 
     @Override
     public UploadedFileVO retrieveMetaInfo(UUID pathUUID) throws ServiceException {

@@ -80,7 +80,7 @@ public class FileMetaInfoServiceImplTest {
 
         // given
         UUID pathUUID = UUID.randomUUID();
-        UploadedFile expectedUploadedFile = UploadedFile.Builder.getBuilder()
+        UploadedFile expectedUploadedFile = UploadedFile.getBuilder()
                 .withId(1L)
                 .build();
         given(uploadedFileDAO.findByPathUUID(any(UUID.class))).willReturn(expectedUploadedFile);
@@ -112,7 +112,7 @@ public class FileMetaInfoServiceImplTest {
 
         // given
         UUID pathUUID = UUID.randomUUID();
-        UploadedFile expectedUploadedFile = UploadedFile.Builder.getBuilder()
+        UploadedFile expectedUploadedFile = UploadedFile.getBuilder()
                 .withId(1L)
                 .build();
         given(uploadedFileDAO.findByPathUUID(any(UUID.class))).willReturn(expectedUploadedFile);
@@ -162,7 +162,7 @@ public class FileMetaInfoServiceImplTest {
     }
 
     private UpdateFileMetaInfoVO prepareUpdateFileMetaInfoVO() {
-        return UpdateFileMetaInfoVO.Builder.getBuilder()
+        return UpdateFileMetaInfoVO.getBuilder()
                 .withDescription("Updated description")
                 .withOriginalFilename("renamed_image.jpg")
                 .build();

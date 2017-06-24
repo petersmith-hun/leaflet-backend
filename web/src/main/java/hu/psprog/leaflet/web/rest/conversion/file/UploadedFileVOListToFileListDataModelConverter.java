@@ -25,7 +25,7 @@ public class UploadedFileVOListToFileListDataModelConverter implements Converter
 
     @Override
     public FileListDataModel convert(List<UploadedFileVO> source) {
-        FileListDataModel.Builder builder = FileListDataModel.Builder.getBuilder();
+        FileListDataModel.FileListDataModelBuilder builder = FileListDataModel.getBuilder();
         source.stream()
                 .map(uploadedFileVOToFileDataModelConverter::convert)
                 .forEach(builder::withItem);

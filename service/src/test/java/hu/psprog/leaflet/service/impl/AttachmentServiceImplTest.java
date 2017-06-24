@@ -62,15 +62,15 @@ public class AttachmentServiceImplTest {
 
     @Before
     public void setup() {
-        entryVO = new EntryVO.Builder()
+        entryVO = EntryVO.getBuilder()
                 .withId(ENTRY_ID)
                 .withTitle("Test entry")
-                .createEntryVO();
-        uploadedFileVO = UploadedFileVO.Builder.getBuilder()
+                .build();
+        uploadedFileVO = UploadedFileVO.getBuilder()
                 .withId(UPLOADED_FILE_ID)
                 .withPath("images/stored_control_15.jpg")
                 .build();
-        controlUploadedFile = UploadedFile.Builder.getBuilder()
+        controlUploadedFile = UploadedFile.getBuilder()
                 .withStoredFilename("stored_control_15.jpg")
                 .withOriginalFilename("original_control_15.jpg")
                 .withPathUUID(UUID.randomUUID())
@@ -199,7 +199,7 @@ public class AttachmentServiceImplTest {
 
         attachments = new ArrayList<>();
         for (int cnt = 1; cnt <= 5; cnt++) {
-            attachments.add(UploadedFile.Builder.getBuilder()
+            attachments.add(UploadedFile.getBuilder()
                     .withId((long) cnt)
                     .withPathUUID(UUID.randomUUID())
                     .withStoredFilename("stored_filename_" + cnt + ".jpg")

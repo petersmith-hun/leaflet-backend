@@ -55,26 +55,26 @@ public class AttachmentRequestVO implements Serializable {
                 .toString();
     }
 
+    public static AttachmentRequestBuilder getBuilder() {
+        return new AttachmentRequestBuilder();
+    }
+
     /**
      * Builder for {@link AttachmentRequestVO}.
      */
-    public static final class Builder {
+    public static final class AttachmentRequestBuilder {
         private Long entryID;
         private UUID pathUUID;
 
-        private Builder() {
+        private AttachmentRequestBuilder() {
         }
 
-        public static Builder getBuilder() {
-            return new Builder();
-        }
-
-        public Builder withEntryID(Long entryID) {
+        public AttachmentRequestBuilder withEntryID(Long entryID) {
             this.entryID = entryID;
             return this;
         }
 
-        public Builder withPathUUID(UUID pathUUID) {
+        public AttachmentRequestBuilder withPathUUID(UUID pathUUID) {
             this.pathUUID = pathUUID;
             return this;
         }

@@ -18,16 +18,19 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class DocumentVOToEditDocumentDataModelEntityConverter implements Converter<DocumentVO, EditDocumentDataModel> {
 
-    @Autowired
     private CommonFormatter commonFormatter;
+    private HttpServletRequest httpServletRequest;
 
     @Autowired
-    private HttpServletRequest httpServletRequest;
+    public DocumentVOToEditDocumentDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
+        this.commonFormatter = commonFormatter;
+        this.httpServletRequest = httpServletRequest;
+    }
 
     @Override
     public EditDocumentDataModel convert(DocumentVO source) {
 
-        EditDocumentDataModel.Builder builder = new EditDocumentDataModel.Builder()
+        EditDocumentDataModel.EditDocumentDataModelBuilder builder = EditDocumentDataModel.getExtendedBuilder()
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withLink(source.getLink())
@@ -36,8 +39,8 @@ public class DocumentVOToEditDocumentDataModelEntityConverter implements Convert
                 .withRawContent(source.getRawContent())
                 .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
                 .withEnabled(source.isEnabled())
-                .withUser(new UserDataModel.Builder()
-                        .withID(source.getOwner().getId())
+                .withUser(UserDataModel.getBuilder()
+                        .withId(source.getOwner().getId())
                         .withUsername(source.getOwner().getUsername())
                         .build());
 

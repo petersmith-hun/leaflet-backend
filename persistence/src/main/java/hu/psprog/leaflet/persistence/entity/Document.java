@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -51,24 +55,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_LOCALE)
     @Enumerated(EnumType.STRING)
     private Locale locale;
-
-    public Document() {
-        // Serializable
-    }
-
-    public Document(Long id, Date created, Date lastModified, boolean enabled, User user, String title, String link,
-                    String content, String rawContent, String seoTitle, String seoDescription, String seoKeywords, Locale locale) {
-        super(id, created, lastModified, enabled);
-        this.user = user;
-        this.title = title;
-        this.link = link;
-        this.content = content;
-        this.rawContent = rawContent;
-        this.seoTitle = seoTitle;
-        this.seoDescription = seoDescription;
-        this.seoKeywords = seoKeywords;
-        this.locale = locale;
-    }
 
     public User getUser() {
         return user;
@@ -143,17 +129,72 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Document)) return false;
+
+        Document document = (Document) o;
+
+        return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(user, document.user)
+                .append(title, document.title)
+                .append(link, document.link)
+                .append(content, document.content)
+                .append(rawContent, document.rawContent)
+                .append(seoTitle, document.seoTitle)
+                .append(seoDescription, document.seoDescription)
+                .append(seoKeywords, document.seoKeywords)
+                .append(locale, document.locale)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(user)
+                .append(title)
+                .append(link)
+                .append(content)
+                .append(rawContent)
+                .append(seoTitle)
+                .append(seoDescription)
+                .append(seoKeywords)
+                .append(locale)
+                .toHashCode();
+    }
+
+    @Override
     public String toString() {
-        return super.toString();
+        return new ToStringBuilder(this)
+                .append("id", getId())
+                .append("user", user)
+                .append("created", getCreated())
+                .append("title", title)
+                .append("link", link)
+                .append("lastModified", getLastModified())
+                .append("content", content)
+                .append("enabled", isEnabled())
+                .append("rawContent", rawContent)
+                .append("seoTitle", seoTitle)
+                .append("seoDescription", seoDescription)
+                .append("seoKeywords", seoKeywords)
+                .append("locale", locale)
+                .toString();
+    }
+
+    public static DocumentBuilder getBuilder() {
+        return new DocumentBuilder();
     }
 
     /**
      * Document entity builder.
      */
-    public static class Builder {
-
-        private Long id;
+    public static final class DocumentBuilder {
         private Date created;
+        private Long id;
         private Date lastModified;
         private boolean enabled;
         private User user;
@@ -166,74 +207,90 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
         private String seoKeywords;
         private Locale locale;
 
-        public Builder withId(Long id) {
-            this.id = id;
-            return this;
+        private DocumentBuilder() {
         }
 
-        public Builder withCreated(Date created) {
+        public DocumentBuilder withCreated(Date created) {
             this.created = created;
             return this;
         }
 
-        public Builder withLastModified(Date lastModified) {
+        public DocumentBuilder withId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public DocumentBuilder withLastModified(Date lastModified) {
             this.lastModified = lastModified;
             return this;
         }
 
-        public Builder isEnabled(boolean enabled) {
+        public DocumentBuilder withEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
         }
 
-        public Builder withUser(User user) {
+        public DocumentBuilder withUser(User user) {
             this.user = user;
             return this;
         }
 
-        public Builder withTitle(String title) {
+        public DocumentBuilder withTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public Builder withLink(String link) {
+        public DocumentBuilder withLink(String link) {
             this.link = link;
             return this;
         }
 
-        public Builder withContent(String content) {
+        public DocumentBuilder withContent(String content) {
             this.content = content;
             return this;
         }
 
-        public Builder withRawContent(String rawContent) {
+        public DocumentBuilder withRawContent(String rawContent) {
             this.rawContent = rawContent;
             return this;
         }
 
-        public Builder withSeoTitle(String seoTitle) {
+        public DocumentBuilder withSeoTitle(String seoTitle) {
             this.seoTitle = seoTitle;
             return this;
         }
 
-        public Builder withSeoDescription(String seoDescription) {
+        public DocumentBuilder withSeoDescription(String seoDescription) {
             this.seoDescription = seoDescription;
             return this;
         }
 
-        public Builder withSeoKeywords(String seoKeywords) {
+        public DocumentBuilder withSeoKeywords(String seoKeywords) {
             this.seoKeywords = seoKeywords;
             return this;
         }
 
-        public Builder withLocale(Locale locale) {
+        public DocumentBuilder withLocale(Locale locale) {
             this.locale = locale;
             return this;
         }
 
-        public Document createDocument() {
-            return new Document(id, created, lastModified, enabled, user, title, link, content, rawContent,
-                    seoTitle, seoDescription, seoKeywords, locale);
+        public Document build() {
+            Document document = new Document();
+            document.setCreated(created);
+            document.setId(id);
+            document.setLastModified(lastModified);
+            document.setEnabled(enabled);
+            document.setUser(user);
+            document.setTitle(title);
+            document.setLink(link);
+            document.setContent(content);
+            document.setRawContent(rawContent);
+            document.setSeoTitle(seoTitle);
+            document.setSeoDescription(seoDescription);
+            document.setSeoKeywords(seoKeywords);
+            document.setLocale(locale);
+            return document;
         }
     }
 }

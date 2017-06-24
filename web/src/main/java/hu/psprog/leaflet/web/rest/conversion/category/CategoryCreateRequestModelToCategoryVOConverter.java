@@ -16,9 +16,9 @@ public class CategoryCreateRequestModelToCategoryVOConverter implements Converte
     @Override
     public CategoryVO convert(CategoryCreateRequestModel source) {
 
-        return new CategoryVO.Builder()
+        return CategoryVO.getBuilder()
                 .withTitle(source.getTitle())
                 .withDescription(source.getDescription())
-                .createCategoryVO();
+                .build();
     }
 }

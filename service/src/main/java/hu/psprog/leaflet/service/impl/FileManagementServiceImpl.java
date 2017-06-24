@@ -27,6 +27,8 @@ import java.util.Objects;
 public class FileManagementServiceImpl implements FileManagementService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileManagementServiceImpl.class);
+    private static final String GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH = "Given path [{}] is invalid";
+    private static final String GIVEN_PATH_IS_INVALID = "Given path is invalid";
 
     private File fileStorage;
     private FileUploader fileUploader;
@@ -69,8 +71,8 @@ public class FileManagementServiceImpl implements FileManagementService {
             }
             return file;
         } catch (InvalidPathException exc) {
-            LOGGER.error("Given path [{}] is invalid", path);
-            throw new ServiceException("Given path is invalid", exc);
+            LOGGER.error(GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH, path);
+            throw new ServiceException(GIVEN_PATH_IS_INVALID, exc);
         }
     }
 
@@ -87,8 +89,8 @@ public class FileManagementServiceImpl implements FileManagementService {
                 throw new ServiceException("Failed to remove file");
             }
         } catch (InvalidPathException exc) {
-            LOGGER.error("Given path [{}] is invalid", path);
-            throw new ServiceException("Given path is invalid", exc);
+            LOGGER.error(GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH, path);
+            throw new ServiceException(GIVEN_PATH_IS_INVALID, exc);
         }
     }
 
@@ -102,8 +104,8 @@ public class FileManagementServiceImpl implements FileManagementService {
                 throw new ServiceException("Failed to create directory");
             }
         } catch (InvalidPathException exc) {
-            LOGGER.error("Given path [{}] is invalid", parent);
-            throw new ServiceException("Given path is invalid", exc);
+            LOGGER.error(GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH, parent);
+            throw new ServiceException(GIVEN_PATH_IS_INVALID, exc);
         }
     }
 
@@ -113,8 +115,8 @@ public class FileManagementServiceImpl implements FileManagementService {
             File file = buildAbsolutePath(path).toFile();
             return isAccessible(file);
         } catch (InvalidPathException exc) {
-            LOGGER.error("Given path [{}] is invalid", path);
-            throw new ServiceException("Given path is invalid", exc);
+            LOGGER.error(GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH, path);
+            throw new ServiceException(GIVEN_PATH_IS_INVALID, exc);
         }
     }
 

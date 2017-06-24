@@ -15,7 +15,7 @@ public class TagAssignmentRequestConverter implements Converter<TagAssignmentReq
 
     @Override
     public TagAssignmentVO convert(TagAssignmentRequestModel source) {
-        return TagAssignmentVO.Builder.getBuilder()
+        return TagAssignmentVO.getBuilder()
                 .withEntryID(source.getEntryID())
                 .withTagID(source.getTagID())
                 .build();
