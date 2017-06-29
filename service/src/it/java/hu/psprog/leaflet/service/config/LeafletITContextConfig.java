@@ -3,9 +3,15 @@ package hu.psprog.leaflet.service.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import hu.psprog.leaflet.mail.client.MailClient;
+import hu.psprog.leaflet.mail.config.MailProcessorConfigurationProperties;
+import hu.psprog.leaflet.mail.domain.Mail;
+import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
+import hu.psprog.leaflet.mail.domain.MailDeliveryStatus;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
+import io.reactivex.Observable;
 import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -32,6 +38,7 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Properties;
 
@@ -64,6 +71,26 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     private UserDetailsService userDetailsService;
 
     private TemporaryFolder temporaryFolder;
+
+    @Bean
+    public MailClient mailClient() {
+        return new MailClient() {
+
+            @Override
+            public Observable<MailDeliveryInfo> sendMail(Mail mail) {
+                return Observable.just(MailDeliveryInfo.getBuilder()
+                        .withMail(Mail.getBuilder().build())
+                        .withConstraintViolations(Collections.emptyMap())
+                        .withMailDeliveryStatus(MailDeliveryStatus.DELIVERED)
+                        .build());
+            }
+        };
+    }
+
+    @Bean
+    public MailProcessorConfigurationProperties mailProcessorConfigurationProperties() {
+        return new MailProcessorConfigurationProperties(null, null, null);
+    }
 
     @Bean
     public DataSource dataSource() {
