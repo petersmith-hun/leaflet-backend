@@ -5,7 +5,7 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>0.8.3-dev</version>
+        <version>0.8.4-dev</version>
     </parent>
     
     <artifactId>leaflet-service</artifactId>
@@ -19,6 +19,10 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>leaflet-jwt-component</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>leaflet-mailer-component</artifactId>
         </dependency>
 
         <dependency>

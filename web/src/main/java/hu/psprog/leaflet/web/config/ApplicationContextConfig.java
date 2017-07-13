@@ -33,9 +33,7 @@ public class ApplicationContextConfig {
     private static final String APPLICATION_CONFIG_PROPERTY_SOURCE = "applicationConfigPropertySource";
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationContextConfig.class);
     private static final String JNDI_LEAFLET_CONFIG_LOCATION = "java:comp/env/leafletAppConfig";
-    private static final boolean LOG_READ_PROPERTIES = true;
     private static final String APP_VERSION_PROPERTY = "${app.version}";
-    private static final String APP_BUILD_DATE_PROPERTY = "${app.built}";
 
     static final String COMPONENT_SCAN = "hu.psprog.leaflet";
 
@@ -97,9 +95,7 @@ public class ApplicationContextConfig {
 
     @Bean
     @DependsOn(APPLICATION_CONFIG_PROPERTY_SOURCE)
-    public String appVersion(@Value(APP_VERSION_PROPERTY) String version, @Value(APP_BUILD_DATE_PROPERTY) String builtOn) {
-        LOGGER.info("Application loaded successfully, running version v{}, built on {}", version, builtOn);
-
+    public String appVersion(@Value(APP_VERSION_PROPERTY) String version) {
         return version;
     }
 
@@ -107,20 +103,6 @@ public class ApplicationContextConfig {
         Properties properties = new Properties();
         properties.loadFromXML(inputStream);
 
-        if(LOG_READ_PROPERTIES) {
-            logProperties(properties);
-        }
-
         return properties;
-    }
-
-    private static void logProperties(Properties properties) {
-        LOGGER.info("------------------------------------------------------------------------------------------ ");
-        LOGGER.info(" External application configuration found. Entries: ");
-        properties.entrySet().stream()
-                .map(e -> String.format("  * %-40s: %s", e.getKey(), e.getValue()))
-                .sorted()
-                .forEach(LOGGER::info);
-        LOGGER.info("------------------------------------------------------------------------------------------ ");
     }
 }
