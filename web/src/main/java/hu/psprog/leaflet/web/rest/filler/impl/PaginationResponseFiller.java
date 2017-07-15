@@ -33,8 +33,8 @@ public class PaginationResponseFiller implements ResponseFiller {
                 .withEntityCountOnPage((int) httpServletRequest.getAttribute(RequestParameter.PAGINATION_ENTITY_COUNT_ON_PAGE))
                 .withPageCount((int) httpServletRequest.getAttribute(RequestParameter.PAGINATION_PAGE_COUNT))
                 .withPageNumber((int) httpServletRequest.getAttribute(RequestParameter.PAGINATION_PAGE_NUMBER))
-                .withIsFirst((boolean) httpServletRequest.getAttribute(RequestParameter.PAGINATION_IS_FIRST))
-                .withIsLast((boolean) httpServletRequest.getAttribute(RequestParameter.PAGINATION_IS_LAST))
+                .withFirst((boolean) httpServletRequest.getAttribute(RequestParameter.PAGINATION_IS_FIRST))
+                .withLast((boolean) httpServletRequest.getAttribute(RequestParameter.PAGINATION_IS_LAST))
                 .withHasNext((boolean) httpServletRequest.getAttribute(RequestParameter.PAGINATION_HAS_NEXT))
                 .withHasPrevious((boolean) httpServletRequest.getAttribute(RequestParameter.PAGINATION_HAS_PREVIOUS))
                 .build();
