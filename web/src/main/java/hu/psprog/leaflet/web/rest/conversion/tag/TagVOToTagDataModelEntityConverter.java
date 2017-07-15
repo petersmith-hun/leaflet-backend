@@ -31,7 +31,7 @@ public class TagVOToTagDataModelEntityConverter implements Converter<TagVO, TagD
         return TagDataModel.getBuilder()
                 .withId(source.getId())
                 .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
-                .withIsEnabled(source.isEnabled())
+                .withEnabled(source.isEnabled())
                 .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
                 .withName(source.getTitle())
                 .build();
