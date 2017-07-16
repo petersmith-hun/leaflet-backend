@@ -7,7 +7,6 @@ import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
-import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
@@ -60,12 +59,12 @@ public class UserServiceImpl implements UserService {
     private AuthorityToRoleConverter authorityToRoleConverter;
     private AuthenticationManager authenticationManager;
     private JWTComponent jwtComponent;
-    private RunLevel runLevel;
+    private Boolean initModeEnabled;
 
     @Autowired
     public UserServiceImpl(UserDAO userDAO, UserDetailsService userDetailsService, UserToUserVOConverter userToUserVOConverter,
                            UserVOToUserConverter userVOToUserConverter, AuthorityToRoleConverter authorityToRoleConverter,
-                           AuthenticationManager authenticationManager, JWTComponent jwtComponent, RunLevel runLevel) {
+                           AuthenticationManager authenticationManager, JWTComponent jwtComponent, Boolean initModeEnabled) {
         this.userDAO = userDAO;
         this.userDetailsService = userDetailsService;
         this.userToUserVOConverter = userToUserVOConverter;
@@ -73,7 +72,7 @@ public class UserServiceImpl implements UserService {
         this.authorityToRoleConverter = authorityToRoleConverter;
         this.authenticationManager = authenticationManager;
         this.jwtComponent = jwtComponent;
-        this.runLevel = runLevel;
+        this.initModeEnabled = initModeEnabled;
     }
 
     @Override
@@ -196,12 +195,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long initialize(UserVO userVO) throws UserInitializationException, EntityCreationException {
 
-        if(runLevel != RunLevel.INIT) {
+        if (!initModeEnabled) {
             throw new UserInitializationException("Application is NOT in INIT mode");
         }
 
         long userCount = userDAO.count();
-        if(userCount > 0) {
+        if (userCount > 0) {
             throw new UserInitializationException("Application already initialized");
         }
 

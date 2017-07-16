@@ -4,7 +4,6 @@ import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.common.Authority;
-import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
@@ -180,9 +179,9 @@ public class UserServiceImplTest {
     public void testInitializeWithSuccess() throws UserInitializationException, EntityCreationException, NoSuchFieldException, IllegalAccessException {
 
         // given
-        Field runLevel = userService.getClass().getDeclaredField("runLevel");
+        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
         runLevel.setAccessible(true);
-        runLevel.set(userService, RunLevel.INIT);
+        runLevel.set(userService, true);
         given(userDAO.count()).willReturn(0L);
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
         given(userDAO.save(user)).willReturn(user);
@@ -200,9 +199,9 @@ public class UserServiceImplTest {
     public void testInitializeWhenAppIsNotInInitMode() throws UserInitializationException, EntityCreationException, NoSuchFieldException, IllegalAccessException {
 
         // given
-        Field runLevel = userService.getClass().getDeclaredField("runLevel");
+        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
         runLevel.setAccessible(true);
-        runLevel.set(userService, RunLevel.PRODUCTION);
+        runLevel.set(userService, false);
 
         // when
         userService.initialize(userVO);
@@ -217,9 +216,9 @@ public class UserServiceImplTest {
     public void testInitializeWhenAppIsAlreadyInitialized() throws NoSuchFieldException, IllegalAccessException, UserInitializationException, EntityCreationException {
 
         // given
-        Field runLevel = userService.getClass().getDeclaredField("runLevel");
+        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
         runLevel.setAccessible(true);
-        runLevel.set(userService, RunLevel.INIT);
+        runLevel.set(userService, true);
         given(userDAO.count()).willReturn(1L);
 
         // when
@@ -235,9 +234,9 @@ public class UserServiceImplTest {
     public void testInitializeWithCreationFailure() throws NoSuchFieldException, IllegalAccessException, UserInitializationException, EntityCreationException {
 
         // given
-        Field runLevel = userService.getClass().getDeclaredField("runLevel");
+        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
         runLevel.setAccessible(true);
-        runLevel.set(userService, RunLevel.INIT);
+        runLevel.set(userService, true);
         given(userDAO.count()).willReturn(0L);
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
         given(userDAO.save(user)).willReturn(null);

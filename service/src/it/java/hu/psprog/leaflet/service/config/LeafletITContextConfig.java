@@ -9,7 +9,6 @@ import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
 import hu.psprog.leaflet.mail.domain.MailDeliveryStatus;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
-import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import io.reactivex.Observable;
 import org.junit.rules.TemporaryFolder;
@@ -129,9 +128,8 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     }
 
     @Bean
-    public RunLevel runLevel() {
-
-        return RunLevel.INIT;
+    public Boolean initModeEnabled() {
+        return true;
     }
 
     @Bean

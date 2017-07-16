@@ -25,7 +25,7 @@ public class ServiceConfiguration {
 
     public static final String PERSISTENCE_DAO_PACKAGE = "hu.psprog.leaflet.persistence.dao";
 
-    @Value("${uploads.directory}")
+    @Value("${spring.http.multipart.location}")
     @NotNull
     private String storageRootDirectoryPath;
 
