@@ -188,7 +188,7 @@ public class UserServiceImplIT {
 
     @Test
     @Transactional
-    public void testInitializeWithSuccess() throws ServiceException {
+    public void testInitializeWithSuccess() throws ServiceException, NoSuchFieldException, IllegalAccessException {
 
         // given
         GrantedAuthority adminAuthority = new SimpleGrantedAuthority(Role.ADMIN.name());

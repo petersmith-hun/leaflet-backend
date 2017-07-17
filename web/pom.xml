@@ -5,10 +5,10 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>0.8.5-dev</version>
+        <version>0.9.0-dev</version>
     </parent>
 
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <artifactId>leaflet-web</artifactId>
 
     <dependencies>
@@ -35,6 +35,10 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -59,4 +63,28 @@
             <artifactId>aspectjweaver</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9991</jvmArguments>
+                    <arguments>
+                        <argument>--spring.profiles.active=${spring.profiles.active}</argument>
+                        <argument>--spring.config.location=${spring.config.location}</argument>
+                    </arguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -32,7 +32,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String PATH_USERS_CLAIM = "/users/claim";
     private static final String PATH_USERS_REGISTER = "/users/register";
     private static final String PATH_USERS_INIT = "/users/init";
-    private static final String INIT_ACCESS_FILTER_EXPRESSION = "@runLevel == T(hu.psprog.leaflet.service.common.RunLevel).INIT";
+    private static final String INIT_ACCESS_FILTER_EXPRESSION = "@initModeEnabled";
 
     @Autowired
     private UserDetailsService userDetailsService;

@@ -3,9 +3,7 @@ package hu.psprog.leaflet.web.rest.conversion.user;
 import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
 import hu.psprog.leaflet.service.common.Authority;
-import hu.psprog.leaflet.service.common.RunLevel;
 import hu.psprog.leaflet.service.vo.UserVO;
-import hu.psprog.leaflet.web.config.ConfigurationProperty;
 import hu.psprog.leaflet.web.rest.conversion.JULocaleToLeafletLocaleConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,16 +23,18 @@ import java.util.List;
 @Component
 public class UserInitializeRequestModelToUserVOConverter implements Converter<UserInitializeRequestModel, UserVO> {
 
+    private static final String USERS_ENABLED_BY_DEFAULT = "${usersEnabledByDefault:true}";
+
     private boolean enabled;
-    private RunLevel runLevel;
+    private Boolean initModeEnabled;
     private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Autowired
-    public UserInitializeRequestModelToUserVOConverter(@Value(ConfigurationProperty.USERS_ENABLED_BY_DEFAULT) boolean enabled,
-                                                       RunLevel runLevel, JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
+    public UserInitializeRequestModelToUserVOConverter(@Value(USERS_ENABLED_BY_DEFAULT) boolean enabled,
+                                                       Boolean initModeEnabled, JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
         this.enabled = enabled;
-        this.runLevel = runLevel;
         this.juLocaleToLeafletLocaleConverter = juLocaleToLeafletLocaleConverter;
+        this.initModeEnabled = initModeEnabled;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class UserInitializeRequestModelToUserVOConverter implements Converter<Us
         if (userInitializeRequestModel instanceof UserCreateRequestModel) {
             String role = ((UserCreateRequestModel) userInitializeRequestModel).getRole();
             authority = Authority.getAuthorityByName(role);
-        } else if (runLevel == RunLevel.INIT) {
+        } else if (initModeEnabled) {
             authority = Authority.ADMIN;
         }
 
