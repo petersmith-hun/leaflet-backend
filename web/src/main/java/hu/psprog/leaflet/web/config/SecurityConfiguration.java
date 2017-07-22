@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.config;
 
+import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationProvider;
 import hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter;
 import hu.psprog.leaflet.web.rest.handler.RESTAuthenticationEntryPoint;
@@ -38,7 +39,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private JWTAuthenticationFilter jwtAuthenticationFilter;
+    private JWTComponent jwtComponent;
+
+    @Autowired
+    private JWTAuthenticationProvider jwtAuthenticationProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -52,12 +56,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
         return authenticationProvider;
-    }
-
-    @Bean
-    public AuthenticationProvider jwtAuthenticationProvider() {
-
-        return new JWTAuthenticationProvider();
     }
 
     @Bean
@@ -77,7 +75,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         auth
             .authenticationProvider(claimAuthenticationProvider())
-            .authenticationProvider(jwtAuthenticationProvider());
+            .authenticationProvider(jwtAuthenticationProvider);
     }
 
     @Override
@@ -85,7 +83,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         // TODO temporary configuration - shall be changed during the implementation of LFLT-16!
         http
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(getJwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
             .authorizeRequests()
                 .antMatchers(PATH_USERS_CLAIM, PATH_USERS_REGISTER)
@@ -108,6 +106,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
 
             .anonymous()
-                .key(JWTAuthenticationFilter.ANONYMOUS_USERNAME);
+                .key(JWTAuthenticationFilter.ANONYMOUS_ID);
+    }
+
+    private JWTAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
+        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtComponent);
+        jwtAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
+        return jwtAuthenticationFilter;
     }
 }

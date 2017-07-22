@@ -3,6 +3,7 @@ package hu.psprog.leaflet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Profile;
  *
  * @author Peter Smith
  */
-@SpringBootApplication(exclude = ThymeleafAutoConfiguration.class)
+@SpringBootApplication(exclude = {ThymeleafAutoConfiguration.class, H2ConsoleAutoConfiguration.class})
 public class LeafletBackendApplication {
 
     private static final String AJP_PROTOCOL = "AJP/1.3";

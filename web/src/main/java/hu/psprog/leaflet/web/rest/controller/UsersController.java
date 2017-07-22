@@ -11,15 +11,14 @@ import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListData
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
+import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
-import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
-import hu.psprog.leaflet.service.vo.AuthRequestVO;
-import hu.psprog.leaflet.service.vo.AuthResponseVO;
+import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
@@ -38,8 +37,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
+import java.util.UUID;
+
+import static hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter.AUTH_TOKEN_HEADER;
+import static hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter.DEVICE_ID_HEADER;
 
 /**
  * REST controller for user-related entry points.
@@ -70,11 +75,13 @@ public class UsersController extends BaseController {
 
     private UserService userService;
     private PasswordEncoder passwordEncoder;
+    private UserAuthenticationService userAuthenticationService;
 
     @Autowired
-    public UsersController(UserService userService, PasswordEncoder passwordEncoder) {
+    public UsersController(UserService userService, PasswordEncoder passwordEncoder, UserAuthenticationService userAuthenticationService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.userAuthenticationService = userAuthenticationService;
     }
 
     /**
@@ -317,30 +324,36 @@ public class UsersController extends BaseController {
      * @return process status and if "sign-in" is successful, the generated token
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_CLAIM_TOKEN)
-    public ResponseEntity<BaseBodyDataModel> claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel, BindingResult bindingResult) throws TokenClaimException, ResourceNotFoundException {
+    public ResponseEntity<BaseBodyDataModel> claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel,
+                                                        HttpServletRequest httpServletRequest, BindingResult bindingResult)
+            throws TokenClaimException, ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
             return ResponseEntity
                     .badRequest()
                     .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
-            AuthRequestVO requestModel = conversionService.convert(loginRequestModel, AuthRequestVO.class);
-            AuthResponseVO authenticationAnswer = userService.claimToken(requestModel);
+            try {
+                String token = userAuthenticationService.claimToken(LoginContextVO.getBuilder()
+                        .withUsername(loginRequestModel.getEmail())
+                        .withPassword(loginRequestModel.getPassword())
+                        .withDeviceID(extractDeviceID(httpServletRequest))
+                        .withRemoteAddress(httpServletRequest.getRemoteAddr())
+                        .build());
 
-            if (authenticationAnswer.getAuthenticationResult() == AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS) {
+                userService.updateLastLogin(loginRequestModel.getEmail());
+
+                return ResponseEntity
+                        .ok()
+                        .header(AUTH_TOKEN_HEADER, token)
+                        .body(LoginResponseDataModel.getBuilder()
+                                .withStatus(LoginResponseDataModel.AuthenticationResult.AUTH_SUCCESS)
+                                .withToken(token)
+                                .build());
+            } catch (Exception exc) {
+                LOGGER.error("Failed to authenticate user.", exc);
                 throw new TokenClaimException();
             }
-
-            try {
-                userService.updateLastLogin(loginRequestModel.getEmail());
-            } catch (EntityNotFoundException e) {
-                LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
-                throw new ResourceNotFoundException(LAST_LOGIN_COULD_NOT_BE_UPDATED_FOR_THIS_USER);
-            }
-
-            return ResponseEntity
-                    .ok()
-                    .body(conversionService.convert(authenticationAnswer, LoginResponseDataModel.class));
         }
     }
 
@@ -384,5 +397,11 @@ public class UsersController extends BaseController {
 
     private URI buildLocation(Long id) {
         return URI.create(BASE_PATH_USERS + "/" + id);
+    }
+
+    private UUID extractDeviceID(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(DEVICE_ID_HEADER))
+                .map(UUID::fromString)
+                .orElse(null);
     }
 }
