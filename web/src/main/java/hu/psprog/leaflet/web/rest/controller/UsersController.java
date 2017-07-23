@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
@@ -91,6 +92,7 @@ public class UsersController extends BaseController {
      * @return list of existing users.
      */
     @RequestMapping(method = RequestMethod.GET)
+    @Timed
     public ResponseEntity<UserListDataModel> getAllUsers() {
 
         return ResponseEntity
@@ -180,6 +182,7 @@ public class UsersController extends BaseController {
      * @throws ResourceNotFoundException when no user exists identified by the given ID
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
+    @Timed
     public ResponseEntity<ExtendedUserDataModel> getUserByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
@@ -255,6 +258,7 @@ public class UsersController extends BaseController {
      * @return updated data of given user
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PROFILE)
+    @Timed
     public ResponseEntity<BaseBodyDataModel> updateProfile(@PathVariable(PATH_VARIABLE_ID) Long id,
                                       @RequestBody @Valid UpdateProfileRequestModel updateProfileRequestModel,
                                       BindingResult bindingResult)
@@ -291,6 +295,7 @@ public class UsersController extends BaseController {
      * @return updated data of given user
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PASSWORD)
+    @Timed
     public ResponseEntity<BaseBodyDataModel> updatePassword(@PathVariable(PATH_VARIABLE_ID) Long id,
                                        @RequestBody @Valid UserPasswordRequestModel userPasswordRequestModel,
                                        BindingResult bindingResult)
@@ -324,6 +329,7 @@ public class UsersController extends BaseController {
      * @return process status and if "sign-in" is successful, the generated token
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_CLAIM_TOKEN)
+    @Timed
     public ResponseEntity<BaseBodyDataModel> claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel,
                                                         HttpServletRequest httpServletRequest, BindingResult bindingResult)
             throws TokenClaimException, ResourceNotFoundException {
@@ -366,6 +372,7 @@ public class UsersController extends BaseController {
      * @return created user's data
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_REGISTER)
+    @Timed
     public ResponseEntity<BaseBodyDataModel> signUp(@RequestBody @Valid UserInitializeRequestModel userInitializeRequestModel,
                                     BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
