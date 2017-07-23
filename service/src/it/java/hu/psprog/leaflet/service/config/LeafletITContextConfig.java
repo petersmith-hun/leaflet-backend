@@ -9,6 +9,10 @@ import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
 import hu.psprog.leaflet.mail.domain.MailDeliveryStatus;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
+import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationToken;
+import hu.psprog.leaflet.security.sessionstore.domain.ClaimedTokenContext;
+import hu.psprog.leaflet.security.sessionstore.domain.SessionStoreValidationStatus;
+import hu.psprog.leaflet.security.sessionstore.service.SessionStoreService;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import io.reactivex.Observable;
 import org.junit.rules.TemporaryFolder;
@@ -89,6 +93,31 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     @Bean
     public MailProcessorConfigurationProperties mailProcessorConfigurationProperties() {
         return new MailProcessorConfigurationProperties(null, null, null);
+    }
+
+    @Bean
+    public SessionStoreService sessionStoreServiceStub() {
+        return new SessionStoreService() {
+            @Override
+            public void storeToken(ClaimedTokenContext claimedTokenContext) {
+
+            }
+
+            @Override
+            public SessionStoreValidationStatus validateToken(JWTAuthenticationToken jwtAuthenticationToken) {
+                return null;
+            }
+
+            @Override
+            public void revokeToken(JWTAuthenticationToken jwtAuthenticationToken) {
+
+            }
+
+            @Override
+            public void cleanExpiredToken(int i) {
+
+            }
+        };
     }
 
     @Bean

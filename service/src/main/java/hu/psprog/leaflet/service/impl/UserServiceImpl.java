@@ -3,8 +3,6 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.security.jwt.JWTComponent;
-import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
@@ -16,8 +14,6 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.util.PageableUtil;
-import hu.psprog.leaflet.service.vo.AuthRequestVO;
-import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.slf4j.Logger;
@@ -25,13 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.PersistenceException;
@@ -53,25 +43,18 @@ public class UserServiceImpl implements UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private UserDAO userDAO;
-    private UserDetailsService userDetailsService;
     private UserToUserVOConverter userToUserVOConverter;
     private UserVOToUserConverter userVOToUserConverter;
     private AuthorityToRoleConverter authorityToRoleConverter;
-    private AuthenticationManager authenticationManager;
-    private JWTComponent jwtComponent;
     private Boolean initModeEnabled;
 
     @Autowired
-    public UserServiceImpl(UserDAO userDAO, UserDetailsService userDetailsService, UserToUserVOConverter userToUserVOConverter,
-                           UserVOToUserConverter userVOToUserConverter, AuthorityToRoleConverter authorityToRoleConverter,
-                           AuthenticationManager authenticationManager, JWTComponent jwtComponent, Boolean initModeEnabled) {
+    public UserServiceImpl(UserDAO userDAO, UserToUserVOConverter userToUserVOConverter, UserVOToUserConverter userVOToUserConverter,
+                           AuthorityToRoleConverter authorityToRoleConverter, Boolean initModeEnabled) {
         this.userDAO = userDAO;
-        this.userDetailsService = userDetailsService;
         this.userToUserVOConverter = userToUserVOConverter;
         this.userVOToUserConverter = userVOToUserConverter;
         this.authorityToRoleConverter = authorityToRoleConverter;
-        this.authenticationManager = authenticationManager;
-        this.jwtComponent = jwtComponent;
         this.initModeEnabled = initModeEnabled;
     }
 
@@ -263,29 +246,6 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.disable(id);
-    }
-
-    @Override
-    public AuthResponseVO claimToken(AuthRequestVO authRequestVO) {
-
-        AuthResponseVO.AuthResponseVOBuilder builder = AuthResponseVO.getBuilder();
-        try {
-            Authentication authentication = new UsernamePasswordAuthenticationToken(authRequestVO.getUsername(), authRequestVO.getPassword());
-            authenticationManager.authenticate(authentication);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(authRequestVO.getUsername());
-            JWTAuthenticationAnswerModel authenticationAnswer = jwtComponent.generateToken(userDetails);
-
-            return builder
-                    .withAuthenticationResult(AuthResponseVO.AuthenticationResult.AUTH_SUCCESS)
-                    .withToken(authenticationAnswer.getToken())
-                    .build();
-
-        } catch (AuthenticationException exception) {
-            LOGGER.error("Authentication failed.", exception);
-            return builder
-                    .withAuthenticationResult(AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS)
-                    .build();
-        }
     }
 
     @Override
