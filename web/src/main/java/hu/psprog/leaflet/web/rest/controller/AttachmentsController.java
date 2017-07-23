@@ -68,7 +68,7 @@ public class AttachmentsController extends BaseController {
     }
 
     /**
-     * DELETE /attachments
+     * PUT /attachments
      * Detaches an existing file from an existing entry.
      *
      * @param attachmentRequestModel attachment request
@@ -76,7 +76,7 @@ public class AttachmentsController extends BaseController {
      * @return validation errors or {@code null} if request is fulfilled
      * @throws ResourceNotFoundException if one of or both entities are not found
      */
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(method = RequestMethod.PUT)
     public ResponseEntity<BaseBodyDataModel> detach(@RequestBody @Valid AttachmentRequestModel attachmentRequestModel, BindingResult bindingResult)
             throws ResourceNotFoundException {
 

@@ -243,7 +243,7 @@ public class TagsController extends BaseController {
     }
 
     /**
-     * DELETE /tags/assign
+     * PUT /tags/assign
      * Un-assigns a tag from an entry.
      *
      * @param tagAssignmentRequestModel IDs of the entry and the tag to un-assign as {@link TagAssignmentRequestModel}
@@ -251,7 +251,7 @@ public class TagsController extends BaseController {
      * @return validation information on failed validation, null otherwise
      * @throws ResourceNotFoundException if no tag or entry found under given IDs
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = PATH_ASSIGN_TAG)
+    @RequestMapping(method = RequestMethod.PUT, value = PATH_ASSIGN_TAG)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<ValidationErrorMessageListDataModel> detachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
                                   BindingResult bindingResult) throws ResourceNotFoundException {
