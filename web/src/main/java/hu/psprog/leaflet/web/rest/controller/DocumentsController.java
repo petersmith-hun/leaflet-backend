@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
@@ -64,6 +65,7 @@ public class DocumentsController extends BaseController {
      * @return list of existing documents
      */
     @RequestMapping(method = RequestMethod.GET)
+    @Timed
     public ResponseEntity<DocumentListDataModel> getAllDocuments() {
 
         List<DocumentVO> documentVOList = documentService.getAll();
@@ -82,6 +84,7 @@ public class DocumentsController extends BaseController {
      * @throws ResourceNotFoundException if no document associated with given ID exists
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
+    @Timed
     public ResponseEntity<EditDocumentDataModel> getDocumentByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
@@ -106,6 +109,7 @@ public class DocumentsController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, path = PATH_DOCUMENT_BY_LINK)
+    @Timed
     public ResponseEntity<DocumentDataModel> getDocumentByLink(@PathVariable(PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
 
         try {

@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.category.ExtendedCategoryDataModel;
@@ -58,6 +59,7 @@ public class CategoriesController extends BaseController {
      * @return list of categories
      */
     @RequestMapping(method = RequestMethod.GET)
+    @Timed
     public ResponseEntity<CategoryListDataModel> getAllCategories() {
 
         List<CategoryVO> categories = categoryService.getAll();
@@ -75,6 +77,7 @@ public class CategoriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(value = PATH_PUBLIC, method = RequestMethod.GET)
+    @Timed
     public ResponseEntity<CategoryListDataModel> getPublicCategories() {
 
         List<CategoryVO> categories = categoryService.getAllPublic();

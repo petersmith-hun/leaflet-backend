@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
@@ -71,6 +72,7 @@ public class EntriesController extends BaseController {
      * @return list of existing entries
      */
     @RequestMapping(method = RequestMethod.GET)
+    @Timed
     public ResponseEntity<EntryListDataModel> getAllEntries() {
 
         List<EntryVO> entries = entryService.getAll();
@@ -92,6 +94,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES)
+    @Timed
     public ResponseEntity<EntryListDataModel> getPageOfPublicEntries(
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
             @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
@@ -119,6 +122,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_BY_CATEGORY)
+    @Timed
     public ResponseEntity<EntryListDataModel> getPageOfPublicEntriesByCategory(
             @PathVariable(BaseController.PATH_VARIABLE_ID) Long id,
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
@@ -144,6 +148,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_ENTRY_BY_LINK)
+    @Timed
     public ResponseEntity<ExtendedEntryDataModel> getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link)
             throws ResourceNotFoundException {
         try {
@@ -165,6 +170,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PART_ID)
+    @Timed
     public ResponseEntity<EditEntryDataModel> getEntryByID(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {

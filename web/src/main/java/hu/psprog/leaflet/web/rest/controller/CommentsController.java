@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.comment.CommentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
@@ -79,6 +80,7 @@ public class CommentsController extends BaseController {
      */
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_PUBLIC_COMMENTS_FOR_ENTRY)
+    @Timed
     public ResponseEntity<CommentListDataModel> getPageOfPublicCommentsForEntry(
             @PathVariable(PATH_VARIABLE_ID) Long entryID,
             @PathVariable(PATH_VARIABLE_PAGE) int page,
@@ -108,6 +110,7 @@ public class CommentsController extends BaseController {
      */
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_ALL_COMMENTS_FOR_ENTRY)
+    @Timed
     public ResponseEntity<CommentListDataModel> getPageOfCommentsForEntry(
             @PathVariable(PATH_VARIABLE_ID) Long entryID,
             @PathVariable(PATH_VARIABLE_PAGE) int page,
@@ -132,6 +135,7 @@ public class CommentsController extends BaseController {
      * @throws ResourceNotFoundException if no comment found associated with given ID
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
+    @Timed
     public ResponseEntity<ExtendedCommentDataModel> getCommentById(@PathVariable(PATH_VARIABLE_ID) Long commentID)
             throws ResourceNotFoundException {
 
@@ -157,6 +161,7 @@ public class CommentsController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if a service exception occurred
      */
     @RequestMapping(method = RequestMethod.POST)
+    @Timed
     public ResponseEntity<BaseBodyDataModel> createComment(@RequestBody @AuthenticatedRequest @Valid CommentCreateRequestModel commentCreateRequestModel,
                                                            BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
@@ -259,6 +264,7 @@ public class CommentsController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_PART_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Timed
     public void deleteCommentLogically(@PathVariable(PATH_VARIABLE_ID) Long commentID)
             throws ResourceNotFoundException {
 

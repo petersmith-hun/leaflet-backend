@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.file.DirectoryCreationRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.FileUploadRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.UpdateFileMetaInfoRequestModel;
@@ -62,6 +63,7 @@ public class FilesController extends BaseController {
      * @return list of uploaded files as {@link FileDataModel} objects wrapped in ModelAndView
      */
     @RequestMapping(method = RequestMethod.GET)
+    @Timed
     public ResponseEntity<FileListDataModel> getUploadedFiles() {
         List<UploadedFileVO> uploadedFiles = fileManagementFacade.retrieveStoredFileList();
         return ResponseEntity
@@ -79,6 +81,7 @@ public class FilesController extends BaseController {
      * @throws ResourceNotFoundException if no existing file is found for given fileIdentifier
      */
     @RequestMapping(method = RequestMethod.GET, value = PATH_FULLY_IDENTIFIED_FILE)
+    @Timed
     public ResponseEntity<Resource> downloadFile(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier,
                                                  @PathVariable(PATH_VARIABLE_FILENAME) String storedFilename)
             throws ResourceNotFoundException {
@@ -105,6 +108,7 @@ public class FilesController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if file can not be uploaded
      */
     @RequestMapping(method = RequestMethod.POST)
+    @Timed
     public ResponseEntity<BaseBodyDataModel> uploadFile(@Valid final FileUploadRequestModel fileUploadRequestModel,
                                                         BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
