@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -122,27 +123,20 @@ public class DCPStoreController extends BaseController {
      * DELETE /dcp
      * Deletes an existing DCP Store entry.
      *
-     * @param dcpRequestModel {@link DCPRequestModel} object holding entry data (only the key is required)
-     * @param bindingResult validation results
+     * @param dcpEntryID {@link DCPRequestModel} object holding entry data (only the key is required)
      */
-    @RequestMapping(method = RequestMethod.DELETE)
-    public ResponseEntity<BaseBodyDataModel> remove(@RequestBody @Valid DCPRequestModel dcpRequestModel, BindingResult bindingResult)
+    @RequestMapping(method = RequestMethod.DELETE, path = PATH_PART_ID)
+    public ResponseEntity<Void> remove(@PathVariable(PATH_VARIABLE_ID) String dcpEntryID)
             throws RequestCouldNotBeFulfilledException {
 
-        if (bindingResult.hasErrors()) {
+        try {
+            dynamicConfigurationPropertyService.delete(dcpEntryID);
             return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
-        } else {
-            try {
-                dynamicConfigurationPropertyService.delete(dcpRequestModel.getKey());
-                return ResponseEntity
-                        .status(HttpStatus.NO_CONTENT)
-                        .body(null);
-            } catch (ServiceException e) {
-                LOGGER.error(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED, e);
-                throw new RequestCouldNotBeFulfilledException(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED);
-            }
+                    .status(HttpStatus.NO_CONTENT)
+                    .body(null);
+        } catch (ServiceException e) {
+            LOGGER.error(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED, e);
+            throw new RequestCouldNotBeFulfilledException(NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED);
         }
     }
 

@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.2-dev</version>
+    <version>0.9.3-dev</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
