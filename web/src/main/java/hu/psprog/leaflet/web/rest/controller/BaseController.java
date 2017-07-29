@@ -4,6 +4,7 @@ import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
 import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,9 @@ public class BaseController {
     @Autowired
     ConversionService conversionService;
 
+    @Autowired
+    private ExceptionHandlerCounters exceptionHandlerCounters;
+
     /**
      * HTTP 404 exception handler.
      */
@@ -69,6 +73,7 @@ public class BaseController {
     public ResponseEntity<ErrorMessageDataModel> resourceNotFoundExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Requested resource is not available.", exception);
+        exceptionHandlerCounters.resourceNotFound();
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -84,6 +89,7 @@ public class BaseController {
     public ResponseEntity<ErrorMessageDataModel> authenticationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Exception thrown during user authentication.", exception);
+        exceptionHandlerCounters.authenticationFailure();
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
@@ -99,6 +105,7 @@ public class BaseController {
     public ResponseEntity<ErrorMessageDataModel> requestCouldNotBeFulfilledExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("User interaction caused a recognized exception.", exception);
+        exceptionHandlerCounters.requestCouldNotBeFulfilled();
 
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
@@ -114,6 +121,7 @@ public class BaseController {
     public ResponseEntity<ErrorMessageDataModel> defaultExceptionHandler(HttpServletRequest request, Exception exception) {
 
         LOGGER.error("Default handler caught exception.", exception);
+        exceptionHandlerCounters.defaultExceptionHandler();
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
