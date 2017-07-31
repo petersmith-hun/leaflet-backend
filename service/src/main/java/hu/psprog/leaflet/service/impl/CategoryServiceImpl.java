@@ -9,6 +9,7 @@ import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public CategoryVO getOne(Long id) throws ServiceException {
 
         Category category = categoryDAO.findOne(id);
@@ -56,6 +58,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<CategoryVO> getAll() {
 
         return categoryDAO.findAll().stream()
@@ -72,12 +75,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long count() {
 
         return categoryDAO.count();
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long createOne(CategoryVO entity) throws ServiceException {
 
         Category category = categoryVOToCategoryConverter.convert(entity);
@@ -91,6 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<Long> createBulk(List<CategoryVO> entities) throws ServiceException {
 
         List<Long> ids = new LinkedList<>();
@@ -103,6 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public CategoryVO updateOne(Long id, CategoryVO updatedEntity) throws ServiceException {
 
         Category updatedCategory = categoryDAO.updateOne(id, categoryVOToCategoryConverter.convert(updatedEntity));
@@ -115,6 +122,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<CategoryVO> updateBulk(Map<Long, CategoryVO> updatedEntities) throws ServiceException {
 
         List<CategoryVO> entryVOs = new LinkedList<>();
@@ -130,6 +138,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteByEntity(CategoryVO entity) throws ServiceException {
 
         if (!categoryDAO.exists(entity.getId())) {
@@ -140,6 +149,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         try {
@@ -151,6 +161,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
 
         for (long id : ids) {
@@ -159,6 +170,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!categoryDAO.exists(id)) {
@@ -169,6 +181,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!categoryDAO.exists(id)) {

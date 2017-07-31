@@ -20,6 +20,10 @@ public class ExceptionHandlerCounters {
     }
 
     @Counted(monotonic = true)
+    public void authorizationFailure() {
+    }
+
+    @Counted(monotonic = true)
     public void requestCouldNotBeFulfilled() {
     }
 

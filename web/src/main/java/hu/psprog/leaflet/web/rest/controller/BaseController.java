@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -93,6 +94,22 @@ public class BaseController {
 
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorMessageDataModel.getBuilder()
+                        .withMessage(exception.getMessage())
+                        .build());
+    }
+
+    /**
+     * HTTP 403 exception handler.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorMessageDataModel> authorizationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
+
+        LOGGER.error("Unauthorized operation attempt was made by user.", exception);
+        exceptionHandlerCounters.authorizationFailure();
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(ErrorMessageDataModel.getBuilder()
                         .withMessage(exception.getMessage())
                         .build());

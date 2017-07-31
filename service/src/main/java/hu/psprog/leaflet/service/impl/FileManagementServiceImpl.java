@@ -4,6 +4,7 @@ import hu.psprog.leaflet.service.FileManagementService;
 import hu.psprog.leaflet.service.exception.FileUploadException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.uploader.FileUploader;
+import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public UploadedFileVO upload(FileInputVO fileInputVO) throws ServiceException {
 
         Assert.state(fileInputVO.getSize() > 0, "File size must be greater than 0!");
@@ -77,6 +79,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void remove(String path) throws ServiceException {
         try {
             File file = buildAbsolutePath(path).toFile();
@@ -95,6 +98,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void createDirectory(String parent, String directoryName) throws ServiceException {
         try {
             Path path = Paths.get(parent, directoryName);

@@ -12,6 +12,9 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -56,6 +59,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteByEntity(EntryVO entity) throws ServiceException {
 
         if (!entryDAO.exists(entity.getId())) {
@@ -66,6 +70,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitSelf.Entry
     public void deleteByID(Long id) throws ServiceException {
 
         try {
@@ -77,6 +82,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitAdmin
     public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
 
         for (long id : ids) {
@@ -85,6 +91,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public EntryVO getOne(Long id) throws ServiceException {
 
         Entry entry = entryDAO.findOne(id);
@@ -97,6 +104,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<EntryVO> getAll() {
 
         return entryDAO.findAll().stream()
@@ -105,12 +113,14 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long count() {
 
         return entryDAO.count();
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long createOne(EntryVO entity) throws ServiceException {
 
         Entry entry = entryVOToEntryConverter.convert(entity);
@@ -129,6 +139,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<Long> createBulk(List<EntryVO> entities) throws ServiceException {
 
         List<Long> ids = new LinkedList<>();
@@ -141,6 +152,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitSelf.Entry
     public EntryVO updateOne(Long id, EntryVO updatedEntity) throws ServiceException {
 
         Entry updatedEntry;
@@ -158,6 +170,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<EntryVO> updateBulk(Map<Long, EntryVO> updatedEntities) throws ServiceException {
 
         List<EntryVO> entryVOs = new LinkedList<>();
@@ -210,6 +223,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitSelf.Entry
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!entryDAO.exists(id)) {
@@ -220,6 +234,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitSelf.Entry
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!entryDAO.exists(id)) {
@@ -230,6 +245,7 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public EntityPageVO<EntryVO> getEntityPage(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
