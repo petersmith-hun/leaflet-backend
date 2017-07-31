@@ -7,6 +7,8 @@ import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.ryantenney.metrics.spring.config.annotation.EnableMetrics;
 import com.ryantenney.metrics.spring.config.annotation.MetricsConfigurerAdapter;
+import hu.psprog.leaflet.web.metrics.SystemMetricSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,11 +31,15 @@ public class MetricsConfiguration extends MetricsConfigurerAdapter {
     private long period;
     private TimeUnit unit;
 
+    @Autowired
+    private SystemMetricSet systemMetricSet;
+
     @Override
     public void configureReporters(MetricRegistry metricRegistry) {
         if (enabled) {
             metricRegistry.registerAll(new MemoryUsageGaugeSet());
             metricRegistry.registerAll(new GarbageCollectorMetricSet());
+            metricRegistry.registerAll(systemMetricSet);
 
             registerReporter(buildGraphiteReporter(metricRegistry))
                     .start(period, unit);
