@@ -20,6 +20,11 @@ public class JWTComponentStub implements JWTComponent {
     }
 
     @Override
+    public JWTAuthenticationAnswerModel generateToken(UserDetails userDetails, Integer integer) {
+        return null;
+    }
+
+    @Override
     public JWTPayload decode(String s) throws InvalidJWTTokenException {
         return null;
     }
