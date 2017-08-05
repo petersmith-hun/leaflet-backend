@@ -63,6 +63,7 @@ public class UsersController extends BaseController {
     private static final String PATH_IDENTIFIED_USER_UPDATE_PASSWORD = PATH_PART_ID + "/password";
     private static final String PATH_CLAIM_TOKEN = "/claim";
     private static final String PATH_REGISTER = "/register";
+    private static final String PATH_REVOKE = "/revoke";
     private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = PATH_PART_ID + "/profile";
 
     private static final String REQUESTED_USER_IS_NOT_EXISTING = "Requested user is not existing.";
@@ -72,7 +73,8 @@ public class UsersController extends BaseController {
     private static final String USER_COULD_NOT_BE_CREATED = "User could not be created. See details:";
     private static final String USER_ACCOUNT_COULD_NOT_BE_CREATED = "Your user account could not be created. Please try again later!";
     private static final String PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Provided email address is already in use.";
-    private static final String LAST_LOGIN_COULD_NOT_BE_UPDATED_FOR_THIS_USER = "Last login could not be updated for this user.";
+    private static final String COULD_NOT_REVOKE_TOKEN = "Could not revoke token.";
+    private static final String AN_ERROR_OCCURRED_WHILE_SIGNING_YOU_OUT = "An error occurred while signing you out - please try again later.";
 
     private UserService userService;
     private PasswordEncoder passwordEncoder;
@@ -393,6 +395,27 @@ public class UsersController extends BaseController {
                 LOGGER.error(USER_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(USER_ACCOUNT_COULD_NOT_BE_CREATED);
             }
+        }
+    }
+
+    /**
+     * POST /users/revoke
+     * Logout (token revoke) endpoint.
+     *
+     * @return empty response
+     * @throws RequestCouldNotBeFulfilledException is logout could not be performed
+     */
+    @RequestMapping(method = RequestMethod.POST, path = PATH_REVOKE)
+    public ResponseEntity<Void> revokeToken() throws RequestCouldNotBeFulfilledException {
+
+        try {
+            userAuthenticationService.revokeToken();
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .build();
+        } catch (Exception e) {
+            LOGGER.error(COULD_NOT_REVOKE_TOKEN, e);
+            throw new RequestCouldNotBeFulfilledException(AN_ERROR_OCCURRED_WHILE_SIGNING_YOU_OUT);
         }
     }
 

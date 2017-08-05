@@ -10,11 +10,13 @@ import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
+import static hu.psprog.leaflet.service.security.annotation.SecurityTestContextConfiguration.SECURITY_TEST_PROFILE;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyLong;
 
@@ -23,12 +25,14 @@ import static org.mockito.Matchers.anyLong;
  *
  * @author Peter Smith
  */
+@Profile(SECURITY_TEST_PROFILE)
 @Configuration
 @ComponentScan("hu.psprog.leaflet.service.security.evaluator")
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityTestContextConfiguration extends WebSecurityConfigurerAdapter {
 
+    static final String SECURITY_TEST_PROFILE = "securityTest";
     static final long CURRENT_USER_ID = 2L;
 
     @Bean

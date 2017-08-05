@@ -16,4 +16,9 @@ public interface UserAuthenticationService {
      * @return claim result (token if successful)
      */
     String claimToken(LoginContextVO loginContextVO);
+
+    /**
+     * Revokes currently used authentication token.
+     */
+    void revokeToken();
 }
