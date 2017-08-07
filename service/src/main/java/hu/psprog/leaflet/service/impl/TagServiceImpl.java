@@ -11,6 +11,7 @@ import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public TagVO getOne(Long id) throws ServiceException {
 
         Tag tag = tagDAO.findOne(id);
@@ -60,6 +62,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<TagVO> getAll() {
 
         return tagDAO.findAll().stream()
@@ -76,12 +79,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long count() {
 
         return tagDAO.count();
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long createOne(TagVO entity) throws ServiceException {
 
         Tag tag = tagVOToTagConverter.convert(entity);
@@ -95,6 +100,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<Long> createBulk(List<TagVO> entities) throws ServiceException {
 
         List<Long> ids = new LinkedList<>();
@@ -107,6 +113,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void attachTagToEntry(TagVO tagVO, EntryVO entryVO) throws ServiceException {
 
         assertState(tagVO, entryVO);
@@ -123,6 +130,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void detachTagFromEntry(TagVO tagVO, EntryVO entryVO) throws ServiceException {
 
         assertState(tagVO, entryVO);
@@ -139,6 +147,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public TagVO updateOne(Long id, TagVO updatedEntity) throws ServiceException {
 
         Tag updatedTag = tagDAO.updateOne(id, tagVOToTagConverter.convert(updatedEntity));
@@ -151,6 +160,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<TagVO> updateBulk(Map<Long, TagVO> updatedEntities) throws ServiceException {
 
         List<TagVO> tagVOs = new LinkedList<>();
@@ -166,6 +176,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteByEntity(TagVO entity) throws ServiceException {
 
         if (!tagDAO.exists(entity.getId())) {
@@ -176,6 +187,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         try {
@@ -187,6 +199,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
 
         for (long id : ids) {
@@ -195,6 +208,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!tagDAO.exists(id)) {
@@ -205,6 +219,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!tagDAO.exists(id)) {

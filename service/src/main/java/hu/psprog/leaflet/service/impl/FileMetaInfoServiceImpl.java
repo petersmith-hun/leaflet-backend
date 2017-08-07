@@ -9,6 +9,7 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long storeMetaInfo(UploadedFileVO uploadedFileVO) throws ServiceException {
 
         UploadedFile uploadedFileToStore = uploadedFileVOToUploadedFileConverter.convert(uploadedFileVO);
@@ -70,6 +72,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void removeMetaInfo(UUID pathUUID) throws ServiceException  {
 
         UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
@@ -81,6 +84,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void updateMetaInfo(UUID pathUUID, UpdateFileMetaInfoVO updateFileMetaInfoVO) throws ServiceException  {
 
         UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
@@ -94,6 +98,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<UploadedFileVO> getUploadedFiles() {
         return uploadedFileDAO.findAll().stream()
                 .map(uploadedFileToUploadedFileVOConverter::convert)

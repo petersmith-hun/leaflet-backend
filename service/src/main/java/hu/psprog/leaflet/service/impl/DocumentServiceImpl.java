@@ -11,6 +11,7 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -51,6 +52,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public DocumentVO getOne(Long id) throws ServiceException {
 
         Document document = documentDAO.findOne(id);
@@ -63,6 +65,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<DocumentVO> getAll() {
 
         return documentDAO.findAll().stream()
@@ -92,12 +95,14 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long count() {
 
         return documentDAO.count();
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long createOne(DocumentVO entity) throws ServiceException {
 
         Document document = documentVOToDocumentConverter.convert(entity);
@@ -116,6 +121,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<Long> createBulk(List<DocumentVO> entities) throws ServiceException {
 
         List<Long> ids = new LinkedList<>();
@@ -128,6 +134,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public DocumentVO updateOne(Long id, DocumentVO updatedEntity) throws ServiceException {
 
         Document updatedDocument;
@@ -145,6 +152,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<DocumentVO> updateBulk(Map<Long, DocumentVO> updatedEntities) throws ServiceException {
 
         List<DocumentVO> documentVOs = new LinkedList<>();
@@ -160,6 +168,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteByEntity(DocumentVO entity) throws ServiceException {
 
         if (!documentDAO.exists(entity.getId())) {
@@ -170,6 +179,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         try {
@@ -181,6 +191,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
 
         for (long id : ids) {
@@ -189,6 +200,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!documentDAO.exists(id)) {
@@ -199,6 +211,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!documentDAO.exists(id)) {

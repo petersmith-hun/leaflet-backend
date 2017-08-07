@@ -13,6 +13,9 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
+import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitAuthenticated;
+import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.method.P;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +63,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserVO getOne(Long userID) throws ServiceException {
+    @PermitSelf.User
+    public UserVO getOne(@P("id") Long userID) throws ServiceException {
 
         User user = userDAO.findOne(userID);
 
@@ -71,6 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public List<UserVO> getAll() {
 
         return userDAO.findAll().stream()
@@ -79,12 +85,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public Long count() {
 
         return userDAO.count();
     }
 
     @Override
+    @PermitAuthenticated
     public void deleteByEntity(UserVO entity) throws ServiceException {
 
         if (!userDAO.exists(entity.getId())) {
@@ -95,7 +103,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteByID(Long userID) throws ServiceException {
+    @PermitSelf.User
+    public void deleteByID(@P("id") Long userID) throws ServiceException {
 
         try {
             userDAO.delete(userID);
@@ -106,6 +115,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
 
         for (Long id : ids) {
@@ -114,6 +124,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public Long createOne(UserVO entity) throws ServiceException {
 
         User user = userVOToUserConverter.convert(entity);
@@ -132,6 +143,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public List<Long> createBulk(List<UserVO> entities) throws ServiceException {
 
         List<Long> ids = new LinkedList<>();
@@ -144,6 +156,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitSelf.User
     public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
 
         User updatedUser;
@@ -161,6 +174,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public List<UserVO> updateBulk(Map<Long, UserVO> updatedEntities) throws ServiceException {
 
         List<UserVO> userVOs = new LinkedList<>();
@@ -199,6 +213,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitSelf.User
     public void changePassword(Long id, String password) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {
@@ -209,6 +224,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {
@@ -219,6 +235,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public EntityPageVO<UserVO> getEntityPage(int page, int limit, OrderDirection direction, UserVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
@@ -228,6 +245,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitAdmin
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {
@@ -239,6 +257,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @PermitAdmin
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {

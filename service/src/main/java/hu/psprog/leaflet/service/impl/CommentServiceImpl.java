@@ -14,6 +14,9 @@ import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -61,6 +64,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitSelf.Comment
     public CommentVO getOne(Long id) throws ServiceException {
 
         Comment comment = commentDAO.findOne(id);
@@ -73,6 +77,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public List<CommentVO> getAll() {
 
         return commentDAO.findAll().stream()
@@ -81,6 +86,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction,
                                                              CommentVO.OrderBy orderBy, EntryVO entryVO) {
 
@@ -105,6 +111,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction,
                                                             CommentVO.OrderBy orderBy, UserVO userVO) {
 
@@ -116,6 +123,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public Long count() {
 
         return commentDAO.count();
@@ -135,6 +143,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitAdmin
     public List<Long> createBulk(List<CommentVO> entities) throws ServiceException {
 
         List<Long> ids = new LinkedList<>();
@@ -147,6 +156,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitSelf.Comment
     public CommentVO updateOne(Long id, CommentVO updatedEntity) throws ServiceException {
 
         Comment updatedComment = commentDAO.updateOne(id, commentVOToCommentConverter.convert(updatedEntity));
@@ -159,6 +169,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitAdmin
     public List<CommentVO> updateBulk(Map<Long, CommentVO> updatedEntities) throws ServiceException {
 
         List<CommentVO> commentVOs = new LinkedList<>();
@@ -174,6 +185,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitAdmin
     public void deleteByEntity(CommentVO entity) throws ServiceException {
 
         if (!commentDAO.exists(entity.getId())) {
@@ -184,6 +196,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         try {
@@ -195,6 +208,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitAdmin
     public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
 
         for (long id : ids) {
@@ -203,6 +217,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!commentDAO.exists(id)) {
@@ -213,6 +228,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!commentDAO.exists(id)) {
@@ -223,6 +239,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitSelf.CommentByEntity
     public void deleteLogicallyByEntity(CommentVO entity) throws ServiceException {
 
         if (!commentDAO.exists(entity.getId())) {
@@ -233,6 +250,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitEditorOrAdmin
     public void restoreEntity(CommentVO entity) throws ServiceException {
 
         if (!commentDAO.exists(entity.getId())) {
