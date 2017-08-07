@@ -33,6 +33,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -54,6 +55,7 @@ import java.util.Properties;
 @Configuration
 @ComponentScan(basePackages = LeafletITContextConfig.COMPONENT_SCAN_PACKAGE)
 @EnableJpaRepositories(basePackages = LeafletITContextConfig.REPOSITORY_PACKAGE)
+@EnableGlobalMethodSecurity(prePostEnabled = false)
 public class LeafletITContextConfig implements ApplicationListener<ContextClosedEvent> {
 
     public static final String INTEGRATION_TEST_DB_SCRIPT_USERS = "classpath:/service_it_db_script_users.sql";
