@@ -2,6 +2,8 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
+import hu.psprog.leaflet.api.rest.request.user.PasswordResetConfirmationRequestModel;
+import hu.psprog.leaflet.api.rest.request.user.PasswordResetDemandRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
@@ -29,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,6 +68,7 @@ public class UsersController extends BaseController {
     private static final String PATH_REGISTER = "/register";
     private static final String PATH_REVOKE = "/revoke";
     private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = PATH_PART_ID + "/profile";
+    private static final String PATH_RECLAIM = "/reclaim";
 
     private static final String REQUESTED_USER_IS_NOT_EXISTING = "Requested user is not existing.";
     private static final String INITIALIZATION_FAILED_SEE_DETAILS = "Initialization failed. See details:";
@@ -75,6 +79,9 @@ public class UsersController extends BaseController {
     private static final String PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Provided email address is already in use.";
     private static final String COULD_NOT_REVOKE_TOKEN = "Could not revoke token.";
     private static final String AN_ERROR_OCCURRED_WHILE_SIGNING_YOU_OUT = "An error occurred while signing you out - please try again later.";
+    private static final String FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST = "Failed to process password reset request.";
+    private static final String UNREGISTERED_EMAIL_ADDRESS = "The email address you've specified could not be found. Please check it.";
+    private static final String PASSWORD_RESET_FAILURE = "Your password reset request cannot be processed at the moment - please try again later.";
 
     private UserService userService;
     private PasswordEncoder passwordEncoder;
@@ -416,6 +423,60 @@ public class UsersController extends BaseController {
         } catch (Exception e) {
             LOGGER.error(COULD_NOT_REVOKE_TOKEN, e);
             throw new RequestCouldNotBeFulfilledException(AN_ERROR_OCCURRED_WHILE_SIGNING_YOU_OUT);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = PATH_RECLAIM)
+    public ResponseEntity<BaseBodyDataModel> demandPasswordReset(@RequestBody @Valid PasswordResetDemandRequestModel passwordResetDemandRequestModel,
+                                                    HttpServletRequest httpServletRequest, BindingResult bindingResult)
+            throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            LoginContextVO loginContextVO = LoginContextVO.getBuilder()
+                    .withUsername(passwordResetDemandRequestModel.getEmail())
+                    .withDeviceID(extractDeviceID(httpServletRequest))
+                    .withRemoteAddress(httpServletRequest.getRemoteAddr())
+                    .build();
+            try {
+                userAuthenticationService.demandPasswordReset(loginContextVO);
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .build();
+            } catch (UsernameNotFoundException e) {
+                LOGGER.error(FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST, e);
+                throw new ResourceNotFoundException(UNREGISTERED_EMAIL_ADDRESS);
+            } catch (Exception e) {
+                LOGGER.error(FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST, e);
+                throw new RequestCouldNotBeFulfilledException(PASSWORD_RESET_FAILURE);
+            }
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, path = PATH_RECLAIM)
+    public ResponseEntity<BaseBodyDataModel> confirmPasswordReset(@RequestBody @Valid PasswordResetConfirmationRequestModel passwordResetConfirmationRequestModel,
+                                                                  BindingResult bindingResult)
+            throws RequestCouldNotBeFulfilledException {
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+        } else {
+            hashPassword(passwordResetConfirmationRequestModel);
+            try {
+                userAuthenticationService.confirmPasswordReset(passwordResetConfirmationRequestModel.getEmail(),
+                        passwordResetConfirmationRequestModel.getPassword());
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .build();
+            } catch (Exception e) {
+                LOGGER.error(FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST, e);
+                throw new RequestCouldNotBeFulfilledException(PASSWORD_RESET_FAILURE);
+            }
         }
     }
 

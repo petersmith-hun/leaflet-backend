@@ -6,6 +6,8 @@ import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
 import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
 import io.reactivex.Observable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,8 @@ import java.util.Map;
  */
 @Service
 public class EmailBasedNotificationService implements NotificationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmailBasedNotificationService.class);
 
     private static final String VERSION = "version";
     private static final String GENERATED_AT = "generatedAt";
@@ -45,6 +49,16 @@ public class EmailBasedNotificationService implements NotificationService {
     public void startupFinished(String version) {
         Observable<MailDeliveryInfo> status = mailClient.sendMail(createMail(version));
         loggingMailObserverHandler.attachObserver(status);
+    }
+
+    @Override
+    public void passwordResetRequested(String resetToken) {
+        LOGGER.info("Your reset token: {}", resetToken);
+    }
+
+    @Override
+    public void successfulPasswordReset() {
+        LOGGER.info("Password successfully reset.");
     }
 
     private Mail createMail(String version) {

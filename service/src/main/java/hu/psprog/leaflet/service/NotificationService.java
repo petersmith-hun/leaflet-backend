@@ -13,4 +13,8 @@ public interface NotificationService {
      * @param version version of currently running application
      */
     void startupFinished(String version);
+
+    void passwordResetRequested(String resetToken);
+
+    void successfulPasswordReset();
 }
