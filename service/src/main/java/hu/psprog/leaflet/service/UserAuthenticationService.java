@@ -31,9 +31,9 @@ public interface UserAuthenticationService {
 
     /**
      * Confirms password reset and updates password of the user.
+     * No explicit user identifier is required, as principal is retrieved from Security Context.
      *
-     * @param email email address of the user to request password reset for
      * @param password user's new password
      */
-    void confirmPasswordReset(String email, String password);
+    void confirmPasswordReset(String password);
 }

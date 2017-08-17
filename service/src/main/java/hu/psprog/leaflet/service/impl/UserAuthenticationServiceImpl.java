@@ -9,11 +9,11 @@ import hu.psprog.leaflet.security.sessionstore.domain.ClaimedTokenContext;
 import hu.psprog.leaflet.security.sessionstore.service.SessionStoreService;
 import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.UserAuthenticationService;
+import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.security.annotation.PermitAuthenticated;
 import hu.psprog.leaflet.service.security.annotation.PermitReclaim;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -75,11 +75,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @PermitAuthenticated
     public void revokeToken() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (Objects.isNull(authentication) || !(authentication instanceof JWTAuthenticationToken)) {
-            throw new IllegalStateException("No JWT authentication token found in security context - revoke failed.");
-        }
-
+        Authentication authentication = retrieveAuthentication();
         sessionStoreService.revokeToken((JWTAuthenticationToken) authentication);
     }
 
@@ -94,17 +90,32 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
                 .withDeviceID(loginContextVO.getDeviceID())
                 .build());
 
-        notificationService.passwordResetRequested(authenticationAnswerModel.getToken());
+        notificationService.passwordResetRequested(PasswordResetRequest.getBuilder()
+                .withParticipant(loginContextVO.getUsername())
+                .withUserDetails((ExtendedUserDetails) reclaimUserDetails)
+                .withExpiration(RECLAIM_TOKEN_EXPIRATION_IN_HOURS)
+                .withToken(authenticationAnswerModel.getToken())
+                .build());
     }
 
     @Override
     @PermitReclaim
-    public void confirmPasswordReset(@P("email") String email, String password) {
+    public void confirmPasswordReset(String password) {
 
-        ExtendedUserDetails userDetails = (ExtendedUserDetails) userDetailsService.loadUserByUsername(email);
+        ExtendedUserDetails userDetails = (ExtendedUserDetails) userDetailsService.loadUserByUsername(retrieveAuthentication().getPrincipal().toString());
         userDAO.updatePassword(userDetails.getId(), password);
         notificationService.successfulPasswordReset();
         revokeToken();
+    }
+
+    private Authentication retrieveAuthentication() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (Objects.isNull(authentication) || !(authentication instanceof JWTAuthenticationToken)) {
+            throw new IllegalStateException("No JWT authentication token found in security context - password reset failed.");
+        }
+
+        return authentication;
     }
 
     private UserDetails generateReclaimUserDetails(UserDetails originalUserDetails) {

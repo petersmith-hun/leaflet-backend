@@ -11,6 +11,6 @@ import java.lang.annotation.RetentionPolicy;
  * @author Peter Smith
  */
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("isAuthenticated() && hasAuthority('RECLAIM') && #email == principal")
+@PreAuthorize("isAuthenticated() && hasAuthority('RECLAIM')")
 public @interface PermitReclaim {
 }

@@ -2,7 +2,6 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
-import hu.psprog.leaflet.api.rest.request.user.PasswordResetConfirmationRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.PasswordResetDemandRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
@@ -457,7 +456,7 @@ public class UsersController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, path = PATH_RECLAIM)
-    public ResponseEntity<BaseBodyDataModel> confirmPasswordReset(@RequestBody @Valid PasswordResetConfirmationRequestModel passwordResetConfirmationRequestModel,
+    public ResponseEntity<BaseBodyDataModel> confirmPasswordReset(@RequestBody @Valid UserPasswordRequestModel userPasswordRequestModel,
                                                                   BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
@@ -466,10 +465,9 @@ public class UsersController extends BaseController {
                     .badRequest()
                     .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
         } else {
-            hashPassword(passwordResetConfirmationRequestModel);
+            hashPassword(userPasswordRequestModel);
             try {
-                userAuthenticationService.confirmPasswordReset(passwordResetConfirmationRequestModel.getEmail(),
-                        passwordResetConfirmationRequestModel.getPassword());
+                userAuthenticationService.confirmPasswordReset(userPasswordRequestModel.getPassword());
                 return ResponseEntity
                         .status(HttpStatus.CREATED)
                         .build();
