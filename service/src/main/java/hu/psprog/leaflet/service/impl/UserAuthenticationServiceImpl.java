@@ -10,6 +10,7 @@ import hu.psprog.leaflet.security.sessionstore.service.SessionStoreService;
 import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
+import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.security.annotation.PermitAuthenticated;
 import hu.psprog.leaflet.service.security.annotation.PermitReclaim;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
@@ -17,12 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -35,6 +39,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
 
     private static final int RECLAIM_TOKEN_EXPIRATION_IN_HOURS = 1;
     private static final String RECLAIM_ROLE = "RECLAIM";
+    private static final List<String> ELEVATED_ROLES = Arrays.asList("ADMIN", "EDITOR");
 
     private AuthenticationManager authenticationManager;
     private UserDetailsService userDetailsService;
@@ -92,7 +97,8 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
 
         notificationService.passwordResetRequested(PasswordResetRequest.getBuilder()
                 .withParticipant(loginContextVO.getUsername())
-                .withUserDetails((ExtendedUserDetails) reclaimUserDetails)
+                .withUsername(((ExtendedUserDetails) reclaimUserDetails).getName())
+                .withElevated(isElevatedUser(reclaimUserDetails))
                 .withExpiration(RECLAIM_TOKEN_EXPIRATION_IN_HOURS)
                 .withToken(authenticationAnswerModel.getToken())
                 .build());
@@ -104,8 +110,17 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
 
         ExtendedUserDetails userDetails = (ExtendedUserDetails) userDetailsService.loadUserByUsername(retrieveAuthentication().getPrincipal().toString());
         userDAO.updatePassword(userDetails.getId(), password);
-        notificationService.successfulPasswordReset();
+        notificationService.successfulPasswordReset(PasswordResetSuccess.getBuilder()
+                .withParticipant(userDetails.getUsername())
+                .withUsername(userDetails.getName())
+                .build());
         revokeToken();
+    }
+
+    private boolean isElevatedUser(UserDetails userDetails) {
+        return userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(ELEVATED_ROLES::contains);
     }
 
     private Authentication retrieveAuthentication() {

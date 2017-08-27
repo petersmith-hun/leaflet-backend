@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.service.mail.domain;
 
-import hu.psprog.leaflet.security.jwt.model.ExtendedUserDetails;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -13,7 +12,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class PasswordResetRequest {
 
     private String participant;
-    private ExtendedUserDetails userDetails;
+    private boolean elevated;
+    private String username;
     private String token;
     private int expiration;
 
@@ -21,8 +21,12 @@ public class PasswordResetRequest {
         return participant;
     }
 
-    public ExtendedUserDetails getUserDetails() {
-        return userDetails;
+    public boolean isElevated() {
+        return elevated;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getToken() {
@@ -44,7 +48,8 @@ public class PasswordResetRequest {
         return new EqualsBuilder()
                 .append(expiration, that.expiration)
                 .append(participant, that.participant)
-                .append(userDetails, that.userDetails)
+                .append(elevated, that.elevated)
+                .append(username, that.username)
                 .append(token, that.token)
                 .isEquals();
     }
@@ -53,7 +58,8 @@ public class PasswordResetRequest {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(participant)
-                .append(userDetails)
+                .append(elevated)
+                .append(username)
                 .append(token)
                 .append(expiration)
                 .toHashCode();
@@ -63,7 +69,8 @@ public class PasswordResetRequest {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("participant", participant)
-                .append("userDetails", userDetails)
+                .append("elevated", elevated)
+                .append("username", username)
                 .append("token", token)
                 .append("expiration", expiration)
                 .toString();
@@ -78,7 +85,8 @@ public class PasswordResetRequest {
      */
     public static final class PasswordResetRequestBuilder {
         private String participant;
-        private ExtendedUserDetails userDetails;
+        private boolean elevated;
+        private String username;
         private String token;
         private int expiration;
 
@@ -90,8 +98,13 @@ public class PasswordResetRequest {
             return this;
         }
 
-        public PasswordResetRequestBuilder withUserDetails(ExtendedUserDetails userDetails) {
-            this.userDetails = userDetails;
+        public PasswordResetRequestBuilder withElevated(boolean elevated) {
+            this.elevated = elevated;
+            return this;
+        }
+
+        public PasswordResetRequestBuilder withUsername(String username) {
+            this.username = username;
             return this;
         }
 
@@ -109,7 +122,8 @@ public class PasswordResetRequest {
             PasswordResetRequest passwordResetRequest = new PasswordResetRequest();
             passwordResetRequest.participant = this.participant;
             passwordResetRequest.token = this.token;
-            passwordResetRequest.userDetails = this.userDetails;
+            passwordResetRequest.elevated = this.elevated;
+            passwordResetRequest.username = this.username;
             passwordResetRequest.expiration = this.expiration;
             return passwordResetRequest;
         }

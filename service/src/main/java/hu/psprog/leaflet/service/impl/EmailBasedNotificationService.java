@@ -4,12 +4,12 @@ import hu.psprog.leaflet.mail.client.MailClient;
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
+import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.mail.impl.MailFactoryRegistry;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetRequestMailFactory;
+import hu.psprog.leaflet.service.mail.impl.PasswordResetSuccessMailFactory;
 import hu.psprog.leaflet.service.mail.impl.SystemStartupMailFactory;
 import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +20,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class EmailBasedNotificationService implements NotificationService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EmailBasedNotificationService.class);
 
     private MailClient mailClient;
     private LoggingMailObserverHandler loggingMailObserverHandler;
@@ -51,7 +49,10 @@ public class EmailBasedNotificationService implements NotificationService {
     }
 
     @Override
-    public void successfulPasswordReset() {
-        LOGGER.info("Password successfully reset.");
+    public void successfulPasswordReset(PasswordResetSuccess passwordResetSuccess) {
+        Mail mail = mailFactoryRegistry
+                .getFactory(PasswordResetSuccessMailFactory.class)
+                .buildMail(passwordResetSuccess.getUsername(), passwordResetSuccess.getParticipant());
+        loggingMailObserverHandler.attachObserver(mailClient.sendMail(mail));
     }
 }

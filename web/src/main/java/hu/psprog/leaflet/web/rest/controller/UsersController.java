@@ -425,6 +425,17 @@ public class UsersController extends BaseController {
         }
     }
 
+    /**
+     * POST /users/reclaim
+     * Starts password reset process.
+     *
+     * @param passwordResetDemandRequestModel user's email address wrapped in {@link PasswordResetDemandRequestModel} to request password reset for
+     * @param httpServletRequest {@link HttpServletRequest} object
+     * @param bindingResult validation result
+     * @return empty response on success, validation results if validation fails
+     * @throws RequestCouldNotBeFulfilledException if request cannot be processed
+     * @throws ResourceNotFoundException if no existing user found for given email address
+     */
     @RequestMapping(method = RequestMethod.POST, path = PATH_RECLAIM)
     public ResponseEntity<BaseBodyDataModel> demandPasswordReset(@RequestBody @Valid PasswordResetDemandRequestModel passwordResetDemandRequestModel,
                                                     HttpServletRequest httpServletRequest, BindingResult bindingResult)
@@ -455,6 +466,15 @@ public class UsersController extends BaseController {
         }
     }
 
+    /**
+     * PUT /users/reclaim
+     * Confirms password reset request by providing the new password.
+     *
+     * @param userPasswordRequestModel {@link UserPasswordRequestModel} holding the new password and its confirmation
+     * @param bindingResult validation result
+     * @return empty response on success, validation results if validation fails
+     * @throws RequestCouldNotBeFulfilledException if request cannot be processed
+     */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_RECLAIM)
     public ResponseEntity<BaseBodyDataModel> confirmPasswordReset(@RequestBody @Valid UserPasswordRequestModel userPasswordRequestModel,
                                                                   BindingResult bindingResult)

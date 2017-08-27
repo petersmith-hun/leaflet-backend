@@ -1,15 +1,12 @@
 package hu.psprog.leaflet.service.mail.impl;
 
 import hu.psprog.leaflet.mail.domain.Mail;
-import hu.psprog.leaflet.security.jwt.model.ExtendedUserDetails;
 import hu.psprog.leaflet.service.mail.MailFactory;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,12 +18,11 @@ import java.util.Objects;
  * @author Peter Smith
  */
 @Component
-@ConfigurationProperties(prefix = "mail.event.password-reset", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "mail.event.password-reset.url", ignoreUnknownFields = false)
 public class PasswordResetRequestMailFactory implements MailFactory<PasswordResetRequest> {
 
     private static final String PASSWORD_RESET_REQUEST_MAIL_SUBJECT = "Password reset requested";
     private static final String PASSWORD_RESET_REQUEST_MAIL_TEMPLATE = "pw_reset_request.html";
-    private static final String DEFAULT = "default";
 
     private static final String GENERATED_AT = "generatedAt";
     private static final String EXPIRATION = "expiration";
@@ -34,12 +30,8 @@ public class PasswordResetRequestMailFactory implements MailFactory<PasswordRese
     private static final String TOKEN = "token";
     private static final String RESET_LINK = "resetLink";
 
-    private Map<String, String> urlByRole;
-
-    @PostConstruct
-    public void checkUrlMap() {
-        Assert.isTrue(urlByRole.containsKey(DEFAULT), "URL map must contain default URL");
-    }
+    private String elevated;
+    private String visitor;
 
     @Override
     public Mail buildMail(PasswordResetRequest content, String... recipient) {
@@ -54,32 +46,41 @@ public class PasswordResetRequestMailFactory implements MailFactory<PasswordRese
                 .build();
     }
 
-    public Map<String, String> getUrlByRole() {
-        return urlByRole;
+    public String getElevated() {
+        return elevated;
     }
 
-    public void setUrlByRole(Map<String, String> urlByRole) {
-        this.urlByRole = urlByRole;
+    public void setElevated(String elevated) {
+        this.elevated = elevated;
+    }
+
+    public String getVisitor() {
+        return visitor;
+    }
+
+    public void setVisitor(String visitor) {
+        this.visitor = visitor;
     }
 
     private Map<String, Object> createContentMap(PasswordResetRequest passwordResetRequest) {
 
         Map<String, Object> contentMap = new HashMap<>();
         contentMap.put(TOKEN, passwordResetRequest.getToken());
-        contentMap.put(USERNAME, passwordResetRequest.getUserDetails().getName());
+        contentMap.put(USERNAME, passwordResetRequest.getUsername());
         contentMap.put(EXPIRATION, passwordResetRequest.getExpiration());
-        contentMap.put(RESET_LINK, getResetURL(passwordResetRequest.getUserDetails()));
+        contentMap.put(RESET_LINK, getResetURL(passwordResetRequest));
         contentMap.put(GENERATED_AT, DATE_FORMAT.format(new Date()));
 
         return contentMap;
     }
 
-    private String getResetURL(ExtendedUserDetails userDetails) {
-        String authority = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElse(null);
+    private String getResetURL(PasswordResetRequest passwordResetRequest) {
 
-        return urlByRole.getOrDefault(authority, urlByRole.get(DEFAULT));
+        String resetURL = visitor;
+        if (passwordResetRequest.isElevated()) {
+            resetURL = elevated;
+        }
+
+        return resetURL;
     }
 }
