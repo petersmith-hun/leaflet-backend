@@ -1,5 +1,8 @@
 package hu.psprog.leaflet.service;
 
+import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
+import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
+
 /**
  * System notification handler service.
  *
@@ -13,4 +16,18 @@ public interface NotificationService {
      * @param version version of currently running application
      */
     void startupFinished(String version);
+
+    /**
+     * Sends response mail for password reset request.
+     *
+     * @param passwordResetRequest domain object holding required parameters
+     */
+    void passwordResetRequested(PasswordResetRequest passwordResetRequest);
+
+    /**
+     * Sends notification of successful password reset.
+     *
+     * @param passwordResetSuccess domain object holding required parameters
+     */
+    void successfulPasswordReset(PasswordResetSuccess passwordResetSuccess);
 }

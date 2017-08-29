@@ -2,18 +2,16 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.mail.client.MailClient;
 import hu.psprog.leaflet.mail.domain.Mail;
-import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
 import hu.psprog.leaflet.service.NotificationService;
+import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
+import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
+import hu.psprog.leaflet.service.mail.impl.MailFactoryRegistry;
+import hu.psprog.leaflet.service.mail.impl.PasswordResetRequestMailFactory;
+import hu.psprog.leaflet.service.mail.impl.PasswordResetSuccessMailFactory;
+import hu.psprog.leaflet.service.mail.impl.SystemStartupMailFactory;
 import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
-import io.reactivex.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Email-based implementation of {@link NotificationService}.
@@ -23,45 +21,38 @@ import java.util.Map;
 @Service
 public class EmailBasedNotificationService implements NotificationService {
 
-    private static final String VERSION = "version";
-    private static final String GENERATED_AT = "generatedAt";
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss z";
-
-    private static final String SYSTEM_STARTUP_MAIL_SUBJECT = "Leaflet started up";
-    private static final String SYSTEM_STARTUP_MAIL_TEMPLATE = "system_startup.html";
-
     private MailClient mailClient;
     private LoggingMailObserverHandler loggingMailObserverHandler;
-    private DateFormat dateFormat;
+    private MailFactoryRegistry mailFactoryRegistry;
 
     @Autowired
-    public EmailBasedNotificationService(MailClient mailClient, LoggingMailObserverHandler loggingMailObserverHandler) {
+    public EmailBasedNotificationService(MailClient mailClient, LoggingMailObserverHandler loggingMailObserverHandler, MailFactoryRegistry mailFactoryRegistry) {
         this.mailClient = mailClient;
         this.loggingMailObserverHandler = loggingMailObserverHandler;
-        dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        this.mailFactoryRegistry = mailFactoryRegistry;
     }
 
     @Override
     public void startupFinished(String version) {
-        Observable<MailDeliveryInfo> status = mailClient.sendMail(createMail(version));
-        loggingMailObserverHandler.attachObserver(status);
+        Mail mail = mailFactoryRegistry
+                .getFactory(SystemStartupMailFactory.class)
+                .buildMail(version);
+        loggingMailObserverHandler.attachObserver(mailClient.sendMail(mail));
     }
 
-    private Mail createMail(String version) {
-
-        return Mail.getBuilder()
-                .withSubject(SYSTEM_STARTUP_MAIL_SUBJECT)
-                .withTemplate(SYSTEM_STARTUP_MAIL_TEMPLATE)
-                .withContentMap(createContentMap(version))
-                .build();
+    @Override
+    public void passwordResetRequested(PasswordResetRequest passwordResetRequest) {
+        Mail mail = mailFactoryRegistry
+                .getFactory(PasswordResetRequestMailFactory.class)
+                .buildMail(passwordResetRequest, passwordResetRequest.getParticipant());
+        loggingMailObserverHandler.attachObserver(mailClient.sendMail(mail));
     }
 
-    private Map<String, Object> createContentMap(String version) {
-
-        Map<String, Object> contentMap = new HashMap<>();
-        contentMap.put(VERSION, version);
-        contentMap.put(GENERATED_AT, dateFormat.format(new Date()));
-
-        return contentMap;
+    @Override
+    public void successfulPasswordReset(PasswordResetSuccess passwordResetSuccess) {
+        Mail mail = mailFactoryRegistry
+                .getFactory(PasswordResetSuccessMailFactory.class)
+                .buildMail(passwordResetSuccess.getUsername(), passwordResetSuccess.getParticipant());
+        loggingMailObserverHandler.attachObserver(mailClient.sendMail(mail));
     }
 }

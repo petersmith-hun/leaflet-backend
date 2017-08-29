@@ -7,6 +7,7 @@ import hu.psprog.leaflet.web.rest.handler.RESTAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -34,6 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final String PATH_USERS_CLAIM = "/users/claim";
     private static final String PATH_USERS_REGISTER = "/users/register";
+    private static final String PATH_USERS_RECLAIM = "/users/reclaim";
     private static final String PATH_USERS_INIT = "/users/init";
     private static final String INIT_ACCESS_FILTER_EXPRESSION = "@initModeEnabled";
 
@@ -88,6 +90,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
             .authorizeRequests()
                 .antMatchers(PATH_USERS_CLAIM, PATH_USERS_REGISTER)
+                    .anonymous()
+                .antMatchers(HttpMethod.POST, PATH_USERS_RECLAIM)
                     .anonymous()
                 .antMatchers(PATH_USERS_INIT)
                     .access(INIT_ACCESS_FILTER_EXPRESSION)

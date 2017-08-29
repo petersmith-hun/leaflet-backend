@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Leaflet System Event Notification</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+            body {
+                max-width: 600px;
+                margin: auto;
+                font-family: Calibri;
+            }
+
+            h1 {
+                color: #00638A;
+                border-bottom: 2px solid #eee;
+                padding: 10px 20px;
+            }
+
+            h2 {
+                color: #B0B0B0;
+                padding-left: 30px;
+                font-size: 14px;
+            }
+
+            #content {
+                border-left: 2px solid #eee;
+                margin-left: 30px;
+                margin-top: 30px;
+                padding: 10px 0px 20px 20px;
+            }
+
+            #genDate {
+                margin-top: 60px;
+                font-style: italic;
+                color: #B0B0B0;
+                text-align: right;
+            }
+        </style>
+</head>
+<body>
+<h1>User account notification</h1>
+<h2>Password reset requested</h2>
+<div id="content">
+    <p style="font-weight: bold; margin-bottom: 10px;">Hi <span th:text="${username}">username</span>,</p>
+    <p>You, or someone in your name requested a password reset. If it wasn't you, please ignore this message (or contact the administrator if you think this could be an attempt of stealing your account).</p>
+    <p>Otherwise, please <a th:href="@{${resetLink}(token=${token})}">click on this link</a> to continue your password reset request. This link will navigate you to a page, where you have to provide your new password.</p>
+    <p>Please note, that the link above can be used for only <span th:text="${expiration}">0</span> hour from the generation of this email (you can see it below).</p>
+    <p id="genDate">Event sent at <span th:text="${generatedAt}">2017. 06. 27. 22:52</span></p>
+</div>
+</body>
+</html>
