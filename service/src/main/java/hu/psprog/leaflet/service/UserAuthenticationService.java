@@ -36,4 +36,12 @@ public interface UserAuthenticationService {
      * @param password user's new password
      */
     void confirmPasswordReset(String password);
+
+    /**
+     * Extends user session.
+     *
+     * @param loginContextVO {@link LoginContextVO} object holding client information - only device ID and remote address is required here
+     * @return replacement token on success
+     */
+    String extendSession(LoginContextVO loginContextVO);
 }

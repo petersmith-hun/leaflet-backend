@@ -62,18 +62,12 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @Override
     public String claimToken(LoginContextVO loginContextVO) {
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(loginContextVO.getUsername(), loginContextVO.getPassword());
-        authenticationManager.authenticate(authentication);
+        authenticationManager.authenticate(createUsernamePasswordAuthentication(loginContextVO));
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginContextVO.getUsername());
-        JWTAuthenticationAnswerModel authenticationAnswer = jwtComponent.generateToken(userDetails);
+        JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(userDetails);
+        storeToken(loginContextVO, authenticationAnswerModel);
 
-        sessionStoreService.storeToken(ClaimedTokenContext.getBuilder()
-                .withToken(authenticationAnswer.getToken())
-                .withDeviceID(loginContextVO.getDeviceID())
-                .withRemoteAddress(loginContextVO.getRemoteAddress())
-                .build());
-
-        return authenticationAnswer.getToken();
+        return authenticationAnswerModel.getToken();
     }
 
     @Override
@@ -89,11 +83,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
 
         UserDetails reclaimUserDetails = generateReclaimUserDetails(userDetailsService.loadUserByUsername(loginContextVO.getUsername()));
         JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(reclaimUserDetails, RECLAIM_TOKEN_EXPIRATION_IN_HOURS);
-        sessionStoreService.storeToken(ClaimedTokenContext.getBuilder()
-                .withToken(authenticationAnswerModel.getToken())
-                .withRemoteAddress(loginContextVO.getRemoteAddress())
-                .withDeviceID(loginContextVO.getDeviceID())
-                .build());
+        storeToken(loginContextVO, authenticationAnswerModel);
 
         notificationService.passwordResetRequested(PasswordResetRequest.getBuilder()
                 .withParticipant(loginContextVO.getUsername())
@@ -108,7 +98,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @PermitReclaim
     public void confirmPasswordReset(String password) {
 
-        ExtendedUserDetails userDetails = (ExtendedUserDetails) userDetailsService.loadUserByUsername(retrieveAuthentication().getPrincipal().toString());
+        ExtendedUserDetails userDetails = retrieveAuthenticatedUserDetails();
         userDAO.updatePassword(userDetails.getId(), password);
         notificationService.successfulPasswordReset(PasswordResetSuccess.getBuilder()
                 .withParticipant(userDetails.getUsername())
@@ -117,17 +107,36 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
         revokeToken();
     }
 
+    @Override
+    @PermitAuthenticated
+    public String extendSession(LoginContextVO loginContextVO) {
+
+        JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(retrieveAuthenticatedUserDetails());
+        revokeToken();
+        storeToken(loginContextVO, authenticationAnswerModel);
+
+        return authenticationAnswerModel.getToken();
+    }
+
     private boolean isElevatedUser(UserDetails userDetails) {
         return userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(ELEVATED_ROLES::contains);
     }
 
+    private ExtendedUserDetails retrieveAuthenticatedUserDetails() {
+        return (ExtendedUserDetails) userDetailsService.loadUserByUsername(retrieveAuthentication().getPrincipal().toString());
+    }
+
+    private Authentication createUsernamePasswordAuthentication(LoginContextVO loginContextVO) {
+        return new UsernamePasswordAuthenticationToken(loginContextVO.getUsername(), loginContextVO.getPassword());
+    }
+
     private Authentication retrieveAuthentication() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (Objects.isNull(authentication) || !(authentication instanceof JWTAuthenticationToken)) {
-            throw new IllegalStateException("No JWT authentication token found in security context - password reset failed.");
+            throw new IllegalStateException("No JWT authentication token found in security context - retrieving authentication object failed.");
         }
 
         return authentication;
@@ -142,5 +151,13 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
                 .withEnabled(userDetails.isEnabled())
                 .withAuthorities(AuthorityUtils.createAuthorityList(RECLAIM_ROLE))
                 .build();
+    }
+
+    private void storeToken(LoginContextVO loginContextVO, JWTAuthenticationAnswerModel authenticationAnswerModel) {
+        sessionStoreService.storeToken(ClaimedTokenContext.getBuilder()
+                .withToken(authenticationAnswerModel.getToken())
+                .withRemoteAddress(loginContextVO.getRemoteAddress())
+                .withDeviceID(loginContextVO.getDeviceID())
+                .build());
     }
 }
