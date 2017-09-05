@@ -68,6 +68,7 @@ public class UsersController extends BaseController {
     private static final String PATH_REVOKE = "/revoke";
     private static final String PATH_IDENTIFIED_USER_UPDATE_PROFILE = PATH_PART_ID + "/profile";
     private static final String PATH_RECLAIM = "/reclaim";
+    private static final String PATH_RENEW = "/renew";
 
     private static final String REQUESTED_USER_IS_NOT_EXISTING = "Requested user is not existing.";
     private static final String INITIALIZATION_FAILED_SEE_DETAILS = "Initialization failed. See details:";
@@ -81,6 +82,7 @@ public class UsersController extends BaseController {
     private static final String FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST = "Failed to process password reset request.";
     private static final String UNREGISTERED_EMAIL_ADDRESS = "The email address you've specified could not be found. Please check it.";
     private static final String PASSWORD_RESET_FAILURE = "Your password reset request cannot be processed at the moment - please try again later.";
+    private static final String FAILED_TO_EXTEND_USER_SESSION = "Failed to extend user session";
 
     private UserService userService;
     private PasswordEncoder passwordEncoder;
@@ -495,6 +497,35 @@ public class UsersController extends BaseController {
                 LOGGER.error(FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST, e);
                 throw new RequestCouldNotBeFulfilledException(PASSWORD_RESET_FAILURE);
             }
+        }
+    }
+
+    /**
+     * PUT /users/renew
+     * Claims "session extension" - replaces given token with a new one.
+     *
+     * @param httpServletRequest {@link HttpServletRequest} object
+     * @return new token wrapped in {@link LoginResponseDataModel}
+     * @throws RequestCouldNotBeFulfilledException if request cannot be processed
+     */
+    @RequestMapping(method = RequestMethod.PUT, path = PATH_RENEW)
+    public ResponseEntity<LoginResponseDataModel> renewToken(HttpServletRequest httpServletRequest) throws RequestCouldNotBeFulfilledException {
+
+        try {
+            String token = userAuthenticationService.extendSession(LoginContextVO.getBuilder()
+                    .withDeviceID(extractDeviceID(httpServletRequest))
+                    .withRemoteAddress(httpServletRequest.getRemoteAddr())
+                    .build());
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(LoginResponseDataModel.getBuilder()
+                            .withStatus(LoginResponseDataModel.AuthenticationResult.AUTH_SUCCESS)
+                            .withToken(token)
+                            .build());
+        } catch (Exception e) {
+            LOGGER.error(FAILED_TO_EXTEND_USER_SESSION, e);
+            throw new RequestCouldNotBeFulfilledException(FAILED_TO_EXTEND_USER_SESSION);
         }
     }
 
