@@ -4,8 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
-import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,11 @@ import org.springframework.context.annotation.Profile;
  *
  * @author Peter Smith
  */
-@SpringBootApplication(exclude = {ThymeleafAutoConfiguration.class, H2ConsoleAutoConfiguration.class})
+@SpringBootApplication(exclude = {
+        H2ConsoleAutoConfiguration.class,
+        JdbcTemplateAutoConfiguration.class,
+        MailSenderAutoConfiguration.class,
+        ThymeleafAutoConfiguration.class})
 public class LeafletBackendApplication {
 
     private static final String AJP_PROTOCOL = "AJP/1.3";
@@ -28,14 +33,10 @@ public class LeafletBackendApplication {
     @Bean
     @Profile("production")
     public EmbeddedServletContainerCustomizer ajpContainerCustomizer(@Value("${tomcat.ajp.port}") int ajpPort) {
-        return new EmbeddedServletContainerCustomizer() {
-
-            @Override
-            public void customize(ConfigurableEmbeddedServletContainer configurableEmbeddedServletContainer) {
-                TomcatEmbeddedServletContainerFactory tomcat = (TomcatEmbeddedServletContainerFactory) configurableEmbeddedServletContainer;
-                tomcat.setProtocol(AJP_PROTOCOL);
-                tomcat.setPort(ajpPort);
-            }
+        return configurableEmbeddedServletContainer -> {
+            TomcatEmbeddedServletContainerFactory tomcat = (TomcatEmbeddedServletContainerFactory) configurableEmbeddedServletContainer;
+            tomcat.setProtocol(AJP_PROTOCOL);
+            tomcat.setPort(ajpPort);
         };
     }
 }
