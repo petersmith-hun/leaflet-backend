@@ -13,9 +13,9 @@ import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FileMetaInfoServiceImpl implements FileMetaInfoService {
+
+    private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
+    private static final String A_FILE_WITH_GIVEN_FILENAME_ALREADY_EXISTS = "A file with given filename already exists";
 
     private UploadedFileDAO uploadedFileDAO;
     private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
@@ -60,8 +63,10 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
         UploadedFile storedUploadedFile;
         try {
             storedUploadedFile = uploadedFileDAO.save(uploadedFileToStore);
-        } catch (PersistenceException exc) {
-            throw new ConstraintViolationException(exc);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(A_FILE_WITH_GIVEN_FILENAME_ALREADY_EXISTS, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (Objects.isNull(storedUploadedFile)) {

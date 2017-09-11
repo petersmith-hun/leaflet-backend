@@ -22,13 +22,13 @@ import hu.psprog.leaflet.service.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.method.P;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +45,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
+    private static final String EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Email address is already in use";
 
     private UserDAO userDAO;
     private UserToUserVOConverter userToUserVOConverter;
@@ -131,8 +134,10 @@ public class UserServiceImpl implements UserService {
         User savedUser;
         try {
             savedUser = userDAO.save(user);
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(EMAIL_ADDRESS_IS_ALREADY_IN_USE, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (savedUser == null) {
@@ -162,8 +167,10 @@ public class UserServiceImpl implements UserService {
         User updatedUser;
         try {
             updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(EMAIL_ADDRESS_IS_ALREADY_IN_USE, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (updatedUser == null) {

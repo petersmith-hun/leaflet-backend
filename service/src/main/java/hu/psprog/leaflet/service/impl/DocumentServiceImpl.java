@@ -18,11 +18,11 @@ import hu.psprog.leaflet.service.vo.EntityPageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +38,9 @@ import java.util.stream.Collectors;
 public class DocumentServiceImpl implements DocumentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DocumentServiceImpl.class);
+
+    private static final String A_DOCUMENT_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS = "A document with the specified link already exists.";
+    private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
 
     private DocumentDAO documentDAO;
     private DocumentToDocumentVOConverter documentToDocumentVOConverter;
@@ -109,8 +112,10 @@ public class DocumentServiceImpl implements DocumentService {
         Document savedDocument;
         try {
             savedDocument = documentDAO.save(document);
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(A_DOCUMENT_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (savedDocument == null) {
@@ -140,8 +145,10 @@ public class DocumentServiceImpl implements DocumentService {
         Document updatedDocument;
         try {
             updatedDocument = documentDAO.updateOne(id, documentVOToDocumentConverter.convert(updatedEntity));
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(A_DOCUMENT_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (updatedDocument == null) {
