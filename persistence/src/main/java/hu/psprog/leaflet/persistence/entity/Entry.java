@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,8 @@ import java.util.List;
  * @author Peter Smith
  */
 @Entity
-@Table(name = DatabaseConstants.TABLE_ENTRIES)
+@Table(name = DatabaseConstants.TABLE_ENTRIES,
+        uniqueConstraints = @UniqueConstraint(columnNames = DatabaseConstants.COLUMN_LINK, name = DatabaseConstants.UK_ENTRY_LINK))
 public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -67,7 +69,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_TITLE)
     private String title;
 
-    @Column(name = DatabaseConstants.COLUMN_LINK, unique = true)
+    @Column(name = DatabaseConstants.COLUMN_LINK)
     private String link;
 
     @Column(name = DatabaseConstants.COLUMN_PROLOGUE, columnDefinition = DatabaseConstants.DEF_TEXT)

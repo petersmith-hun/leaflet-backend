@@ -12,6 +12,7 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.Date;
 
 /**
@@ -23,7 +24,8 @@ import java.util.Date;
  * @author Peter Smith
  */
 @Entity
-@Table(name = DatabaseConstants.TABLE_DOCUMENTS)
+@Table(name = DatabaseConstants.TABLE_DOCUMENTS,
+        uniqueConstraints = @UniqueConstraint(columnNames = DatabaseConstants.COLUMN_LINK, name = DatabaseConstants.UK_DOCUMENT_LINK))
 public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
 
     @ManyToOne
