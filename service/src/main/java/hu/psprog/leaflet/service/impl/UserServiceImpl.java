@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitSelf.User
+    @PermitSelf.UserOrAdmin
     public UserVO getOne(@P("id") Long userID) throws ServiceException {
 
         User user = userDAO.findOne(userID);

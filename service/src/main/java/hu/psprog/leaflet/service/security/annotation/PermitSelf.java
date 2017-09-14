@@ -21,6 +21,14 @@ public interface PermitSelf {
     }
 
     /**
+     * Permits user self-management operations, which are also available for admins to manage users (ex.: get user).
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @PreAuthorize("isAuthenticated() && hasAnyAuthority('ADMIN', 'EDITOR', 'USER') && @ownershipEvaluator.isSelfOrAdmin(authentication, #id)")
+    @interface UserOrAdmin {
+    }
+
+    /**
      * Permits entry modification for entry owners.
      * Administrator can modify other editors' entries as well.
      */
