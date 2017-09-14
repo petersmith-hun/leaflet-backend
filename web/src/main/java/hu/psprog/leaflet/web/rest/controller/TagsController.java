@@ -175,8 +175,7 @@ public class TagsController extends BaseController {
     public void deleteTag(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            TagVO tagVO = tagFacade.getOne(id);
-            tagFacade.deleteByEntity(tagVO);
+            tagFacade.deleteByID(id);
         } catch (ServiceException e) {
             LOGGER.error(TAG_COULD_NOT_BE_DELETED, id);
             throw new ResourceNotFoundException(TAG_COULD_NOT_BE_FOUND, e);

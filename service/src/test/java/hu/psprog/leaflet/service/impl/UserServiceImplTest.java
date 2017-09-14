@@ -28,7 +28,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -83,32 +82,30 @@ public class UserServiceImplTest {
         // expected exception
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByEntity() throws ServiceException {
+    @Test
+    public void testDeleteByIDWithSuccess() throws ServiceException {
 
         // given
-        given(userDAO.exists(userVO.getId())).willReturn(false);
+        given(userDAO.exists(userVO.getId())).willReturn(true);
 
         // when
-        userService.deleteByEntity(userVO);
+        userService.deleteByID(userVO.getId());
 
         // then
-        // expected exception
-        verify(userDAO, never()).delete(any());
+        verify(userDAO).delete(userVO.getId());
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByID() throws ServiceException {
+    public void testDeleteByIDWithFailure() throws ServiceException {
 
         // given
-        willThrow(IllegalArgumentException.class).given(userDAO).delete(userVO.getId());
+        given(userDAO.exists(userVO.getId())).willReturn(false);
 
         // when
         userService.deleteByID(userVO.getId());
 
         // then
         // expected exception
-        verify(userDAO, never()).delete(any());
     }
 
     @Test

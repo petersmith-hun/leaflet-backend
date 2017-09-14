@@ -25,9 +25,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -203,45 +201,17 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testDeleteByEntityWithExistingComment() throws ServiceException {
-
-        // given
-        given(commentDAO.exists(commentVO.getId())).willReturn(true);
-
-        // when
-        commentService.deleteByEntity(commentVO);
-
-        // then
-        verify(commentDAO).delete(commentVO.getId());
-    }
-
-    @Test
     public void testDeleteByIdWithExistingComment() throws ServiceException {
 
         // given
         Long id = 1L;
+        given(commentDAO.exists(id)).willReturn(true);
 
         // when
         commentService.deleteByID(id);
 
         // then
         verify(commentDAO).delete(id);
-    }
-
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByEntityWithNonExistingComment() throws ServiceException {
-
-        // given
-        Long id = 1L;
-        given(commentDAO.exists(commentVO.getId())).willReturn(false);
-        given(commentVO.getId()).willReturn(id);
-
-        // when
-        commentService.deleteByEntity(commentVO);
-
-        // then
-        // expected exception
-        verify(commentDAO, never()).delete(anyLong());
     }
 
     @Test
@@ -307,13 +277,12 @@ public class CommentServiceImplTest {
 
         // given
         Long id = 1L;
-        doThrow(IllegalArgumentException.class).when(commentDAO).delete(id);
+        given(commentDAO.exists(id)).willReturn(false);
 
         // when
         commentService.deleteByID(id);
 
         // then
         // expected exception
-        verify(commentDAO).delete(id);
     }
 }

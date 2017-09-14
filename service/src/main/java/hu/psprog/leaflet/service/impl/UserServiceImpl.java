@@ -14,7 +14,6 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
-import hu.psprog.leaflet.service.security.annotation.PermitAuthenticated;
 import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -95,26 +94,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAuthenticated
-    public void deleteByEntity(UserVO entity) throws ServiceException {
-
-        if (!userDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(User.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
     @PermitSelf.User
     public void deleteByID(@P("id") Long userID) throws ServiceException {
 
-        try {
-            userDAO.delete(userID);
-        } catch (IllegalArgumentException exc) {
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!userDAO.exists(userID)) {
             throw new EntityNotFoundException(User.class, userID);
         }
+
+        userDAO.delete(userID);
     }
 
     @Override

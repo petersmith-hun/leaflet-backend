@@ -294,8 +294,7 @@ public class EntriesController extends BaseController {
     public void deleteEntry(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            EntryVO entryVO = entryService.getOne(id);
-            entryService.deleteByEntity(entryVO);
+            entryService.deleteByID(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

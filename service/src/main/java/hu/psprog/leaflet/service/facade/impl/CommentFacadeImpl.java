@@ -55,11 +55,6 @@ public class CommentFacadeImpl implements CommentFacade {
     }
 
     @Override
-    public void deleteByEntity(CommentVO entity) throws ServiceException {
-        commentService.deleteByEntity(entity);
-    }
-
-    @Override
     public void deleteByID(Long id) throws ServiceException {
         commentService.deleteByID(id);
     }

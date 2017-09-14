@@ -290,8 +290,7 @@ public class CommentsController extends BaseController {
             throws ResourceNotFoundException {
 
         try {
-            CommentVO commentVO = commentFacade.getOne(commentID);
-            commentFacade.deleteByEntity(commentVO);
+            commentFacade.deleteByID(commentID);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_COMMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

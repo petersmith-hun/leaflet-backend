@@ -62,26 +62,14 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
-    public void deleteByEntity(EntryVO entity) throws ServiceException {
-
-        if (!entryDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(Entry.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
     @PermitSelf.Entry
     public void deleteByID(Long id) throws ServiceException {
 
-        try {
-            entryDAO.delete(id);
-        } catch (IllegalArgumentException exc) {
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!entryDAO.exists(id)) {
             throw new EntityNotFoundException(Entry.class, id);
         }
+
+        entryDAO.delete(id);
     }
 
     @Override

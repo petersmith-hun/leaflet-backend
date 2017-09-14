@@ -18,7 +18,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -151,20 +150,10 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void testDeleteByEntityWithExistingEntry() throws ServiceException {
+    public void testDeleteByIdWithExistingEntry() throws ServiceException {
 
         // given
         given(categoryDAO.exists(categoryVO.getId())).willReturn(true);
-
-        // when
-        categoryService.deleteByEntity(categoryVO);
-
-        // then
-        verify(categoryDAO).delete(categoryVO.getId());
-    }
-
-    @Test
-    public void testDeleteByIdWithExistingEntry() throws ServiceException {
 
         // when
         categoryService.deleteByID(categoryVO.getId());
@@ -174,26 +163,11 @@ public class CategoryServiceImplTest {
     }
 
     @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByEntityWithNonExistingEntry() throws ServiceException {
-
-        // given
-        given(categoryDAO.exists(categoryVO.getId())).willReturn(false);
-        given(categoryVO.getId()).willReturn(1L);
-
-        // when
-        categoryService.deleteByEntity(categoryVO);
-
-        // then
-        // expected exception
-        verify(categoryDAO, never()).delete(any());
-    }
-
-    @Test(expected = EntityNotFoundException.class)
     public void testDeleteByIdWithNonExistingEntry() throws ServiceException {
 
         // given
         Long id = 1L;
-        doThrow(IllegalArgumentException.class).when(categoryDAO).delete(id);
+        given(categoryDAO.exists(categoryVO.getId())).willReturn(false);
 
         // when
         categoryService.deleteByID(id);

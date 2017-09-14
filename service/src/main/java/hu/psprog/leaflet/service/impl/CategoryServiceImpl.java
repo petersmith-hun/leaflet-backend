@@ -139,25 +139,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @PermitEditorOrAdmin
-    public void deleteByEntity(CategoryVO entity) throws ServiceException {
-
-        if (!categoryDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(Category.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
-        try {
-            categoryDAO.delete(id);
-        } catch (IllegalArgumentException exc) {
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!categoryDAO.exists(id)) {
             throw new EntityNotFoundException(Category.class, id);
         }
+
+        categoryDAO.delete(id);
     }
 
     @Override

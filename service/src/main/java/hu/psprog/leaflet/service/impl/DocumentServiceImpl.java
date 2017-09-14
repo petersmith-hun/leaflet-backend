@@ -176,25 +176,13 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     @PermitEditorOrAdmin
-    public void deleteByEntity(DocumentVO entity) throws ServiceException {
-
-        if (!documentDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(Document.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
-        try {
-            documentDAO.delete(id);
-        } catch (IllegalArgumentException exc){
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!documentDAO.exists(id)) {
             throw new EntityNotFoundException(Document.class, id);
         }
+
+        documentDAO.delete(id);
     }
 
     @Override

@@ -166,11 +166,11 @@ public class TagServiceImplIT {
         TagVO tagToDelete = tagService.getOne(id);
 
         // when
-        tagService.deleteByEntity(tagToDelete);
+        tagService.deleteByID(id);
 
         // then
         assertThat(tagService.count(), equalTo(19L));
-        assertThat(tagService.getAll().stream().noneMatch(e -> tagToDelete.equals(e)), equalTo(true));
+        assertThat(tagService.getAll().stream().noneMatch(tagToDelete::equals), equalTo(true));
     }
 
     @Test

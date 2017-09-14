@@ -218,8 +218,7 @@ public class UsersController extends BaseController {
     public void deleteUser(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            UserVO userVO = userService.getOne(id);
-            userService.deleteByEntity(userVO);
+            userService.deleteByID(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
             throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);

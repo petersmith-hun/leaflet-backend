@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -231,39 +230,11 @@ public class DocumentServiceImplTest {
     }
 
     @Test
-    public void testDeleteByEntityWithExistingDocument() throws ServiceException {
-
-        // given
-        given(documentDAO.exists(documentVO.getId())).willReturn(true);
-
-        // when
-        documentService.deleteByEntity(documentVO);
-
-        // then
-        verify(documentDAO).delete(documentVO.getId());
-    }
-
-
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByEntityWithNonExistingDocument() throws ServiceException {
-
-        // given
-        Long id = 1L;
-        given(documentDAO.exists(documentVO.getId())).willReturn(false);
-        given(documentVO.getId()).willReturn(1L);
-
-        // when
-        documentService.deleteByEntity(documentVO);
-
-        // then
-        verify(documentDAO, never()).delete(any(Long.class));
-    }
-
-    @Test
     public void testDeleteByIDWithExistingDocument() throws ServiceException {
 
         // given
         Long id = 1L;
+        given(documentDAO.exists(id)).willReturn(true);
 
         // when
         documentService.deleteByID(id);
@@ -278,13 +249,13 @@ public class DocumentServiceImplTest {
 
         // given
         Long id = 1L;
-        doThrow(IllegalArgumentException.class).when(documentDAO).delete(id);
+        given(documentDAO.exists(id)).willReturn(false);
 
         // when
         documentService.deleteByID(id);
 
         // then
-        verify(documentDAO).delete(id);
+        // expected exception
     }
 
     @Test

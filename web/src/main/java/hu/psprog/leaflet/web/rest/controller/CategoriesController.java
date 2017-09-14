@@ -212,8 +212,7 @@ public class CategoriesController extends BaseController {
     public void deleteCategory(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            CategoryVO categoryVO = categoryService.getOne(id);
-            categoryService.deleteByEntity(categoryVO);
+            categoryService.deleteByID(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
