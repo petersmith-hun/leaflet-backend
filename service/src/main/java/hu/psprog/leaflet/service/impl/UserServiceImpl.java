@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.UserService;
+import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
@@ -184,6 +185,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long register(UserVO entity) throws ServiceException {
+
+        if (!isUserRole(entity)) {
+            throw new ServiceException("Only users with role USER can be created via register service entry point.");
+        }
+
+        return createOne(entity);
+    }
+
+    @Override
     public Long initialize(UserVO userVO) throws UserInitializationException, EntityCreationException {
 
         if (!initModeEnabled) {
@@ -277,5 +288,10 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(userDAO.findByEmail(email))
                 .map(userToUserVOConverter::convert)
                 .orElse(null);
+    }
+
+    private boolean isUserRole(UserVO entity) {
+        return entity.getAuthorities().stream()
+                .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.USER));
     }
 }
