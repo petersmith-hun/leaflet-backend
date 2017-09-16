@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Objects;
 
 /**
  * Validates authenticated request model.
@@ -31,13 +32,17 @@ public class AuthenticatedRequestValidator implements ConstraintValidator<Authen
     public boolean isValid(AuthenticatedRequestModel value, ConstraintValidatorContext context) {
 
         boolean valid = false;
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof JWTAuthenticationToken) {
-            JWTPayload payload = (JWTPayload) authentication.getDetails();
-            valid = payload.getId() == value.getAuthenticatedUserId().intValue();
+        if (Objects.isNull(value.getAuthenticatedUserId())) {
+            valid = true;
+        } else {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication instanceof JWTAuthenticationToken) {
+                JWTPayload payload = (JWTPayload) authentication.getDetails();
+                valid = payload.getId() == value.getAuthenticatedUserId().intValue();
 
-            if (!valid) {
-                LOGGER.warn("Request validation failed for userID={} - current userID={} is different", value.getAuthenticatedUserId(), payload.getId());
+                if (!valid) {
+                    LOGGER.warn("Request validation failed for userID={} - current userID={} is different", value.getAuthenticatedUserId(), payload.getId());
+                }
             }
         }
 

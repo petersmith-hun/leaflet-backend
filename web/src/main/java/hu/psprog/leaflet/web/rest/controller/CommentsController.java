@@ -157,7 +157,7 @@ public class CommentsController extends BaseController {
      *
      * @param commentCreateRequestModel comment data
      * @param bindingResult validation result
-     * @return created comment data
+     * @return empty response on success, validation results on validation failure
      * @throws RequestCouldNotBeFulfilledException if a service exception occurred
      */
     @RequestMapping(method = RequestMethod.POST)
@@ -173,11 +173,10 @@ public class CommentsController extends BaseController {
         } else {
             try {
                 Long commentID = commentFacade.createOne(conversionService.convert(commentCreateRequestModel, CommentVO.class));
-                CommentVO commentVO = commentFacade.getOne(commentID);
 
                 return ResponseEntity
                         .created(buildLocation(commentID))
-                        .body(conversionService.convert(commentVO, CommentDataModel.class));
+                        .build();
             } catch (ConstraintViolationException e) {
                 LOGGER.error(ENTRY_TO_ASSOCIATE_COMMENT_WITH_COULD_NOT_BE_FOUND, e);
                 throw new RequestCouldNotBeFulfilledException(YOUR_COMMENT_COULD_NOT_BE_CREATED);

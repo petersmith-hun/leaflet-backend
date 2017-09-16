@@ -33,11 +33,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled =  true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String PATH_USERS_CLAIM = "/users/claim";
-    private static final String PATH_USERS_REGISTER = "/users/register";
-    private static final String PATH_USERS_RECLAIM = "/users/reclaim";
     private static final String PATH_USERS_INIT = "/users/init";
     private static final String INIT_ACCESS_FILTER_EXPRESSION = "@initModeEnabled";
+    private static final String[] PUBLIC_GET_ENDPOINTS = {
+            "/categories/public",
+            "/comments/entry/*/*",
+            "/documents/link/*",
+            "/entries/link/*",
+            "/entries/page/*",
+            "/entries/*/page/*",
+            "/files/*/*",
+            "/tags/public"};
+    private static final String[] PUBLIC_POST_ENDPOINTS = {
+            "/comments",
+            "/users/claim",
+            "/users/register",
+            "/users/reclaim"};
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -89,10 +100,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .addFilterBefore(getJwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
             .authorizeRequests()
-                .antMatchers(PATH_USERS_CLAIM, PATH_USERS_REGISTER)
-                    .anonymous()
-                .antMatchers(HttpMethod.POST, PATH_USERS_RECLAIM)
-                    .anonymous()
+                .antMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
+                    .permitAll()
+                .antMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
+                    .permitAll()
                 .antMatchers(PATH_USERS_INIT)
                     .access(INIT_ACCESS_FILTER_EXPRESSION)
                 .anyRequest()
