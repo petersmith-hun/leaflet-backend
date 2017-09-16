@@ -35,6 +35,7 @@ public class CategoryVOToExtendedCategoryDataModelEntityConverter implements Con
                 .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
                 .withId(source.getId())
                 .withTitle(source.getTitle())
+                .withEnabled(source.isEnabled())
                 .build();
     }
 }
