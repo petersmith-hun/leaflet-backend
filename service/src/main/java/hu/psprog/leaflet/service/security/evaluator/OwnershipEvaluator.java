@@ -51,6 +51,21 @@ public class OwnershipEvaluator {
     }
 
     /**
+     * Validates that a user is accessing their own user entry or an admin is accessing user information.
+     *
+     * @param authentication current {@link Authentication} object
+     * @param id user ID
+     * @return {@code true} if the given user ID is the same as in the one in the {@link Authentication} object,
+     * or the authenticated user is an admin, {@code false} otherwise
+     */
+    public boolean isSelfOrAdmin(Authentication authentication, Long id) {
+
+        return extractPayload(authentication)
+                .map(jwtPayload -> jwtPayload.getId().equals(id.intValue()) || isAdmin(jwtPayload))
+                .orElse(false);
+    }
+
+    /**
      * Validates that an editor is accessing their own entry.
      * Admin users can also access.
      *

@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.UserService;
+import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
@@ -14,7 +15,6 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
-import hu.psprog.leaflet.service.security.annotation.PermitAuthenticated;
 import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -22,13 +22,13 @@ import hu.psprog.leaflet.service.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.method.P;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +45,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
+    private static final String EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Email address is already in use";
 
     private UserDAO userDAO;
     private UserToUserVOConverter userToUserVOConverter;
@@ -63,7 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitSelf.User
+    @PermitSelf.UserOrAdmin
     public UserVO getOne(@P("id") Long userID) throws ServiceException {
 
         User user = userDAO.findOne(userID);
@@ -92,26 +95,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAuthenticated
-    public void deleteByEntity(UserVO entity) throws ServiceException {
-
-        if (!userDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(User.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
     @PermitSelf.User
     public void deleteByID(@P("id") Long userID) throws ServiceException {
 
-        try {
-            userDAO.delete(userID);
-        } catch (IllegalArgumentException exc) {
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!userDAO.exists(userID)) {
             throw new EntityNotFoundException(User.class, userID);
         }
+
+        userDAO.delete(userID);
     }
 
     @Override
@@ -131,8 +122,10 @@ public class UserServiceImpl implements UserService {
         User savedUser;
         try {
             savedUser = userDAO.save(user);
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(EMAIL_ADDRESS_IS_ALREADY_IN_USE, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (savedUser == null) {
@@ -162,8 +155,10 @@ public class UserServiceImpl implements UserService {
         User updatedUser;
         try {
             updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(EMAIL_ADDRESS_IS_ALREADY_IN_USE, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (updatedUser == null) {
@@ -187,6 +182,16 @@ public class UserServiceImpl implements UserService {
         }
 
         return userVOs;
+    }
+
+    @Override
+    public Long register(UserVO entity) throws ServiceException {
+
+        if (!isUserRole(entity)) {
+            throw new ServiceException("Only users with role USER can be created via register service entry point.");
+        }
+
+        return createOne(entity);
     }
 
     @Override
@@ -283,5 +288,10 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(userDAO.findByEmail(email))
                 .map(userToUserVOConverter::convert)
                 .orElse(null);
+    }
+
+    private boolean isUserRole(UserVO entity) {
+        return entity.getAuthorities().stream()
+                .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.USER));
     }
 }

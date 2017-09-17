@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -24,7 +25,8 @@ import java.util.Date;
  * @author Peter Smith
  */
 @Entity
-@Table(name = DatabaseConstants.TABLE_USERS)
+@Table(name = DatabaseConstants.TABLE_USERS,
+        uniqueConstraints = @UniqueConstraint(columnNames = DatabaseConstants.COLUMN_EMAIL, name = DatabaseConstants.UK_USER_EMAIL))
 public class User extends SelfStatusAwareIdentifiableEntity<Long> {
 
     @Column(name = DatabaseConstants.COLUMN_USERNAME)
@@ -32,7 +34,7 @@ public class User extends SelfStatusAwareIdentifiableEntity<Long> {
     @Size(max = 255)
     private String username;
 
-    @Column(name = DatabaseConstants.COLUMN_EMAIL, unique = true)
+    @Column(name = DatabaseConstants.COLUMN_EMAIL)
     @NotNull
     @Size(max = 255)
     private String email;

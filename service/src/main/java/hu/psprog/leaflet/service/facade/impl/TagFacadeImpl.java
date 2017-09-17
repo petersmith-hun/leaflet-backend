@@ -42,11 +42,6 @@ public class TagFacadeImpl implements TagFacade {
     }
 
     @Override
-    public void deleteByEntity(TagVO entity) throws ServiceException {
-        tagService.deleteByEntity(entity);
-    }
-
-    @Override
     public void deleteByID(Long id) throws ServiceException {
         tagService.deleteByID(id);
     }

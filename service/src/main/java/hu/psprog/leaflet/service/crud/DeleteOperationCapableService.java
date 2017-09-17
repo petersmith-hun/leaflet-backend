@@ -16,23 +16,16 @@ import java.util.List;
 public interface DeleteOperationCapableService<T extends BaseVO, ID extends Serializable> {
 
     /**
-     * Deletes entity of type T by entity object.
-     *
-     * @param entity {@link BaseVO} object to delete
-     */
-    public void deleteByEntity(T entity) throws ServiceException;
-
-    /**
      * Deletes entity of type T by its identifier.
      *
      * @param id {@link Serializable} identifier of entity
      */
-    public void deleteByID(ID id) throws ServiceException;
+    void deleteByID(ID id) throws ServiceException;
 
     /**
      * Deletes a list of entities of type T by their identifier.
      *
      * @param ids {@link List} of {@link Serializable} identifiers
      */
-    public void deleteBulkByIDs(List<ID> ids) throws ServiceException;
+    void deleteBulkByIDs(List<ID> ids) throws ServiceException;
 }

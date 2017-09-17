@@ -208,7 +208,7 @@ public class EntriesController extends BaseController {
 
                 return ResponseEntity
                         .created(buildLocation(entryID))
-                        .body(conversionService.convert(createdEntry, ExtendedEntryDataModel.class));
+                        .body(conversionService.convert(createdEntry, EditEntryDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -244,7 +244,7 @@ public class EntriesController extends BaseController {
 
                 return ResponseEntity
                         .created(buildLocation(id))
-                        .body(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
+                        .body(conversionService.convert(entryVO, EditEntryDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS);
@@ -263,7 +263,7 @@ public class EntriesController extends BaseController {
      * @return updated entry data
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_CHANGE_STATUS)
-    public ResponseEntity<ExtendedEntryDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+    public ResponseEntity<EditEntryDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
             EntryVO entryVO = entryService.getOne(id);
@@ -276,7 +276,7 @@ public class EntriesController extends BaseController {
 
             return ResponseEntity
                     .created(buildLocation(id))
-                    .body(conversionService.convert(updatedEntryVO, ExtendedEntryDataModel.class));
+                    .body(conversionService.convert(updatedEntryVO, EditEntryDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -294,8 +294,7 @@ public class EntriesController extends BaseController {
     public void deleteEntry(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            EntryVO entryVO = entryService.getOne(id);
-            entryService.deleteByEntity(entryVO);
+            entryService.deleteByID(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

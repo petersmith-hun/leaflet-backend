@@ -67,5 +67,12 @@ public final class DatabaseConstants {
     static final String DEF_TEXT = "TEXT";
     static final String DEF_LONGTEXT = "LONGTEXT";
 
+    static final String UK_UPLOADED_FILE_PATH = "UK_UPLOADED_FILE_PATH";
+    static final String UK_UPLOADED_FILE_PATH_UUID = "UK_UPLOADED_FILE_PATH_UUID";
+    static final String UK_TAG_TITLE = "UK_TAG_TITLE";
+    static final String UK_USER_EMAIL = "UK_USER_EMAIL";
+    static final String UK_ENTRY_LINK = "UK_ENTRY_LINK";
+    static final String UK_DOCUMENT_LINK = "UK_DOCUMENT_LINK";
+
     private DatabaseConstants() {}
 }

@@ -8,6 +8,7 @@ import org.hibernate.annotations.Type;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.Date;
 import java.util.UUID;
 
@@ -17,10 +18,13 @@ import java.util.UUID;
  * @author Peter Smith
  */
 @Entity
-@Table(name = DatabaseConstants.TABLE_UPLOADED_FILES)
+@Table(name = DatabaseConstants.TABLE_UPLOADED_FILES, uniqueConstraints = {
+        @UniqueConstraint(columnNames = DatabaseConstants.COLUMN_PATH, name = DatabaseConstants.UK_UPLOADED_FILE_PATH),
+        @UniqueConstraint(columnNames = DatabaseConstants.COLUMN_PATH_UUID, name = DatabaseConstants.UK_UPLOADED_FILE_PATH_UUID)
+})
 public class UploadedFile extends SelfStatusAwareIdentifiableEntity<Long> {
 
-    @Column(name = DatabaseConstants.COLUMN_PATH, unique = true)
+    @Column(name = DatabaseConstants.COLUMN_PATH)
     private String path;
 
     @Column(name = DatabaseConstants.COLUMN_ORIGINAL_FILENAME)
@@ -30,7 +34,7 @@ public class UploadedFile extends SelfStatusAwareIdentifiableEntity<Long> {
     private String mime;
 
     @Type(type = "uuid-char")
-    @Column(name = DatabaseConstants.COLUMN_PATH_UUID, unique = true)
+    @Column(name = DatabaseConstants.COLUMN_PATH_UUID)
     private UUID pathUUID;
 
     @Column(name = DatabaseConstants.COLUMN_STORED_FILENAME)

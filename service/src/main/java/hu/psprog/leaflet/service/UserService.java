@@ -8,6 +8,7 @@ import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,15 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
         DeleteOperationCapableService<UserVO, Long>,
         PageableService<UserVO, UserVO.OrderBy>,
         StatusChangeCapableService<Long> {
+
+    /**
+     * Creates a user via registration.
+     *
+     * @param entity user data
+     * @return created user's ID
+     * @throws ServiceException if user could not be created
+     */
+    Long register(UserVO entity) throws ServiceException;
 
     /**
      * Initializes user database with first administrator user. Application must be running in INIT mode,

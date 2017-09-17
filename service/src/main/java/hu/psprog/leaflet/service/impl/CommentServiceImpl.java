@@ -186,25 +186,13 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @PermitAdmin
-    public void deleteByEntity(CommentVO entity) throws ServiceException {
-
-        if (!commentDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(Comment.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
-    @PermitAdmin
     public void deleteByID(Long id) throws ServiceException {
 
-        try {
-            commentDAO.delete(id);
-        } catch (IllegalArgumentException exc) {
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!commentDAO.exists(id)) {
             throw new EntityNotFoundException(Comment.class, id);
         }
+
+        commentDAO.delete(id);
     }
 
     @Override

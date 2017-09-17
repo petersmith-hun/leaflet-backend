@@ -218,8 +218,7 @@ public class UsersController extends BaseController {
     public void deleteUser(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            UserVO userVO = userService.getOne(id);
-            userService.deleteByEntity(userVO);
+            userService.deleteByID(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
             throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
@@ -379,7 +378,7 @@ public class UsersController extends BaseController {
      *
      * @param userInitializeRequestModel user data
      * @param bindingResult validation results
-     * @return created user's data
+     * @return empty response on success, or validation results on validation failure
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_REGISTER)
     @Timed
@@ -393,12 +392,14 @@ public class UsersController extends BaseController {
         } else {
             try {
                 hashPassword(userInitializeRequestModel);
-                Long userID = userService.createOne(conversionService.convert(userInitializeRequestModel, UserVO.class));
-                UserVO createdUser = userService.getOne(userID);
+                Long userID = userService.register(conversionService.convert(userInitializeRequestModel, UserVO.class));
 
                 return ResponseEntity
-                        .ok()
-                        .body(conversionService.convert(createdUser, ExtendedUserDataModel.class));
+                        .created(buildLocation(userID))
+                        .build();
+            } catch (ConstraintViolationException e) {
+                LOGGER.error(CONSTRAINT_VIOLATION, e);
+                throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);
             } catch (ServiceException e) {
                 LOGGER.error(USER_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(USER_ACCOUNT_COULD_NOT_BE_CREATED);

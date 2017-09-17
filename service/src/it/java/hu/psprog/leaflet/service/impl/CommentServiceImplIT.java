@@ -246,14 +246,14 @@ public class CommentServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
-    public void testDeleteByEntity() throws ServiceException {
+    public void testDeleteByID() throws ServiceException {
 
         // given
         Long id = 4L;
         CommentVO commentToDelete = commentService.getOne(id);
 
         // when
-        commentService.deleteByEntity(commentToDelete);
+        commentService.deleteByID(id);
 
         // then
         assertThat(commentService.count(), equalTo(9L));

@@ -179,11 +179,11 @@ public class DocumentServiceImplIT {
         DocumentVO documentToDelete = documentService.getOne(id);
 
         // when
-        documentService.deleteByEntity(documentToDelete);
+        documentService.deleteByID(id);
 
         // then
         assertThat(documentService.count(), equalTo(3L));
-        assertThat(documentService.getAll().stream().noneMatch(e -> documentToDelete.equals(e)), equalTo(true));
+        assertThat(documentService.getAll().stream().noneMatch(documentToDelete::equals), equalTo(true));
     }
 
     @Test

@@ -31,7 +31,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -215,39 +214,11 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void testDeleteByEntityWithExistingDocument() throws ServiceException {
-
-        // given
-        given(tagDAO.exists(tagVO.getId())).willReturn(true);
-
-        // when
-        tagService.deleteByEntity(tagVO);
-
-        // then
-        verify(tagDAO).delete(tagVO.getId());
-    }
-
-
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByEntityWithNonExistingDocument() throws ServiceException {
-
-        // given
-        Long id = 1L;
-        given(tagDAO.exists(tagVO.getId())).willReturn(false);
-        given(tagVO.getId()).willReturn(1L);
-
-        // when
-        tagService.deleteByEntity(tagVO);
-
-        // then
-        verify(tagDAO, never()).delete(any(Long.class));
-    }
-
-    @Test
     public void testDeleteByIDWithExistingDocument() throws ServiceException {
 
         // given
         Long id = 1L;
+        given(tagDAO.exists(id)).willReturn(true);
 
         // when
         tagService.deleteByID(id);
@@ -262,13 +233,13 @@ public class TagServiceImplTest {
 
         // given
         Long id = 1L;
-        doThrow(IllegalArgumentException.class).when(tagDAO).delete(id);
+        given(tagDAO.exists(id)).willReturn(false);
 
         // when
         tagService.deleteByID(id);
 
         // then
-        verify(tagDAO).delete(id);
+        // expected exception
     }
 
     @Test

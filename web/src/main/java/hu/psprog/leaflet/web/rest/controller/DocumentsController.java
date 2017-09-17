@@ -211,8 +211,7 @@ public class DocumentsController extends BaseController {
     public void deleteDocument(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            DocumentVO documentVO = documentService.getOne(id);
-            documentService.deleteByEntity(documentVO);
+            documentService.deleteByID(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

@@ -22,12 +22,12 @@ import hu.psprog.leaflet.service.vo.EntryVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +44,9 @@ public class EntryServiceImpl implements EntryService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryServiceImpl.class);
 
+    private static final String AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS = "An entry with the specified link already exists.";
+    private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
+
     private EntryDAO entryDAO;
     private EntryToEntryVOConverter entryToEntryVOConverter;
     private EntryVOToEntryConverter entryVOToEntryConverter;
@@ -59,26 +62,14 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
-    public void deleteByEntity(EntryVO entity) throws ServiceException {
-
-        if (!entryDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(Entry.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
     @PermitSelf.Entry
     public void deleteByID(Long id) throws ServiceException {
 
-        try {
-            entryDAO.delete(id);
-        } catch (IllegalArgumentException exc) {
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!entryDAO.exists(id)) {
             throw new EntityNotFoundException(Entry.class, id);
         }
+
+        entryDAO.delete(id);
     }
 
     @Override
@@ -127,8 +118,10 @@ public class EntryServiceImpl implements EntryService {
         Entry savedEntry;
         try {
             savedEntry = entryDAO.save(entry);
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (savedEntry == null) {
@@ -158,8 +151,10 @@ public class EntryServiceImpl implements EntryService {
         Entry updatedEntry;
         try {
             updatedEntry = entryDAO.updateOne(id, entryVOToEntryConverter.convert(updatedEntity));
-        } catch (PersistenceException e) {
-            throw new ConstraintViolationException(e);
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
+        } catch (Exception e) {
+            throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
 
         if (updatedEntry == null) {

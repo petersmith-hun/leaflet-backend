@@ -1,10 +1,12 @@
 package hu.psprog.leaflet.persistence.dao.impl;
 
+import hu.psprog.leaflet.persistence.dao.BaseDAO;
 import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
 import hu.psprog.leaflet.persistence.entity.SerializableEntity;
-import hu.psprog.leaflet.persistence.dao.BaseDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.io.Serializable;
@@ -19,6 +21,9 @@ import java.util.List;
 public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Serializable> implements BaseDAO<T, ID> {
 
     protected JpaRepository<T, ID> jpaRepository;
+
+    @Autowired
+    private JpaContext jpaContext;
 
     public BaseDAOImpl(JpaRepository<T, ID> jpaRepository) {
         this.jpaRepository = jpaRepository;
@@ -56,7 +61,10 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
             ((SelfStatusAwareIdentifiableEntity) entity).setCreated(new Date());
         }
 
-        return jpaRepository.save(entity);
+        S savedEntity = jpaRepository.saveAndFlush(entity);
+        jpaContext.getEntityManagerByManagedType(entity.getClass()).clear();
+
+        return savedEntity;
     }
 
     @Override

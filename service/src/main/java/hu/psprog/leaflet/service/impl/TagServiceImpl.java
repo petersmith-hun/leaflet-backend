@@ -177,25 +177,13 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @PermitEditorOrAdmin
-    public void deleteByEntity(TagVO entity) throws ServiceException {
-
-        if (!tagDAO.exists(entity.getId())) {
-            throw new EntityNotFoundException(Tag.class, entity.getId());
-        }
-
-        deleteByID(entity.getId());
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
-        try {
-            tagDAO.delete(id);
-        } catch (IllegalArgumentException exc) {
-            LOGGER.error("Error occurred during deletion", exc);
+        if (!tagDAO.exists(id)) {
             throw new EntityNotFoundException(Tag.class, id);
         }
+
+        tagDAO.delete(id);
     }
 
     @Override

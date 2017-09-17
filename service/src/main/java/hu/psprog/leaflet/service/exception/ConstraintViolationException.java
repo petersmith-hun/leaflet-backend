@@ -12,4 +12,8 @@ public class ConstraintViolationException extends ServiceException {
     public ConstraintViolationException(Exception exception) {
         super(MESSAGE, exception);
     }
+
+    public ConstraintViolationException(String message, Exception exception) {
+        super(message, exception);
+    }
 }
