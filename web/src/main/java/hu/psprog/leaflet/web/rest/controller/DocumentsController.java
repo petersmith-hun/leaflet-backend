@@ -83,6 +83,7 @@ public class DocumentsController extends BaseController {
      * @return identified document
      * @throws ResourceNotFoundException if no document associated with given ID exists
      */
+    @FillResponse
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
     @Timed
     public ResponseEntity<EditDocumentDataModel> getDocumentByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
