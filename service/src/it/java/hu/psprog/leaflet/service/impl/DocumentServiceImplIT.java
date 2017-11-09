@@ -80,30 +80,6 @@ public class DocumentServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_DOCUMENTS)
-    public void testGetPageOfPublicDocuments() {
-
-        // given
-        int limit = 3;
-        int page = 1;
-        OrderDirection direction = OrderDirection.DESC;
-        DocumentVO.OrderBy orderBy = DocumentVO.OrderBy.CREATED;
-
-        // when
-        EntityPageVO<DocumentVO> result = documentService.getPageOfPublicDocuments(page, limit, direction, orderBy);
-
-        // then
-        assertThat(result.getEntityCountOnPage(), equalTo(3));
-        assertThat(result.getEntityCount(), equalTo(3L));
-        assertThat(result.getPageCount(), equalTo(1));
-        assertThat(result.getPageSize(), equalTo(limit));
-        assertThat(result.getEntitiesOnPage(), notNullValue());
-        assertThat(result.getEntitiesOnPage().stream().allMatch(e -> e != null), equalTo(true));
-        assertThat(result.getEntitiesOnPage().size(), equalTo(3));
-    }
-
-    @Test
-    @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_DOCUMENTS)
     public void testGetByLink() throws ServiceException {
 
         // given

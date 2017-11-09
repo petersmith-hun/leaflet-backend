@@ -83,6 +83,7 @@ public class DocumentsController extends BaseController {
      * @return identified document
      * @throws ResourceNotFoundException if no document associated with given ID exists
      */
+    @FillResponse
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
     @Timed
     public ResponseEntity<EditDocumentDataModel> getDocumentByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
@@ -196,6 +197,36 @@ public class DocumentsController extends BaseController {
                 LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
                 throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
             }
+        }
+    }
+
+    /**
+     * PUT /documents/{id}/status
+     * Changes status of an existing document.
+     *
+     * @param id ID of the document to update status of
+     * @return updated document data
+     * @throws ResourceNotFoundException if no document associated with given id exists
+     */
+    @RequestMapping(method = RequestMethod.PUT, path = PATH_CHANGE_STATUS)
+    public ResponseEntity<EditDocumentDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
+
+        try {
+            DocumentVO document = documentService.getOne(id);
+            if (document.isEnabled()) {
+                documentService.disable(id);
+            } else {
+                documentService.enable(id);
+            }
+            DocumentVO updatedDocument = documentService.getOne(id);
+
+            return ResponseEntity
+                    .created(buildLocation(id))
+                    .body(conversionService.convert(updatedDocument, EditDocumentDataModel.class));
+
+        } catch (ServiceException e) {
+            LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
+            throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
         }
     }
 
