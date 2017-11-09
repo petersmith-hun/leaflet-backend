@@ -96,6 +96,7 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
             currentEntry.setLastModified(new Date());
             currentEntry.setStatus(updatedEntity.getStatus());
             currentEntry.setEnabled(updatedEntity.isEnabled());
+            currentEntry.setLocale(updatedEntity.getLocale());
             jpaRepository.flush();
         }
 

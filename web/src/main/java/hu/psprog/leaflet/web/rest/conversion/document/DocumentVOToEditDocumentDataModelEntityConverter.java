@@ -39,6 +39,7 @@ public class DocumentVOToEditDocumentDataModelEntityConverter implements Convert
                 .withRawContent(source.getRawContent())
                 .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
                 .withEnabled(source.isEnabled())
+                .withLocale(source.getLocale().name())
                 .withUser(UserDataModel.getBuilder()
                         .withId(source.getOwner().getId())
                         .withUsername(source.getOwner().getUsername())

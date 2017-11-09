@@ -36,6 +36,7 @@ public class DocumentVOToDocumentDataModelEntityConverter implements Converter<D
                 .withLink(source.getLink())
                 .withContent(source.getContent())
                 .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
+                .withLocale(source.getLocale().name())
                 .withUser(UserDataModel.getBuilder()
                         .withId(source.getOwner().getId())
                         .withUsername(source.getOwner().getUsername())
