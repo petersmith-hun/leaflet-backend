@@ -2,9 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.DocumentDAO;
 import hu.psprog.leaflet.persistence.entity.Document;
-import hu.psprog.leaflet.persistence.repository.specification.DocumentSpecification;
 import hu.psprog.leaflet.service.DocumentService;
-import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.DocumentToDocumentVOConverter;
 import hu.psprog.leaflet.service.converter.DocumentVOToDocumentConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
@@ -12,15 +10,11 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
-import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.DocumentVO;
-import hu.psprog.leaflet.service.vo.EntityPageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -74,15 +68,6 @@ public class DocumentServiceImpl implements DocumentService {
         return documentDAO.findAll().stream()
                 .map(documentToDocumentVOConverter::convert)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public EntityPageVO<DocumentVO> getPageOfPublicDocuments(int page, int limit, OrderDirection direction, DocumentVO.OrderBy orderBy) {
-
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Page<Document> documentPage = documentDAO.findAll(DocumentSpecification.IS_ENABLED, pageable);
-
-        return PageableUtil.convertPage(documentPage, documentToDocumentVOConverter);
     }
 
     @Override
