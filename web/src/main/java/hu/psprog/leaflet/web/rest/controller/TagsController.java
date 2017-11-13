@@ -98,6 +98,27 @@ public class TagsController extends BaseController {
     }
 
     /**
+     * GET /tags/{id}
+     * Retrieves an existing tag.
+     *
+     * @param tagID ID of the tag to retrieve
+     * @return tag data
+     * @throws ResourceNotFoundException if the requested tag could not be found
+     */
+    @RequestMapping(method = RequestMethod.GET, value = PATH_PART_ID)
+    public ResponseEntity<TagDataModel> getTag(@PathVariable(PATH_VARIABLE_ID) Long tagID) throws ResourceNotFoundException {
+
+        try {
+            return ResponseEntity
+                    .ok()
+                    .body(conversionService.convert(tagFacade.getOne(tagID), TagDataModel.class));
+        } catch (ServiceException e) {
+            LOGGER.error(TAG_COULD_NOT_BE_FOUND, e);
+            throw new ResourceNotFoundException(TAG_COULD_NOT_BE_FOUND, e);
+        }
+    }
+
+    /**
      * POST /tags
      * Creates a new tag.
      *
