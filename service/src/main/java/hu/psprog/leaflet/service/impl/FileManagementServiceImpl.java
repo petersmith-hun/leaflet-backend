@@ -4,7 +4,9 @@ import hu.psprog.leaflet.service.FileManagementService;
 import hu.psprog.leaflet.service.exception.FileUploadException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.uploader.FileUploader;
+import hu.psprog.leaflet.service.impl.uploader.acceptor.UploadAcceptor;
 import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.slf4j.Logger;
@@ -14,10 +16,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link FileManagementService}.
@@ -33,11 +41,13 @@ public class FileManagementServiceImpl implements FileManagementService {
 
     private File fileStorage;
     private FileUploader fileUploader;
+    private List<UploadAcceptor> uploadAcceptors;
 
     @Autowired
-    public FileManagementServiceImpl(File fileStorage, FileUploader fileUploader) {
+    public FileManagementServiceImpl(File fileStorage, FileUploader fileUploader, List<UploadAcceptor> uploadAcceptors) {
         this.fileStorage = fileStorage;
         this.fileUploader = fileUploader;
+        this.uploadAcceptors = uploadAcceptors;
     }
 
     @Override
@@ -122,6 +132,41 @@ public class FileManagementServiceImpl implements FileManagementService {
             LOGGER.error(GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH, path);
             throw new ServiceException(GIVEN_PATH_IS_INVALID, exc);
         }
+    }
+
+    @Override
+    @PermitEditorOrAdmin
+    public List<AcceptorInfoVO> getAcceptorInfo() {
+
+        return uploadAcceptors.stream()
+                .map(this::extractUploadAcceptorInfo)
+                .collect(Collectors.toList());
+    }
+
+    private AcceptorInfoVO extractUploadAcceptorInfo(UploadAcceptor uploadAcceptor) {
+        return AcceptorInfoVO.getBuilder()
+                .withId(uploadAcceptor.acceptedAs())
+                .withRootDirectoryName(uploadAcceptor.groupRootDirectory())
+                .withChildrenDirectories(getChildrenDirectories(uploadAcceptor))
+                .build();
+    }
+
+    private List<String> getChildrenDirectories(UploadAcceptor uploadAcceptor) {
+
+        List<String> childrenDirectories = null;
+        try {
+            Path acceptorRootPath = buildAbsolutePath(uploadAcceptor.groupRootDirectory());
+            childrenDirectories = Files.walk(acceptorRootPath)
+                    .filter(path -> path.toFile().isDirectory())
+                    .map(acceptorRootPath::relativize)
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            LOGGER.error("Unable to retrieve acceptor root information.", e);
+        }
+
+        return Optional.ofNullable(childrenDirectories)
+                .orElse(Collections.emptyList());
     }
 
     private boolean isAccessible(File file) {

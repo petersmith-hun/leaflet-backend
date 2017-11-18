@@ -4,6 +4,7 @@ import hu.psprog.leaflet.service.FileManagementService;
 import hu.psprog.leaflet.service.FileMetaInfoService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.FileManagementFacade;
+import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.DownloadableFileWrapperVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
@@ -99,6 +100,11 @@ public class FileManagementFacadeImpl implements FileManagementFacade {
             LOGGER.error("Requested file does not exist", e);
         }
         return uploadedFileVOOptional;
+    }
+
+    @Override
+    public List<AcceptorInfoVO> getAcceptorInfo() {
+        return fileManagementService.getAcceptorInfo();
     }
 
     private DownloadableFileWrapperVO wrapFile(UploadedFileVO metaInfo, File fileToDownload) throws IOException {

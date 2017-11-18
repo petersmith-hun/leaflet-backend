@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.service.facade;
 
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.DownloadableFileWrapperVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
@@ -75,4 +76,11 @@ public interface FileManagementFacade {
      * @return UploadedFileVO wrapped in Optional if the file exists, empty Optional otherwise
      */
     Optional<UploadedFileVO> getCheckedMetaInfo(UUID pathUUID);
+
+    /**
+     * Retrieves information of existing acceptors.
+     *
+     * @return List of {@link AcceptorInfoVO} holding information about acceptors
+     */
+    List<AcceptorInfoVO> getAcceptorInfo();
 }

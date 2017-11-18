@@ -6,10 +6,12 @@ import hu.psprog.leaflet.api.rest.request.file.FileUploadRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.UpdateFileMetaInfoRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
+import hu.psprog.leaflet.api.rest.response.file.DirectoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileListDataModel;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.FileManagementFacade;
+import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.DownloadableFileWrapperVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
@@ -47,7 +49,7 @@ public class FilesController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilesController.class);
     private static final String PATH_FULLY_IDENTIFIED_FILE = PATH_PART_FILE_IDENTIFIER + PATH_PART_FILENAME;
-    private static final String PATH_CREATE_DIRECTORY = "/directory";
+    private static final String PATH_DIRECTORIES = "/directories";
 
     private FileManagementFacade fileManagementFacade;
 
@@ -162,7 +164,7 @@ public class FilesController extends BaseController {
      * @return validation result on validation error, {@code null} otherwise
      * @throws RequestCouldNotBeFulfilledException if directory cannot be created
      */
-    @RequestMapping(method = RequestMethod.POST, value = PATH_CREATE_DIRECTORY)
+    @RequestMapping(method = RequestMethod.POST, value = PATH_DIRECTORIES)
     public ResponseEntity<BaseBodyDataModel> createDirectory(@RequestBody @Valid DirectoryCreationRequestModel directoryCreationRequestModel,
                                         BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
@@ -216,6 +218,21 @@ public class FilesController extends BaseController {
                 throw new ResourceNotFoundException("Requested file can not be updated, probably not existing.");
             }
         }
+    }
+
+    /**
+     * GET /files/directories
+     * Retrieves existing acceptor root directories and their children directories.
+     *
+     * @return directory structure information as {@link DirectoryListDataModel}
+     */
+    @RequestMapping(method = RequestMethod.GET, value = PATH_DIRECTORIES)
+    public ResponseEntity<DirectoryListDataModel> getDirectories() {
+
+        List<AcceptorInfoVO> directories = fileManagementFacade.getAcceptorInfo();
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(directories, DirectoryListDataModel.class));
     }
 
     private URI buildLocation(FileDataModel fileDataModel) {

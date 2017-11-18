@@ -1,10 +1,12 @@
 package hu.psprog.leaflet.service;
 
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Service to handle file operations.
@@ -58,4 +60,11 @@ public interface FileManagementService {
      * @throws ServiceException if there's no existing file by the given filename
      */
     boolean exists(String path) throws ServiceException;
+
+    /**
+     * Retrieves information of existing acceptors.
+     *
+     * @return List of {@link AcceptorInfoVO} holding information about acceptors
+     */
+    List<AcceptorInfoVO> getAcceptorInfo();
 }
