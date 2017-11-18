@@ -22,6 +22,7 @@ public class UploadedFileVOToFileDataModelConverter implements Converter<Uploade
                 .withReference(buildReference(source))
                 .withAcceptedAs(source.getAcceptedAs())
                 .withDescription(source.getDescription())
+                .withPath(source.getPath())
                 .build();
     }
 

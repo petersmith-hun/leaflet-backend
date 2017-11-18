@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -217,6 +218,29 @@ public class FilesController extends BaseController {
                 LOGGER.error("Failed to update given file.", e);
                 throw new ResourceNotFoundException("Requested file can not be updated, probably not existing.");
             }
+        }
+    }
+
+    /**
+     * Retrieves file meta information for given file identifier.
+     *
+     * @param fileIdentifier UUID of the uploaded file
+     * @return file meta information as {@link FileDataModel}
+     * @throws ResourceNotFoundException if no existing file is found for given fileIdentifier
+     */
+    @RequestMapping(method = RequestMethod.GET, path = PATH_PART_FILE_IDENTIFIER)
+    public ResponseEntity<FileDataModel> getFileDetails(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier)
+            throws ResourceNotFoundException {
+
+        Optional<UploadedFileVO> fileDetails = fileManagementFacade.getCheckedMetaInfo(fileIdentifier);
+        if (fileDetails.isPresent()) {
+            return ResponseEntity
+                    .ok()
+                    .body(conversionService.convert(fileDetails.get(), FileDataModel.class));
+        } else {
+            String message = String.format("File [%s] not found.", fileIdentifier);
+            LOGGER.error(message);
+            throw new ResourceNotFoundException(message);
         }
     }
 
