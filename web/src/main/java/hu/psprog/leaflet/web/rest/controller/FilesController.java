@@ -18,6 +18,7 @@ import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,13 +140,11 @@ public class FilesController extends BaseController {
      * Deletes an existing file.
      *
      * @param fileIdentifier UUID of the uploaded file
-     * @param storedFilename stored filename of the uploaded file (currently only the fileIdentifier is used for identification)
      * @throws ResourceNotFoundException if no existing file is found for given fileIdentifier
      */
-    @RequestMapping(method = RequestMethod.DELETE, value = PATH_FULLY_IDENTIFIED_FILE)
+    @RequestMapping(method = RequestMethod.DELETE, value = PATH_PART_FILE_IDENTIFIER)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFile(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier,
-                           @PathVariable(PATH_VARIABLE_FILENAME) String storedFilename)
+    public void deleteFile(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier)
             throws ResourceNotFoundException {
 
         try {
@@ -191,17 +190,15 @@ public class FilesController extends BaseController {
      * Updates given file's meta information.
      *
      * @param fileIdentifier UUID of the uploaded file
-     * @param storedFilename stored filename of the uploaded file (currently only the fileIdentifier is used for identification)
      * @param updateFileMetaInfoRequestModel updated meta information
      * @param bindingResult validation result
      * @return validation result on validation error, {@code null} otherwise
      * @throws ResourceNotFoundException if no existing file is found for given fileIdentifier
      */
-    @RequestMapping(method = RequestMethod.PUT, value = PATH_FULLY_IDENTIFIED_FILE)
+    @RequestMapping(method = RequestMethod.PUT, value = PATH_PART_FILE_IDENTIFIER)
     public ResponseEntity<BaseBodyDataModel> updateFileMetaInfo(@PathVariable(PATH_VARIABLE_FILE_IDENTIFIER) UUID fileIdentifier,
-                                           @PathVariable(PATH_VARIABLE_FILENAME) String storedFilename,
-                                           @RequestBody @Valid UpdateFileMetaInfoRequestModel updateFileMetaInfoRequestModel,
-                                           BindingResult bindingResult) throws ResourceNotFoundException {
+                                                                @RequestBody @Valid UpdateFileMetaInfoRequestModel updateFileMetaInfoRequestModel,
+                                                                BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
             return ResponseEntity
@@ -211,8 +208,9 @@ public class FilesController extends BaseController {
             UpdateFileMetaInfoVO updateFileMetaInfoVO = conversionService.convert(updateFileMetaInfoRequestModel, UpdateFileMetaInfoVO.class);
             try {
                 fileManagementFacade.updateMetaInfo(fileIdentifier, updateFileMetaInfoVO);
+                Optional<UploadedFileVO> fileInfo = fileManagementFacade.getCheckedMetaInfo(fileIdentifier);
                 return ResponseEntity
-                        .created(buildLocation(fileIdentifier, storedFilename))
+                        .created(buildLocation(fileIdentifier, fileInfo))
                         .body(null);
             } catch (ServiceException e) {
                 LOGGER.error("Failed to update given file.", e);
@@ -263,7 +261,10 @@ public class FilesController extends BaseController {
         return URI.create(BASE_PATH_FILES + "/" + fileDataModel.getReference());
     }
 
-    private URI buildLocation(UUID fileIdentifier, String storedFilename) {
-        return URI.create(BASE_PATH_FILES + "/" + fileIdentifier + "/" + storedFilename);
+    private URI buildLocation(UUID fileIdentifier, Optional<UploadedFileVO> fileInfo) {
+        String location = BASE_PATH_FILES + "/" + fileIdentifier + "/" + fileInfo
+                .map(UploadedFileVO::getStoredFilename)
+                .orElse(StringUtils.EMPTY);
+        return URI.create(location);
     }
 }
