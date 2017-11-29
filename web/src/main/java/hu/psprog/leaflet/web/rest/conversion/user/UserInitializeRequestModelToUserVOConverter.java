@@ -26,15 +26,13 @@ public class UserInitializeRequestModelToUserVOConverter implements Converter<Us
     private static final String USERS_ENABLED_BY_DEFAULT = "${usersEnabledByDefault:true}";
 
     private boolean enabled;
-    private Boolean initModeEnabled;
     private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Autowired
     public UserInitializeRequestModelToUserVOConverter(@Value(USERS_ENABLED_BY_DEFAULT) boolean enabled,
-                                                       Boolean initModeEnabled, JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
+                                                       JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
         this.enabled = enabled;
         this.juLocaleToLeafletLocaleConverter = juLocaleToLeafletLocaleConverter;
-        this.initModeEnabled = initModeEnabled;
     }
 
     @Override
@@ -57,8 +55,6 @@ public class UserInitializeRequestModelToUserVOConverter implements Converter<Us
         if (userInitializeRequestModel instanceof UserCreateRequestModel) {
             String role = ((UserCreateRequestModel) userInitializeRequestModel).getRole();
             authority = Authority.getAuthorityByName(role);
-        } else if (initModeEnabled) {
-            authority = Authority.ADMIN;
         }
 
         return Collections.singletonList(authority);

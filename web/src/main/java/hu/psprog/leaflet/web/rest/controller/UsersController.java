@@ -17,9 +17,7 @@ import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
@@ -60,7 +58,6 @@ public class UsersController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UsersController.class);
 
-    private static final String PATH_INIT = "/init";
     private static final String PATH_IDENTIFIED_USER_UPDATE_ROLE = PATH_PART_ID + "/role";
     private static final String PATH_IDENTIFIED_USER_UPDATE_PASSWORD = PATH_PART_ID + "/password";
     private static final String PATH_CLAIM_TOKEN = "/claim";
@@ -71,9 +68,6 @@ public class UsersController extends BaseController {
     private static final String PATH_RENEW = "/renew";
 
     private static final String REQUESTED_USER_IS_NOT_EXISTING = "Requested user is not existing.";
-    private static final String INITIALIZATION_FAILED_SEE_DETAILS = "Initialization failed. See details:";
-    private static final String INITIALIZATION_IS_NOT_AVAILABLE_NOW = "Initialization is not available now.";
-    private static final String SERVICE_HAS_THROWN_AN_EXCEPTION = "Service has thrown an exception. See details:";
     private static final String USER_COULD_NOT_BE_CREATED = "User could not be created. See details:";
     private static final String USER_ACCOUNT_COULD_NOT_BE_CREATED = "Your user account could not be created. Please try again later!";
     private static final String PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Provided email address is already in use.";
@@ -141,44 +135,6 @@ public class UsersController extends BaseController {
             } catch (ServiceException e) {
                 LOGGER.error(USER_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(USER_ACCOUNT_COULD_NOT_BE_CREATED);
-            }
-        }
-    }
-
-    /**
-     * POST /users/init
-     * Initializes user database with the first user who always has ADMIN role. After initialization, endpoint shall not be used!
-     *
-     * @param userInitializeRequestModel user data
-     * @param bindingResult validation results
-     * @return created user's data
-     */
-    @RequestMapping(method = RequestMethod.POST, path = PATH_INIT)
-    public ResponseEntity<BaseBodyDataModel> initUserDatabase(@RequestBody @Valid UserInitializeRequestModel userInitializeRequestModel, BindingResult bindingResult)
-            throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
-
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
-        } else {
-            try {
-                hashPassword(userInitializeRequestModel);
-                Long userID = userService.initialize(conversionService.convert(userInitializeRequestModel, UserVO.class));
-                UserVO createdUser = userService.getOne(userID);
-
-                return ResponseEntity
-                        .created(buildLocation(userID))
-                        .body(conversionService.convert(createdUser, ExtendedUserDataModel.class));
-            } catch (UserInitializationException e) {
-                LOGGER.error(SERVICE_HAS_THROWN_AN_EXCEPTION, e);
-                throw new RequestCouldNotBeFulfilledException(INITIALIZATION_IS_NOT_AVAILABLE_NOW, e);
-            } catch (EntityCreationException e) {
-                LOGGER.error("User could not be created. See details:", e);
-                throw new RequestCouldNotBeFulfilledException(INITIALIZATION_FAILED_SEE_DETAILS, e);
-            } catch (ServiceException e) {
-                LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
-                throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
             }
         }
     }

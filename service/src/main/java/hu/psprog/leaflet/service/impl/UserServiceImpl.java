@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.UserDAO;
-import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
@@ -13,7 +12,6 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
 import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
@@ -53,16 +51,14 @@ public class UserServiceImpl implements UserService {
     private UserToUserVOConverter userToUserVOConverter;
     private UserVOToUserConverter userVOToUserConverter;
     private AuthorityToRoleConverter authorityToRoleConverter;
-    private Boolean initModeEnabled;
 
     @Autowired
     public UserServiceImpl(UserDAO userDAO, UserToUserVOConverter userToUserVOConverter, UserVOToUserConverter userVOToUserConverter,
-                           AuthorityToRoleConverter authorityToRoleConverter, Boolean initModeEnabled) {
+                           AuthorityToRoleConverter authorityToRoleConverter) {
         this.userDAO = userDAO;
         this.userToUserVOConverter = userToUserVOConverter;
         this.userVOToUserConverter = userVOToUserConverter;
         this.authorityToRoleConverter = authorityToRoleConverter;
-        this.initModeEnabled = initModeEnabled;
     }
 
     @Override
@@ -192,29 +188,6 @@ public class UserServiceImpl implements UserService {
         }
 
         return createOne(entity);
-    }
-
-    @Override
-    public Long initialize(UserVO userVO) throws UserInitializationException, EntityCreationException {
-
-        if (!initModeEnabled) {
-            throw new UserInitializationException("Application is NOT in INIT mode");
-        }
-
-        long userCount = userDAO.count();
-        if (userCount > 0) {
-            throw new UserInitializationException("Application already initialized");
-        }
-
-        User user = userVOToUserConverter.convert(userVO);
-        user.setRole(Role.ADMIN);
-        User savedUser = userDAO.save(user);
-
-        if (savedUser == null) {
-            throw new EntityCreationException(User.class);
-        }
-
-        return savedUser.getId();
     }
 
     @Override

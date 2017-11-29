@@ -79,17 +79,11 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
 
     @Bean
     public MailClient mailClient() {
-        return new MailClient() {
-
-            @Override
-            public Observable<MailDeliveryInfo> sendMail(Mail mail) {
-                return Observable.just(MailDeliveryInfo.getBuilder()
-                        .withMail(Mail.getBuilder().build())
-                        .withConstraintViolations(Collections.emptyMap())
-                        .withMailDeliveryStatus(MailDeliveryStatus.DELIVERED)
-                        .build());
-            }
-        };
+        return mail -> Observable.just(MailDeliveryInfo.getBuilder()
+                .withMail(Mail.getBuilder().build())
+                .withConstraintViolations(Collections.emptyMap())
+                .withMailDeliveryStatus(MailDeliveryStatus.DELIVERED)
+                .build());
     }
 
     @Bean
@@ -156,11 +150,6 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
         txManager.setEntityManagerFactory(entityManagerFactory());
 
         return txManager;
-    }
-
-    @Bean
-    public Boolean initModeEnabled() {
-        return true;
     }
 
     @Bean
