@@ -1,8 +1,6 @@
 package hu.psprog.leaflet.web.config;
 
 import hu.psprog.leaflet.web.exception.InitializationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,11 +19,8 @@ import java.util.Set;
 @EnableAspectJAutoProxy
 public class ApplicationContextConfig {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationContextConfig.class);
-
     private static final String APPLICATION_CONFIG_PROPERTY_SOURCE = "applicationConfigPropertySource";
     private static final String APP_VERSION_PROPERTY = "${app.version}";
-    private static final String INIT_MODE_ENABLED = "${init:false}";
 
     @Bean
     @Autowired
@@ -45,16 +40,6 @@ public class ApplicationContextConfig {
         configurer.setLocation(new ClassPathResource("version.properties"));
 
         return configurer;
-    }
-
-    @Bean
-    public Boolean initModeEnabled(@Value(INIT_MODE_ENABLED) boolean initModeEnabled) {
-
-        if (initModeEnabled) {
-            LOGGER.warn("Application is running in INIT mode! Please change it before deploying to production!");
-        }
-
-        return initModeEnabled;
     }
 
     @Bean

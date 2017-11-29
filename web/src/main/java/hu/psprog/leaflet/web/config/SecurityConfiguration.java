@@ -33,8 +33,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled =  true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String PATH_USERS_INIT = "/users/init";
-    private static final String INIT_ACCESS_FILTER_EXPRESSION = "@initModeEnabled";
     private static final String[] PUBLIC_GET_ENDPOINTS = {
             "/categories/public",
             "/comments/entry/*/*",
@@ -104,8 +102,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .permitAll()
                 .antMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
                     .permitAll()
-                .antMatchers(PATH_USERS_INIT)
-                    .access(INIT_ACCESS_FILTER_EXPRESSION)
                 .anyRequest()
                     .authenticated()
                 .and()

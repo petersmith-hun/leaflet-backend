@@ -10,7 +10,6 @@ import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.exception.UserInitializationException;
 import hu.psprog.leaflet.service.helper.UserEntityTestDataGenerator;
 import hu.psprog.leaflet.service.helper.UserVOTestDataGenerator;
 import hu.psprog.leaflet.service.vo.UserVO;
@@ -20,8 +19,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.lang.reflect.Field;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -170,81 +167,6 @@ public class UserServiceImplTest {
         verify(userVOToUserConverter).convert(userVO);
         verify(userToUserVOConverter, never()).convert(user);
         verify(userDAO).updateOne(user.getId(), user);
-    }
-
-    @Test
-    public void testInitializeWithSuccess() throws UserInitializationException, EntityCreationException, NoSuchFieldException, IllegalAccessException {
-
-        // given
-        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
-        runLevel.setAccessible(true);
-        runLevel.set(userService, true);
-        given(userDAO.count()).willReturn(0L);
-        given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userDAO.save(user)).willReturn(user);
-
-        // when
-        Long result = userService.initialize(userVO);
-
-        // then
-        assertThat(result, equalTo(user.getId()));
-        verify(userVOToUserConverter).convert(userVO);
-        verify(userDAO).save(user);
-    }
-
-    @Test(expected = UserInitializationException.class)
-    public void testInitializeWhenAppIsNotInInitMode() throws UserInitializationException, EntityCreationException, NoSuchFieldException, IllegalAccessException {
-
-        // given
-        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
-        runLevel.setAccessible(true);
-        runLevel.set(userService, false);
-
-        // when
-        userService.initialize(userVO);
-
-        // then
-        verify(userDAO, never()).count();
-        verify(userVOToUserConverter, never()).convert(userVO);
-        verify(userDAO, never()).save(user);
-    }
-
-    @Test(expected = UserInitializationException.class)
-    public void testInitializeWhenAppIsAlreadyInitialized() throws NoSuchFieldException, IllegalAccessException, UserInitializationException, EntityCreationException {
-
-        // given
-        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
-        runLevel.setAccessible(true);
-        runLevel.set(userService, true);
-        given(userDAO.count()).willReturn(1L);
-
-        // when
-        userService.initialize(userVO);
-
-        // then
-        verify(userDAO).count();
-        verify(userVOToUserConverter, never()).convert(userVO);
-        verify(userDAO, never()).save(user);
-    }
-
-    @Test(expected = EntityCreationException.class)
-    public void testInitializeWithCreationFailure() throws NoSuchFieldException, IllegalAccessException, UserInitializationException, EntityCreationException {
-
-        // given
-        Field runLevel = userService.getClass().getDeclaredField("initModeEnabled");
-        runLevel.setAccessible(true);
-        runLevel.set(userService, true);
-        given(userDAO.count()).willReturn(0L);
-        given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userDAO.save(user)).willReturn(null);
-
-        // when
-        Long result = userService.initialize(userVO);
-
-        // then
-        assertThat(result, equalTo(user.getId()));
-        verify(userVOToUserConverter).convert(userVO);
-        verify(userDAO).save(user);
     }
 
     @Test

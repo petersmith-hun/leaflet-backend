@@ -171,37 +171,6 @@ public class UserServiceImplIT {
         assertThat(resultUser.getLastModified(), nullValue());
     }
 
-    @Test(expected = UserInitializationException.class)
-    @Transactional
-    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
-    public void testInitializeWithFailure() throws UserInitializationException, EntityCreationException {
-
-        // given
-        UserVO initUser = new UserVOTestDataGenerator().generate();
-
-        // when
-        userService.initialize(initUser);
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @Transactional
-    public void testInitializeWithSuccess() throws ServiceException, NoSuchFieldException, IllegalAccessException {
-
-        // given
-        GrantedAuthority adminAuthority = new SimpleGrantedAuthority(Role.ADMIN.name());
-
-        // when
-        UserVO initVO = new UserVOTestDataGenerator().generate();
-        Long result = userService.initialize(initVO);
-
-        // then
-        assertThat(userService.count(), equalTo(1L));
-        assertThat(userService.getAll().get(0).getAuthorities().iterator().next(), equalTo(adminAuthority));
-    }
-
     @Test
     @Transactional
     @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
