@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.DocumentDAO;
 import hu.psprog.leaflet.persistence.entity.Document;
+import hu.psprog.leaflet.persistence.repository.specification.DocumentSpecification;
 import hu.psprog.leaflet.service.DocumentService;
 import hu.psprog.leaflet.service.converter.DocumentToDocumentVOConverter;
 import hu.psprog.leaflet.service.converter.DocumentVOToDocumentConverter;
@@ -66,6 +67,14 @@ public class DocumentServiceImpl implements DocumentService {
     public List<DocumentVO> getAll() {
 
         return documentDAO.findAll().stream()
+                .map(documentToDocumentVOConverter::convert)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocumentVO> getPublicDocuments() {
+
+        return documentDAO.findAll(DocumentSpecification.IS_ENABLED).stream()
                 .map(documentToDocumentVOConverter::convert)
                 .collect(Collectors.toList());
     }

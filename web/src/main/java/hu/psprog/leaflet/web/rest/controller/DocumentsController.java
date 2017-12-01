@@ -76,6 +76,23 @@ public class DocumentsController extends BaseController {
     }
 
     /**
+     * GET /documents/public
+     * Returns basic information of existing public documents.
+     *
+     * @return list of public documents
+     */
+    @RequestMapping(method = RequestMethod.GET, path = PATH_PUBLIC)
+    @Timed
+    public ResponseEntity<DocumentListDataModel> getPublicDocuments() {
+
+        List<DocumentVO> documentVOList = documentService.getPublicDocuments();
+
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(documentVOList, DocumentListDataModel.class));
+    }
+
+    /**
      * GET /documents/{id}
      * Returns detailed information of document identified by given ID (for admin usage).
      *
