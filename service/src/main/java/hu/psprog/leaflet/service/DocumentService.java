@@ -8,6 +8,8 @@ import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 
+import java.util.List;
+
 /**
  * Document service operations interface.
  *
@@ -18,6 +20,13 @@ public interface DocumentService extends CreateOperationCapableService<DocumentV
         UpdateOperationCapableService<DocumentVO, DocumentVO, Long>,
         DeleteOperationCapableService<DocumentVO, Long>,
         StatusChangeCapableService<Long> {
+
+    /**
+     * Returns a page of public documents.
+     *
+     * @return list of public documents
+     */
+    List<DocumentVO> getPublicDocuments();
 
     /**
      * Returns {@link DocumentVO} identified by given link

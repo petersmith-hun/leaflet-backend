@@ -4,10 +4,12 @@ import hu.psprog.leaflet.persistence.dao.DocumentDAO;
 import hu.psprog.leaflet.persistence.entity.Document;
 import hu.psprog.leaflet.persistence.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * DAO implementation for {@link DocumentRepository}.
@@ -20,6 +22,11 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
     @Autowired
     public DocumentDAOImpl(final DocumentRepository documentRepository) {
         super(documentRepository);
+    }
+
+    @Override
+    public List<Document> findAll(Specification<Document> specification) {
+        return ((DocumentRepository) jpaRepository).findAll(specification);
     }
 
     @Override

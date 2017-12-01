@@ -1,12 +1,10 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.service.DocumentService;
-import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import hu.psprog.leaflet.service.vo.DocumentVO;
-import hu.psprog.leaflet.service.vo.EntityPageVO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,10 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 /**
@@ -66,15 +66,29 @@ public class DocumentServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_DOCUMENTS)
-    public void testGetAll() throws ServiceException {
+    public void testGetAll() {
 
         // when
         List<DocumentVO> result = documentService.getAll();
 
         // then
-        assertThat(result.stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.size(), equalTo(4));
         assertThat(result.get(0).getContent(), equalTo(controlDocumentVO.getContent()));
+    }
+
+    @Test
+    @Transactional
+    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_DOCUMENTS)
+    public void testGetPublicDocuments() {
+
+        // when
+        List<DocumentVO> result = documentService.getPublicDocuments();
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.size(), equalTo(3));
+        assertThat(result.stream().allMatch(DocumentVO::isEnabled), is(true));
     }
 
     @Test

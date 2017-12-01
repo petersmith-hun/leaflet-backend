@@ -37,6 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/categories/public",
             "/comments/entry/*/*",
             "/documents/link/*",
+            "/documents/public",
             "/entries/link/*",
             "/entries/page/*",
             "/entries/*/page/*",
