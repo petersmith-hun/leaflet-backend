@@ -30,12 +30,12 @@ public interface UserAuthenticationService {
     void demandPasswordReset(LoginContextVO loginContextVO);
 
     /**
-     * Confirms password reset and updates password of the user.
+     * Confirms password reset for currently authenticated RECLAIM user.
      * No explicit user identifier is required, as principal is retrieved from Security Context.
      *
-     * @param password user's new password
+     * @return ID of the user whose password got reset
      */
-    void confirmPasswordReset(String password);
+    Long confirmPasswordReset();
 
     /**
      * Extends user session.

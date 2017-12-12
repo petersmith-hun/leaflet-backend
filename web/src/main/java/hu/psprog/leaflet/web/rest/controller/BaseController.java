@@ -1,6 +1,8 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
+import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
@@ -145,5 +148,17 @@ public class BaseController {
                 .body(ErrorMessageDataModel.getBuilder()
                         .withMessage(exception.getMessage())
                         .build());
+    }
+
+    /**
+     * Builds validation failure response.
+     *
+     * @param bindingResult validation results
+     * @return ValidationErrorMessageListDataModel wrapped in {@link ResponseEntity} with HTTP status 400
+     */
+    ResponseEntity<BaseBodyDataModel> validationFailureResponse(BindingResult bindingResult) {
+        return ResponseEntity
+                .badRequest()
+                .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
     }
 }

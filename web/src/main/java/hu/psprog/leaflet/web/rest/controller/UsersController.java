@@ -9,27 +9,23 @@ import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserPasswordRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
-import hu.psprog.leaflet.service.UserAuthenticationService;
-import hu.psprog.leaflet.service.UserService;
-import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.vo.LoginContextVO;
+import hu.psprog.leaflet.service.facade.UserFacade;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.exception.TokenClaimException;
+import hu.psprog.leaflet.web.rest.conversion.user.LoginContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,11 +37,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
-import java.util.UUID;
 
 import static hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter.AUTH_TOKEN_HEADER;
-import static hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter.DEVICE_ID_HEADER;
 
 /**
  * REST controller for user-related entry points.
@@ -78,15 +71,13 @@ public class UsersController extends BaseController {
     private static final String PASSWORD_RESET_FAILURE = "Your password reset request cannot be processed at the moment - please try again later.";
     private static final String FAILED_TO_EXTEND_USER_SESSION = "Failed to extend user session";
 
-    private UserService userService;
-    private PasswordEncoder passwordEncoder;
-    private UserAuthenticationService userAuthenticationService;
+    private UserFacade userFacade;
+    private LoginContextFactory loginContextFactory;
 
     @Autowired
-    public UsersController(UserService userService, PasswordEncoder passwordEncoder, UserAuthenticationService userAuthenticationService) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.userAuthenticationService = userAuthenticationService;
+    public UsersController(UserFacade userFacade, LoginContextFactory loginContextFactory) {
+        this.userFacade = userFacade;
+        this.loginContextFactory = loginContextFactory;
     }
 
     /**
@@ -101,7 +92,7 @@ public class UsersController extends BaseController {
 
         return ResponseEntity
                 .ok()
-                .body(conversionService.convert(userService.getAll(), UserListDataModel.class));
+                .body(conversionService.convert(userFacade.getUserList(), UserListDataModel.class));
     }
 
     /**
@@ -117,17 +108,12 @@ public class UsersController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                hashPassword(userCreateRequestModel);
-                Long userID = userService.createOne(conversionService.convert(userCreateRequestModel, UserVO.class));
-                UserVO createdUser = userService.getOne(userID);
-
+                UserVO createdUser = userFacade.createUser(conversionService.convert(userCreateRequestModel, UserVO.class));
                 return ResponseEntity
-                        .created(buildLocation(userID))
+                        .created(buildLocation(createdUser.getId()))
                         .body(conversionService.convert(createdUser, ExtendedUserDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
@@ -152,11 +138,9 @@ public class UsersController extends BaseController {
     public ResponseEntity<ExtendedUserDataModel> getUserByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            UserVO userVO = userService.getOne(id);
-
             return ResponseEntity
                     .ok()
-                    .body(conversionService.convert(userVO, ExtendedUserDataModel.class));
+                    .body(conversionService.convert(userFacade.getUserByID(id), ExtendedUserDataModel.class));
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
             throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
@@ -174,7 +158,7 @@ public class UsersController extends BaseController {
     public void deleteUser(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            userService.deleteByID(id);
+            userFacade.deleteUserByID(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_USER_IS_NOT_EXISTING, e);
             throw new ResourceNotFoundException(REQUESTED_USER_IS_NOT_EXISTING);
@@ -196,14 +180,10 @@ public class UsersController extends BaseController {
             throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                userService.changeAuthority(id, Authority.getAuthorityByName(updateRoleRequestModel.getRole()));
-                UserVO userVO = userService.getOne(id);
-
+                UserVO userVO = userFacade.changeAuthority(id, updateRoleRequestModel.getRole());
                 return ResponseEntity
                         .created(buildLocation(id))
                         .body(conversionService.convert(userVO, ExtendedUserDataModel.class));
@@ -230,14 +210,10 @@ public class UsersController extends BaseController {
             throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                userService.updateOne(id, conversionService.convert(updateProfileRequestModel, UserVO.class));
-                UserVO userVO = userService.getOne(id);
-
+                UserVO userVO = userFacade.updateUserProfile(id, conversionService.convert(updateProfileRequestModel, UserVO.class));
                 return ResponseEntity
                         .created(buildLocation(id))
                         .body(conversionService.convert(userVO, ExtendedUserDataModel.class));
@@ -267,15 +243,10 @@ public class UsersController extends BaseController {
             throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                hashPassword(userPasswordRequestModel);
-                userService.changePassword(id, userPasswordRequestModel.getPassword());
-                UserVO userVO = userService.getOne(id);
-
+                UserVO userVO = userFacade.updateUserPassword(id, null, userPasswordRequestModel.getPassword());
                 return ResponseEntity
                         .created(buildLocation(id))
                         .body(conversionService.convert(userVO, ExtendedUserDataModel.class));
@@ -297,23 +268,13 @@ public class UsersController extends BaseController {
     @Timed
     public ResponseEntity<BaseBodyDataModel> claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel,
                                                         HttpServletRequest httpServletRequest, BindingResult bindingResult)
-            throws TokenClaimException, ResourceNotFoundException {
+            throws TokenClaimException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                String token = userAuthenticationService.claimToken(LoginContextVO.getBuilder()
-                        .withUsername(loginRequestModel.getEmail())
-                        .withPassword(loginRequestModel.getPassword())
-                        .withDeviceID(extractDeviceID(httpServletRequest))
-                        .withRemoteAddress(httpServletRequest.getRemoteAddr())
-                        .build());
-
-                userService.updateLastLogin(loginRequestModel.getEmail());
-
+                String token = userFacade.login(loginContextFactory.forLogin(loginRequestModel, httpServletRequest));
                 return ResponseEntity
                         .ok()
                         .header(AUTH_TOKEN_HEADER, token)
@@ -342,14 +303,10 @@ public class UsersController extends BaseController {
                                     BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                hashPassword(userInitializeRequestModel);
-                Long userID = userService.register(conversionService.convert(userInitializeRequestModel, UserVO.class));
-
+                Long userID = userFacade.register(conversionService.convert(userInitializeRequestModel, UserVO.class));
                 return ResponseEntity
                         .created(buildLocation(userID))
                         .build();
@@ -374,7 +331,7 @@ public class UsersController extends BaseController {
     public ResponseEntity<Void> revokeToken() throws RequestCouldNotBeFulfilledException {
 
         try {
-            userAuthenticationService.revokeToken();
+            userFacade.logout();
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT)
                     .build();
@@ -401,17 +358,10 @@ public class UsersController extends BaseController {
             throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
-            LoginContextVO loginContextVO = LoginContextVO.getBuilder()
-                    .withUsername(passwordResetDemandRequestModel.getEmail())
-                    .withDeviceID(extractDeviceID(httpServletRequest))
-                    .withRemoteAddress(httpServletRequest.getRemoteAddr())
-                    .build();
             try {
-                userAuthenticationService.demandPasswordReset(loginContextVO);
+                userFacade.demandPasswordReset(loginContextFactory.forPasswordReset(passwordResetDemandRequestModel, httpServletRequest));
                 return ResponseEntity
                         .status(HttpStatus.CREATED)
                         .build();
@@ -440,13 +390,10 @@ public class UsersController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
-            hashPassword(userPasswordRequestModel);
             try {
-                userAuthenticationService.confirmPasswordReset(userPasswordRequestModel.getPassword());
+                userFacade.confirmPasswordReset(userPasswordRequestModel.getPassword());
                 return ResponseEntity
                         .status(HttpStatus.CREATED)
                         .build();
@@ -469,10 +416,7 @@ public class UsersController extends BaseController {
     public ResponseEntity<LoginResponseDataModel> renewToken(HttpServletRequest httpServletRequest) throws RequestCouldNotBeFulfilledException {
 
         try {
-            String token = userAuthenticationService.extendSession(LoginContextVO.getBuilder()
-                    .withDeviceID(extractDeviceID(httpServletRequest))
-                    .withRemoteAddress(httpServletRequest.getRemoteAddr())
-                    .build());
+            String token = userFacade.extendSession(loginContextFactory.forRenewal(httpServletRequest));
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -486,19 +430,7 @@ public class UsersController extends BaseController {
         }
     }
 
-    private void hashPassword(UserPasswordRequestModel userPasswordRequestModel) {
-        String encodedPassword = passwordEncoder.encode(userPasswordRequestModel.getPassword());
-        userPasswordRequestModel.setPassword(encodedPassword);
-        userPasswordRequestModel.setPasswordConfirmation(null); // we don't need confirmation value anymore
-    }
-
     private URI buildLocation(Long id) {
         return URI.create(BASE_PATH_USERS + "/" + id);
-    }
-
-    private UUID extractDeviceID(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(DEVICE_ID_HEADER))
-                .map(UUID::fromString)
-                .orElse(null);
     }
 }
