@@ -17,6 +17,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -105,6 +107,11 @@ public class AcceptanceTestConfig {
     @Bean
     public NamedParameterJdbcTemplate sessionStoreJDBCTemplate() {
         return new NamedParameterJdbcTemplate(sessionStoreDataSource());
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
     }
 
     public void setUsername(String username) {

@@ -34,6 +34,6 @@ public class UsersControllerAcceptanceTest {
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getUsers().size(), equalTo(3));
+        assertThat(result.getUsers().size(), equalTo(5));
     }
 }
