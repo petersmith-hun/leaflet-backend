@@ -315,7 +315,6 @@
     </dependencies>
     
     <build>
-        <finalName>leaflet-backend</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -331,6 +330,7 @@
                     <argLine>${argLine.surefire}</argLine>
                     <excludes>
                         <exclude>**/*IT.java</exclude>
+                        <exclude>**/*AcceptanceTest.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -340,6 +340,10 @@
                 <version>${maven-failsafe-plugin.version}</version>
                 <configuration>
                     <skip>${skip.it}</skip>
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/*AcceptanceTest.java</include>
+                    </includes>
                 </configuration>
                 <executions>
                     <execution>
@@ -435,6 +439,10 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

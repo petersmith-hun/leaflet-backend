@@ -9,6 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <packaging>jar</packaging>
     <artifactId>leaflet-acceptance-tests</artifactId>
 
     <dependencies>
@@ -24,6 +25,10 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>leaflet-bridge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>pl.pragmatists</groupId>
+            <artifactId>JUnitParams</artifactId>
         </dependency>
     </dependencies>
 

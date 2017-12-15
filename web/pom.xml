@@ -78,6 +78,7 @@
     </dependencies>
 
     <build>
+        <finalName>leaflet-backend</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -89,12 +90,16 @@
                         <argument>--spring.profiles.active=${spring.profiles.active}</argument>
                         <argument>--spring.config.location=${spring.config.location}</argument>
                     </arguments>
+                    <executable>true</executable>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

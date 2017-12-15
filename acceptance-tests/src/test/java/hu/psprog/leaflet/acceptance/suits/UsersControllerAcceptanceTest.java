@@ -4,7 +4,6 @@ import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuit;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.service.UserBridgeService;
-import hu.psprog.leaflet.web.rest.controller.UsersController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Acceptance tests for {@link UsersController}.
+ * Acceptance tests for {@code /users} endpoints.
  *
  * @author Peter Smith
  */
