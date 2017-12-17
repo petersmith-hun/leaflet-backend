@@ -68,12 +68,7 @@ public class InvocationFactoryConfig {
                 .withDeviceID(deviceId)
                 .build());
 
-        return () -> {
-            Map<String, String> authenticationHeader = new HashMap<>();
-            authenticationHeader.put(HEADER_PARAMETER_AUTHORIZATION, MessageFormat.format(AUTHORIZATION_SCHEMA, token));
-
-            return authenticationHeader;
-        };
+        return new MockedRequestAuthentication(token);
     }
 
     @Bean
@@ -110,5 +105,23 @@ public class InvocationFactoryConfig {
         httpServletRequest.setRemoteAddr(remoteAddress);
 
         return httpServletRequest;
+    }
+
+    public class MockedRequestAuthentication implements RequestAuthentication {
+
+        private String token;
+
+        public MockedRequestAuthentication(String token) {
+            this.token = token;
+        }
+
+        @Override
+        public Map<String, String> getAuthenticationHeader() {
+
+            Map<String, String> authenticationHeader = new HashMap<>();
+            authenticationHeader.put(HEADER_PARAMETER_AUTHORIZATION, MessageFormat.format(AUTHORIZATION_SCHEMA, token));
+
+            return authenticationHeader;
+        }
     }
 }

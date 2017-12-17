@@ -24,7 +24,11 @@ values
   (2, @CREATED_DATE, true, 'EN', 'test-user-1@ac-leaflet.local', 'USER', 'Test User 1', @TEST_PW),
   (3, @CREATED_DATE, true, 'EN', 'test-editor-2@ac-leaflet.local', 'EDITOR', 'Test Editor 2', @TEST_PW),
   (4, @CREATED_DATE, true, 'HU', 'test-user-3@ac-leaflet.local', 'USER', 'Test User 3', @TEST_PW),
-  (5, @CREATED_DATE, true, 'HU', 'test-editor-4@ac-leaflet.local', 'EDITOR', 'Test User 4', @TEST_PW);
+  (5, @CREATED_DATE, true, 'HU', 'test-editor-4@ac-leaflet.local', 'EDITOR', 'Test Editor 4', @TEST_PW),
+  (6, @CREATED_DATE, true, 'EN', 'test-editor-5@ac-leaflet.local', 'EDITOR', 'Test Editor 5', @TEST_PW),
+  (7, @CREATED_DATE, true, 'EN', 'test-user-6@ac-leaflet.local', 'USER', 'Test User 6', @TEST_PW),
+  (8, @CREATED_DATE, true, 'EN', 'test-user-7@ac-leaflet.local', 'USER', 'Test User 7', @TEST_PW),
+  (9, @CREATED_DATE, true, 'EN', 'test-editor-8@ac-leaflet.local', 'EDITOR', 'Test Editor 8', @TEST_PW);
 
 -- insert test categories
 insert into

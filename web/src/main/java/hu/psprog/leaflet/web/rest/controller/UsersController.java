@@ -12,6 +12,7 @@ import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
+import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
@@ -352,7 +353,9 @@ public class UsersController extends BaseController {
 
                 return ResponseEntity
                         .created(buildLocation(userID))
-                        .build();
+                        .body(UserDataModel.getBuilder()
+                                .withId(userID)
+                                .build());
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);

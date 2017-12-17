@@ -3,6 +3,7 @@ package hu.psprog.leaflet.acceptance.suits;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
+import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -10,6 +11,7 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -55,6 +57,11 @@ public abstract class AbstractParameterizedBaseTest extends AbstractTransactiona
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    // keep it here, as context will restart if this is autowired separately in each tests
+    @Autowired
+    @SpyBean
+    RequestAuthentication requestAuthentication;
 
     <T> T getControl(String id, GenericType<T> asType) {
         return getControl(id, null, asType);

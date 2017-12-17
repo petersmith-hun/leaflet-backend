@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.acceptance.suits;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuit;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
@@ -58,9 +57,6 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
     @Autowired
     private EntryBridgeService entryBridgeService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     public void shouldReturnAllEntries() throws CommunicationFailureException {

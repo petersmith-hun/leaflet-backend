@@ -1,6 +1,8 @@
 package hu.psprog.leaflet.acceptance.config;
 
+import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.bridge.client.impl.InvocationFactoryConfig;
+import hu.psprog.leaflet.service.NotificationService;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -45,6 +47,11 @@ public class AcceptanceTestConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    public NotificationService notificationService() {
+        return new MockNotificationService();
     }
 
     private DataSource sessionStoreDataSource() {
