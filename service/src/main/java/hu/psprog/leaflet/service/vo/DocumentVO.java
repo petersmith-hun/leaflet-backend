@@ -13,7 +13,7 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
+public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> implements CustomSEODataProviderVO<DocumentVO> {
 
     public enum OrderBy {
         ID("id"),
@@ -56,16 +56,24 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> {
         return rawContent;
     }
 
+    @Override
     public String getSeoTitle() {
         return seoTitle;
     }
 
+    @Override
     public String getSeoDescription() {
         return seoDescription;
     }
 
+    @Override
     public String getSeoKeywords() {
         return seoKeywords;
+    }
+
+    @Override
+    public DocumentVO getEntity() {
+        return this;
     }
 
     public UserVO getOwner() {

@@ -50,10 +50,9 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
     private static final String CONTROL_ENTRY_LINK = "entry-1";
     private static final Long CONTROL_ENTRY_ID = 1L;
-    private static final String CONTROL_SUFFIX_EDIT = "edit";
     private static final String CONTROL_ENTRY_26 = "entry-26";
-    private static final String CONTROL_ENTRY_SUFFIX_CREATE = "create";
-    private static final String CONTROL_ENTRY_SUFFIX_MODIFY = "modify";
+    private static final GenericType<WrapperBodyDataModel<ExtendedEntryDataModel>> GENERIC_TYPE_EXTENDED_ENTRY_DATA_MODEL = new GenericType<WrapperBodyDataModel<ExtendedEntryDataModel>>() {};
+    private static final GenericType<WrapperBodyDataModel<EditEntryDataModel>> GENERIC_TYPE_EDIT_ENTRY_DATA_MODEL = new GenericType<WrapperBodyDataModel<EditEntryDataModel>>() {};
 
     @Autowired
     private EntryBridgeService entryBridgeService;
@@ -112,7 +111,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     public void shouldReturnExistingEntryByLink() throws CommunicationFailureException {
 
         // given
-        WrapperBodyDataModel<ExtendedEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, new GenericType<WrapperBodyDataModel<ExtendedEntryDataModel>>(){});
+        WrapperBodyDataModel<ExtendedEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, GENERIC_TYPE_EXTENDED_ENTRY_DATA_MODEL);
 
         // when
         WrapperBodyDataModel<ExtendedEntryDataModel> result = entryBridgeService.getEntryByLink(CONTROL_ENTRY_LINK);
@@ -126,7 +125,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     public void shouldReturnExistingEntryByID() throws CommunicationFailureException {
 
         // given
-        WrapperBodyDataModel<EditEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, CONTROL_SUFFIX_EDIT, new GenericType<WrapperBodyDataModel<EditEntryDataModel>>(){});
+        WrapperBodyDataModel<EditEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, CONTROL_SUFFIX_EDIT, GENERIC_TYPE_EDIT_ENTRY_DATA_MODEL);
 
         // when
         WrapperBodyDataModel<EditEntryDataModel> result = entryBridgeService.getEntryByID(CONTROL_ENTRY_ID);
@@ -154,7 +153,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     public void shouldCreateEntry() throws CommunicationFailureException {
 
         // given
-        EntryCreateRequestModel entryCreateRequestModel = getControl(CONTROL_ENTRY_26, CONTROL_ENTRY_SUFFIX_CREATE, EntryCreateRequestModel.class);
+        EntryCreateRequestModel entryCreateRequestModel = getControl(CONTROL_ENTRY_26, CONTROL_SUFFIX_CREATE, EntryCreateRequestModel.class);
 
         // when
         entryBridgeService.createEntry(entryCreateRequestModel);
@@ -168,7 +167,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     public void shouldUpdateEntry() throws CommunicationFailureException {
 
         // given
-        EntryUpdateRequestModel entryUpdateRequestModel = getControl(CONTROL_ENTRY_LINK, CONTROL_ENTRY_SUFFIX_MODIFY, EntryUpdateRequestModel.class);
+        EntryUpdateRequestModel entryUpdateRequestModel = getControl(CONTROL_ENTRY_LINK, CONTROL_SUFFIX_MODIFY, EntryUpdateRequestModel.class);
 
         // when
         entryBridgeService.updateEntry(CONTROL_ENTRY_ID, entryUpdateRequestModel);

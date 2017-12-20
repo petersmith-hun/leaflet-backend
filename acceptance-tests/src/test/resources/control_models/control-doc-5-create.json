@@ -1,0 +1,12 @@
+{
+  "title": "Doc #5 title",
+  "link": "doc-5",
+  "content": "<h1>content-doc-5</h1>",
+  "rawContent": "## content-doc-5",
+  "locale": "HU",
+  "enabled": false,
+  "metaTitle": "Doc #5 SEO title",
+  "metaDescription": "Doc #5 SEO description",
+  "metaKeywords": "Doc #5 SEO keywords",
+  "userID": 1
+}
