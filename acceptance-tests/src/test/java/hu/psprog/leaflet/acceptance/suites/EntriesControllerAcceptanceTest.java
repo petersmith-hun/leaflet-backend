@@ -1,6 +1,6 @@
-package hu.psprog.leaflet.acceptance.suits;
+package hu.psprog.leaflet.acceptance.suites;
 
-import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuit;
+import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
@@ -39,7 +39,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Peter Smith
  */
 @RunWith(JUnitParamsRunner.class)
-@LeafletAcceptanceSuit
+@LeafletAcceptanceSuite
 public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
     private static final int NUMBER_OF_ALL_ENTRIES = 25;
@@ -257,7 +257,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         public static Object[] pageOfEntries() {
             return new Object[] {
-                    // page, limit, order by, order desc, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
+                    // page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
                     new Object[] {1, 10, CREATED, ASC,  25, 10, 3, true,  false},
                     new Object[] {2, 10, CREATED, ASC,  25, 10, 3, true,  true},
                     new Object[] {3, 10, CREATED, ASC,  25, 5,  3, false, true},
@@ -270,7 +270,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         public static Object[] pageOfPublicEntries() {
             return new Object[] {
-                    // page, limit, order by, order desc, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
+                    // page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
                     new Object[] {1, 10, CREATED, ASC,  19, 10, 2, true,  false},
                     new Object[] {2, 10, CREATED, ASC,  19, 9,  2, false, true},
                     new Object[] {3, 10, CREATED, ASC,  19, 0,  2, false, true},
@@ -283,7 +283,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         public static Object[] pageOfPublicEntriesByCategory() {
             return new Object[] {
-                    // category ID, page, limit, order by, order desc, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
+                    // category ID, page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
                     new Object[] {1L, 1, 5,  CREATED, ASC,  8,  5,  2, true,  false},
                     new Object[] {1L, 2, 5,  CREATED, ASC,  8,  3,  2, false, true},
                     new Object[] {2L, 1, 10, CREATED, ASC,  11, 10, 2, true,  false},

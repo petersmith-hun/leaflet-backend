@@ -1,4 +1,4 @@
-package hu.psprog.leaflet.acceptance.suits;
+package hu.psprog.leaflet.acceptance.suites;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +21,11 @@ import javax.ws.rs.core.GenericType;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+
+import static org.mockito.BDDMockito.given;
 
 /**
  * Base test class defining JUnit rules.
@@ -62,6 +66,8 @@ public abstract class AbstractParameterizedBaseTest extends AbstractTransactiona
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Map<String, String> requestAuthenticationHeaderTemp;
+
     // keep it here, as context will restart if this is autowired separately in each tests
     @Autowired
     @SpyBean
@@ -90,6 +96,15 @@ public abstract class AbstractParameterizedBaseTest extends AbstractTransactiona
 
     <T> T getControl(String id, String suffix, Class<T> asType) {
         return getControl(id, suffix, new GenericType<>(asType));
+    }
+
+    void clearAuthentication() {
+        requestAuthenticationHeaderTemp = requestAuthentication.getAuthenticationHeader();
+        given(requestAuthentication.getAuthenticationHeader()).willReturn(new HashMap<>());
+    }
+
+    void restoreAuthentication() {
+        given(requestAuthentication.getAuthenticationHeader()).willReturn(requestAuthenticationHeaderTemp);
     }
 
     private void resetDatabase() {

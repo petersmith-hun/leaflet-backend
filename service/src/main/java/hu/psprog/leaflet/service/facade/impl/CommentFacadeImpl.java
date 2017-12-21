@@ -95,7 +95,7 @@ public class CommentFacadeImpl implements CommentFacade {
         if (Objects.isNull(entity.getOwner().getId())) {
             UserVO user = userService.silentGetUserByEmail(entity.getOwner().getEmail());
             if (Objects.isNull(user)) {
-                Long id = userService.createOne(createNoLoginUser(entity.getOwner()));
+                Long id = userService.registerNoLogin(createNoLoginUser(entity.getOwner()));
                 commentToBeCreated = updateCommentOwner(entity, id);
             } else {
                 if (user.getAuthorities().containsAll(NO_LOGIN_AUTHORITY)) {

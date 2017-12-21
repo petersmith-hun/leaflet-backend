@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Leaflet acceptance test suit marker annotation.
+ * Leaflet acceptance test suite marker annotation.
  * - Starts up embedded web server with defined port (server.port).
  * - Also defines {@link AcceptanceTestConfig} class for base context configuration (used for required overrides).
  * - Sets active profile to {@code acceptance}.
@@ -23,9 +23,9 @@ import java.lang.annotation.Target;
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         classes = AcceptanceTestConfig.class)
-@ActiveProfiles(LeafletAcceptanceSuit.PROFILE_ACCEPTANCE)
+@ActiveProfiles(LeafletAcceptanceSuite.PROFILE_ACCEPTANCE)
 @Rollback(false)
-public @interface LeafletAcceptanceSuit {
+public @interface LeafletAcceptanceSuite {
 
     String PROFILE_ACCEPTANCE = "acceptance";
 }

@@ -1,6 +1,6 @@
-package hu.psprog.leaflet.acceptance.suits;
+package hu.psprog.leaflet.acceptance.suites;
 
-import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuit;
+import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
@@ -47,7 +47,7 @@ import static org.mockito.BDDMockito.given;
  * @author Peter Smith
  */
 @RunWith(JUnitParamsRunner.class)
-@LeafletAcceptanceSuit
+@LeafletAcceptanceSuite
 public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
     private static final String HEADER_PARAMETER_AUTHORIZATION = "Authorization";

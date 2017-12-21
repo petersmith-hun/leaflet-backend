@@ -80,16 +80,16 @@ values
 insert into 
   leaflet_comments(id, date_created, is_enabled, is_deleted, date_last_modified, content, entry_id, user_id)
 values
-  (1, @CREATE_DATE, true, false, @CREATE_DATE, 'Test comment 1', 1, 2),
-  (2, @CREATE_DATE, true, false, @CREATE_DATE, 'Test comment 2', 1, 2),
-  (3, @CREATE_DATE, true, false, @CREATE_DATE, 'Test comment 3', 1, 4),
-  (4, @CREATE_DATE, true, false, @CREATE_DATE, 'Test comment 4', 1, 2),
-  (5, @CREATE_DATE, false, false, @CREATE_DATE, 'Test comment 5', 1, 4),
-  (6, @CREATE_DATE, true, false, @CREATE_DATE, 'Test comment 6', 1, 2),
-  (7, @CREATE_DATE, true, false, @CREATE_DATE, 'Test comment 7', 1, 2),
-  (8, @CREATE_DATE, false, false, @CREATE_DATE, 'Test comment 8', 1, 4),
-  (9, @CREATE_DATE, false, false, @CREATE_DATE, 'Test comment 9', 1, 4),
-  (10, @CREATE_DATE, true, true, @CREATE_DATE, 'Test comment 10', 1, 2);
+  (1, '2017-12-13 20:00:01.000', true, false, @MODIFIED_DATE, 'Test comment 1', 1, 2),
+  (2, '2017-12-13 20:00:02.000', true, false, @MODIFIED_DATE, 'Test comment 2', 1, 2),
+  (3, '2017-12-13 20:00:04.000', true, true, @MODIFIED_DATE, 'Test comment 3', 1, 4),
+  (4, '2017-12-13 20:00:05.000', true, false, @MODIFIED_DATE, 'Test comment 4', 1, 2),
+  (5, '2017-12-13 20:00:06.000', false, false, @MODIFIED_DATE, 'Test comment 5', 1, 4),
+  (6, '2017-12-13 20:00:07.000', true, true, @MODIFIED_DATE, 'Test comment 6', 1, 2),
+  (7, '2017-12-13 20:00:08.000', true, true, @MODIFIED_DATE, 'Test comment 7', 1, 2),
+  (8, '2017-12-13 20:00:09.000', false, false, @MODIFIED_DATE, 'Test comment 8', 1, 4),
+  (9, '2017-12-13 20:00:10.000', false, false, @MODIFIED_DATE, 'Test comment 9', 1, 4),
+  (10, '2017-12-13 20:00:11.000', true, true, @MODIFIED_DATE, 'Test comment 10', 1, 2);
 
 -- insert test tags
 insert into leaflet_tags
