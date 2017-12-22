@@ -15,6 +15,7 @@ import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
+import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.ForbiddenOperationException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.client.exception.UnauthorizedAccessException;
@@ -360,6 +361,21 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         // then
         assertCreatedUser(userInitializeRequestModel, result.getId());
+    }
+
+    @Test(expected = ConflictingRequestException.class)
+    @ResetDatabase
+    public void shouldNotRegisterWithAlreadyRegisteredEmail() throws CommunicationFailureException {
+
+        // given
+        UserInitializeRequestModel userInitializeRequestModel = getControl(CONTROL_USER_REGISTER, UserInitializeRequestModel.class);
+        userInitializeRequestModel.setEmail(TEST_USER_1_EMAIL);
+
+        // when
+        userBridgeService.signUp(userInitializeRequestModel);
+
+        // then
+        // exception expected
     }
 
     private void assertCreatedUser(UserInitializeRequestModel userInitializeRequestModel, long createdUserID) throws CommunicationFailureException {

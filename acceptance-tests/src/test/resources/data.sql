@@ -35,7 +35,8 @@ insert into
   leaflet_categories(id, date_created, is_enabled, title, description)
 values
   (1, @CREATED_DATE, true, 'Test category #1', 'Description for test category #1'),
-  (2, @CREATED_DATE, true, 'Test category #1', 'Description for test category #1');
+  (2, @CREATED_DATE, true, 'Test category #2', 'Description for test category #2'),
+  (3, @CREATED_DATE, false, 'Test category #3', 'Description for test category #3'),;
 
 -- insert test documents
 insert into 
