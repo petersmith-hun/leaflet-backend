@@ -176,7 +176,9 @@ public class CommentsController extends BaseController {
 
                 return ResponseEntity
                         .created(buildLocation(commentID))
-                        .build();
+                        .body(CommentDataModel.getBuilder()
+                                .withId(commentID)
+                                .build());
             } catch (ConstraintViolationException e) {
                 LOGGER.error(ENTRY_TO_ASSOCIATE_COMMENT_WITH_COULD_NOT_BE_FOUND, e);
                 throw new RequestCouldNotBeFulfilledException(YOUR_COMMENT_COULD_NOT_BE_CREATED);

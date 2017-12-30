@@ -11,6 +11,7 @@ import hu.psprog.leaflet.api.rest.request.user.UserPasswordRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
+import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -309,7 +310,9 @@ public class UsersController extends BaseController {
                 Long userID = userFacade.register(conversionService.convert(userInitializeRequestModel, UserVO.class));
                 return ResponseEntity
                         .created(buildLocation(userID))
-                        .build();
+                        .body(UserDataModel.getBuilder()
+                                .withId(userID)
+                                .build());
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
                 throw new RequestCouldNotBeFulfilledException(PROVIDED_EMAIL_ADDRESS_IS_ALREADY_IN_USE);

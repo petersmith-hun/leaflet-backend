@@ -14,6 +14,7 @@ public class Authority {
     public static final GrantedAuthority USER = new SimpleGrantedAuthority(AuthorityName.USER.name());
     public static final GrantedAuthority EDITOR = new SimpleGrantedAuthority(AuthorityName.EDITOR.name());
     public static final GrantedAuthority SERVICE = new SimpleGrantedAuthority(AuthorityName.SERVICE.name());
+    public static final GrantedAuthority NO_LOGIN = new SimpleGrantedAuthority(AuthorityName.NO_LOGIN.name());
 
     private Authority() {}
 
@@ -26,6 +27,8 @@ public class Authority {
                 return Authority.EDITOR;
             case SERVICE:
                 return Authority.SERVICE;
+            case NO_LOGIN:
+                return Authority.NO_LOGIN;
             case USER:
             default:
                 return Authority.USER;
@@ -36,6 +39,7 @@ public class Authority {
         ADMIN,
         USER,
         EDITOR,
-        SERVICE
+        SERVICE,
+        NO_LOGIN
     }
 }

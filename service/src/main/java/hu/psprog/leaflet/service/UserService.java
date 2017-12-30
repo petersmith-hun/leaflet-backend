@@ -31,6 +31,14 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
      * @throws ServiceException if user could not be created
      */
     Long register(UserVO entity) throws ServiceException;
+    /**
+     * Creates a no-login user via anonymous commenting.
+     *
+     * @param entity user data
+     * @return created user's ID
+     * @throws ServiceException if user could not be created
+     */
+    Long registerNoLogin(UserVO entity) throws ServiceException;
 
     /**
      * Changes given user's password.

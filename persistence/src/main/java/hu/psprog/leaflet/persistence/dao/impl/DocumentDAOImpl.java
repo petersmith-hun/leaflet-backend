@@ -48,6 +48,7 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
             currentDocument.setSeoKeywords(updatedEntity.getSeoKeywords());
             currentDocument.setLink(updatedEntity.getLink());
             currentDocument.setLocale(updatedEntity.getLocale());
+            currentDocument.setEnabled(updatedEntity.isEnabled());
             currentDocument.setLastModified(new Date());
             jpaRepository.flush();
         }

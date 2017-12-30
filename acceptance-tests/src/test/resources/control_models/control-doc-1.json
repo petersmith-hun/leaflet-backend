@@ -1,0 +1,22 @@
+{
+  "body": {
+    "id": 1,
+    "title": "Doc #1 title",
+    "link": "doc-1",
+    "content": "<h1>content-doc-1</h1>",
+    "user": {
+      "id": 1,
+      "username": "Administrator"
+    },
+    "created": "Thursday, December 14, 2017 8:00 PM",
+    "locale": "EN"
+  },
+  "pagination": null,
+  "seo": {
+    "pageTitle": "Default page title",
+    "metaTitle": "Doc #1 SEO Title",
+    "metaDescription": "Doc #1 SEO Desc",
+    "metaKeywords": "Doc #1 SEO Keywords"
+  },
+  "error": null
+}
