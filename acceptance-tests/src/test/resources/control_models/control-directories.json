@@ -1,0 +1,12 @@
+{
+  "acceptors": [
+    {
+      "id": "IMAGE",
+      "root": "images",
+      "children": [
+        "",
+        "test_sub"
+      ]
+    }
+  ]
+}

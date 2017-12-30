@@ -1,0 +1,11 @@
+{
+  "title": "Doc #1 title mod",
+  "link": "doc-1-mod",
+  "content": "<h1>content-doc-1-mod</h1>",
+  "rawContent": "## content-doc-1-mod",
+  "locale": "HU",
+  "enabled": false,
+  "metaTitle": "Modified SEO title",
+  "metaDescription": "Modified SEO description",
+  "metaKeywords": "Modified SEO keywords"
+}

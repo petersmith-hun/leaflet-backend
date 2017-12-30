@@ -1,0 +1,14 @@
+{
+  "metaTitle": "modified seo title",
+  "metaDescription": "modified seo desc",
+  "metaKeywords": "modified seo keywords",
+  "title": "Modified title",
+  "link": "modified-link-1",
+  "prologue": "modified prologue",
+  "content": "<h1>modified content</h1>",
+  "rawContent": "## modified raw content",
+  "categoryID": 1,
+  "locale": "en_CA",
+  "enabled": false,
+  "status": "REVIEW"
+}

@@ -191,6 +191,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Long registerNoLogin(UserVO entity) throws ServiceException {
+
+        if (!isNoLoginRole(entity)) {
+            throw new ServiceException("Only users with role NO_LOGIN can be created via registerNoLogin service entry point.");
+        }
+
+        return createOne(entity);
+    }
+
+    @Override
     @PermitSelf.User
     public void changePassword(Long id, String password) throws EntityNotFoundException {
 
@@ -266,5 +276,10 @@ public class UserServiceImpl implements UserService {
     private boolean isUserRole(UserVO entity) {
         return entity.getAuthorities().stream()
                 .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.USER));
+    }
+
+    private boolean isNoLoginRole(UserVO entity) {
+        return entity.getAuthorities().stream()
+                .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.NO_LOGIN));
     }
 }

@@ -62,14 +62,14 @@ public class CommentFacadeImplTest {
         // given
         CommentVO commentVO = prepareCommentVO(null);
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(null);
-        given(userService.createOne(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
+        given(userService.registerNoLogin(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
 
         // when
         commentFacade.createOne(commentVO);
 
         // then
         verify(userService).silentGetUserByEmail(USER_EMAIL);
-        verify(userService).createOne(any(UserVO.class));
+        verify(userService).registerNoLogin(any(UserVO.class));
         verify(commentService).createOne(prepareCommentVO(NEW_NO_LOGIN_USER_ID));
     }
 

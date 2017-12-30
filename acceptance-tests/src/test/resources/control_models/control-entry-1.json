@@ -1,0 +1,71 @@
+{
+  "body": {
+    "id": 1,
+    "title": "Entry #01 title",
+    "link": "entry-1",
+    "prologue": "Prologue #1",
+    "user": {
+      "id": 1,
+      "username": "Administrator"
+    },
+    "tags": [
+      {
+        "id": 1,
+        "name": "Tag #1",
+        "created": "Thursday, December 14, 2017 8:00 PM",
+        "lastModified": "Thursday, December 14, 2017 8:00 PM",
+        "enabled": true
+      },
+      {
+        "id": 2,
+        "name": "Tag #2",
+        "created": "Thursday, December 14, 2017 8:00 PM",
+        "lastModified": "Thursday, December 14, 2017 8:00 PM",
+        "enabled": true
+      },
+      {
+        "id": 3,
+        "name": "Tag #3",
+        "created": "Thursday, December 14, 2017 8:00 PM",
+        "lastModified": "Thursday, December 14, 2017 8:00 PM",
+        "enabled": false
+      }
+    ],
+    "category": {
+      "id": 1,
+      "title": "Test category #1",
+      "description": null,
+      "created": null,
+      "lastModified": null,
+      "enabled": false
+    },
+    "created": "Wednesday, December 13, 2017 8:00 PM",
+    "lastModified": "Monday, December 18, 2017 8:00 PM",
+    "attachments": [
+      {
+        "originalFilename": "original_filename_1.jpg",
+        "reference": "/d4b1830d-f368-37a0-88f9-2faf7fa8ded6/stored_filename_1.jpg",
+        "acceptedAs": "image/jpeg",
+        "description": "Uploaded file #1",
+        "path": "images/stored_filename_1.jpg"
+      },
+      {
+        "originalFilename": "original_filename_2.jpg",
+        "reference": "/a167450b-e162-309d-bac4-fb5149d10512/stored_filename_2.jpg",
+        "acceptedAs": "image/jpeg",
+        "description": "Uploaded file #2",
+        "path": "images/stored_filename_2.jpg"
+      }
+    ],
+    "locale": "EN",
+    "content": "<h1>content-entry-1</h1>"
+  },
+  "pagination": null,
+  "seo": {
+    "pageTitle": "Default page title",
+    "metaTitle": "Entry #1 SEO Title",
+    "metaDescription": "Entry #1 SEO Desc",
+    "metaKeywords": "Entry #1 SEO Keywords"
+  },
+  "error": null
+}
