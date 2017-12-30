@@ -42,7 +42,7 @@
         <leaflet.rest-api.version>1.1.9</leaflet.rest-api.version>
         <leaflet.jwt-component.version>2.2.1</leaflet.jwt-component.version>
         <leaflet.mailer-component.version>1.0.0</leaflet.mailer-component.version>
-        <leaflet.bridge.version>1.7.1</leaflet.bridge.version>
+        <leaflet.bridge.version>1.7.2</leaflet.bridge.version>
         
         <!-- Spring versions -->
         <spring.boot.version>1.5.4.RELEASE</spring.boot.version>
