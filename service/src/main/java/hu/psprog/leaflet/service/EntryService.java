@@ -31,7 +31,7 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @return entry related to given link or null if not exists
      * @throws EntityNotFoundException when entity identified by given link does not exist
      */
-    public EntryVO findByLink(String link) throws EntityNotFoundException;
+    EntryVO findByLink(String link) throws EntityNotFoundException;
 
     /**
      * Returns a page of public entries.
@@ -42,7 +42,7 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @param orderBy order by field
      * @return page of public entries
      */
-    public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
+    EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
 
     /**
      * Returns a page of public entries under given category.
@@ -54,5 +54,5 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @param orderBy order by field
      * @return page of public entries under given category
      */
-    public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
+    EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
 }

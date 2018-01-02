@@ -4,16 +4,13 @@ import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
-import hu.psprog.leaflet.service.EntryService;
-import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.vo.CategoryVO;
+import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.annotation.FillResponse;
@@ -59,11 +56,11 @@ public class EntriesController extends BaseController {
     private static final String REQUESTED_ENTRY_NOT_FOUND = "Requested entry not found";
     private static final String AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS = "An entry with the same 'link' already exists.";
 
-    private EntryService entryService;
+    private EntryFacade entryFacade;
 
     @Autowired
-    public EntriesController(EntryService entryService) {
-        this.entryService = entryService;
+    public EntriesController(EntryFacade entryFacade) {
+        this.entryFacade = entryFacade;
     }
 
     /**
@@ -76,7 +73,7 @@ public class EntriesController extends BaseController {
     @Timed
     public ResponseEntity<EntryListDataModel> getAllEntries() {
 
-        List<EntryVO> entries = entryService.getAll();
+        List<EntryVO> entries = entryFacade.getAll();
 
         return ResponseEntity
                 .ok()
@@ -102,8 +99,7 @@ public class EntriesController extends BaseController {
             @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        EntityPageVO<EntryVO> entryPage =
-                entryService.getPageOfPublicEntries(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
+        EntityPageVO<EntryVO> entryPage = entryFacade.getPageOfPublicEntries(page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()
@@ -130,8 +126,7 @@ public class EntriesController extends BaseController {
             @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        EntityPageVO<EntryVO> entryPage =
-                entryService.getEntityPage(page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
+        EntityPageVO<EntryVO> entryPage = entryFacade.getEntityPage(page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()
@@ -159,9 +154,7 @@ public class EntriesController extends BaseController {
             @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        EntityPageVO<EntryVO> entryPage =
-                entryService.getPageOfPublicEntriesUnderCategory(CategoryVO.wrapMinimumVO(id),
-                        page, limit, OrderDirection.valueOf(orderDirection), EntryVO.OrderBy.valueOf(orderBy));
+        EntityPageVO<EntryVO> entryPage = entryFacade.getPageOfPublicEntriesUnderCategory(id, page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()
@@ -181,7 +174,7 @@ public class EntriesController extends BaseController {
     public ResponseEntity<ExtendedEntryDataModel> getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link)
             throws ResourceNotFoundException {
         try {
-            EntryVO entryVO = entryService.findByLink(link);
+            EntryVO entryVO = entryFacade.findByLink(link);
 
             return ResponseEntity.ok(conversionService.convert(entryVO, ExtendedEntryDataModel.class));
         } catch (EntityNotFoundException e) {
@@ -203,7 +196,7 @@ public class EntriesController extends BaseController {
     public ResponseEntity<EditEntryDataModel> getEntryByID(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            EntryVO entryVO = entryService.getOne(id);
+            EntryVO entryVO = entryFacade.getOne(id);
 
             return ResponseEntity
                     .ok()
@@ -227,16 +220,13 @@ public class EntriesController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                Long entryID = entryService.createOne(conversionService.convert(entryCreateRequestModel, EntryVO.class));
-                EntryVO createdEntry = entryService.getOne(entryID);
+                EntryVO createdEntry = entryFacade.createOne(conversionService.convert(entryCreateRequestModel, EntryVO.class));
 
                 return ResponseEntity
-                        .created(buildLocation(entryID))
+                        .created(buildLocation(createdEntry.getId()))
                         .body(conversionService.convert(createdEntry, EditEntryDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
@@ -263,13 +253,10 @@ public class EntriesController extends BaseController {
             throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                entryService.updateOne(id, conversionService.convert(entryUpdateRequestModel, EntryVO.class));
-                EntryVO entryVO = entryService.getOne(id);
+                EntryVO entryVO = entryFacade.updateOne(id, conversionService.convert(entryUpdateRequestModel, EntryVO.class));
 
                 return ResponseEntity
                         .created(buildLocation(id))
@@ -295,13 +282,7 @@ public class EntriesController extends BaseController {
     public ResponseEntity<EditEntryDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            EntryVO entryVO = entryService.getOne(id);
-            if (entryVO.isEnabled()) {
-                entryService.disable(id);
-            } else {
-                entryService.enable(id);
-            }
-            EntryVO updatedEntryVO = entryService.getOne(id);
+            EntryVO updatedEntryVO = entryFacade.changeStatus(id);
 
             return ResponseEntity
                     .created(buildLocation(id))
@@ -323,7 +304,7 @@ public class EntriesController extends BaseController {
     public void deleteEntry(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            entryService.deleteByID(id);
+            entryFacade.deletePermanently(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

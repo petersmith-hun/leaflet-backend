@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.service.impl;
 
-import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationToken;
 import hu.psprog.leaflet.security.jwt.model.ExtendedUserDetails;
@@ -46,17 +45,15 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     private JWTComponent jwtComponent;
     private SessionStoreService sessionStoreService;
     private NotificationService notificationService;
-    private UserDAO userDAO;
 
     @Autowired
     public UserAuthenticationServiceImpl(AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JWTComponent jwtComponent,
-                                         SessionStoreService sessionStoreService, NotificationService notificationService, UserDAO userDAO) {
+                                         SessionStoreService sessionStoreService, NotificationService notificationService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtComponent = jwtComponent;
         this.sessionStoreService = sessionStoreService;
         this.notificationService = notificationService;
-        this.userDAO = userDAO;
     }
 
     @Override
@@ -96,15 +93,16 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
 
     @Override
     @PermitReclaim
-    public void confirmPasswordReset(String password) {
+    public Long confirmPasswordReset() {
 
         ExtendedUserDetails userDetails = retrieveAuthenticatedUserDetails();
-        userDAO.updatePassword(userDetails.getId(), password);
         notificationService.successfulPasswordReset(PasswordResetSuccess.getBuilder()
                 .withParticipant(userDetails.getUsername())
                 .withUsername(userDetails.getName())
                 .build());
         revokeToken();
+
+        return userDetails.getId();
     }
 
     @Override

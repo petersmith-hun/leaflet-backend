@@ -6,7 +6,6 @@ import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
-import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentVO;
@@ -21,11 +20,10 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
- * {@inheritDoc}
+ * Implementation of {@link CommentFacade}.
  *
  * @author Peter Smith
  */
@@ -45,33 +43,33 @@ public class CommentFacadeImpl implements CommentFacade {
     }
 
     @Override
-    public void enable(Long id) throws EntityNotFoundException {
-        commentService.enable(id);
-    }
-
-    @Override
-    public void disable(Long id) throws EntityNotFoundException {
-        commentService.disable(id);
-    }
-
-    @Override
-    public void deleteByID(Long id) throws ServiceException {
+    public void deletePermanently(Long id) throws ServiceException {
         commentService.deleteByID(id);
     }
 
     @Override
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-        commentService.deleteBulkByIDs(ids);
+    public void deleteLogically(Long id) throws ServiceException {
+        CommentVO commentVO = commentService.getOne(id);
+        commentService.deleteLogicallyByEntity(commentVO);
     }
 
     @Override
-    public void deleteLogicallyByEntity(CommentVO entity) throws ServiceException {
-        commentService.deleteLogicallyByEntity(entity);
+    public void restoreEntity(Long id) throws ServiceException {
+        CommentVO commentVO = commentService.getOne(id);
+        commentService.restoreEntity(commentVO);
     }
 
     @Override
-    public void restoreEntity(CommentVO entity) throws ServiceException {
-        commentService.restoreEntity(entity);
+    public CommentVO changeStatus(Long id) throws ServiceException {
+
+        CommentVO commentVO = commentService.getOne(id);
+        if (commentVO.isEnabled()) {
+            commentService.disable(id);
+        } else {
+            commentService.enable(id);
+        }
+
+        return commentService.getOne(id);
     }
 
     @Override
@@ -111,33 +109,48 @@ public class CommentFacadeImpl implements CommentFacade {
     }
 
     @Override
-    public List<Long> createBulk(List<CommentVO> entities) throws ServiceException {
-        return commentService.createBulk(entities);
-    }
-
-    @Override
     public CommentVO updateOne(Long id, CommentVO updatedEntity) throws ServiceException {
-        return commentService.updateOne(id, updatedEntity);
+        commentService.updateOne(id, updatedEntity);
+        return commentService.getOne(id);
     }
 
     @Override
-    public List<CommentVO> updateBulk(Map<Long, CommentVO> updatedEntities) throws ServiceException {
-        return commentService.updateBulk(updatedEntities);
+    public EntityPageVO<CommentVO> getPageOfCommentsForEntry(Long entryID, int page, int limit, String direction, String orderBy) {
+        return commentService.getPageOfCommentsForEntry(page, limit, parseDirection(direction), parseOrderBy(orderBy), EntryVO.wrapMinimumVO(entryID));
     }
 
     @Override
-    public EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, EntryVO entryVO) {
-        return commentService.getPageOfCommentsForEntry(page, limit, direction, orderBy, entryVO);
+    public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(Long entryID, int page, int limit, String direction, String orderBy) {
+        return commentService.getPageOfPublicCommentsForEntry(page, limit, parseDirection(direction), parseOrderBy(orderBy), EntryVO.wrapMinimumVO(entryID));
     }
 
     @Override
-    public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, EntryVO entryVO) {
-        return commentService.getPageOfPublicCommentsForEntry(page, limit, direction, orderBy, entryVO);
+    public EntityPageVO<CommentVO> getPageOfCommentsForUser(Long userID, int page, int limit, String direction, String orderBy) {
+        return commentService.getPageOfCommentsForUser(page, limit, parseDirection(direction), parseOrderBy(orderBy), UserVO.wrapMinimumVO(userID));
     }
 
-    @Override
-    public EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, UserVO userVO) {
-        return commentService.getPageOfCommentsForUser(page, limit, direction, orderBy, userVO);
+    private CommentVO.OrderBy parseOrderBy(String by) {
+
+        CommentVO.OrderBy orderBy = CommentVO.OrderBy.CREATED;
+        try {
+            orderBy = CommentVO.OrderBy.valueOf(by.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Unknown order by constant [{}] specified, falling back to OrderBy.CREATED value.", by, e);
+        }
+
+        return orderBy;
+    }
+
+    private OrderDirection parseDirection(String direction) {
+
+        OrderDirection orderDirection = OrderDirection.ASC;
+        try {
+            orderDirection = OrderDirection.valueOf(direction.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Unknown order direction constant [{}] specified, falling back to OrderDirection.ASC value.", direction, e);
+        }
+
+        return orderDirection;
     }
 
     private CommentVO updateCommentOwner(CommentVO comment, Long updatedUserID) {

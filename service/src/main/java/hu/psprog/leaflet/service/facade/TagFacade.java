@@ -1,11 +1,6 @@
 package hu.psprog.leaflet.service.facade;
 
 import hu.psprog.leaflet.service.TagService;
-import hu.psprog.leaflet.service.crud.CreateOperationCapableService;
-import hu.psprog.leaflet.service.crud.DeleteOperationCapableService;
-import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
-import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
-import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.TagAssignmentVO;
 import hu.psprog.leaflet.service.vo.TagVO;
@@ -17,11 +12,73 @@ import java.util.List;
  *
  * @author Peter Smith
  */
-public interface TagFacade extends CreateOperationCapableService<TagVO, Long>,
-        ReadOperationCapableService<TagVO, Long>,
-        UpdateOperationCapableService<TagVO, TagVO, Long>,
-        DeleteOperationCapableService<TagVO, Long>,
-        StatusChangeCapableService<Long> {
+public interface TagFacade {
+
+    /**
+     * Returns all enabled (public) tags.
+     *
+     * @return list of enabled tags
+     */
+    List<TagVO> getPublicTags();
+
+    /**
+     * Returns all existing tags.
+     *
+     * @return list of tags
+     */
+    List<TagVO> getAll();
+
+    /**
+     * Returns tag identified by given ID.
+     *
+     * @param id ID of tag to return
+     * @return tag data
+     * @throws ServiceException if requested tag does not exist
+     */
+    TagVO getOne(Long id) throws ServiceException;
+
+    /**
+     * Returns number of all tags.
+     *
+     * @return number of all tags
+     */
+    Long count();
+
+    /**
+     * Creates a new tag.
+     *
+     * @param entity tag data
+     * @return created tag data
+     * @throws ServiceException if tag could not be created
+     */
+    TagVO createOne(TagVO entity) throws ServiceException;
+
+    /**
+     * Updates an existing tag.
+     *
+     * @param id ID of tag to update
+     * @param updatedEntity tag data
+     * @return updated tag data
+     * @throws ServiceException if tag could not be updated
+     */
+    TagVO updateOne(Long id, TagVO updatedEntity) throws ServiceException;
+
+    /**
+     * Changes status of tag.
+     *
+     * @param id ID of tag to change status of
+     * @return updated tag data
+     * @throws ServiceException if tag could not be updated
+     */
+    TagVO changeStatus(Long id) throws ServiceException;
+
+    /**
+     * Permanently deletes tag identified by given ID.
+     *
+     * @param id ID of tag to delete
+     * @throws ServiceException if tag could not be deleted
+     */
+    void deletePermanently(Long id) throws ServiceException;
 
     /**
      * Attaches an existing tag to an existing entry.
@@ -36,11 +93,4 @@ public interface TagFacade extends CreateOperationCapableService<TagVO, Long>,
      * @param tagAssignmentVO {@link TagAssignmentVO} containing the ID of an entry and a tag to assign to each other
      */
     void detachTagFromEntry(TagAssignmentVO tagAssignmentVO) throws ServiceException;
-
-    /**
-     * Returns all enabled (public) tags.
-     *
-     * @return list of enabled tags
-     */
-    List<TagVO> getPublicTags();
 }

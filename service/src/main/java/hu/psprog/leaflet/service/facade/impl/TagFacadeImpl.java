@@ -2,7 +2,6 @@ package hu.psprog.leaflet.service.facade.impl;
 
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.TagService;
-import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.TagFacade;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Implementation of {@link TagFacade}.
@@ -32,23 +30,8 @@ public class TagFacadeImpl implements TagFacade {
     }
 
     @Override
-    public void enable(Long id) throws EntityNotFoundException {
-        tagService.enable(id);
-    }
-
-    @Override
-    public void disable(Long id) throws EntityNotFoundException {
-        tagService.disable(id);
-    }
-
-    @Override
-    public void deleteByID(Long id) throws ServiceException {
-        tagService.deleteByID(id);
-    }
-
-    @Override
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-        tagService.deleteBulkByIDs(ids);
+    public List<TagVO> getPublicTags() {
+        return tagService.getPublicTags();
     }
 
     @Override
@@ -67,23 +50,33 @@ public class TagFacadeImpl implements TagFacade {
     }
 
     @Override
-    public Long createOne(TagVO entity) throws ServiceException {
-        return tagService.createOne(entity);
-    }
-
-    @Override
-    public List<Long> createBulk(List<TagVO> entities) throws ServiceException {
-        return tagService.createBulk(entities);
+    public TagVO createOne(TagVO entity) throws ServiceException {
+        Long createdID = tagService.createOne(entity);
+        return tagService.getOne(createdID);
     }
 
     @Override
     public TagVO updateOne(Long id, TagVO updatedEntity) throws ServiceException {
-        return tagService.updateOne(id, updatedEntity);
+        tagService.updateOne(id, updatedEntity);
+        return tagService.getOne(id);
     }
 
     @Override
-    public List<TagVO> updateBulk(Map<Long, TagVO> updatedEntities) throws ServiceException {
-        return tagService.updateBulk(updatedEntities);
+    public TagVO changeStatus(Long id) throws ServiceException {
+
+        TagVO tagVO = tagService.getOne(id);
+        if (tagVO.isEnabled()) {
+            tagService.disable(id);
+        } else {
+            tagService.enable(id);
+        }
+
+        return tagService.getOne(id);
+    }
+
+    @Override
+    public void deletePermanently(Long id) throws ServiceException {
+        tagService.deleteByID(id);
     }
 
     @Override
@@ -98,11 +91,6 @@ public class TagFacadeImpl implements TagFacade {
         TagVO tagVO = getTagVO(tagAssignmentVO);
         EntryVO entryVO = getEntryVO(tagAssignmentVO);
         tagService.detachTagFromEntry(tagVO, entryVO);
-    }
-
-    @Override
-    public List<TagVO> getPublicTags() {
-        return tagService.getPublicTags();
     }
 
     private EntryVO getEntryVO(TagAssignmentVO tagAssignmentVO) throws ServiceException {

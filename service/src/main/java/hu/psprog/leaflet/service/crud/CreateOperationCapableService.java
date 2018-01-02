@@ -21,7 +21,7 @@ public interface CreateOperationCapableService<T extends BaseVO, ID extends Seri
      * @param entity {@link BaseVO} value object
      * @return identifier of newly created entity
      */
-    public ID createOne(T entity) throws ServiceException;
+    ID createOne(T entity) throws ServiceException;
 
     /**
      * Passes a list of entities for persistence layer and returns the list of IDs of new created entities.
@@ -29,5 +29,5 @@ public interface CreateOperationCapableService<T extends BaseVO, ID extends Seri
      * @param entities {@link List} of {@link BaseVO} value objects
      * @return identifiers of newly created entities as a list
      */
-    public List<ID> createBulk(List<T> entities) throws ServiceException;
+    List<ID> createBulk(List<T> entities) throws ServiceException;
 }
