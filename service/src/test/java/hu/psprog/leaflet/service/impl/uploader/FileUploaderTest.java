@@ -19,8 +19,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -44,8 +44,10 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
     private static final String DESTINATION_FILENAME = "destination_filename.jpg";
     private static final String MIME_TYPE = "image/jpg";
     private static final String ACCEPTED_AS_IMAGE = "IMAGE";
-    private static final UUID PATH_UUID_NO_SUBFOLDER = UUID.fromString("b69aeb6f-cd6b-34e4-be52-ed0d825d3a72");
-    private static final UUID PATH_UUID_SUBFOLDER = UUID.fromString("2075f10c-e190-3cee-a99c-63ebafb5bc6e");
+    private static final String EXPECTED_PATH_WITHOUT_SUBFOLDER = "images/destination_filename.jpg";
+    private static final String EXPECTED_PATH_WITH_SUBFOLDER = "images/test/destination_filename.jpg";
+    private static final UUID PATH_UUID_NO_SUBFOLDER = UUID.fromString("97538ca5-951b-3690-a6d5-3745bbbdd878");
+    private static final UUID PATH_UUID_SUBFOLDER = UUID.fromString("f59aa5c8-3013-31c7-a53f-bd29f44e99f8");
 
     @Mock
     private FilenameGeneratorUtil filenameGeneratorUtil;
@@ -62,7 +64,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         given(imageUploadAcceptor.acceptedAs()).willReturn(ACCEPTED_AS_IMAGE);
         given(imageUploadAcceptor.groupRootDirectory()).willReturn(IMAGES_FOLDER);
         given(filenameGeneratorUtil.cleanFilename(any(FileInputVO.class))).willReturn(DESTINATION_FILENAME);
-        fileUploader = new FileUploader(fileStorage, Arrays.asList(imageUploadAcceptor), filenameGeneratorUtil);
+        fileUploader = new FileUploader(fileStorage, Collections.singletonList(imageUploadAcceptor), filenameGeneratorUtil);
         fileInputStream = new FileInputStream(prepareTempFile());
     }
 
@@ -74,7 +76,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
     }
 
     @Test
-    public void shouldUploadFileUnderAcceptorRootWithAcceptableMIME() throws FileUploadException, IOException {
+    public void shouldUploadFileUnderAcceptorRootWithAcceptableMIME() throws FileUploadException {
 
         // given
         FileInputVO fileInputVO = prepareValidFileInputVO(false);
@@ -87,12 +89,12 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         assertThat(result, notNullValue());
         assertThat(result.getOriginalFilename(), equalTo(ORIGINAL_FILENAME));
         assertThat(result.getAcceptedAs(), equalTo(MIME_TYPE));
-        assertThat(result.getPath(), equalTo(Paths.get(IMAGES_FOLDER, DESTINATION_FILENAME).toString()));
-        assertThat(result.getPathUUID(), notNullValue());
+        assertThat(result.getPath(), equalTo(EXPECTED_PATH_WITHOUT_SUBFOLDER));
+        assertThat(result.getPathUUID(), equalTo(PATH_UUID_NO_SUBFOLDER));
     }
 
     @Test
-    public void shouldUploadFileUnderSubfolderWithAcceptableMIME() throws FileUploadException, IOException {
+    public void shouldUploadFileUnderSubfolderWithAcceptableMIME() throws FileUploadException {
 
         // given
         FileInputVO fileInputVO = prepareValidFileInputVO(true);
@@ -105,12 +107,12 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         assertThat(result, notNullValue());
         assertThat(result.getOriginalFilename(), equalTo(ORIGINAL_FILENAME));
         assertThat(result.getAcceptedAs(), equalTo(MIME_TYPE));
-        assertThat(result.getPath(), equalTo(Paths.get(IMAGES_FOLDER, SUBFOLDER, DESTINATION_FILENAME).toString()));
-        assertThat(result.getPathUUID(), notNullValue());
+        assertThat(result.getPath(), equalTo(EXPECTED_PATH_WITH_SUBFOLDER));
+        assertThat(result.getPathUUID(), equalTo(PATH_UUID_SUBFOLDER));
     }
 
     @Test
-    public void shouldNotUploadFileWithUnacceptableMIME() throws FileUploadException, IOException {
+    public void shouldNotUploadFileWithUnacceptableMIME() throws FileUploadException {
 
         // given
         FileInputVO fileInputVO = prepareValidFileInputVO(false);
@@ -123,7 +125,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         assertThat(result, nullValue());
     }
 
-    private FileInputVO prepareValidFileInputVO(boolean withSubfolder) throws IOException {
+    private FileInputVO prepareValidFileInputVO(boolean withSubfolder) {
         return FileInputVO.getBuilder()
                 .withContentType(MIME_TYPE)
                 .withOriginalFilename(ORIGINAL_FILENAME)
