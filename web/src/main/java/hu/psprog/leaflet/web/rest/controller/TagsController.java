@@ -4,7 +4,6 @@ import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.tag.TagAssignmentRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagCreateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagListDataModel;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -132,16 +131,13 @@ public class TagsController extends BaseController {
                                                        BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                Long id = tagFacade.createOne(conversionService.convert(tagCreateRequestModel, TagVO.class));
-                TagVO tagVO = tagFacade.getOne(id);
+                TagVO tagVO = tagFacade.createOne(conversionService.convert(tagCreateRequestModel, TagVO.class));
 
                 return ResponseEntity
-                        .created(buildLocation(id))
+                        .created(buildLocation(tagVO.getId()))
                         .body(conversionService.convert(tagVO, TagDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(TAG_COULD_NOT_BE_CREATED, e);
@@ -166,13 +162,10 @@ public class TagsController extends BaseController {
                                   BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                tagFacade.updateOne(id, conversionService.convert(tagCreateRequestModel, TagVO.class));
-                TagVO tagVO = tagFacade.getOne(id);
+                TagVO tagVO = tagFacade.updateOne(id, conversionService.convert(tagCreateRequestModel, TagVO.class));
 
                 return ResponseEntity
                         .created(buildLocation(id))
@@ -196,7 +189,7 @@ public class TagsController extends BaseController {
     public void deleteTag(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            tagFacade.deleteByID(id);
+            tagFacade.deletePermanently(id);
         } catch (ServiceException e) {
             LOGGER.error(TAG_COULD_NOT_BE_DELETED, id);
             throw new ResourceNotFoundException(TAG_COULD_NOT_BE_FOUND, e);
@@ -215,13 +208,7 @@ public class TagsController extends BaseController {
     public ResponseEntity<TagDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            TagVO tagVO = tagFacade.getOne(id);
-            if (tagVO.isEnabled()) {
-                tagFacade.disable(id);
-            } else {
-                tagFacade.enable(id);
-            }
-            TagVO updatedTagVO = tagFacade.getOne(id);
+            TagVO updatedTagVO = tagFacade.changeStatus(id);
 
             return ResponseEntity
                     .created(buildLocation(id))
@@ -242,13 +229,11 @@ public class TagsController extends BaseController {
      * @throws ResourceNotFoundException if no tag or entry found under given IDs
      */
     @RequestMapping(method = RequestMethod.POST, value = PATH_ASSIGN_TAG)
-    public ResponseEntity<ValidationErrorMessageListDataModel> attachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
+    public ResponseEntity<BaseBodyDataModel> attachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
                                   BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 tagFacade.attachTagToEntry(conversionService.convert(tagAssignmentRequestModel, TagAssignmentVO.class));
@@ -273,13 +258,11 @@ public class TagsController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_ASSIGN_TAG)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<ValidationErrorMessageListDataModel> detachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
+    public ResponseEntity<BaseBodyDataModel> detachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
                                   BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 tagFacade.detachTagFromEntry(conversionService.convert(tagAssignmentRequestModel, TagAssignmentVO.class));

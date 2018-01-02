@@ -69,7 +69,7 @@ public class UserFacadeImpl implements UserFacade {
     @Override
     public UserVO updateUserPassword(Long userID, String currentPassword, String newPassword) throws ServiceException {
         // TODO checking currentPassword will be implemented by LFLT-182
-        updateUserPassword(userID, newPassword);
+        userService.changePassword(userID, passwordEncoder.encode(newPassword));
         return userService.getOne(userID);
     }
 
@@ -99,18 +99,13 @@ public class UserFacadeImpl implements UserFacade {
 
     @Override
     public void confirmPasswordReset(String password) throws EntityNotFoundException {
-
         Long userID = authenticationService.confirmPasswordReset();
-        updateUserPassword(userID, password);
+        userService.reclaimPassword(userID, passwordEncoder.encode(password));
     }
 
     @Override
     public String extendSession(LoginContextVO loginContext) {
         return authenticationService.extendSession(loginContext);
-    }
-
-    private void updateUserPassword(Long userID, String newPassword) throws EntityNotFoundException {
-        userService.changePassword(userID, passwordEncoder.encode(newPassword));
     }
 
     private UserVO rebuildUserDataWithHashedPassword(UserVO originalUserVO) {

@@ -2,12 +2,11 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
-import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
+import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
-import hu.psprog.leaflet.service.CategoryService;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.facade.CategoryFacade;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
@@ -45,11 +44,11 @@ public class CategoriesController extends BaseController {
     private static final String CATEGORY_COULD_NOT_BE_CREATED = "Category could not be created. See details:";
     private static final String CATEGORY_COULD_NOT_BE_CREATED_TRY_AGAIN = "Category could not be created, please try again later.";
 
-    private CategoryService categoryService;
+    private CategoryFacade categoryFacade;
 
     @Autowired
-    public CategoriesController(CategoryService categoryService) {
-        this.categoryService = categoryService;
+    public CategoriesController(CategoryFacade categoryFacade) {
+        this.categoryFacade = categoryFacade;
     }
 
     /**
@@ -62,7 +61,7 @@ public class CategoriesController extends BaseController {
     @Timed
     public ResponseEntity<CategoryListDataModel> getAllCategories() {
 
-        List<CategoryVO> categories = categoryService.getAll();
+        List<CategoryVO> categories = categoryFacade.getAll();
 
         return ResponseEntity
                 .ok()
@@ -80,7 +79,7 @@ public class CategoriesController extends BaseController {
     @Timed
     public ResponseEntity<CategoryListDataModel> getPublicCategories() {
 
-        List<CategoryVO> categories = categoryService.getAllPublic();
+        List<CategoryVO> categories = categoryFacade.getAllPublic();
 
         return ResponseEntity
                 .ok()
@@ -98,7 +97,7 @@ public class CategoriesController extends BaseController {
     public ResponseEntity<CategoryDataModel> getCategory(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            CategoryVO category = categoryService.getOne(id);
+            CategoryVO category = categoryFacade.getOne(id);
 
             return ResponseEntity
                     .ok()
@@ -122,16 +121,13 @@ public class CategoriesController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                Long categoryID = categoryService.createOne(conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
-                CategoryVO createdCategory = categoryService.getOne(categoryID);
+                CategoryVO createdCategory = categoryFacade.createOne(conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
 
                 return ResponseEntity
-                        .created(buildLocation(categoryID))
+                        .created(buildLocation(createdCategory.getId()))
                         .body(conversionService.convert(createdCategory, CategoryDataModel.class));
             } catch (ServiceException e) {
                 LOGGER.error(CATEGORY_COULD_NOT_BE_CREATED, e);
@@ -155,13 +151,10 @@ public class CategoriesController extends BaseController {
                                        BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                categoryService.updateOne(id, conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
-                CategoryVO updatedCategory = categoryService.getOne(id);
+                CategoryVO updatedCategory = categoryFacade.updateOne(id, conversionService.convert(categoryCreateRequestModel, CategoryVO.class));
 
                 return ResponseEntity
                         .created(buildLocation(id))
@@ -184,13 +177,7 @@ public class CategoriesController extends BaseController {
     public ResponseEntity<CategoryDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            CategoryVO categoryVO = categoryService.getOne(id);
-            if (categoryVO.isEnabled()) {
-                categoryService.disable(id);
-            } else {
-                categoryService.enable(id);
-            }
-            CategoryVO updatedCategoryVO = categoryService.getOne(id);
+            CategoryVO updatedCategoryVO = categoryFacade.changeStatus(id);
 
             return ResponseEntity
                     .created(buildLocation(id))
@@ -212,7 +199,7 @@ public class CategoriesController extends BaseController {
     public void deleteCategory(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            categoryService.deleteByID(id);
+            categoryFacade.deletePermanently(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_CATEGORY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_CATEGORY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

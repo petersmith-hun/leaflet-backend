@@ -2,7 +2,6 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.dcp.DCPRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.dcp.DCPDataModel;
 import hu.psprog.leaflet.api.rest.response.dcp.DCPListDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
@@ -75,9 +74,7 @@ public class DCPStoreController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 dynamicConfigurationPropertyService.add(dcpRequestModel.getKey(), dcpRequestModel.getValue());
@@ -103,9 +100,7 @@ public class DCPStoreController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 dynamicConfigurationPropertyService.update(dcpRequestModel.getKey(), dcpRequestModel.getValue());

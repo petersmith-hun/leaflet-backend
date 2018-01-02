@@ -20,5 +20,5 @@ public interface CategoryService extends CreateOperationCapableService<CategoryV
         DeleteOperationCapableService<CategoryVO, Long>,
         StatusChangeCapableService<Long> {
 
-    public List<CategoryVO> getAllPublic();
+    List<CategoryVO> getAllPublic();
 }

@@ -5,7 +5,6 @@ import hu.psprog.leaflet.api.rest.request.file.DirectoryCreationRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.FileUploadRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.UpdateFileMetaInfoRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.file.DirectoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileListDataModel;
@@ -117,9 +116,7 @@ public class FilesController extends BaseController {
                                                         BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             FileInputVO fileInputVO = conversionService.convert(fileUploadRequestModel, FileInputVO.class);
             try {
@@ -169,9 +166,7 @@ public class FilesController extends BaseController {
                                         BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 fileManagementFacade.createDirectory(directoryCreationRequestModel.getParent(), directoryCreationRequestModel.getName());
@@ -201,9 +196,7 @@ public class FilesController extends BaseController {
                                                                 BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             UpdateFileMetaInfoVO updateFileMetaInfoVO = conversionService.convert(updateFileMetaInfoRequestModel, UpdateFileMetaInfoVO.class);
             try {

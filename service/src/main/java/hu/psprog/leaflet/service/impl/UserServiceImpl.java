@@ -13,6 +13,7 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitReclaim;
 import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -209,6 +210,12 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.updatePassword(id, password);
+    }
+
+    @Override
+    @PermitReclaim
+    public void reclaimPassword(Long id, String password) throws EntityNotFoundException {
+        changePassword(id, password);
     }
 
     @Override

@@ -2,7 +2,6 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.request.attachment.AttachmentRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.AttachmentFacade;
 import hu.psprog.leaflet.service.vo.AttachmentRequestVO;
@@ -51,9 +50,7 @@ public class AttachmentsController extends BaseController {
             throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 attachmentFacade.attachFileToEntry(conversionService.convert(attachmentRequestModel, AttachmentRequestVO.class));
@@ -81,9 +78,7 @@ public class AttachmentsController extends BaseController {
             throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 attachmentFacade.detachFileFromEntry(conversionService.convert(attachmentRequestModel, AttachmentRequestVO.class));

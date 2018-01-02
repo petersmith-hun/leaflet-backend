@@ -7,14 +7,11 @@ import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentDataModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
-import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
-import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.annotation.AuthenticatedRequest;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.annotation.ResponseFillMode;
@@ -88,8 +85,7 @@ public class CommentsController extends BaseController {
             @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        EntityPageVO<CommentVO> comments = commentFacade.getPageOfPublicCommentsForEntry(page, limit,
-                OrderDirection.valueOf(orderDirection), CommentVO.OrderBy.valueOf(orderBy), EntryVO.wrapMinimumVO(entryID));
+        EntityPageVO<CommentVO> comments = commentFacade.getPageOfPublicCommentsForEntry(entryID, page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()
@@ -118,8 +114,7 @@ public class CommentsController extends BaseController {
             @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        EntityPageVO<CommentVO> comments = commentFacade.getPageOfCommentsForEntry(page, limit,
-                OrderDirection.valueOf(orderDirection), CommentVO.OrderBy.valueOf(orderBy), EntryVO.wrapMinimumVO(entryID));
+        EntityPageVO<CommentVO> comments = commentFacade.getPageOfCommentsForEntry(entryID, page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()
@@ -167,9 +162,7 @@ public class CommentsController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
                 Long commentID = commentFacade.createOne(conversionService.convert(commentCreateRequestModel, CommentVO.class));
@@ -198,22 +191,18 @@ public class CommentsController extends BaseController {
      * @param bindingResult validation result
      * @return updated comment data
      * @throws ResourceNotFoundException if no comment found associated with given ID
-     * @throws RequestCouldNotBeFulfilledException if a service exception occurred
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_PART_ID)
     public ResponseEntity<BaseBodyDataModel> updateComment(@PathVariable(PATH_VARIABLE_ID) Long commentID,
                                       @RequestBody @Valid CommentUpdateRequestModel commentUpdateRequestModel,
                                       BindingResult bindingResult)
-            throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
+            throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                commentFacade.updateOne(commentID, conversionService.convert(commentUpdateRequestModel, CommentVO.class));
-                CommentVO commentVO = commentFacade.getOne(commentID);
+                CommentVO commentVO = commentFacade.updateOne(commentID, conversionService.convert(commentUpdateRequestModel, CommentVO.class));
 
                 return ResponseEntity
                         .created(buildLocation(commentID))
@@ -239,14 +228,7 @@ public class CommentsController extends BaseController {
             throws ResourceNotFoundException {
 
         try {
-            CommentVO commentVO = commentFacade.getOne(commentID);
-            if (commentVO.isEnabled()) {
-                commentFacade.disable(commentID);
-            } else {
-                commentFacade.enable(commentID);
-            }
-            CommentVO updatedCommentVO = commentFacade.getOne(commentID);
-
+            CommentVO updatedCommentVO = commentFacade.changeStatus(commentID);
             return ResponseEntity
                     .created(buildLocation(commentID))
                     .body(conversionService.convert(updatedCommentVO, ExtendedCommentDataModel.class));
@@ -270,8 +252,7 @@ public class CommentsController extends BaseController {
             throws ResourceNotFoundException {
 
         try {
-            CommentVO commentVO = commentFacade.getOne(commentID);
-            commentFacade.deleteLogicallyByEntity(commentVO);
+            commentFacade.deleteLogically(commentID);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_COMMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
@@ -291,7 +272,7 @@ public class CommentsController extends BaseController {
             throws ResourceNotFoundException {
 
         try {
-            commentFacade.deleteByID(commentID);
+            commentFacade.deletePermanently(commentID);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_COMMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

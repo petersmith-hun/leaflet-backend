@@ -4,13 +4,12 @@ import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
-import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.document.DocumentDataModel;
 import hu.psprog.leaflet.api.rest.response.document.DocumentListDataModel;
 import hu.psprog.leaflet.api.rest.response.document.EditDocumentDataModel;
-import hu.psprog.leaflet.service.DocumentService;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.facade.DocumentFacade;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
@@ -51,11 +50,11 @@ public class DocumentsController extends BaseController {
     private static final String DOCUMENT_COULD_NOT_BE_CREATED_SEE_DETAILS = "Document could not be created, please try again later.";
     private static final String DOCUMENT_COULD_NOT_BE_CREATED = "Document could not be created. See details: ";
 
-    private DocumentService documentService;
+    private DocumentFacade documentFacade;
 
     @Autowired
-    public DocumentsController(DocumentService documentService) {
-        this.documentService = documentService;
+    public DocumentsController(DocumentFacade documentFacade) {
+        this.documentFacade = documentFacade;
     }
 
     /**
@@ -68,7 +67,7 @@ public class DocumentsController extends BaseController {
     @Timed
     public ResponseEntity<DocumentListDataModel> getAllDocuments() {
 
-        List<DocumentVO> documentVOList = documentService.getAll();
+        List<DocumentVO> documentVOList = documentFacade.getAll();
 
         return ResponseEntity
                 .ok()
@@ -85,7 +84,7 @@ public class DocumentsController extends BaseController {
     @Timed
     public ResponseEntity<DocumentListDataModel> getPublicDocuments() {
 
-        List<DocumentVO> documentVOList = documentService.getPublicDocuments();
+        List<DocumentVO> documentVOList = documentFacade.getPublicDocuments();
 
         return ResponseEntity
                 .ok()
@@ -106,7 +105,7 @@ public class DocumentsController extends BaseController {
     public ResponseEntity<EditDocumentDataModel> getDocumentByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            DocumentVO documentVO = documentService.getOne(id);
+            DocumentVO documentVO = documentFacade.getOne(id);
 
             return ResponseEntity
                     .ok()
@@ -131,7 +130,7 @@ public class DocumentsController extends BaseController {
     public ResponseEntity<DocumentDataModel> getDocumentByLink(@PathVariable(PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
 
         try {
-            DocumentVO documentVO = documentService.getByLink(link);
+            DocumentVO documentVO = documentFacade.getByLink(link);
 
             return ResponseEntity
                     .ok()
@@ -157,16 +156,13 @@ public class DocumentsController extends BaseController {
             throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                Long documentID = documentService.createOne(conversionService.convert(documentCreateRequestModel, DocumentVO.class));
-                DocumentVO createdDocument = documentService.getOne(documentID);
+                DocumentVO createdDocument = documentFacade.createOne(conversionService.convert(documentCreateRequestModel, DocumentVO.class));
 
                 return ResponseEntity
-                        .created(buildLocation(documentID))
+                        .created(buildLocation(createdDocument.getId()))
                         .body(conversionService.convert(createdDocument, EditDocumentDataModel.class));
             } catch (ConstraintViolationException e) {
                 LOGGER.error(CONSTRAINT_VIOLATION, e);
@@ -196,13 +192,10 @@ public class DocumentsController extends BaseController {
             throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(conversionService.convert(bindingResult.getAllErrors(), ValidationErrorMessageListDataModel.class));
+            return validationFailureResponse(bindingResult);
         } else {
             try {
-                documentService.updateOne(id, conversionService.convert(documentUpdateRequestModel, DocumentVO.class));
-                DocumentVO updatedDocument = documentService.getOne(id);
+                DocumentVO updatedDocument = documentFacade.updateOne(id, conversionService.convert(documentUpdateRequestModel, DocumentVO.class));
 
                 return ResponseEntity
                         .created(buildLocation(id))
@@ -229,13 +222,7 @@ public class DocumentsController extends BaseController {
     public ResponseEntity<EditDocumentDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            DocumentVO document = documentService.getOne(id);
-            if (document.isEnabled()) {
-                documentService.disable(id);
-            } else {
-                documentService.enable(id);
-            }
-            DocumentVO updatedDocument = documentService.getOne(id);
+            DocumentVO updatedDocument = documentFacade.changeStatus(id);
 
             return ResponseEntity
                     .created(buildLocation(id))
@@ -259,7 +246,7 @@ public class DocumentsController extends BaseController {
     public void deleteDocument(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
-            documentService.deleteByID(id);
+            documentFacade.deletePermanently(id);
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_DOCUMENT_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_DOCUMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

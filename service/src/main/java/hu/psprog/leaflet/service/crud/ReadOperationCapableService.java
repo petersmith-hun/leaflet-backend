@@ -21,19 +21,19 @@ public interface ReadOperationCapableService<T extends BaseVO, ID extends Serial
      * @param id {@link Serializable} identifier of entity
      * @return entity identified by given identifier
      */
-    public T getOne(ID id) throws ServiceException;
+    T getOne(ID id) throws ServiceException;
 
     /**
      * Retrieves all entity of type T.
      *
      * @return list of all entities of type T
      */
-    public List<T> getAll();
+    List<T> getAll();
 
     /**
      * Returns number of entities.
      *
      * @return number of entities
      */
-    public Long count();
+    Long count();
 }

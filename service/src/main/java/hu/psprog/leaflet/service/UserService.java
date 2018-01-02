@@ -49,6 +49,14 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
     void changePassword(Long id, String password) throws EntityNotFoundException;
 
     /**
+     * Changes given user's password during reset flow.
+     *
+     * @param id ID of user to update password for
+     * @param password new password
+     */
+    void reclaimPassword(Long id, String password) throws EntityNotFoundException;
+
+    /**
      * Changes given user's authority (role).
      *
      * @param id ID of user to update role for

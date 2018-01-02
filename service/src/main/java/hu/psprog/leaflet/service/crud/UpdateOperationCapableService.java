@@ -24,7 +24,7 @@ public interface UpdateOperationCapableService<T extends BaseVO, R extends BaseV
      * @param updatedEntity {@link BaseVO} filled with data to updateOne to
      * @return updated entity
      */
-    public R updateOne(ID id, T updatedEntity) throws ServiceException;
+    R updateOne(ID id, T updatedEntity) throws ServiceException;
 
     /**
      * Updates a list of entities of type T specified by given ID. Returns updated entities of type R.
@@ -32,5 +32,5 @@ public interface UpdateOperationCapableService<T extends BaseVO, R extends BaseV
      * @param updatedEntities {@link Map} of ID-T identifier-entity pairs.
      * @return list of updates entities
      */
-    public List<R> updateBulk(Map<ID, T> updatedEntities) throws ServiceException;
+    List<R> updateBulk(Map<ID, T> updatedEntities) throws ServiceException;
 }
