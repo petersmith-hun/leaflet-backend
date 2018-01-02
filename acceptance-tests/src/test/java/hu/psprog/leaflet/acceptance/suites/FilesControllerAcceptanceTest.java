@@ -51,7 +51,7 @@ public class FilesControllerAcceptanceTest extends AbstractTempFileHandlingParam
     private static final String MOCK_FILE_ORIGINAL_FILENAME = "upload-test.jpg";
     private static final byte[] MOCK_FILE_CONTENT = "content".getBytes();
     private static final String CONTROL_FILE_UPLOAD = "file-upload";
-    private static final UUID CONTROL_FILE_UPLOAD_UUID = UUID.fromString("620eeb8c-a006-3893-aef0-89b6b56a3e2c");
+    private static final UUID CONTROL_FILE_UPLOAD_UUID = UUID.fromString("13bccef4-dcbd-3086-b8c5-b7fae3de9d38");
     private static final String UPLOADED_MOCK_FILE_PATH = "images/test_sub/" + MOCK_FILE_ORIGINAL_FILENAME;
     private static final String CREATED_DIRECTORY_NAME = "created-directory";
     private static final String CREATED_DIRECTORY_PATH = "images/created-directory";

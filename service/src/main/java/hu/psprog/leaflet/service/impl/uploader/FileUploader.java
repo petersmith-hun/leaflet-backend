@@ -36,6 +36,8 @@ public class FileUploader {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUploader.class);
 
     private static final String GIVEN_PATH_IS_INVALID = "Given path is invalid";
+    private static final String CHARACTER_BACKSLASH = "\\";
+    private static final String CHARACTER_SLASH = "/";
 
     private FilenameGeneratorUtil filenameGeneratorUtil;
     private File fileStorage;
@@ -102,7 +104,7 @@ public class FileUploader {
     private UploadedFileVO doUpload(FileInputVO fileInputVO, UploadAcceptor uploadAcceptor) throws IOException {
         Path path = buildPath(fileInputVO, uploadAcceptor);
         String targetFilename = filenameGeneratorUtil.cleanFilename(fileInputVO);
-        String fileRelativePath = buildFileRelatePath(fileInputVO, targetFilename, uploadAcceptor).toString();
+        String fileRelativePath = getNormalizedPathAsString(buildRelativePath(fileInputVO, targetFilename, uploadAcceptor));
         Files.copy(fileInputVO.getFileContentStream(), path.resolve(targetFilename));
 
         return UploadedFileVO.getBuilder()
@@ -110,9 +112,17 @@ public class FileUploader {
                 .withPath(fileRelativePath)
                 .withAcceptedAs(fileInputVO.getContentType())
                 .withStoredFilename(targetFilename)
-                .withPathUUID(UUID.nameUUIDFromBytes(fileRelativePath.getBytes()))
+                .withPathUUID(generatePathUUID(fileRelativePath))
                 .withDescription(fileInputVO.getDescription())
                 .build();
+    }
+
+    private UUID generatePathUUID(String path) {
+        return UUID.nameUUIDFromBytes(path.getBytes());
+    }
+
+    private String getNormalizedPathAsString(Path path) {
+        return path.toString().replace(CHARACTER_BACKSLASH, CHARACTER_SLASH);
     }
 
     private Path buildPath(FileInputVO fileInputVO, UploadAcceptor uploadAcceptor) {
@@ -126,7 +136,7 @@ public class FileUploader {
         return path;
     }
 
-    private Path buildFileRelatePath(FileInputVO fileInputVO, String filename, UploadAcceptor uploadAcceptor) {
+    private Path buildRelativePath(FileInputVO fileInputVO, String filename, UploadAcceptor uploadAcceptor) {
         Path path;
         String acceptorRootName = getAcceptorRoot(uploadAcceptor).getName();
         if (Objects.nonNull(fileInputVO.getRelativePath())) {
