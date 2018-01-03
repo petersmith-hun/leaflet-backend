@@ -1,8 +1,7 @@
 package hu.psprog.leaflet.service.impl.uploader.acceptor;
 
 import hu.psprog.leaflet.service.vo.FileInputVO;
-
-import java.util.List;
+import org.springframework.util.MimeType;
 
 /**
  * Common implementation for {@code accept} method.
@@ -13,8 +12,12 @@ public abstract class AbstractUploadAcceptor implements UploadAcceptor {
 
     @Override
     public boolean accept(FileInputVO fileInputVO) {
-        return getAcceptedMIMETypes().contains(fileInputVO.getContentType());
+        MimeType mimeType = getMimeType(fileInputVO);
+        return getAcceptedMIMETypes().stream()
+                .anyMatch(mimeType::isCompatibleWith);
     }
 
-    protected abstract List<String> getAcceptedMIMETypes();
+    private MimeType getMimeType(FileInputVO fileInputVO) {
+        return MimeType.valueOf(fileInputVO.getContentType());
+    }
 }

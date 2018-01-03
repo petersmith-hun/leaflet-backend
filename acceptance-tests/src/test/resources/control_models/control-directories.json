@@ -6,6 +6,9 @@
       "children": [
         "",
         "test_sub"
+      ],
+      "acceptableMimeTypes": [
+        "image/*"
       ]
     }
   ]
