@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
+import hu.psprog.leaflet.api.rest.request.user.PasswordChangeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.PasswordResetDemandRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
@@ -233,13 +234,13 @@ public class UsersController extends BaseController {
      * Updates given user's password.
      *
      * @param id ID of an existing user
-     * @param userPasswordRequestModel new password and its confirmation
+     * @param passwordChangeRequestModel current password for permission validation and new password with its confirmation
      * @return updated data of given user
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PASSWORD)
     @Timed
     public ResponseEntity<BaseBodyDataModel> updatePassword(@PathVariable(PATH_VARIABLE_ID) Long id,
-                                       @RequestBody @Valid UserPasswordRequestModel userPasswordRequestModel,
+                                       @RequestBody @Valid PasswordChangeRequestModel passwordChangeRequestModel,
                                        BindingResult bindingResult)
             throws ResourceNotFoundException {
 
@@ -247,7 +248,7 @@ public class UsersController extends BaseController {
             return validationFailureResponse(bindingResult);
         } else {
             try {
-                UserVO userVO = userFacade.updateUserPassword(id, null, userPasswordRequestModel.getPassword());
+                UserVO userVO = userFacade.updateUserPassword(id, passwordChangeRequestModel.getCurrentPassword(), passwordChangeRequestModel.getPassword());
                 return ResponseEntity
                         .created(buildLocation(id))
                         .body(conversionService.convert(userVO, ExtendedUserDataModel.class));

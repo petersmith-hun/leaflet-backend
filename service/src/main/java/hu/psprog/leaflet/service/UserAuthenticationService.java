@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service;
 
+import hu.psprog.leaflet.service.exception.ReAuthenticationFailureException;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 
 /**
@@ -8,6 +9,14 @@ import hu.psprog.leaflet.service.vo.LoginContextVO;
  * @author Peter Smith
  */
 public interface UserAuthenticationService {
+
+    /**
+     * Tries to re-authenticate current user with given password.
+     * Throws {@link ReAuthenticationFailureException} on failure.
+     *
+     * @param password current user's password to authenticate with
+     */
+    void reAuthenticate(String password);
 
     /**
      * Requests JWT token for given user (identified by {@link LoginContextVO}).

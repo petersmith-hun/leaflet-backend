@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>1.3.2-dev</version>
+    <version>1.4.0-dev</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -39,7 +39,7 @@
         <java.version>1.8</java.version>
 
         <!-- leaflet internal dependency versions -->
-        <leaflet.rest-api.version>1.1.9</leaflet.rest-api.version>
+        <leaflet.rest-api.version>1.2.0</leaflet.rest-api.version>
         <leaflet.jwt-component.version>2.2.1</leaflet.jwt-component.version>
         <leaflet.mailer-component.version>1.0.0</leaflet.mailer-component.version>
         <leaflet.bridge.version>1.7.2</leaflet.bridge.version>
