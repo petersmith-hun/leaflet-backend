@@ -17,6 +17,7 @@ public class AcceptorInfoVO implements Serializable {
     private String id;
     private String rootDirectoryName;
     private List<String> childrenDirectories;
+    private List<String> acceptableMimeTypes;
 
     public String getId() {
         return id;
@@ -28,6 +29,10 @@ public class AcceptorInfoVO implements Serializable {
 
     public List<String> getChildrenDirectories() {
         return childrenDirectories;
+    }
+
+    public List<String> getAcceptableMimeTypes() {
+        return acceptableMimeTypes;
     }
 
     @Override
@@ -42,6 +47,7 @@ public class AcceptorInfoVO implements Serializable {
                 .append(id, that.id)
                 .append(rootDirectoryName, that.rootDirectoryName)
                 .append(childrenDirectories, that.childrenDirectories)
+                .append(acceptableMimeTypes, that.acceptableMimeTypes)
                 .isEquals();
     }
 
@@ -51,6 +57,7 @@ public class AcceptorInfoVO implements Serializable {
                 .append(id)
                 .append(rootDirectoryName)
                 .append(childrenDirectories)
+                .append(acceptableMimeTypes)
                 .toHashCode();
     }
 
@@ -60,6 +67,7 @@ public class AcceptorInfoVO implements Serializable {
                 .append("id", id)
                 .append("rootDirectoryName", rootDirectoryName)
                 .append("childrenDirectories", childrenDirectories)
+                .append("acceptableMimeTypes", acceptableMimeTypes)
                 .toString();
     }
 
@@ -74,6 +82,7 @@ public class AcceptorInfoVO implements Serializable {
         private String id;
         private String rootDirectoryName;
         private List<String> childrenDirectories;
+        private List<String> acceptableMimeTypes;
 
         private AcceptorInfoVOBuilder() {
         }
@@ -93,11 +102,17 @@ public class AcceptorInfoVO implements Serializable {
             return this;
         }
 
+        public AcceptorInfoVOBuilder withAcceptableMimeTypes(List<String> acceptableMimeTypes) {
+            this.acceptableMimeTypes = acceptableMimeTypes;
+            return this;
+        }
+
         public AcceptorInfoVO build() {
             AcceptorInfoVO acceptorInfoVO = new AcceptorInfoVO();
             acceptorInfoVO.id = this.id;
             acceptorInfoVO.rootDirectoryName = this.rootDirectoryName;
             acceptorInfoVO.childrenDirectories = this.childrenDirectories;
+            acceptorInfoVO.acceptableMimeTypes = this.acceptableMimeTypes;
             return acceptorInfoVO;
         }
     }

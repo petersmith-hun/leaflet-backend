@@ -1,6 +1,9 @@
 package hu.psprog.leaflet.service.impl.uploader.acceptor;
 
 import hu.psprog.leaflet.service.vo.FileInputVO;
+import org.springframework.util.MimeType;
+
+import java.util.List;
 
 /**
  * Upload acceptors decide whether to accept of reject the file being uploaded.
@@ -33,4 +36,11 @@ public interface UploadAcceptor {
      * @return suggested subdirectory name
      */
     String groupRootDirectory();
+
+    /**
+     * Returns list of acceptable MIME types.
+     *
+     * @return list of acceptable MIME types
+     */
+    List<MimeType> getAcceptedMIMETypes();
 }

@@ -20,6 +20,7 @@ public class AcceptorInfoVOToDirectoryDataModelConverter implements Converter<Ac
                 .withId(source.getId())
                 .withRoot(source.getRootDirectoryName())
                 .withChildren(source.getChildrenDirectories())
+                .withAcceptableMimeTypes(source.getAcceptableMimeTypes())
                 .build();
     }
 }
