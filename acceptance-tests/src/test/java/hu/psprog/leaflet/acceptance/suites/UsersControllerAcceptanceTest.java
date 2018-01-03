@@ -4,6 +4,7 @@ import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
+import hu.psprog.leaflet.api.rest.request.user.PasswordChangeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.PasswordResetDemandRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
@@ -176,7 +177,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     public void shouldUpdatePassword() throws CommunicationFailureException {
 
         // given
-        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel();
+        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
 
         // when
         userBridgeService.updatePassword(ADMIN_USER_ID, userPasswordRequestModel);
@@ -187,10 +188,24 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     }
 
     @Test(expected = ForbiddenOperationException.class)
+    public void shouldFailUpdatingPasswordWithIncorrectCurrentPassword() throws CommunicationFailureException {
+
+        // given
+        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
+        ((PasswordChangeRequestModel) userPasswordRequestModel).setCurrentPassword("incorrect-password");
+
+        // when
+        userBridgeService.updatePassword(ADMIN_USER_ID, userPasswordRequestModel);
+
+        // then
+        // exception expected
+    }
+
+    @Test(expected = ForbiddenOperationException.class)
     public void shouldFailUpdatingDifferentUserPassword() throws CommunicationFailureException {
 
         // given
-        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel();
+        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
 
         // when
         userBridgeService.updatePassword(TEST_USER_1_ID, userPasswordRequestModel);
@@ -249,7 +264,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         // given
         prepareMockedRequestAuthentication(preparePasswordResetConfirmation(TEST_EDITOR_4_EMAIL));
-        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel();
+        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(true);
 
         // when
         userBridgeService.confirmPasswordReset(userPasswordRequestModel);
@@ -415,11 +430,14 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         prepareMockedRequestAuthentication(loginResponse.getToken());
     }
 
-    private UserPasswordRequestModel prepareUserPasswordRequestModel() {
+    private UserPasswordRequestModel prepareUserPasswordRequestModel(boolean forPasswordReset) {
 
-        UserPasswordRequestModel userPasswordRequestModel = new UserPasswordRequestModel();
+        PasswordChangeRequestModel userPasswordRequestModel = new PasswordChangeRequestModel();
         userPasswordRequestModel.setPassword(UPDATED_PASSWORD);
         userPasswordRequestModel.setPasswordConfirmation(UPDATED_PASSWORD);
+        if (!forPasswordReset) {
+            userPasswordRequestModel.setCurrentPassword(TEST_PASSWORD);
+        }
 
         return userPasswordRequestModel;
     }

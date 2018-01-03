@@ -4,11 +4,13 @@ import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.ReAuthenticationFailureException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.UserFacade;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,9 +70,14 @@ public class UserFacadeImpl implements UserFacade {
 
     @Override
     public UserVO updateUserPassword(Long userID, String currentPassword, String newPassword) throws ServiceException {
-        // TODO checking currentPassword will be implemented by LFLT-182
-        userService.changePassword(userID, passwordEncoder.encode(newPassword));
-        return userService.getOne(userID);
+        try {
+            authenticationService.reAuthenticate(currentPassword);
+            userService.changePassword(userID, passwordEncoder.encode(newPassword));
+
+            return userService.getOne(userID);
+        } catch (AuthenticationException e) {
+            throw new ReAuthenticationFailureException(e);
+        }
     }
 
     @Override

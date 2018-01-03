@@ -57,9 +57,15 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     }
 
     @Override
+    public void reAuthenticate(String password) {
+        ExtendedUserDetails userDetails = retrieveAuthenticatedUserDetails();
+        authenticationManager.authenticate(createUsernamePasswordAuthentication(userDetails.getUsername(), password));
+    }
+
+    @Override
     public String claimToken(LoginContextVO loginContextVO) {
 
-        authenticationManager.authenticate(createUsernamePasswordAuthentication(loginContextVO));
+        authenticationManager.authenticate(createUsernamePasswordAuthentication(loginContextVO.getUsername(), loginContextVO.getPassword()));
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginContextVO.getUsername());
         JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(userDetails);
         storeToken(loginContextVO, authenticationAnswerModel);
@@ -126,8 +132,8 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
         return (ExtendedUserDetails) userDetailsService.loadUserByUsername(retrieveAuthentication().getPrincipal().toString());
     }
 
-    private Authentication createUsernamePasswordAuthentication(LoginContextVO loginContextVO) {
-        return new UsernamePasswordAuthenticationToken(loginContextVO.getUsername(), loginContextVO.getPassword());
+    private Authentication createUsernamePasswordAuthentication(String username, String password) {
+        return new UsernamePasswordAuthenticationToken(username, password);
     }
 
     private Authentication retrieveAuthentication() {
