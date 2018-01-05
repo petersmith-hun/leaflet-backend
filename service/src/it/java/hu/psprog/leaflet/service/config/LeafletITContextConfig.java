@@ -23,6 +23,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -78,6 +79,19 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     private UserDetailsService userDetailsService;
 
     private TemporaryFolder temporaryFolder;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
+
+        Properties properties = new Properties();
+        properties.setProperty("spring.http.multipart.location", "${java.io.tmpdir}");
+        properties.setProperty("mail.event.comment-notification.enabled", "false");
+
+        PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
+        configurer.setProperties(properties);
+
+        return configurer;
+    }
 
     @Bean
     public MailClient mailClient() {

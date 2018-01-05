@@ -15,6 +15,7 @@ import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.RequestProcessingFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.CommentBridgeService;
+import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
@@ -50,6 +51,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
     private static final String DELETED_COMMENT = "DELETED_COMMENT";
     private static final String CONTROL_COMMENT_AUTH = "comment-auth";
     private static final String CONTROL_COMMENT_ANON = "comment-anon";
+    private static final String CONTROL_COMMENT_NOTIFICATION_ANON = "comment-notification-anon";
+    private static final String CONTROL_COMMENT_NOTIFICATION_AUTH = "comment-notification-auth";
 
     private static final String ANONYMOUS_USER_NAME = "Anonymous User";
     private static final String TEST_USER_1_EMAIL = "test-user-1@ac-leaflet.local";
@@ -117,6 +120,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(current.getContent(), equalTo(control.getContent()));
         assertThat(current.getAssociatedEntry().getId(), equalTo(control.getEntryId()));
         assertThat(current.getOwner().getId(), equalTo(1L));
+        assertThat(notificationService.getCommentNotification(), notNullValue());
+        assertThat(notificationService.getCommentNotification(), equalTo(getControl(CONTROL_COMMENT_NOTIFICATION_AUTH, CommentNotification.class)));
     }
 
     @Test
@@ -137,6 +142,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(current.getContent(), equalTo(control.getContent()));
         assertThat(current.getAssociatedEntry().getId(), equalTo(control.getEntryId()));
         assertThat(current.getOwner().getUsername(), equalTo(ANONYMOUS_USER_NAME));
+        assertThat(notificationService.getCommentNotification(), notNullValue());
+        assertThat(notificationService.getCommentNotification(), equalTo(getControl(CONTROL_COMMENT_NOTIFICATION_ANON, CommentNotification.class)));
     }
 
     @Test

@@ -32,7 +32,7 @@ public interface CommentService extends CreateOperationCapableService<CommentVO,
      * @param entryVO {@link EntryVO} object to return comments for.
      * @return list of all comments under given entry
      */
-    public EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction,
+    EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction,
                                                              CommentVO.OrderBy orderBy, EntryVO entryVO);
 
     /**
@@ -45,7 +45,7 @@ public interface CommentService extends CreateOperationCapableService<CommentVO,
      * @param entryVO {@link EntryVO} object to return comments for.
      * @return list of enabled comments under given entry
      */
-    public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction,
+    EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction,
                                                                    CommentVO.OrderBy orderBy, EntryVO entryVO);
 
     /**
@@ -58,6 +58,13 @@ public interface CommentService extends CreateOperationCapableService<CommentVO,
      * @param userVO {@link UserVO} object to return comments for.
      * @return
      */
-    public EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction,
+    EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction,
                                                             CommentVO.OrderBy orderBy, UserVO userVO);
+
+    /**
+     * Sends email notification for the author of an entry under a comment has been created.
+     *
+     * @param commentID ID of the comment to notify the author about
+     */
+    void notifyEntryAuthor(Long commentID);
 }

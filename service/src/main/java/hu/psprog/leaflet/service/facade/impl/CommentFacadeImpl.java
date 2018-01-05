@@ -15,6 +15,7 @@ import hu.psprog.leaflet.service.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
@@ -32,14 +33,18 @@ public class CommentFacadeImpl implements CommentFacade {
 
     private static final List<GrantedAuthority> NO_LOGIN_AUTHORITY = AuthorityUtils.createAuthorityList(Role.NO_LOGIN.name());
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentFacadeImpl.class);
+    private static final String COMMENT_NOTIFICATION_ENABLED = "${mail.event.comment-notification.enabled}";
 
     private CommentService commentService;
     private UserService userService;
+    private boolean commentNotificationEnabled;
 
     @Autowired
-    public CommentFacadeImpl(CommentService commentService, UserService userService) {
+    public CommentFacadeImpl(CommentService commentService, UserService userService,
+                             @Value(COMMENT_NOTIFICATION_ENABLED) boolean commentNotificationEnabled) {
         this.commentService = commentService;
         this.userService = userService;
+        this.commentNotificationEnabled = commentNotificationEnabled;
     }
 
     @Override
@@ -104,8 +109,12 @@ public class CommentFacadeImpl implements CommentFacade {
                 }
             }
         }
+        Long commentID = commentService.createOne(commentToBeCreated);
+        if (commentNotificationEnabled) {
+            commentService.notifyEntryAuthor(commentID);
+        }
 
-        return commentService.createOne(commentToBeCreated);
+        return commentID;
     }
 
     @Override

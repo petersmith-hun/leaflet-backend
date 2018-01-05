@@ -63,6 +63,8 @@ mail:
     sender: leaflet@acceptance
     renderer: hu.psprog.leaflet.mail.client.renderer.impl.ThymeleafMailRenderer
     event:
+        comment-notification:
+            enabled: true
         startup:
             enabled: false
         password-reset:
