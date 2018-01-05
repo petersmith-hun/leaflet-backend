@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
+ * {@link MailFactory} implementation for comment notification emails.
+ *
  * @author Peter Smith
  */
 @Component
