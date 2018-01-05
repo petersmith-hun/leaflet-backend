@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.service.facade.impl;
 
 import hu.psprog.leaflet.persistence.entity.Comment;
+import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.UserService;
@@ -180,6 +181,7 @@ public class CommentFacadeImpl implements CommentFacade {
                 .withUsername(owner.getUsername())
                 .withAuthorities(NO_LOGIN_AUTHORITY)
                 .withEnabled(true)
+                .withLocale(Locale.EN)
                 .build();
     }
 }
