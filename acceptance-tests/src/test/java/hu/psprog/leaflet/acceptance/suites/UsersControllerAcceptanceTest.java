@@ -2,7 +2,6 @@ package hu.psprog.leaflet.acceptance.suites;
 
 import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
-import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.PasswordChangeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.PasswordResetDemandRequestModel;
@@ -79,9 +78,6 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
     @Autowired
     private UserBridgeService userBridgeService;
-
-    @Autowired
-    private MockNotificationService notificationService;
 
     @Autowired
     private JWTComponent jwtComponent;

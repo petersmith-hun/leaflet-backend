@@ -4,11 +4,12 @@ import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -17,6 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -39,8 +41,12 @@ public class CommentFacadeImplTest {
     @Mock
     private CommentService commentService;
 
-    @InjectMocks
-    private CommentFacadeImpl commentFacade;
+    private CommentFacade commentFacade;
+
+    @Before
+    public void setup() {
+        commentFacade = new CommentFacadeImpl(commentService, userService, true);
+    }
 
     @Test
     public void testCreateOneWithRegisteredUser() throws ServiceException {
@@ -54,6 +60,7 @@ public class CommentFacadeImplTest {
         // then
         verifyZeroInteractions(userService);
         verify(commentService).createOne(commentVO);
+        verify(commentService).notifyEntryAuthor(anyLong());
     }
 
     @Test
@@ -71,6 +78,7 @@ public class CommentFacadeImplTest {
         verify(userService).silentGetUserByEmail(USER_EMAIL);
         verify(userService).registerNoLogin(any(UserVO.class));
         verify(commentService).createOne(prepareCommentVO(NEW_NO_LOGIN_USER_ID));
+        verify(commentService).notifyEntryAuthor(anyLong());
     }
 
     @Test
@@ -89,6 +97,7 @@ public class CommentFacadeImplTest {
         verify(userService).silentGetUserByEmail(USER_EMAIL);
         verify(userService, never()).createOne(any(UserVO.class));
         verify(commentService).createOne(prepareCommentVO(REGISTERED_USER_ID));
+        verify(commentService).notifyEntryAuthor(anyLong());
     }
 
     @Test(expected = EntityCreationException.class)

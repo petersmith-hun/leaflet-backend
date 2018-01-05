@@ -6,6 +6,7 @@ import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.repository.specification.CommentSpecification;
 import hu.psprog.leaflet.service.CommentService;
+import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.CommentToCommentVOConverter;
 import hu.psprog.leaflet.service.converter.CommentVOToCommentConverter;
@@ -14,6 +15,7 @@ import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
 import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.security.annotation.PermitSelf;
@@ -51,16 +53,18 @@ public class CommentServiceImpl implements CommentService {
     private CommentVOToCommentConverter commentVOToCommentConverter;
     private EntryVOToEntryConverter entryVOToEntryConverter;
     private UserVOToUserConverter userVOToUserConverter;
+    private NotificationService notificationService;
 
     @Autowired
     public CommentServiceImpl(CommentDAO commentDAO, CommentToCommentVOConverter commentToCommentVOConverter,
                               CommentVOToCommentConverter commentVOToCommentConverter, EntryVOToEntryConverter entryVOToEntryConverter,
-                              UserVOToUserConverter userVOToUserConverter) {
+                              UserVOToUserConverter userVOToUserConverter, NotificationService notificationService) {
         this.commentDAO = commentDAO;
         this.commentToCommentVOConverter = commentToCommentVOConverter;
         this.commentVOToCommentConverter = commentVOToCommentConverter;
         this.entryVOToEntryConverter = entryVOToEntryConverter;
         this.userVOToUserConverter = userVOToUserConverter;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -120,6 +124,20 @@ public class CommentServiceImpl implements CommentService {
         Page<Comment> commentPage = commentDAO.findByUser(pageable, user);
 
         return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+    }
+
+    @Override
+    public void notifyEntryAuthor(Long commentID) {
+
+        Comment comment = commentDAO.findOne(commentID);
+        notificationService.commentNotification(CommentNotification.getBuilder()
+                .withUsername(comment.getUser().getUsername())
+                .withEmail(comment.getUser().getEmail())
+                .withContent(comment.getContent())
+                .withEntryTitle(comment.getEntry().getTitle())
+                .withAuthorEmail(comment.getEntry().getUser().getEmail())
+                .withAuthorName(comment.getEntry().getUser().getUsername())
+                .build());
     }
 
     @Override
@@ -247,5 +265,6 @@ public class CommentServiceImpl implements CommentService {
 
         commentDAO.revertLogicalDeletion(entity.getId());
     }
+
 
 }

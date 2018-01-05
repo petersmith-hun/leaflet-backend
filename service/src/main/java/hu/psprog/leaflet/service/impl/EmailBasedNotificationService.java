@@ -3,8 +3,10 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.mail.client.MailClient;
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.NotificationService;
+import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
+import hu.psprog.leaflet.service.mail.impl.CommentNotificationMailFactory;
 import hu.psprog.leaflet.service.mail.impl.MailFactoryRegistry;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetRequestMailFactory;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetSuccessMailFactory;
@@ -37,7 +39,7 @@ public class EmailBasedNotificationService implements NotificationService {
         Mail mail = mailFactoryRegistry
                 .getFactory(SystemStartupMailFactory.class)
                 .buildMail(version);
-        loggingMailObserverHandler.attachObserver(mailClient.sendMail(mail));
+        sendMailAndAttachObserver(mail);
     }
 
     @Override
@@ -45,7 +47,7 @@ public class EmailBasedNotificationService implements NotificationService {
         Mail mail = mailFactoryRegistry
                 .getFactory(PasswordResetRequestMailFactory.class)
                 .buildMail(passwordResetRequest, passwordResetRequest.getParticipant());
-        loggingMailObserverHandler.attachObserver(mailClient.sendMail(mail));
+        sendMailAndAttachObserver(mail);
     }
 
     @Override
@@ -53,6 +55,18 @@ public class EmailBasedNotificationService implements NotificationService {
         Mail mail = mailFactoryRegistry
                 .getFactory(PasswordResetSuccessMailFactory.class)
                 .buildMail(passwordResetSuccess.getUsername(), passwordResetSuccess.getParticipant());
+        sendMailAndAttachObserver(mail);
+    }
+
+    @Override
+    public void commentNotification(CommentNotification commentNotification) {
+        Mail mail = mailFactoryRegistry
+                .getFactory(CommentNotificationMailFactory.class)
+                .buildMail(commentNotification, commentNotification.getAuthorEmail());
+        sendMailAndAttachObserver(mail);
+    }
+
+    private void sendMailAndAttachObserver(Mail mail) {
         loggingMailObserverHandler.attachObserver(mailClient.sendMail(mail));
     }
 }

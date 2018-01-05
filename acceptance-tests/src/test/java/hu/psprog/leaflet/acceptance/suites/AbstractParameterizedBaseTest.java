@@ -3,8 +3,10 @@ package hu.psprog.leaflet.acceptance.suites;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
+import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.MethodRule;
@@ -68,10 +70,18 @@ public abstract class AbstractParameterizedBaseTest extends AbstractTransactiona
 
     private Map<String, String> requestAuthenticationHeaderTemp;
 
+    @Autowired
+    MockNotificationService notificationService;
+
     // keep it here, as context will restart if this is autowired separately in each tests
     @Autowired
     @SpyBean
     RequestAuthentication requestAuthentication;
+
+    @After
+    public void tearDown() {
+        notificationService.reset();
+    }
 
     <T> T getControl(String id, GenericType<T> asType) {
         return getControl(id, null, asType);
