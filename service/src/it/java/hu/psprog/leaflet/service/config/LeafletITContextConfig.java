@@ -84,7 +84,7 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
 
         Properties properties = new Properties();
-        properties.setProperty("spring.http.multipart.location", "${java.io.tmpdir}");
+        properties.setProperty("files.upload.storage-path", "${java.io.tmpdir}");
         properties.setProperty("mail.event.comment-notification.enabled", "false");
 
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
