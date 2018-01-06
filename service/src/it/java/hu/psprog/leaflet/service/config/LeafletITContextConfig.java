@@ -104,7 +104,7 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
 
     @Bean
     public MailProcessorConfigurationProperties mailProcessorConfigurationProperties() {
-        return new MailProcessorConfigurationProperties(null, null, null);
+        return new MailProcessorConfigurationProperties(null, null, null, null);
     }
 
     @Bean
