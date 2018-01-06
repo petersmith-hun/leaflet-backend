@@ -15,8 +15,12 @@ spring:
         servlet:
             load-on-startup: 1
     http:
-      multipart:
-        location: ${java.io.tmpdir}
+        multipart:
+            location: ${java.io.tmpdir}
+
+files:
+    upload:
+        storage-path: ${java.io.tmpdir}
 
 server:
     context-path: /api

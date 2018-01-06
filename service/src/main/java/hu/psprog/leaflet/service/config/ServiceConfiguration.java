@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Additional service layer configuration.
@@ -23,41 +22,37 @@ public class ServiceConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceConfiguration.class);
 
-    public static final String PERSISTENCE_DAO_PACKAGE = "hu.psprog.leaflet.persistence.dao";
+    static final String PERSISTENCE_DAO_PACKAGE = "hu.psprog.leaflet.persistence.dao";
 
-    @Value("${spring.http.multipart.location}")
+    @Value("${files.upload.storage-path}")
     @NotNull
     private String storageRootDirectoryPath;
 
     @Bean
     public File fileStorage() throws ServiceException {
-        try {
-            File storageRootDirectory = new File(storageRootDirectoryPath);
-            if (!storageRootDirectory.exists()) {
-                createStorageRoot(storageRootDirectory);
-            }
-            if (!checkStorageRootAccessibility(storageRootDirectory)) {
-                throw new ServiceException("Storage root is not accessible.");
-            }
-            LOGGER.info("File storage attached at [{}].", storageRootDirectoryPath);
-
-            return storageRootDirectory;
-        } catch (IOException exception) {
-            LOGGER.error("Failed to initialize file storage. Stopping context.");
-            throw new ServiceException("Failed to initialize file storage because of the following exception: ", exception);
+        File storageRootDirectory = new File(storageRootDirectoryPath);
+        if (!storageRootDirectory.exists()) {
+            createStorageRoot(storageRootDirectory);
         }
+        if (!checkStorageRootAccessibility(storageRootDirectory)) {
+            throw new ServiceException("Storage root is not accessible.");
+        }
+        LOGGER.info("File storage attached at [{}].", storageRootDirectoryPath);
+
+        return storageRootDirectory;
     }
 
     private boolean checkStorageRootAccessibility(File storageRootDirectory) {
         return storageRootDirectory.canRead() && storageRootDirectory.canWrite();
     }
 
-    private void createStorageRoot(File storageRootDirectory) throws IOException {
+    private void createStorageRoot(File storageRootDirectory) throws ServiceException {
         LOGGER.info("File storage root does not exist. Trying to create...");
         if (storageRootDirectory.mkdirs()) {
             LOGGER.info("Storage root created at [{}].", storageRootDirectoryPath);
         } else {
             LOGGER.error("Failed to create storage root at [{}]", storageRootDirectoryPath);
+            throw new ServiceException("Failed to initialize file storage. Stopping context.");
         }
     }
 }
