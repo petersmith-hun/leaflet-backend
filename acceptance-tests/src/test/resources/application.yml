@@ -60,7 +60,9 @@ mail:
         username: acceptance
         password: 1234
     notification: leaflet@acceptance
-    sender: leaflet@acceptance
+    sender:
+        address: leaflet@acceptance
+        name: "Leaflet Acceptance"
     renderer: hu.psprog.leaflet.mail.client.renderer.impl.ThymeleafMailRenderer
     event:
         comment-notification:
