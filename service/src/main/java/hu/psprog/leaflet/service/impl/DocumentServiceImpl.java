@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -121,19 +118,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     @PermitEditorOrAdmin
-    public List<Long> createBulk(List<DocumentVO> entities) throws ServiceException {
-
-        List<Long> ids = new LinkedList<>();
-        for (DocumentVO entity : entities) {
-            Long id = createOne(entity);
-            ids.add(id);
-        }
-
-        return ids;
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public DocumentVO updateOne(Long id, DocumentVO updatedEntity) throws ServiceException {
 
         Document updatedDocument;
@@ -154,22 +138,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     @PermitEditorOrAdmin
-    public List<DocumentVO> updateBulk(Map<Long, DocumentVO> updatedEntities) throws ServiceException {
-
-        List<DocumentVO> documentVOs = new LinkedList<>();
-
-        Iterator<Map.Entry<Long, DocumentVO>> entities = updatedEntities.entrySet().iterator();
-        while (entities.hasNext()) {
-            Map.Entry<Long, DocumentVO> currentEntity = entities.next();
-            DocumentVO updatedEntity = updateOne(currentEntity.getKey(), currentEntity.getValue());
-            documentVOs.add(updatedEntity);
-        }
-
-        return documentVOs;
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         if (!documentDAO.exists(id)) {
@@ -177,15 +145,6 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         documentDAO.delete(id);
-    }
-
-    @Override
-    @PermitEditorOrAdmin
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-
-        for (long id : ids) {
-            deleteByID(id);
-        }
     }
 
     @Override

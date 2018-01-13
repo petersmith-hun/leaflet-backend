@@ -4,6 +4,8 @@ import hu.psprog.leaflet.persistence.dao.UploadedFileDAO;
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.service.converter.UploadedFileToUploadedFileVOConverter;
 import hu.psprog.leaflet.service.converter.UploadedFileVOToUploadedFileConverter;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
+import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
@@ -12,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +25,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -32,6 +36,10 @@ import static org.mockito.Mockito.verify;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class FileMetaInfoServiceImplTest {
+
+    private static final UploadedFile EXPECTED_UPLOADED_FILE = UploadedFile.getBuilder()
+            .withId(1L)
+            .build();
 
     @Mock
     private UploadedFileDAO uploadedFileDAO;
@@ -80,10 +88,7 @@ public class FileMetaInfoServiceImplTest {
 
         // given
         UUID pathUUID = UUID.randomUUID();
-        UploadedFile expectedUploadedFile = UploadedFile.getBuilder()
-                .withId(1L)
-                .build();
-        given(uploadedFileDAO.findByPathUUID(any(UUID.class))).willReturn(expectedUploadedFile);
+        given(uploadedFileDAO.findByPathUUID(any(UUID.class))).willReturn(EXPECTED_UPLOADED_FILE);
 
         // when
         fileMetaInfoService.removeMetaInfo(pathUUID);
@@ -91,6 +96,62 @@ public class FileMetaInfoServiceImplTest {
         // then
         verify(uploadedFileDAO).findByPathUUID(pathUUID);
         verify(uploadedFileDAO).delete(1L);
+    }
+
+    @Test
+    public void shouldStoreMetaInfo() throws ServiceException {
+
+        // given
+        given(uploadedFileVOToUploadedFileConverter.convert(any(UploadedFileVO.class))).willReturn(EXPECTED_UPLOADED_FILE);
+        given(uploadedFileDAO.save(EXPECTED_UPLOADED_FILE)).willReturn(EXPECTED_UPLOADED_FILE);
+
+        // when
+        Long result = fileMetaInfoService.storeMetaInfo(UploadedFileVO.getBuilder().build());
+
+        // then
+        assertThat(result, equalTo(1L));
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void shouldStoreMetaInfoThrowConstraintViolationException() throws ServiceException {
+
+        // given
+        given(uploadedFileVOToUploadedFileConverter.convert(any(UploadedFileVO.class))).willReturn(EXPECTED_UPLOADED_FILE);
+        doThrow(DataIntegrityViolationException.class).when(uploadedFileDAO).save(EXPECTED_UPLOADED_FILE);
+
+        // when
+        fileMetaInfoService.storeMetaInfo(UploadedFileVO.getBuilder().build());
+
+        // then
+        // exception expected
+    }
+
+    @Test(expected = ServiceException.class)
+    public void shouldStoreMetaInfoThrowServiceException() throws ServiceException {
+
+        // given
+        given(uploadedFileVOToUploadedFileConverter.convert(any(UploadedFileVO.class))).willReturn(EXPECTED_UPLOADED_FILE);
+        doThrow(IllegalArgumentException.class).when(uploadedFileDAO).save(EXPECTED_UPLOADED_FILE);
+
+        // when
+        fileMetaInfoService.storeMetaInfo(UploadedFileVO.getBuilder().build());
+
+        // then
+        // exception expected
+    }
+
+    @Test(expected = EntityCreationException.class)
+    public void shouldStoreMetaInfoThrowEntityCreationException() throws ServiceException {
+
+        // given
+        given(uploadedFileVOToUploadedFileConverter.convert(any(UploadedFileVO.class))).willReturn(EXPECTED_UPLOADED_FILE);
+        given(uploadedFileDAO.save(EXPECTED_UPLOADED_FILE)).willReturn(null);
+
+        // when
+        fileMetaInfoService.storeMetaInfo(UploadedFileVO.getBuilder().build());
+
+        // then
+        // exception expected
     }
 
     @Test(expected = ServiceException.class)

@@ -32,10 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -161,19 +158,6 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @PermitAdmin
-    public List<Long> createBulk(List<CommentVO> entities) throws ServiceException {
-
-        List<Long> ids = new LinkedList<>();
-        for (CommentVO entity : entities) {
-            Long id = createOne(entity);
-            ids.add(id);
-        }
-
-        return ids;
-    }
-
-    @Override
     @PermitSelf.Comment
     public CommentVO updateOne(Long id, CommentVO updatedEntity) throws ServiceException {
 
@@ -188,22 +172,6 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @PermitAdmin
-    public List<CommentVO> updateBulk(Map<Long, CommentVO> updatedEntities) throws ServiceException {
-
-        List<CommentVO> commentVOs = new LinkedList<>();
-
-        Iterator<Map.Entry<Long, CommentVO>> comments = updatedEntities.entrySet().iterator();
-        while (comments.hasNext()) {
-            Map.Entry<Long, CommentVO> currentEntity = comments.next();
-            CommentVO updatedComment = updateOne(currentEntity.getKey(), currentEntity.getValue());
-            commentVOs.add(updatedComment);
-        }
-
-        return commentVOs;
-    }
-
-    @Override
-    @PermitAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         if (!commentDAO.exists(id)) {
@@ -211,15 +179,6 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentDAO.delete(id);
-    }
-
-    @Override
-    @PermitAdmin
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-
-        for (long id : ids) {
-            deleteByID(id);
-        }
     }
 
     @Override

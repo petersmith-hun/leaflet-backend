@@ -28,10 +28,7 @@ import org.springframework.security.access.method.P;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -104,15 +101,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @PermitAdmin
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-
-        for (Long id : ids) {
-            deleteByID(id);
-        }
-    }
-
-    @Override
-    @PermitAdmin
     public Long createOne(UserVO entity) throws ServiceException {
 
         User user = userVOToUserConverter.convert(entity);
@@ -133,19 +121,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAdmin
-    public List<Long> createBulk(List<UserVO> entities) throws ServiceException {
-
-        List<Long> ids = new LinkedList<>();
-        for(UserVO entity : entities) {
-            Long id = createOne(entity);
-            ids.add(id);
-        }
-
-        return ids;
-    }
-
-    @Override
     @PermitSelf.User
     public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
 
@@ -163,22 +138,6 @@ public class UserServiceImpl implements UserService {
         }
 
         return userToUserVOConverter.convert(updatedUser);
-    }
-
-    @Override
-    @PermitAdmin
-    public List<UserVO> updateBulk(Map<Long, UserVO> updatedEntities) throws ServiceException {
-
-        List<UserVO> userVOs = new LinkedList<>();
-
-        Iterator<Map.Entry<Long, UserVO>> entities = updatedEntities.entrySet().iterator();
-        while (entities.hasNext()) {
-            Map.Entry<Long, UserVO> currentEntity = entities.next();
-            UserVO updatedEntity = updateOne(currentEntity.getKey(), currentEntity.getValue());
-            userVOs.add(updatedEntity);
-        }
-
-        return userVOs;
     }
 
     @Override

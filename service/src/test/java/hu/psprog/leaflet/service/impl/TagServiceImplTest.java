@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.dao.TagDAO;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Tag;
+import hu.psprog.leaflet.persistence.repository.specification.TagSpecification;
 import hu.psprog.leaflet.service.converter.TagToTagVOConverter;
 import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -113,7 +114,7 @@ public class TagServiceImplTest {
     public void testGetAllWithPopulatedList() {
 
         // given
-        List<TagVO> documentVOList = Arrays.asList(tagVO, tagVO, tagVO);
+        List<TagVO> tagVOList = Arrays.asList(tagVO, tagVO, tagVO);
         given(tagDAO.findAll()).willReturn(Arrays.asList(tag, tag, tag));
         given(tagToTagVOConverter.convert(tag)).willReturn(tagVO);
 
@@ -121,7 +122,7 @@ public class TagServiceImplTest {
         List<TagVO> result = tagService.getAll();
 
         // then
-        assertThat(result, equalTo(documentVOList));
+        assertThat(result, equalTo(tagVOList));
         verify(tagDAO).findAll();
         verify(tagToTagVOConverter, times(3)).convert(tag);
     }
@@ -139,6 +140,37 @@ public class TagServiceImplTest {
         assertThat(result, empty());
         verify(tagDAO).findAll();
         verify(tagToTagVOConverter, never()).convert(any(Tag.class));
+    }
+
+    @Test
+    public void testGetPublicTags() {
+
+        // given
+        List<TagVO> tagVOList = Arrays.asList(tagVO, tagVO, tagVO);
+        given(tagDAO.findAll(TagSpecification.IS_ENABLED)).willReturn(Arrays.asList(tag, tag, tag));
+        given(tagToTagVOConverter.convert(tag)).willReturn(tagVO);
+
+        // when
+        List<TagVO> result = tagService.getPublicTags();
+
+        // then
+        assertThat(result, equalTo(tagVOList));
+        verify(tagDAO).findAll(TagSpecification.IS_ENABLED);
+        verify(tagToTagVOConverter, times(3)).convert(tag);
+    }
+
+    @Test
+    public void testCount() {
+
+        // given
+        Long count = 5L;
+        given(tagDAO.count()).willReturn(count);
+
+        // when
+        Long result = tagService.count();
+
+        // then
+        assertThat(result, equalTo(count));
     }
 
     @Test

@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.0-dev</version>
+    <version>1.4.1-dev</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -394,6 +394,13 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/vo/**</exclude>
+                        <exclude>**/domain/**</exclude>
+                        <exclude>**/config/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>ut-pre</id>

@@ -2,9 +2,11 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.DocumentDAO;
 import hu.psprog.leaflet.persistence.entity.Document;
+import hu.psprog.leaflet.persistence.repository.specification.DocumentSpecification;
 import hu.psprog.leaflet.service.converter.DocumentToDocumentVOConverter;
 import hu.psprog.leaflet.service.converter.DocumentVOToDocumentConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -25,6 +28,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -124,6 +128,37 @@ public class DocumentServiceImplTest {
     }
 
     @Test
+    public void testGetPublicDocuments() {
+
+        // given
+        List<DocumentVO> documentVOList = Arrays.asList(documentVO, documentVO, documentVO);
+        given(documentDAO.findAll(DocumentSpecification.IS_ENABLED)).willReturn(Arrays.asList(document, document, document));
+        given(documentToDocumentVOConverter.convert(document)).willReturn(documentVO);
+
+        // when
+        List<DocumentVO> result = documentService.getPublicDocuments();
+
+        // then
+        assertThat(result, equalTo(documentVOList));
+        verify(documentDAO).findAll(DocumentSpecification.IS_ENABLED);
+        verify(documentToDocumentVOConverter, times(3)).convert(document);
+    }
+
+    @Test
+    public void testCount() {
+
+        // given
+        Long count = 5L;
+        given(documentDAO.count()).willReturn(count);
+
+        // when
+        Long result = documentService.count();
+
+        // then
+        assertThat(result, equalTo(count));
+    }
+
+    @Test
     public void testGetByLinkWithExistingDocument() throws ServiceException {
 
         // given
@@ -192,6 +227,34 @@ public class DocumentServiceImplTest {
         verify(document, never()).getId();
     }
 
+    @Test(expected = ConstraintViolationException.class)
+    public void testCreateShouldThrowConstraintViolationException() throws ServiceException {
+
+        // given
+        given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
+        doThrow(DataIntegrityViolationException.class).when(documentDAO).save(document);
+
+        // when
+        documentService.createOne(documentVO);
+
+        // then
+        // exception expected
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testCreateShouldThrowServiceException() throws ServiceException {
+
+        // given
+        given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
+        doThrow(IllegalArgumentException.class).when(documentDAO).save(document);
+
+        // when
+        documentService.createOne(documentVO);
+
+        // then
+        // exception expected
+    }
+
     @Test
     public void testUpdateOneWithSuccess() throws ServiceException {
 
@@ -227,6 +290,36 @@ public class DocumentServiceImplTest {
         verify(documentToDocumentVOConverter, never()).convert(document);
         verify(documentVOToDocumentConverter).convert(documentVO);
         verify(documentDAO).updateOne(id, document);
+    }
+
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateShouldThrowConstraintViolationException() throws ServiceException {
+
+        // given
+        Long id = 1L;
+        given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
+        doThrow(DataIntegrityViolationException.class).when(documentDAO).updateOne(id, document);
+
+        // when
+        documentService.updateOne(id, documentVO);
+
+        // then
+        // exception expected
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testUpdateShouldThrowServiceException() throws ServiceException {
+
+        // given
+        Long id = 1L;
+        given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
+        doThrow(IllegalArgumentException.class).when(documentDAO).updateOne(id, document);
+
+        // when
+        documentService.updateOne(id, documentVO);
+
+        // then
+        // exception expected
     }
 
     @Test
