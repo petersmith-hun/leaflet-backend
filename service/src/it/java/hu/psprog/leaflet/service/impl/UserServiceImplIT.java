@@ -1,16 +1,12 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.entity.Locale;
-import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.exception.UserInitializationException;
-import hu.psprog.leaflet.service.helper.UserVOTestDataGenerator;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.junit.Before;

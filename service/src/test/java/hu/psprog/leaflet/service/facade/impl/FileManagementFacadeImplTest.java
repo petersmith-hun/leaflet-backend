@@ -4,8 +4,10 @@ import hu.psprog.leaflet.service.FileManagementService;
 import hu.psprog.leaflet.service.FileMetaInfoService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.TemporalFileStorageBaseTest;
+import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.DownloadableFileWrapperVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
+import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +17,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -190,6 +194,37 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
 
         // then
         assertThat(result.isPresent(), is(false));
+    }
+
+    @Test
+    public void shouldUpdateMetaInfo() throws ServiceException {
+
+        // given
+        UUID pathUUID = UUID.randomUUID();
+        UpdateFileMetaInfoVO updateFileMetaInfoVO = UpdateFileMetaInfoVO.getBuilder().build();
+
+        // when
+        fileManagementFacade.updateMetaInfo(pathUUID, updateFileMetaInfoVO);
+
+        // then
+        verify(fileMetaInfoService).updateMetaInfo(pathUUID, updateFileMetaInfoVO);
+    }
+
+    @Test
+    public void shouldGetAcceptorInfo() {
+
+        // given
+        AcceptorInfoVO acceptorInfoVO = AcceptorInfoVO.getBuilder()
+                .withId("acceptorID")
+                .build();
+        given(fileManagementService.getAcceptorInfo()).willReturn(Collections.singletonList(acceptorInfoVO));
+
+        // when
+        List<AcceptorInfoVO> result = fileManagementFacade.getAcceptorInfo();
+
+        // then
+        assertThat(result.size(), equalTo(1));
+        assertThat(result.get(0), equalTo(acceptorInfoVO));
     }
 
     private UploadedFileVO prepareUploadedFileVO() {

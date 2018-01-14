@@ -84,14 +84,15 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @Override
     public void demandPasswordReset(LoginContextVO loginContextVO) {
 
-        UserDetails reclaimUserDetails = generateReclaimUserDetails(userDetailsService.loadUserByUsername(loginContextVO.getUsername()));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginContextVO.getUsername());
+        UserDetails reclaimUserDetails = generateReclaimUserDetails(userDetails);
         JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(reclaimUserDetails, RECLAIM_TOKEN_EXPIRATION_IN_HOURS);
         storeToken(loginContextVO, authenticationAnswerModel);
 
         notificationService.passwordResetRequested(PasswordResetRequest.getBuilder()
                 .withParticipant(loginContextVO.getUsername())
                 .withUsername(((ExtendedUserDetails) reclaimUserDetails).getName())
-                .withElevated(isElevatedUser(reclaimUserDetails))
+                .withElevated(isElevatedUser(userDetails))
                 .withExpiration(RECLAIM_TOKEN_EXPIRATION_IN_HOURS)
                 .withToken(authenticationAnswerModel.getToken())
                 .build());

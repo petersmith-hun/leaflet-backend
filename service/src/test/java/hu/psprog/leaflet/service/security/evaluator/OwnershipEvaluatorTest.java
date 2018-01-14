@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 
 /**
  * Unit tests for {@link OwnershipEvaluator}.
@@ -65,6 +66,20 @@ public class OwnershipEvaluatorTest {
     }
 
     @Test
+    @Parameters(method = "isSelfOrAdmin", source = OwnershipEvaluatorParameterProvider.class)
+    public void shouldValidateSelfOrAdmin(Long userID, Role role, boolean expectedResult) {
+
+        // given
+        prepareAuthenticationObject(role);
+
+        // when
+        boolean result = ownershipEvaluator.isSelfOrAdmin(authentication, userID);
+
+        // then
+        assertThat(result, is(expectedResult));
+    }
+
+    @Test
     @Parameters(method = "isOwnEntryOrAdmin", source = OwnershipEvaluatorParameterProvider.class)
     public void shouldValidateEntry(Role role, Long ownerID, boolean expectedResult) throws ServiceException {
 
@@ -82,6 +97,20 @@ public class OwnershipEvaluatorTest {
 
         // then
         assertThat(result, is(expectedResult));
+    }
+
+    @Test
+    public void shouldEntryValidationReturnFalseOnRetrievalFailure() throws ServiceException {
+
+        // given
+        doThrow(ServiceException.class).when(entryService).getOne(anyLong());
+        prepareAuthenticationObject(Role.USER);
+
+        // when
+        boolean result = ownershipEvaluator.isOwnEntryOrAdmin(authentication, 1L);
+
+        // then
+        assertThat(result, is(false));
     }
 
     @Test
@@ -124,6 +153,20 @@ public class OwnershipEvaluatorTest {
         assertThat(result, is(expectedResult));
     }
 
+    @Test
+    public void shouldCommentValidationReturnFalseOnRetrievalFailure() throws ServiceException {
+
+        // given
+        doThrow(ServiceException.class).when(commentService).getOne(anyLong());
+        prepareAuthenticationObject(Role.USER);
+
+        // when
+        boolean result = ownershipEvaluator.isOwnCommentOrModerator(authentication, CommentVO.wrapMinimumVO(1L));
+
+        // then
+        assertThat(result, is(false));
+    }
+
     private void prepareAuthenticationObject(Role role) {
         JWTPayload jwtPayload = new JWTPayload();
         jwtPayload.setId(CURRENT_USER_ID.intValue());
@@ -140,6 +183,14 @@ public class OwnershipEvaluatorTest {
             return new Object[] {
                     new Object[] {CURRENT_USER_ID, true},
                     new Object[] {2L, false}
+            };
+        }
+
+        public static Object[] isSelfOrAdmin() {
+            return new Object[] {
+                    new Object[] {CURRENT_USER_ID, Role.USER, true},
+                    new Object[] {2L, Role.ADMIN, true},
+                    new Object[] {2L, Role.USER, false}
             };
         }
 
