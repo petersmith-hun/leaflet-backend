@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 public class ApplicationStartupFinishedListener implements ApplicationListener<ContextRefreshedEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationStartupFinishedListener.class);
+    private static final String APP_VERSION = "${app.version}";
     private static final String APP_BUILD_DATE_PROPERTY = "${app.built}";
     private static final String STARTUP_EVENT_EMAIL_ENABLED = "${mail.event.startup.enabled:true}";
 
@@ -27,7 +28,7 @@ public class ApplicationStartupFinishedListener implements ApplicationListener<C
     private boolean startupEventEmailEnabled;
 
     @Autowired
-    public ApplicationStartupFinishedListener(EmailBasedNotificationService emailBasedNotificationService, String appVersion,
+    public ApplicationStartupFinishedListener(EmailBasedNotificationService emailBasedNotificationService, @Value(APP_VERSION) String appVersion,
                                               @Value(APP_BUILD_DATE_PROPERTY) String builtOn, @Value(STARTUP_EVENT_EMAIL_ENABLED) boolean startupEventEmailEnabled) {
         this.emailBasedNotificationService = emailBasedNotificationService;
         this.appVersion = appVersion;

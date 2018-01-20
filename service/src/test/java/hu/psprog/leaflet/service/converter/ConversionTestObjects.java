@@ -31,7 +31,7 @@ import java.util.UUID;
  *
  * @author Peter Smith
  */
-abstract class ConversionTestObjects {
+public abstract class ConversionTestObjects {
 
     private static final Date CREATED = createDate(-5);
     private static final Date LAST_MODIFIED = createDate(-3);

@@ -1,5 +1,8 @@
 package hu.psprog.leaflet.service.vo;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.UUID;
 
 /**
@@ -28,6 +31,32 @@ public class LoginContextVO {
 
     public String getRemoteAddress() {
         return remoteAddress;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LoginContextVO that = (LoginContextVO) o;
+
+        return new EqualsBuilder()
+                .append(username, that.username)
+                .append(password, that.password)
+                .append(deviceID, that.deviceID)
+                .append(remoteAddress, that.remoteAddress)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(username)
+                .append(password)
+                .append(deviceID)
+                .append(remoteAddress)
+                .toHashCode();
     }
 
     public static LoginContextVOBuilder getBuilder() {

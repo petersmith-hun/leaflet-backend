@@ -56,7 +56,6 @@ public class FileInputVO {
                 .append(size, that.size)
                 .append(originalFilename, that.originalFilename)
                 .append(contentType, that.contentType)
-                .append(fileContentStream, that.fileContentStream)
                 .append(relativePath, that.relativePath)
                 .append(description, that.description)
                 .isEquals();
@@ -68,7 +67,6 @@ public class FileInputVO {
                 .append(originalFilename)
                 .append(contentType)
                 .append(size)
-                .append(fileContentStream)
                 .append(relativePath)
                 .append(description)
                 .toHashCode();
