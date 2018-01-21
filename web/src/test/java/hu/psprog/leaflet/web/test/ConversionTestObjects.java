@@ -123,8 +123,8 @@ public abstract class ConversionTestObjects {
     private static final String IMAGE_GIF = "image/gif";
     private static final String ROOT_DIRECTORY_NAME = "images";
     private static final String ADMIN = "ADMIN";
-    private static final String TOKEN = "token";
 
+    protected static final String TOKEN = "token";
     protected static final String PASSWORD = "test-pw";
     protected static final String USERNAME = "username";
     protected static final Locale LOCALE = Locale.EN;
@@ -840,13 +840,13 @@ public abstract class ConversionTestObjects {
     }
 
     @Mock
-    private CommonFormatter commonFormatter;
+    protected CommonFormatter commonFormatter;
 
     @Mock
-    private HttpServletRequest httpServletRequest;
+    protected HttpServletRequest httpServletRequest;
 
     @Mock
-    private JULocaleToLeafletLocaleConverter localeConverter;
+    protected JULocaleToLeafletLocaleConverter localeConverter;
 
     @Before
     public void setup() {
@@ -855,9 +855,5 @@ public abstract class ConversionTestObjects {
         given(commonFormatter.formatDate(LAST_MODIFIED, java.util.Locale.ENGLISH)).willReturn(FORMATTED_LAST_MODIFIED_DATE);
         given(commonFormatter.formatDate(LAST_LOGIN, java.util.Locale.ENGLISH)).willReturn(FORMATTED_LAST_LOGIN_DATE);
         given(localeConverter.convert(java.util.Locale.ENGLISH)).willReturn(LOCALE);
-    }
-
-    protected JULocaleToLeafletLocaleConverter getLocaleConverter() {
-        return localeConverter;
     }
 }

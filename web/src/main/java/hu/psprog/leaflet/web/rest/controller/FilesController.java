@@ -251,7 +251,7 @@ public class FilesController extends BaseController {
     }
 
     private URI buildLocation(FileDataModel fileDataModel) {
-        return URI.create(BASE_PATH_FILES + "/" + fileDataModel.getReference());
+        return URI.create(BASE_PATH_FILES + fileDataModel.getReference());
     }
 
     private URI buildLocation(UUID fileIdentifier, Optional<UploadedFileVO> fileInfo) {

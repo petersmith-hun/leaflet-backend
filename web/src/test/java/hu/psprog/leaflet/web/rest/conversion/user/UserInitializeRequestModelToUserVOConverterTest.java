@@ -28,7 +28,7 @@ public class UserInitializeRequestModelToUserVOConverterTest extends ConversionT
     @Before
     public void setup() {
         super.setup();
-        converter = new UserInitializeRequestModelToUserVOConverter(ENABLED_BY_DEFAULT, getLocaleConverter());
+        converter = new UserInitializeRequestModelToUserVOConverter(ENABLED_BY_DEFAULT, localeConverter);
     }
 
     @Test

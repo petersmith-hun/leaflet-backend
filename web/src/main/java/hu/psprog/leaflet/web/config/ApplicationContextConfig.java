@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.config;
 
-import hu.psprog.leaflet.web.exception.InitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +28,7 @@ public class ApplicationContextConfig {
     }
 
     @Bean
-    public static PropertySourcesPlaceholderConfigurer applicationConfigPropertySource() throws InitializationException {
+    public static PropertySourcesPlaceholderConfigurer applicationConfigPropertySource() {
 
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
         configurer.setLocation(new ClassPathResource("version.properties"));
