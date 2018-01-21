@@ -32,10 +32,16 @@ public class TemporalFileStorageBaseTest {
     protected File fileStorage;
 
     protected void prepareTemporaryStorage() throws IOException {
-        imagesRootFolder = temporaryFolder.newFolder(IMAGES_FOLDER);
-        imagesSubFolder = new File(imagesRootFolder, SUBFOLDER);
-        if (!imagesSubFolder.mkdir()) {
-            throw new IOException("Failed to prepare temporary storage");
+        prepareTemporaryStorage(true);
+    }
+
+    protected void prepareTemporaryStorage(boolean prepareFolders) throws IOException {
+        if (prepareFolders) {
+            imagesRootFolder = temporaryFolder.newFolder(IMAGES_FOLDER);
+            imagesSubFolder = new File(imagesRootFolder, SUBFOLDER);
+            if (!imagesSubFolder.mkdir()) {
+                throw new IOException("Failed to prepare temporary storage");
+            }
         }
         given(fileStorage.getAbsolutePath()).willReturn(temporaryFolder.getRoot().getAbsolutePath());
     }

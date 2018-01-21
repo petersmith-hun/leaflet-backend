@@ -4,10 +4,9 @@ import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Converts {@link UserVO} to {@link User} object.
@@ -20,14 +19,6 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
     @Override
     public User convert(UserVO source) {
 
-        Role role = null;
-        if (source.getAuthorities() != null) {
-            Iterator<? extends GrantedAuthority> authorityIterator = source.getAuthorities().iterator();
-            while (authorityIterator.hasNext()) {
-                role = Role.valueOf(authorityIterator.next().getAuthority());
-            }
-        }
-
         return User.getBuilder()
                 .withId(source.getId())
                 .withCreated(source.getCreated())
@@ -36,8 +27,21 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
                 .withDefaultLocale(source.getLocale())
                 .withEmail(source.getEmail())
                 .withLastLogin(source.getLastLogin())
-                .withRole(role)
+                .withRole(mapRole(source))
                 .withEnabled(source.isEnabled())
                 .build();
+    }
+
+    private Role mapRole(UserVO source) {
+
+        Role role = null;
+        if (Objects.nonNull(source.getAuthorities())) {
+            role = source.getAuthorities().stream()
+                    .findFirst()
+                    .map(grantedAuthority -> Role.valueOf(grantedAuthority.getAuthority()))
+                    .orElse(null);
+        }
+
+        return role;
     }
 }

@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.CategoryDAO;
 import hu.psprog.leaflet.persistence.entity.Category;
+import hu.psprog.leaflet.persistence.repository.specification.CategorySpecification;
 import hu.psprog.leaflet.service.converter.CategoryToCategoryVOConverter;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
@@ -14,11 +15,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -78,6 +83,54 @@ public class CategoryServiceImplTest {
         // expected exception
         verify(categoryDAO).findOne(id);
         verify(categoryToCategoryVOConverter, never()).convert(any());
+    }
+
+    @Test
+    public void testGetAllWithPopulatedList() {
+
+        // given
+        List<CategoryVO> categoryVOList = Arrays.asList(categoryVO, categoryVO, categoryVO);
+        given(categoryDAO.findAll()).willReturn(Arrays.asList(category, category, category));
+        given(categoryToCategoryVOConverter.convert(category)).willReturn(categoryVO);
+
+        // when
+        List<CategoryVO> result = categoryService.getAll();
+
+        // then
+        assertThat(result, equalTo(categoryVOList));
+        verify(categoryDAO).findAll();
+        verify(categoryToCategoryVOConverter, times(3)).convert(category);
+    }
+
+    @Test
+    public void testGetPublicCategories() {
+
+        // given
+        List<CategoryVO> categoryVOList = Arrays.asList(categoryVO, categoryVO, categoryVO);
+        given(categoryDAO.findAll(CategorySpecification.IS_ENABLED)).willReturn(Arrays.asList(category, category, category));
+        given(categoryToCategoryVOConverter.convert(category)).willReturn(categoryVO);
+
+        // when
+        List<CategoryVO> result = categoryService.getAllPublic();
+
+        // then
+        assertThat(result, equalTo(categoryVOList));
+        verify(categoryDAO).findAll(CategorySpecification.IS_ENABLED);
+        verify(categoryToCategoryVOConverter, times(3)).convert(category);
+    }
+
+    @Test
+    public void testCount() {
+
+        // given
+        Long count = 5L;
+        given(categoryDAO.count()).willReturn(count);
+
+        // when
+        Long result = categoryService.count();
+
+        // then
+        assertThat(result, equalTo(count));
     }
 
     @Test
@@ -174,5 +227,61 @@ public class CategoryServiceImplTest {
 
         // then
         // expected exception
+    }
+
+    @Test
+    public void shouldEnable() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        given(categoryDAO.exists(id)).willReturn(true);
+
+        // when
+        categoryService.enable(id);
+
+        // then
+        verify(categoryDAO).enable(id);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void shouldEnableThrowEntityNotFoundException() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        given(categoryDAO.exists(id)).willReturn(false);
+
+        // when
+        categoryService.enable(id);
+
+        // then
+        // exception expected;
+    }
+
+    @Test
+    public void shouldDisable() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        given(categoryDAO.exists(id)).willReturn(true);
+
+        // when
+        categoryService.disable(id);
+
+        // then
+        verify(categoryDAO).disable(id);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void shouldDisableThrowEntityNotFoundException() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        given(categoryDAO.exists(id)).willReturn(false);
+
+        // when
+        categoryService.disable(id);
+
+        // then
+        // exception expected;
     }
 }

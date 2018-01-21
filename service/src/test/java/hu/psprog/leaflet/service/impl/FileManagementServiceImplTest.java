@@ -3,6 +3,9 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.service.exception.FileUploadException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.uploader.FileUploader;
+import hu.psprog.leaflet.service.impl.uploader.acceptor.ImageUploadAcceptor;
+import hu.psprog.leaflet.service.impl.uploader.acceptor.UploadAcceptor;
+import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import io.jsonwebtoken.lang.Assert;
@@ -15,6 +18,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -43,6 +50,9 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
 
     @Mock
     private FileInputVO fileInputVO;
+
+    @Mock
+    private List<UploadAcceptor> uploadAcceptors;
 
     @InjectMocks
     private FileManagementServiceImpl fileManagementService;
@@ -141,6 +151,20 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         // expected exception
     }
 
+    @Test(expected = ServiceException.class)
+    public void shouldThrowServiceExceptionOnDownloadWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+
+        // given
+        prepareTemporaryStorage();
+        doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
+
+        // when
+        fileManagementService.download(PATH);
+
+        // then
+        // exception expected
+    }
+
     @Test
     public void shouldRemoveFile() throws IOException, ServiceException {
 
@@ -168,6 +192,20 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
 
         // then
         // expected exception
+    }
+
+    @Test(expected = ServiceException.class)
+    public void shouldThrowServiceExceptionOnRemoveWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+
+        // given
+        prepareTemporaryStorage();
+        doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
+
+        // when
+        fileManagementService.remove(PATH);
+
+        // then
+        // exception expected
     }
 
     @Test
@@ -214,6 +252,20 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         // expected exception
     }
 
+    @Test(expected = ServiceException.class)
+    public void shouldThrowServiceExceptionOnCreateDirectoryWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+
+        // given
+        prepareTemporaryStorage();
+        doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
+
+        // when
+        fileManagementService.createDirectory(IMAGES_FOLDER, DIRECTORY_TO_CREATE);
+
+        // then
+        // exception expected
+    }
+
     @Test
     public void shouldExistsReturnTrue() throws IOException, ServiceException {
 
@@ -239,6 +291,67 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
 
         // then
         assertThat(result, is(false));
+    }
+
+    @Test(expected = ServiceException.class)
+    public void shouldThrowServiceExceptionOnExistsWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+
+        // given
+        prepareTemporaryStorage();
+        doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
+
+        // when
+        fileManagementService.exists(PATH);
+
+        // then
+        // exception expected
+    }
+
+    @Test
+    public void shouldGetAcceptorInfo() throws IOException {
+
+        // given
+        prepareTemporaryStorage();
+        AcceptorInfoVO expectedAcceptorInfoVO = AcceptorInfoVO.getBuilder()
+                .withId("IMAGE")
+                .withRootDirectoryName("images")
+                .withAcceptableMimeTypes(Collections.singletonList("image/*"))
+                .withChildrenDirectories(Arrays.asList("", "test"))
+                .build();
+        List<UploadAcceptor> acceptors = Collections.singletonList(new ImageUploadAcceptor());
+        given(uploadAcceptors.stream()).willReturn(acceptors.stream());
+
+        // when
+        List<AcceptorInfoVO> result = fileManagementService.getAcceptorInfo();
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.size(), equalTo(1));
+        assertThat(result.get(0), equalTo(expectedAcceptorInfoVO));
+    }
+
+    @Test
+    public void shouldGetAcceptorInfoReturnWithEmptyChildrenListOnException() throws IOException {
+
+        // given
+        prepareTemporaryStorage();
+        AcceptorInfoVO expectedAcceptorInfoVO = AcceptorInfoVO.getBuilder()
+                .withId("IMAGE")
+                .withRootDirectoryName("images")
+                .withAcceptableMimeTypes(Collections.singletonList("image/*"))
+                .withChildrenDirectories(Collections.emptyList())
+                .build();
+        List<UploadAcceptor> acceptors = Collections.singletonList(new ImageUploadAcceptor());
+        given(uploadAcceptors.stream()).willReturn(acceptors.stream());
+        doThrow(IOException.class).when(fileStorage).getAbsolutePath();
+
+        // when
+        List<AcceptorInfoVO> result = fileManagementService.getAcceptorInfo();
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.size(), equalTo(1));
+        assertThat(result.get(0), equalTo(expectedAcceptorInfoVO));
     }
 
     private void prepareFileInputVo() {

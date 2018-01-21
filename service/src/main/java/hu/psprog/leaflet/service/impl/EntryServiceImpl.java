@@ -12,7 +12,6 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
 import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
@@ -28,10 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -70,15 +66,6 @@ public class EntryServiceImpl implements EntryService {
         }
 
         entryDAO.delete(id);
-    }
-
-    @Override
-    @PermitAdmin
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-
-        for (long id : ids) {
-            deleteByID(id);
-        }
     }
 
     @Override
@@ -132,19 +119,6 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
-    public List<Long> createBulk(List<EntryVO> entities) throws ServiceException {
-
-        List<Long> ids = new LinkedList<>();
-        for (EntryVO entity : entities) {
-            Long id = createOne(entity);
-            ids.add(id);
-        }
-
-        return ids;
-    }
-
-    @Override
     @PermitSelf.Entry
     public EntryVO updateOne(Long id, EntryVO updatedEntity) throws ServiceException {
 
@@ -162,22 +136,6 @@ public class EntryServiceImpl implements EntryService {
         }
 
         return entryToEntryVOConverter.convert(updatedEntry);
-    }
-
-    @Override
-    @PermitEditorOrAdmin
-    public List<EntryVO> updateBulk(Map<Long, EntryVO> updatedEntities) throws ServiceException {
-
-        List<EntryVO> entryVOs = new LinkedList<>();
-
-        Iterator<Map.Entry<Long, EntryVO>> entities = updatedEntities.entrySet().iterator();
-        while (entities.hasNext()) {
-            Map.Entry<Long, EntryVO> currentEntity = entities.next();
-            EntryVO updatedEntity = updateOne(currentEntity.getKey(), currentEntity.getValue());
-            entryVOs.add(updatedEntity);
-        }
-
-        return entryVOs;
     }
 
     @Override

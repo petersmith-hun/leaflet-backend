@@ -257,7 +257,6 @@ public class TagsController extends BaseController {
      * @throws ResourceNotFoundException if no tag or entry found under given IDs
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_ASSIGN_TAG)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<BaseBodyDataModel> detachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
                                   BindingResult bindingResult) throws ResourceNotFoundException {
 

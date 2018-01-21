@@ -19,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -101,19 +98,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @PermitEditorOrAdmin
-    public List<Long> createBulk(List<TagVO> entities) throws ServiceException {
-
-        List<Long> ids = new LinkedList<>();
-        for (TagVO entity : entities) {
-            Long id = createOne(entity);
-            ids.add(id);
-        }
-
-        return ids;
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public void attachTagToEntry(TagVO tagVO, EntryVO entryVO) throws ServiceException {
 
         assertState(tagVO, entryVO);
@@ -161,22 +145,6 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @PermitEditorOrAdmin
-    public List<TagVO> updateBulk(Map<Long, TagVO> updatedEntities) throws ServiceException {
-
-        List<TagVO> tagVOs = new LinkedList<>();
-
-        Iterator<Map.Entry<Long, TagVO>> entities = updatedEntities.entrySet().iterator();
-        while (entities.hasNext()) {
-            Map.Entry<Long, TagVO> currentEntity = entities.next();
-            TagVO updatedEntity = updateOne(currentEntity.getKey(), currentEntity.getValue());
-            tagVOs.add(updatedEntity);
-        }
-
-        return tagVOs;
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         if (!tagDAO.exists(id)) {
@@ -184,15 +152,6 @@ public class TagServiceImpl implements TagService {
         }
 
         tagDAO.delete(id);
-    }
-
-    @Override
-    @PermitEditorOrAdmin
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-
-        for (long id : ids) {
-            deleteByID(id);
-        }
     }
 
     @Override

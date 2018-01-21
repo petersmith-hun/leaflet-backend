@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -97,19 +94,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @PermitEditorOrAdmin
-    public List<Long> createBulk(List<CategoryVO> entities) throws ServiceException {
-
-        List<Long> ids = new LinkedList<>();
-        for (CategoryVO entity : entities) {
-            Long id = createOne(entity);
-            ids.add(id);
-        }
-
-        return ids;
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public CategoryVO updateOne(Long id, CategoryVO updatedEntity) throws ServiceException {
 
         Category updatedCategory = categoryDAO.updateOne(id, categoryVOToCategoryConverter.convert(updatedEntity));
@@ -123,22 +107,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @PermitEditorOrAdmin
-    public List<CategoryVO> updateBulk(Map<Long, CategoryVO> updatedEntities) throws ServiceException {
-
-        List<CategoryVO> entryVOs = new LinkedList<>();
-
-        Iterator<Map.Entry<Long, CategoryVO>> entities = updatedEntities.entrySet().iterator();
-        while (entities.hasNext()) {
-            Map.Entry<Long, CategoryVO> currentEntity = entities.next();
-            CategoryVO updatedEntity = updateOne(currentEntity.getKey(), currentEntity.getValue());
-            entryVOs.add(updatedEntity);
-        }
-
-        return entryVOs;
-    }
-
-    @Override
-    @PermitEditorOrAdmin
     public void deleteByID(Long id) throws ServiceException {
 
         if (!categoryDAO.exists(id)) {
@@ -146,15 +114,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryDAO.delete(id);
-    }
-
-    @Override
-    @PermitEditorOrAdmin
-    public void deleteBulkByIDs(List<Long> ids) throws ServiceException {
-
-        for (long id : ids) {
-            deleteByID(id);
-        }
     }
 
     @Override

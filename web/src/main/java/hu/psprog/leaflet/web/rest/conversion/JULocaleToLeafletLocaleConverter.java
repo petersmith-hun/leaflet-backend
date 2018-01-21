@@ -18,7 +18,6 @@ public class JULocaleToLeafletLocaleConverter implements Converter<java.util.Loc
 
         switch (locale.getLanguage()) {
             case "hu":
-            case "hu_HU":
                 return Locale.HU;
             default:
                 return Locale.EN;

@@ -4,14 +4,17 @@ import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.common.Authority;
+import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.UserEntityTestDataGenerator;
 import hu.psprog.leaflet.service.helper.UserVOTestDataGenerator;
+import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +22,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,6 +37,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -37,6 +48,14 @@ import static org.mockito.Mockito.verify;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
+
+    private static final UserVO USER_VO_WITH_ADMIN_ROLE = UserVO.getBuilder()
+            .withAuthorities(Collections.singletonList(Authority.ADMIN))
+            .build();
+
+    private static final UserVO USER_VO_WITH_NO_LOGIN_ROLE = UserVO.getBuilder()
+            .withAuthorities(Collections.singletonList(Authority.NO_LOGIN))
+            .build();
 
     @Mock
     private UserDAO userDAO;
@@ -65,6 +84,21 @@ public class UserServiceImplTest {
         user = userEntityTestDataGenerator.generate();
     }
 
+    @Test
+    public void testGetOne() throws ServiceException {
+
+        // given
+        Long userID = 1L;
+        given(userDAO.findOne(userID)).willReturn(user);
+        given(userToUserVOConverter.convert(user)).willReturn(userVO);
+
+        // when
+        UserVO result = userService.getOne(userID);
+
+        // then
+        assertThat(result, equalTo(userVO));
+    }
+
     @Test(expected = EntityNotFoundException.class)
     public void testGetOneWithException() throws ServiceException {
 
@@ -77,6 +111,34 @@ public class UserServiceImplTest {
 
         // then
         // expected exception
+    }
+
+    @Test
+    public void testGetAll() {
+
+        // given
+        given(userDAO.findAll()).willReturn(Collections.singletonList(user));
+        given(userToUserVOConverter.convert(user)).willReturn(userVO);
+
+        // when
+        List<UserVO> result = userService.getAll();
+
+        // then
+        assertThat(result, equalTo(Collections.singletonList(userVO)));
+    }
+
+    @Test
+    public void testCount() {
+
+        // given
+        Long count = 5L;
+        given(userDAO.count()).willReturn(count);
+
+        // when
+        Long result = userService.count();
+
+        // then
+        assertThat(result, equalTo(count));
     }
 
     @Test
@@ -137,6 +199,34 @@ public class UserServiceImplTest {
         verify(userDAO).save(user);
     }
 
+    @Test(expected = ConstraintViolationException.class)
+    public void testCreateShouldThrowConstraintViolationException() throws ServiceException {
+
+        // given
+        given(userVOToUserConverter.convert(userVO)).willReturn(user);
+        doThrow(DataIntegrityViolationException.class).when(userDAO).save(user);
+
+        // when
+        userService.createOne(userVO);
+
+        // then
+        // exception expected
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testCreateShouldThrowServiceException() throws ServiceException {
+
+        // given
+        given(userVOToUserConverter.convert(userVO)).willReturn(user);
+        doThrow(IllegalArgumentException.class).when(userDAO).save(user);
+
+        // when
+        userService.createOne(userVO);
+
+        // then
+        // exception expected
+    }
+
     @Test
     public void testUpdateOneWithSuccess() throws ServiceException {
 
@@ -169,6 +259,36 @@ public class UserServiceImplTest {
         verify(userDAO).updateOne(user.getId(), user);
     }
 
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateShouldThrowConstraintViolationException() throws ServiceException {
+
+        // given
+        Long id = 1L;
+        given(userVOToUserConverter.convert(userVO)).willReturn(user);
+        doThrow(DataIntegrityViolationException.class).when(userDAO).updateOne(id, user);
+
+        // when
+        userService.updateOne(id, userVO);
+
+        // then
+        // exception expected
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testUpdateShouldThrowServiceException() throws ServiceException {
+
+        // given
+        Long id = 1L;
+        given(userVOToUserConverter.convert(userVO)).willReturn(user);
+        doThrow(IllegalArgumentException.class).when(userDAO).updateOne(id, user);
+
+        // when
+        userService.updateOne(id, userVO);
+
+        // then
+        // exception expected
+    }
+
     @Test
     public void testChangePasswordWithSuccess() throws EntityNotFoundException {
 
@@ -179,6 +299,21 @@ public class UserServiceImplTest {
 
         // when
         userService.changePassword(id, updatedPassword);
+
+        // then
+        verify(userDAO).updatePassword(id, updatedPassword);
+    }
+
+    @Test
+    public void shouldReclaimPasswordWithSuccess() throws EntityNotFoundException {
+
+        // given
+        Long id = 1L;
+        String updatedPassword = "new password";
+        given(userDAO.exists(id)).willReturn(true);
+
+        // when
+        userService.reclaimPassword(id, updatedPassword);
 
         // then
         verify(userDAO).updatePassword(id, updatedPassword);
@@ -354,5 +489,67 @@ public class UserServiceImplTest {
         assertThat(result, nullValue());
         verify(userDAO).findByEmail(email);
         verify(userToUserVOConverter, never()).convert(any(User.class));
+    }
+
+    @Test
+    public void shouldRegister() throws ServiceException {
+
+        // given
+        given(userVOToUserConverter.convert(userVO)).willReturn(user);
+        given(userDAO.save(user)).willReturn(user);
+
+        // when
+        Long result = userService.register(userVO);
+
+        // then
+        assertThat(result, equalTo(user.getId()));
+    }
+
+    @Test(expected = ServiceException.class)
+    public void shouldRegisterWithFailure() throws ServiceException {
+
+        // when
+        userService.register(USER_VO_WITH_ADMIN_ROLE);
+
+        // then
+        // exception expected
+    }
+
+    @Test
+    public void shouldRegisterNoLogin() throws ServiceException {
+
+        // given
+        given(userVOToUserConverter.convert(USER_VO_WITH_NO_LOGIN_ROLE)).willReturn(user);
+        given(userDAO.save(user)).willReturn(user);
+
+        // when
+        Long result = userService.registerNoLogin(USER_VO_WITH_NO_LOGIN_ROLE);
+
+        // then
+        assertThat(result, equalTo(user.getId()));
+    }
+
+    @Test(expected = ServiceException.class)
+    public void shouldRegisterNoLoginWithFailure() throws ServiceException {
+
+        // when
+        userService.registerNoLogin(USER_VO_WITH_ADMIN_ROLE);
+
+        // then
+        // exception expected
+    }
+
+    @Test
+    public void shouldGetEntityPage() {
+
+        // given
+        Page<User> userPage = new PageImpl<>(Collections.singletonList(user));
+        given(userDAO.findAll(any(Pageable.class))).willReturn(userPage);
+
+        // when
+        EntityPageVO<UserVO> result = userService.getEntityPage(1, 10, OrderDirection.ASC, UserVO.OrderBy.CREATED);
+
+        // then
+        assertThat(result, notNullValue());
     }
 }

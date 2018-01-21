@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
@@ -48,6 +49,8 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
     private static final String EXPECTED_PATH_WITH_SUBFOLDER = "images/test/destination_filename.jpg";
     private static final UUID PATH_UUID_NO_SUBFOLDER = UUID.fromString("97538ca5-951b-3690-a6d5-3745bbbdd878");
     private static final UUID PATH_UUID_SUBFOLDER = UUID.fromString("f59aa5c8-3013-31c7-a53f-bd29f44e99f8");
+    private static final String SELF_INIT_FOLDER = "self_init_folder";
+    private static final String MULTI_LEVEL_FOLDER = "multi/level/folder";
 
     @Mock
     private FilenameGeneratorUtil filenameGeneratorUtil;
@@ -73,6 +76,34 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         if (Objects.nonNull(fileInputStream)) {
             fileInputStream.close();
         }
+    }
+
+    @Test
+    public void shouldInitializationPrepareFolders() {
+
+        // given
+        given(imageUploadAcceptor.groupRootDirectory()).willReturn(SELF_INIT_FOLDER);
+
+        // when
+        new FileUploader(fileStorage, Collections.singletonList(imageUploadAcceptor), filenameGeneratorUtil);
+
+        // then
+        File selfInitFolder = new File(temporaryFolder.getRoot(), SELF_INIT_FOLDER);
+        assertThat(selfInitFolder.exists(), is(true));
+        assertThat(selfInitFolder.isDirectory(), is(true));
+    }
+
+    @Test(expected = DirectoryCreationException.class)
+    public void shouldInitializationFailIfAcceptorRootCouldNotBeCreated() {
+
+        // given
+        given(imageUploadAcceptor.groupRootDirectory()).willReturn(MULTI_LEVEL_FOLDER);
+
+        // when
+        new FileUploader(fileStorage, Collections.singletonList(imageUploadAcceptor), filenameGeneratorUtil);
+
+        // then
+        // exception expected
     }
 
     @Test
@@ -111,6 +142,20 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         assertThat(result.getPathUUID(), equalTo(PATH_UUID_SUBFOLDER));
     }
 
+    @Test(expected = FileUploadException.class)
+    public void shouldUploadFileUnderNonExistingSubfolderThrowException() throws FileUploadException {
+
+        // given
+        FileInputVO fileInputVO = prepareValidFileInputVOWithNonExistingSubFolder();
+        given(imageUploadAcceptor.accept(fileInputVO)).willReturn(true);
+
+        // when
+        fileUploader.upload(fileInputVO);
+
+        // then
+        // exception expected
+    }
+
     @Test
     public void shouldNotUploadFileWithUnacceptableMIME() throws FileUploadException {
 
@@ -131,6 +176,15 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
                 .withOriginalFilename(ORIGINAL_FILENAME)
                 .withFileContentStream(fileInputStream)
                 .withRelativePath(withSubfolder ? SUBFOLDER : null)
+                .build();
+    }
+
+    private FileInputVO prepareValidFileInputVOWithNonExistingSubFolder() {
+        return FileInputVO.getBuilder()
+                .withContentType(MIME_TYPE)
+                .withOriginalFilename(ORIGINAL_FILENAME)
+                .withFileContentStream(fileInputStream)
+                .withRelativePath("non/existing/subfolder")
                 .build();
     }
 

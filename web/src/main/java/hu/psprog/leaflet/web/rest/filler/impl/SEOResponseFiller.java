@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -45,7 +46,9 @@ public class SEOResponseFiller implements ResponseFiller {
 
     @Override
     public boolean shouldFill() {
-        return !((boolean) httpServletRequest.getAttribute(RequestParameter.IS_AJAX_REQUEST));
+        return Optional.ofNullable(httpServletRequest.getAttribute(RequestParameter.IS_AJAX_REQUEST))
+                .map(attribute -> !Boolean.valueOf(attribute.toString()))
+                .orElse(true);
     }
 
     private String getParameter(String key) {

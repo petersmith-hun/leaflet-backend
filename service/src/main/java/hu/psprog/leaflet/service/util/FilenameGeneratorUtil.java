@@ -19,7 +19,7 @@ public class FilenameGeneratorUtil {
     private String doCleanFilename(String filename) {
         return StringUtils.stripAccents(filename)
                 .toLowerCase()
-                .replace(' ', '_')
-                .trim();
+                .trim()
+                .replace(' ', '_');
     }
 }
