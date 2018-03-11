@@ -47,6 +47,13 @@ public interface EntryFacade {
     EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, String direction, String orderBy);
 
     /**
+     * Returns an un-paged list of public entries.
+     *
+     * @return list of public entries
+     */
+    List<EntryVO> getListOfPublicEntries();
+
+    /**
      * Returns a page of public entries under given category.
      *
      * @param categoryID category ID to filter entries by

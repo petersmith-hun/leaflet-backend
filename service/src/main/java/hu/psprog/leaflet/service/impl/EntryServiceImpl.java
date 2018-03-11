@@ -42,6 +42,9 @@ public class EntryServiceImpl implements EntryService {
 
     private static final String AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS = "An entry with the specified link already exists.";
     private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
+    private static final Specifications<Entry> PUBLIC_ENTRIES_SPECIFICATION = Specifications
+            .where(EntrySpecification.IS_PUBLIC)
+            .and(EntrySpecification.IS_ENABLED);
 
     private EntryDAO entryDAO;
     private EntryToEntryVOConverter entryToEntryVOConverter;
@@ -154,10 +157,7 @@ public class EntryServiceImpl implements EntryService {
     public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Specifications<Entry> specs = Specifications
-                .where(EntrySpecification.IS_PUBLIC)
-                .and(EntrySpecification.IS_ENABLED);
-        Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
+        Page<Entry> entityPage = entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }
@@ -173,6 +173,14 @@ public class EntryServiceImpl implements EntryService {
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+    }
+
+    @Override
+    public List<EntryVO> getListOfPublicEntries() {
+
+        return entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, null).getContent().stream()
+                .map(entryToEntryVOConverter::convert)
+                .collect(Collectors.toList());
     }
 
     @Override
