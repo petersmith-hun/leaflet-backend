@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service.facade.impl;
 
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
@@ -7,7 +8,9 @@ import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of {@link FrontEndRoutingSupportFacade}.
@@ -25,18 +28,20 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
     }
 
     @Override
-    public List<FrontEndRouteVO> getHeaderMenu() {
-        return frontEndRoutingSupportService.getHeaderMenu();
+    public Map<FrontEndRouteType, List<FrontEndRouteVO>> getStaticRoutes() {
+
+        Map<FrontEndRouteType, List<FrontEndRouteVO>> staticRouteMap = new HashMap<>();
+        staticRouteMap.put(FrontEndRouteType.HEADER_MENU, frontEndRoutingSupportService.getHeaderMenu());
+        staticRouteMap.put(FrontEndRouteType.FOOTER_MENU, frontEndRoutingSupportService.getFooterMenu());
+        staticRouteMap.put(FrontEndRouteType.STANDALONE, frontEndRoutingSupportService.getStandaloneRoutes());
+
+        return staticRouteMap;
     }
 
     @Override
-    public List<FrontEndRouteVO> getFooterMenu() {
-        return frontEndRoutingSupportService.getFooterMenu();
-    }
-
-    @Override
-    public List<FrontEndRouteVO> getDynamicRoutes() {
-        return frontEndRoutingSupportService.getDynamicRoutes();
+    public List<FrontEndRouteVO> getSitemap() {
+        // TODO will be implemented under LFLT-240
+        return null;
     }
 
     @Override

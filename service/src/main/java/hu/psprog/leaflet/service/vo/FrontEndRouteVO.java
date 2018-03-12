@@ -15,10 +15,15 @@ import java.util.Date;
  */
 public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEndRoute> {
 
+    private String routeId;
     private String name;
     private String url;
     private Integer sequenceNumber;
     private FrontEndRouteType type;
+
+    public String getRouteId() {
+        return routeId;
+    }
 
     public String getName() {
         return name;
@@ -46,6 +51,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
+                .append(routeId, that.routeId)
                 .append(name, that.name)
                 .append(url, that.url)
                 .append(sequenceNumber, that.sequenceNumber)
@@ -57,6 +63,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .appendSuper(super.hashCode())
+                .append(routeId)
                 .append(name)
                 .append(url)
                 .append(sequenceNumber)
@@ -67,6 +74,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("routeId", routeId)
                 .append("name", name)
                 .append("url", url)
                 .append("sequenceNumber", sequenceNumber)
@@ -90,6 +98,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
      * Builder for {@link FrontEndRouteVO}.
      */
     public static final class FrontEndRouteVOBuilder {
+        private String routeId;
         private Long id;
         private Date created;
         private Date lastModified;
@@ -100,6 +109,11 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
         private FrontEndRouteType type;
 
         private FrontEndRouteVOBuilder() {
+        }
+
+        public FrontEndRouteVOBuilder withRouteId(String routeId) {
+            this.routeId = routeId;
+            return this;
         }
 
         public FrontEndRouteVOBuilder withId(Long id) {
@@ -144,6 +158,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
 
         public FrontEndRouteVO build() {
             FrontEndRouteVO frontEndRouteVO = new FrontEndRouteVO();
+            frontEndRouteVO.routeId = this.routeId;
             frontEndRouteVO.sequenceNumber = this.sequenceNumber;
             frontEndRouteVO.lastModified = this.lastModified;
             frontEndRouteVO.enabled = this.enabled;

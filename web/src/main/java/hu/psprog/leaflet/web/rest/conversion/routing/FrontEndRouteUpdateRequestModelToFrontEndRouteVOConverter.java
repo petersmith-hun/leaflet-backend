@@ -20,6 +20,7 @@ public class FrontEndRouteUpdateRequestModelToFrontEndRouteVOConverter implement
     public FrontEndRouteVO convert(FrontEndRouteUpdateRequestModel source) {
 
         return FrontEndRouteVO.getBuilder()
+                .withRouteId(source.getRouteId())
                 .withName(source.getName())
                 .withUrl(source.getUrl())
                 .withSequenceNumber(source.getSequenceNumber())

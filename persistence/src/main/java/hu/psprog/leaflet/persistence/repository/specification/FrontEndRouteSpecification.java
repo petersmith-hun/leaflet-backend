@@ -27,6 +27,11 @@ public class FrontEndRouteSpecification {
     public static final Specification<FrontEndRoute> IS_HEADER = (root, query, builder) -> builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.HEADER_MENU);
 
     /**
+     * Filter to list routes of type {@link FrontEndRouteType#STANDALONE}.
+     */
+    public static final Specification<FrontEndRoute> IS_STANDALONE = (root, query, builder) -> builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.STANDALONE);
+
+    /**
      * Filter to list routes of type {@link FrontEndRouteType#FOOTER_MENU}.
      */
     public static final Specification<FrontEndRoute> IS_FOOTER = (root, query, builder) -> builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.FOOTER_MENU);

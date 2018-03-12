@@ -11,6 +11,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(FrontEndRoute.class)
 public class FrontEndRoute_ extends SelfStatusAwareIdentifiableEntity_ {
 
+    public static volatile SingularAttribute<FrontEndRoute, String> routeId;
     public static volatile SingularAttribute<FrontEndRoute, String> name;
     public static volatile SingularAttribute<FrontEndRoute, String> url;
     public static volatile SingularAttribute<FrontEndRoute, Integer> sequenceNumber;

@@ -44,26 +44,23 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
 
     @Override
     public List<FrontEndRouteVO> getHeaderMenu() {
-
-        return frontEndRouteDAO.findAll(filterPublicRoutesWithSpecification(FrontEndRouteSpecification.IS_HEADER)).stream()
-                .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
-                .sorted(Comparator.comparing(FrontEndRouteVO::getSequenceNumber))
-                .collect(Collectors.toList());
+        return filterPublicRoutesWithSpecification(FrontEndRouteSpecification.IS_HEADER);
     }
 
     @Override
     public List<FrontEndRouteVO> getFooterMenu() {
+        return filterPublicRoutesWithSpecification(FrontEndRouteSpecification.IS_FOOTER);
+    }
 
-        return frontEndRouteDAO.findAll(filterPublicRoutesWithSpecification(FrontEndRouteSpecification.IS_FOOTER)).stream()
-                .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
-                .sorted(Comparator.comparing(FrontEndRouteVO::getSequenceNumber))
-                .collect(Collectors.toList());
+    @Override
+    public List<FrontEndRouteVO> getStandaloneRoutes() {
+        return filterPublicRoutesWithSpecification(FrontEndRouteSpecification.IS_STANDALONE);
     }
 
     @Override
     public List<FrontEndRouteVO> getDynamicRoutes() {
 
-        return frontEndRouteDAO.findAll(filterPublicRoutesWithSpecification(FrontEndRouteSpecification.IS_MASK)).stream()
+        return frontEndRouteDAO.findAll(buildFilter(FrontEndRouteSpecification.IS_MASK)).stream()
                 .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
                 .flatMap(frontEndRoute -> routeMaskProcessors.stream()
                         .filter(processor -> processor.supports(frontEndRoute))
@@ -161,7 +158,16 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
         }
     }
 
-    private Specifications<FrontEndRoute> filterPublicRoutesWithSpecification(Specification<FrontEndRoute> specification) {
+    private List<FrontEndRouteVO> filterPublicRoutesWithSpecification(Specification<FrontEndRoute> specification) {
+
+        return frontEndRouteDAO.findAll(buildFilter(specification)).stream()
+                .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
+                .sorted(Comparator.comparing(FrontEndRouteVO::getSequenceNumber))
+                .collect(Collectors.toList());
+    }
+
+    private Specification<FrontEndRoute> buildFilter(Specification<FrontEndRoute> specification) {
+
         return Specifications
                 .where(FrontEndRouteSpecification.IS_ENABLED)
                 .and(specification);

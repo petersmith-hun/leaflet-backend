@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.Date;
 
 /**
@@ -15,8 +16,12 @@ import java.util.Date;
  * @author Peter Smith
  */
 @Entity
-@Table(name = DatabaseConstants.TABLE_FRONT_END_ROUTES)
+@Table(name = DatabaseConstants.TABLE_FRONT_END_ROUTES,
+        uniqueConstraints = @UniqueConstraint(columnNames = DatabaseConstants.COLUMN_ROUTE_ID, name = DatabaseConstants.UK_ROUTE_ID))
 public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
+
+    @Column(name = DatabaseConstants.COLUMN_ROUTE_ID)
+    private String routeId;
 
     @Column(name = DatabaseConstants.COLUMN_NAME)
     private String name;
@@ -29,6 +34,14 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
 
     @Column(name = DatabaseConstants.COLUMN_TYPE)
     private FrontEndRouteType type;
+
+    public String getRouteId() {
+        return routeId;
+    }
+
+    public void setRouteId(String routeId) {
+        this.routeId = routeId;
+    }
 
     public String getName() {
         return name;
@@ -72,6 +85,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(o))
+                .append(routeId, that.routeId)
                 .append(sequenceNumber, that.sequenceNumber)
                 .append(name, that.name)
                 .append(url, that.url)
@@ -83,6 +97,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .appendSuper(super.hashCode())
+                .append(routeId)
                 .append(name)
                 .append(url)
                 .append(sequenceNumber)
@@ -93,6 +108,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("routeId", routeId)
                 .append("name", name)
                 .append("url", url)
                 .append("sequenceNumber", sequenceNumber)
@@ -112,6 +128,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
      * Builder for {@link FrontEndRoute} entity.
      */
     public static final class FrontEndRouteBuilder {
+        private String routeId;
         private String name;
         private String url;
         private Date created;
@@ -122,6 +139,11 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
         private boolean enabled;
 
         private FrontEndRouteBuilder() {
+        }
+
+        public FrontEndRouteBuilder withRouteId(String routeId) {
+            this.routeId = routeId;
+            return this;
         }
 
         public FrontEndRouteBuilder withName(String name) {
@@ -166,6 +188,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
 
         public FrontEndRoute build() {
             FrontEndRoute frontEndRoute = new FrontEndRoute();
+            frontEndRoute.setRouteId(routeId);
             frontEndRoute.setName(name);
             frontEndRoute.setUrl(url);
             frontEndRoute.setCreated(created);

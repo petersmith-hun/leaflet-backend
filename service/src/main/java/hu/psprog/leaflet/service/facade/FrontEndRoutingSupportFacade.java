@@ -1,10 +1,12 @@
 package hu.psprog.leaflet.service.facade;
 
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Facade for {@link FrontEndRoutingSupportService}.
@@ -14,25 +16,20 @@ import java.util.List;
 public interface FrontEndRoutingSupportFacade {
 
     /**
-     * Returns sorted list of routes marked as header menu items.
+     * Returns map of static routes.
+     * Map key is the route type and the value is a list of routes.
      *
-     * @return List of {@link FrontEndRouteVO} objects or empty list if no items can be found
+     * @return map of static routes
      */
-    List<FrontEndRouteVO> getHeaderMenu();
+    Map<FrontEndRouteType, List<FrontEndRouteVO>> getStaticRoutes();
 
     /**
-     * Returns sorted list of routes marked as footer menu items.
+     * Generates and returns sitemap.
+     * Sitemap contains all static and generated dynamic routes.
      *
      * @return List of {@link FrontEndRouteVO} objects or empty list if no items can be found
      */
-    List<FrontEndRouteVO> getFooterMenu();
-
-    /**
-     * Generates and returns list of routes built from route masks.
-     *
-     * @return List of {@link FrontEndRouteVO} objects or empty list if no items can be found
-     */
-    List<FrontEndRouteVO> getDynamicRoutes();
+    List<FrontEndRouteVO> getSitemap();
 
     /**
      * Passes front-end route item for persistence layer and returns the newly created one.

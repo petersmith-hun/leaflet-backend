@@ -18,6 +18,11 @@ public enum FrontEndRouteType {
     FOOTER_MENU,
 
     /**
+     * Route item is a standalone route, not part of any menus.
+     */
+    STANDALONE,
+
+    /**
      * Route item is a standalone dynamic mask for a group of entry routes.
      */
     ENTRY_ROUTE_MASK,

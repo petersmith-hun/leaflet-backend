@@ -58,6 +58,7 @@ public final class DatabaseConstants {
     static final String COLUMN_URL = "url";
     static final String COLUMN_SEQUENCE_NUMBER = "sequence_number";
     static final String COLUMN_NAME = "name";
+    static final String COLUMN_ROUTE_ID = "route_id";
 
     static final String FK_NM_ENTRIES_UPLOADED_FILES_ENTRY = "FK_NM_ENTRIES_UPLOADED_FILES_ENTRY";
     static final String FK_NM_ENTRIES_UPLOADED_FILES_UPLOADED_FILE = "FK_NM_ENTRIES_UPLOADED_FILES_UPLOADED_FILE";
@@ -78,6 +79,7 @@ public final class DatabaseConstants {
     static final String UK_USER_EMAIL = "UK_USER_EMAIL";
     static final String UK_ENTRY_LINK = "UK_ENTRY_LINK";
     static final String UK_DOCUMENT_LINK = "UK_DOCUMENT_LINK";
+    static final String UK_ROUTE_ID = "UK_ROUTE_ID";
 
     private DatabaseConstants() {}
 }

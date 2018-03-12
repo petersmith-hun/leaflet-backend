@@ -39,6 +39,13 @@ public interface FrontEndRoutingSupportService extends CreateOperationCapableSer
     List<FrontEndRouteVO> getFooterMenu();
 
     /**
+     * Returns sorted list of routes marked as standalone routes.
+     *
+     * @return List of {@link FrontEndRouteVO} objects or empty list if no items can be found
+     */
+    List<FrontEndRouteVO> getStandaloneRoutes();
+
+    /**
      * Generates and returns list of routes built from route masks.
      *
      * @return List of {@link FrontEndRouteVO} objects or empty list if no items can be found

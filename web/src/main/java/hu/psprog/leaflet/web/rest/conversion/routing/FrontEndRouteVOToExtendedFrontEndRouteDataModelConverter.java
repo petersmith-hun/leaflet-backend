@@ -30,6 +30,7 @@ public class FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter implements
     public ExtendedFrontEndRouteDataModel convert(FrontEndRouteVO source) {
 
         return ExtendedFrontEndRouteDataModel.getExtendedBuilder()
+                .withRouteId(source.getRouteId())
                 .withName(source.getName())
                 .withUrl(source.getUrl())
                 .withEnabled(source.isEnabled())
