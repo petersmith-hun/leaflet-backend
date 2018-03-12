@@ -17,14 +17,12 @@ public class FrontEndRouteVOToFrontEndRouteConverter implements Converter<FrontE
     public FrontEndRoute convert(FrontEndRouteVO source) {
 
         return FrontEndRoute.getBuilder()
+                .withRouteId(source.getRouteId())
                 .withName(source.getName())
                 .withUrl(source.getUrl())
                 .withSequenceNumber(source.getSequenceNumber())
                 .withType(source.getType())
                 .withEnabled(source.isEnabled())
-                .withCreated(source.getCreated())
-                .withLastModified(source.getLastModified())
-                .withId(source.getId())
                 .build();
     }
 }

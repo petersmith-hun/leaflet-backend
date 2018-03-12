@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.dao.FrontEndRouteDAO;
 import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
 import hu.psprog.leaflet.persistence.repository.specification.FrontEndRouteSpecification;
 import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -12,6 +13,7 @@ import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupportService {
 
     private static final String COULD_NOT_PERSIST_FRONT_END_ROUTE = "Could not persist FrontEndRoute";
+    private static final String A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS = "A route with the specified ID already exists";
 
     private FrontEndRouteDAO frontEndRouteDAO;
     private ConversionService conversionService;
@@ -75,6 +78,8 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
         FrontEndRoute createdRoute;
         try {
             createdRoute = frontEndRouteDAO.save(conversionService.convert(entity, FrontEndRoute.class));
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS, e);
         } catch (Exception exc) {
             throw new ServiceException(COULD_NOT_PERSIST_FRONT_END_ROUTE, exc);
         }
@@ -140,6 +145,8 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
         FrontEndRoute updatedRoute;
         try {
             updatedRoute = frontEndRouteDAO.updateOne(id, conversionService.convert(updatedEntity, FrontEndRoute.class));
+        } catch (DataIntegrityViolationException e) {
+            throw new ConstraintViolationException(A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS, e);
         } catch (Exception exc) {
             throw new ServiceException(COULD_NOT_PERSIST_FRONT_END_ROUTE, exc);
         }

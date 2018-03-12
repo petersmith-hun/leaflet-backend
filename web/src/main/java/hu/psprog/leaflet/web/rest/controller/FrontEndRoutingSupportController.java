@@ -4,6 +4,7 @@ import hu.psprog.leaflet.api.rest.request.routing.FrontEndRouteUpdateRequestMode
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteDataModel;
 import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteListDataModel;
+import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
@@ -38,9 +39,10 @@ public class FrontEndRoutingSupportController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(FrontEndRoutingSupportController.class);
 
     private static final String REQUESTED_ROUTE_NOT_FOUND = "Requested route not found.";
-    private static final String THE_REQUESTED_ROUTE_ITEM_YOU_ARE_LOOKING_FOR_DOES_NOT_EXIST = "The requested route item you are looking for does not exist.";
     private static final String ROUTE_COULD_NOT_BE_CREATED = "Route could not be created";
+    private static final String THE_REQUESTED_ROUTE_ITEM_YOU_ARE_LOOKING_FOR_DOES_NOT_EXIST = "The requested route item you are looking for does not exist.";
     private static final String ROUTE_COULD_NOT_BE_CREATED_PLEASE_TRY_AGAIN_LATER = "Route could not be created, please try again later.";
+    private static final String A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS = "A route with the specified ID already exists";
 
     private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
 
@@ -49,6 +51,12 @@ public class FrontEndRoutingSupportController extends BaseController {
         this.frontEndRoutingSupportFacade = frontEndRoutingSupportFacade;
     }
 
+    /**
+     * GET /routes
+     * Returns all existing route items.
+     *
+     * @return list of existing route items.
+     */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<ExtendedFrontEndRouteListDataModel> getAllRoutes() {
 
@@ -59,6 +67,14 @@ public class FrontEndRoutingSupportController extends BaseController {
                 .body(conversionService.convert(frontEndRouteVOList, ExtendedFrontEndRouteListDataModel.class));
     }
 
+    /**
+     * GET /routes/{id}
+     * Returns route item identified by given ID.
+     *
+     * @param id ID of the route item
+     * @return identified route item
+     * @throws ResourceNotFoundException if no route item found identified by given ID
+     */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
     public ResponseEntity<ExtendedFrontEndRouteDataModel> getRouteByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
@@ -74,6 +90,15 @@ public class FrontEndRoutingSupportController extends BaseController {
         }
     }
 
+    /**
+     * POST /routes
+     * Creates a new route item.
+     *
+     * @param frontEndRouteUpdateRequestModel {@link FrontEndRouteUpdateRequestModel} containing route information
+     * @param bindingResult validation results
+     * @return data of created route item
+     * @throws RequestCouldNotBeFulfilledException if route item cannot be created
+     */
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<BaseBodyDataModel> createRoute(@RequestBody @Valid FrontEndRouteUpdateRequestModel frontEndRouteUpdateRequestModel,
                                                          BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
@@ -88,6 +113,9 @@ public class FrontEndRoutingSupportController extends BaseController {
                 return ResponseEntity
                         .created(buildLocation(createdRouteVO.getId()))
                         .body(conversionService.convert(createdRouteVO, ExtendedFrontEndRouteDataModel.class));
+            } catch (ConstraintViolationException e) {
+                LOGGER.error(CONSTRAINT_VIOLATION, e);
+                throw new RequestCouldNotBeFulfilledException(A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS);
             } catch (ServiceException e) {
                 LOGGER.error(ROUTE_COULD_NOT_BE_CREATED, e);
                 throw new RequestCouldNotBeFulfilledException(ROUTE_COULD_NOT_BE_CREATED_PLEASE_TRY_AGAIN_LATER);
@@ -95,10 +123,22 @@ public class FrontEndRoutingSupportController extends BaseController {
         }
     }
 
+    /**
+     * PUT /routes/{id}
+     * Updates an existing route item.
+     *
+     * @param id ID of the route item
+     * @param frontEndRouteUpdateRequestModel {@link FrontEndRouteUpdateRequestModel} containing updated route information
+     * @param bindingResult validation result
+     * @return updated data of route item
+     * @throws ResourceNotFoundException if no route item found identified by given ID
+     * @throws RequestCouldNotBeFulfilledException if route item cannot be updated
+     */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_PART_ID)
     public ResponseEntity<BaseBodyDataModel> updateRoute(@PathVariable(PATH_VARIABLE_ID) Long id,
                                                          @RequestBody @Valid FrontEndRouteUpdateRequestModel frontEndRouteUpdateRequestModel,
-                                                         BindingResult bindingResult) throws ResourceNotFoundException {
+                                                         BindingResult bindingResult)
+            throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
             return validationFailureResponse(bindingResult);
@@ -110,6 +150,9 @@ public class FrontEndRoutingSupportController extends BaseController {
                 return ResponseEntity
                         .created(buildLocation(id))
                         .body(conversionService.convert(updatedRouteVO, ExtendedFrontEndRouteDataModel.class));
+            } catch (ConstraintViolationException e) {
+                LOGGER.error(CONSTRAINT_VIOLATION, e);
+                throw new RequestCouldNotBeFulfilledException(A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS);
             } catch (ServiceException e) {
                 LOGGER.error(REQUESTED_ROUTE_NOT_FOUND, e);
                 throw new ResourceNotFoundException(THE_REQUESTED_ROUTE_ITEM_YOU_ARE_LOOKING_FOR_DOES_NOT_EXIST);
@@ -117,6 +160,14 @@ public class FrontEndRoutingSupportController extends BaseController {
         }
     }
 
+    /**
+     * PUT /routes/{id}/status
+     * Changes route item status (enabled/disabled).
+     *
+     * @param id ID of the route item
+     * @return updated data of route item
+     * @throws ResourceNotFoundException if no route item found identified by given ID
+     */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_CHANGE_STATUS)
     public ResponseEntity<ExtendedFrontEndRouteDataModel> changeStatus(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
@@ -132,6 +183,13 @@ public class FrontEndRoutingSupportController extends BaseController {
         }
     }
 
+    /**
+     * DELETE /routes/{id}
+     * Deletes route item identified by given ID.
+     *
+     * @param id ID of the route item
+     * @throws ResourceNotFoundException if no route item found identified by given ID
+     */
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_PART_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRoute(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {

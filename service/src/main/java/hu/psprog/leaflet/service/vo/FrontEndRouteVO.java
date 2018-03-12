@@ -83,10 +83,6 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
                 .append("lastModified", lastModified)
                 .append("enabled", enabled)
                 .append("id", id)
-                .append("created", getCreated())
-                .append("lastModified", getLastModified())
-                .append("enabled", isEnabled())
-                .append("id", getId())
                 .toString();
     }
 

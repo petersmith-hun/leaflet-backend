@@ -6,6 +6,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Date;
@@ -33,6 +35,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
     private Integer sequenceNumber;
 
     @Column(name = DatabaseConstants.COLUMN_TYPE)
+    @Enumerated(EnumType.STRING)
     private FrontEndRouteType type;
 
     public String getRouteId() {
