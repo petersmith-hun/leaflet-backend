@@ -5,6 +5,8 @@ import hu.psprog.leaflet.persistence.entity.Comment;
 import hu.psprog.leaflet.persistence.entity.Document;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
+import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.Tag;
@@ -15,6 +17,7 @@ import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.service.vo.UserVO;
@@ -60,6 +63,11 @@ public abstract class ConversionTestObjects {
     private static final String SEO_KEYWORDS = "seo-keywords";
     private static final String ENTRY_STATUS = "PUBLIC";
     private static final String DELETED_COMMENT = "DELETED_COMMENT";
+    private static final String ROUTE_ID = "route-test";
+    private static final String NAME = "Test Route";
+    private static final String URL = "/test/route";
+    private static final int SEQUENCE_NUMBER = 5;
+    private static final FrontEndRouteType TYPE = FrontEndRouteType.HEADER_MENU;
 
     static final CategoryVO CATEGORY_VO = CategoryVO.getBuilder()
             .withCreated(CREATED)
@@ -329,6 +337,39 @@ public abstract class ConversionTestObjects {
 
     static final Document DOCUMENT_MINIMUM = Document.getBuilder()
             .withId(ID)
+            .build();
+
+    static final FrontEndRoute FRONT_END_ROUTE = FrontEndRoute.getBuilder()
+            .withId(ID)
+            .withRouteId(ROUTE_ID)
+            .withName(NAME)
+            .withUrl(URL)
+            .withSequenceNumber(SEQUENCE_NUMBER)
+            .withType(TYPE)
+            .withEnabled(ENABLED)
+            .withCreated(CREATED)
+            .withLastModified(LAST_MODIFIED)
+            .build();
+
+    static final FrontEndRoute FRONT_END_ROUTE_MINIMUM = FrontEndRoute.getBuilder()
+            .withRouteId(ROUTE_ID)
+            .withName(NAME)
+            .withUrl(URL)
+            .withSequenceNumber(SEQUENCE_NUMBER)
+            .withType(TYPE)
+            .withEnabled(ENABLED)
+            .build();
+
+    static final FrontEndRouteVO FRONT_END_ROUTE_VO = FrontEndRouteVO.getBuilder()
+            .withId(ID)
+            .withRouteId(ROUTE_ID)
+            .withName(NAME)
+            .withUrl(URL)
+            .withSequenceNumber(SEQUENCE_NUMBER)
+            .withType(TYPE)
+            .withEnabled(ENABLED)
+            .withCreated(CREATED)
+            .withLastModified(LAST_MODIFIED)
             .build();
 
     private static Date createDate(int dayOffset) {
