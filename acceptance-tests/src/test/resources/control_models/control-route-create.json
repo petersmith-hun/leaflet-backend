@@ -1,0 +1,7 @@
+{
+  "routeId": "route_acceptance",
+  "name": "Test route acceptance",
+  "url": "/test/standalone/acceptance",
+  "sequenceNumber": 30,
+  "type": "STANDALONE"
+}
