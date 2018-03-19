@@ -11,6 +11,7 @@ import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.FileUploadRequestModel;
 import hu.psprog.leaflet.api.rest.request.file.UpdateFileMetaInfoRequestModel;
+import hu.psprog.leaflet.api.rest.request.routing.FrontEndRouteUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagAssignmentRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
@@ -36,12 +37,17 @@ import hu.psprog.leaflet.api.rest.response.file.DirectoryDataModel;
 import hu.psprog.leaflet.api.rest.response.file.DirectoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileListDataModel;
+import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteDataModel;
+import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteListDataModel;
+import hu.psprog.leaflet.api.rest.response.routing.FrontEndRouteDataModel;
+import hu.psprog.leaflet.api.rest.response.routing.FrontEndRouteListDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagListDataModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
@@ -53,6 +59,7 @@ import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
+import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.TagAssignmentVO;
 import hu.psprog.leaflet.service.vo.TagVO;
@@ -123,6 +130,11 @@ public abstract class ConversionTestObjects {
     private static final String IMAGE_GIF = "image/gif";
     private static final String ROOT_DIRECTORY_NAME = "images";
     private static final String ADMIN = "ADMIN";
+    private static final String ROUTE_ID = "route-test";
+    private static final String NAME = "Test Route";
+    private static final String URL = "/test/route";
+    private static final int SEQUENCE_NUMBER = 5;
+    private static final String TYPE = "HEADER_MENU";
 
     protected static final String TOKEN = "token";
     protected static final String PASSWORD = "test-pw";
@@ -603,6 +615,55 @@ public abstract class ConversionTestObjects {
             .withItem(EDIT_DOCUMENT_DATA_MODEL)
             .build();
 
+    protected static final FrontEndRouteVO FRONT_END_ROUTE_VO = FrontEndRouteVO.getBuilder()
+            .withId(ID)
+            .withRouteId(ROUTE_ID)
+            .withName(NAME)
+            .withUrl(URL)
+            .withSequenceNumber(SEQUENCE_NUMBER)
+            .withType(FrontEndRouteType.valueOf(TYPE))
+            .withEnabled(ENABLED)
+            .withCreated(CREATED)
+            .withLastModified(LAST_MODIFIED)
+            .build();
+
+    protected static final FrontEndRouteVO FRONT_END_ROUTE_VO_CREATE = FrontEndRouteVO.getBuilder()
+            .withRouteId(ROUTE_ID)
+            .withName(NAME)
+            .withUrl(URL)
+            .withSequenceNumber(SEQUENCE_NUMBER)
+            .withType(FrontEndRouteType.valueOf(TYPE))
+            .withEnabled(true)
+            .build();
+
+    protected static final ExtendedFrontEndRouteDataModel EXTENDED_FRONT_END_ROUTE_DATA_MODEL = ExtendedFrontEndRouteDataModel.getExtendedBuilder()
+            .withId(ID)
+            .withCreated(FORMATTED_CREATED_DATE)
+            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withEnabled(ENABLED)
+            .withRouteId(ROUTE_ID)
+            .withName(NAME)
+            .withUrl(URL)
+            .withSequenceNumber(SEQUENCE_NUMBER)
+            .withType(TYPE)
+            .build();
+
+    protected static final FrontEndRouteDataModel FRONT_END_ROUTE_DATA_MODEL = FrontEndRouteDataModel.getBuilder()
+            .withRouteId(ROUTE_ID)
+            .withName(NAME)
+            .withUrl(URL)
+            .build();
+
+    protected static final ExtendedFrontEndRouteListDataModel EXTENDED_FRONT_END_ROUTE_LIST_DATA_MODEL = ExtendedFrontEndRouteListDataModel.getExtendedBuilder()
+            .withItem(EXTENDED_FRONT_END_ROUTE_DATA_MODEL)
+            .build();
+
+    protected static final FrontEndRouteListDataModel FRONT_END_ROUTE_LIST_DATA_MODEL = FrontEndRouteListDataModel.getBuilder()
+            .withItem(FRONT_END_ROUTE_DATA_MODEL)
+            .build();
+
+    protected static final FrontEndRouteUpdateRequestModel FRONT_END_ROUTE_UPDATE_REQUEST_MODEL = prepareFrontEndRouteUpdateRequestModel();
+
     private static ObjectError prepareObjectError(boolean withFieldError) {
 
         ObjectError error;
@@ -837,6 +898,18 @@ public abstract class ConversionTestObjects {
             fail("Failed to init test");
             return null;
         }
+    }
+
+    private static FrontEndRouteUpdateRequestModel prepareFrontEndRouteUpdateRequestModel() {
+
+        FrontEndRouteUpdateRequestModel frontEndRouteUpdateRequestModel = new FrontEndRouteUpdateRequestModel();
+        frontEndRouteUpdateRequestModel.setName(NAME);
+        frontEndRouteUpdateRequestModel.setRouteId(ROUTE_ID);
+        frontEndRouteUpdateRequestModel.setSequenceNumber(SEQUENCE_NUMBER);
+        frontEndRouteUpdateRequestModel.setType(TYPE);
+        frontEndRouteUpdateRequestModel.setUrl(URL);
+
+        return frontEndRouteUpdateRequestModel;
     }
 
     @Mock

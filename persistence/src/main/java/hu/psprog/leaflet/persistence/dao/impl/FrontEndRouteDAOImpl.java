@@ -36,6 +36,7 @@ public class FrontEndRouteDAOImpl extends SelfStatusAwareDAOImpl<FrontEndRoute, 
         if (Objects.nonNull(entity)) {
             entity.setRouteId(updatedEntity.getRouteId());
             entity.setName(updatedEntity.getName());
+            entity.setUrl(updatedEntity.getUrl());
             entity.setSequenceNumber(updatedEntity.getSequenceNumber());
             entity.setType(updatedEntity.getType());
             entity.setEnabled(updatedEntity.isEnabled());
