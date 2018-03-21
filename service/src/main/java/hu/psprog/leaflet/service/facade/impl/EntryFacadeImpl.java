@@ -48,6 +48,11 @@ public class EntryFacadeImpl implements EntryFacade {
     }
 
     @Override
+    public List<EntryVO> getListOfPublicEntries() {
+        return entryService.getListOfPublicEntries();
+    }
+
+    @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(Long categoryID, int page, int limit, String direction, String orderBy) {
         return entryService.getPageOfPublicEntriesUnderCategory(CategoryVO.wrapMinimumVO(categoryID), page, limit, parseDirection(direction), parseOrderBy(orderBy));
     }

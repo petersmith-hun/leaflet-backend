@@ -53,7 +53,8 @@ public abstract class AbstractParameterizedBaseTest extends AbstractTransactiona
             "leaflet_categories",
             "leaflet_tags",
             "leaflet_uploaded_files",
-            "leaflet_users"
+            "leaflet_users",
+            "leaflet_front_end_routes"
     };
 
     @ClassRule

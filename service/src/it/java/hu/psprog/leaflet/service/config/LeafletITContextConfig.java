@@ -24,6 +24,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -47,6 +50,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -69,6 +73,7 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     public static final String INTEGRATION_TEST_DB_SCRIPT_ATTACHMENTS = "classpath:/service_it_db_script_attachments.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_TAGS = "classpath:/service_it_db_script_tags.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_DCP = "classpath:/service_it_db_script_dcp.sql";
+    public static final String INTEGRATION_TEST_DB_SCRIPT_FRONT_END_ROUTES = "classpath:/service_it_db_script_front_end_routes.sql";
 
     public static final String REPOSITORY_PACKAGE = "hu.psprog.leaflet.persistence.repository";
     public static final String ENTITY_PACKAGE = "hu.psprog.leaflet.persistence.entity";
@@ -213,6 +218,16 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     @Bean
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
+    }
+
+    @Bean
+    @Autowired
+    public ConversionService conversionService(List<Converter<?, ?>> converters) {
+
+        DefaultConversionService conversionService = new DefaultConversionService();
+        converters.forEach(conversionService::addConverter);
+
+        return conversionService;
     }
 
     @Override

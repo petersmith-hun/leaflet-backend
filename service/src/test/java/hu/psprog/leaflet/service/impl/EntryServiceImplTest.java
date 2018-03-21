@@ -23,6 +23,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 
 import java.util.Arrays;
@@ -31,9 +32,11 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -178,6 +181,21 @@ public class EntryServiceImplTest {
 
         // then
         assertThat(result, notNullValue());
+    }
+
+    @Test
+    public void testGetListOfPublicEntries() {
+
+        // given
+        given(entryDAO.findAll(any(Specification.class), eq(null))).willReturn(new PageImpl<>(Collections.singletonList(entry)));
+        given(entryToEntryVOConverter.convert(entry)).willReturn(entryVO);
+
+        // when
+        List<EntryVO> result = entryService.getListOfPublicEntries();
+
+        // then
+        assertThat(result.size(), equalTo(1));
+        assertThat(result.contains(entryVO), is(true));
     }
 
     @Test

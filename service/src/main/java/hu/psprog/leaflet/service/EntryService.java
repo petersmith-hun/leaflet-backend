@@ -12,6 +12,8 @@ import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 
+import java.util.List;
+
 /**
  * Entry service operations interface.
  *
@@ -55,4 +57,11 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @return page of public entries under given category
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
+
+    /**
+     * Returns an un-paged list of public entries.
+     *
+     * @return list of public entries
+     */
+    List<EntryVO> getListOfPublicEntries();
 }
