@@ -409,6 +409,7 @@
                     <excludes>
                         <exclude>**/vo/**</exclude>
                         <exclude>**/domain/**</exclude>
+                        <exclude>**/model/**</exclude>
                         <exclude>**/config/**</exclude>
                     </excludes>
                 </configuration>

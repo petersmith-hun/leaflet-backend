@@ -75,6 +75,16 @@ public class EntryFacadeImplTest {
     }
 
     @Test
+    public void shouldGetListOfPublicEntries() {
+
+        // when
+        entryFacade.getListOfPublicEntries();
+
+        // then
+        verify(entryService).getListOfPublicEntries();
+    }
+
+    @Test
     public void shouldCount() {
 
         // given
