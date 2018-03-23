@@ -31,6 +31,7 @@ import static hu.psprog.leaflet.bridge.client.domain.OrderDirection.DESC;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -87,6 +88,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
         assertLogicallyDeletedComments(result, expectedLogicallyDeletedCount);
+        assertThat(result.getMenu(), nullValue());
     }
 
     @Test
@@ -102,6 +104,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
         assertLogicallyDeletedComments(result, expectedLogicallyDeletedCount);
+        assertThat(result.getMenu(), nullValue());
     }
 
     @Test

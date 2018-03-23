@@ -1,0 +1,38 @@
+{
+  "header": [
+    {
+      "routeId": "route-1",
+      "name": "Route 1",
+      "url": "/route/header/1"
+    },
+    {
+      "routeId": "route-2",
+      "name": "Route 2",
+      "url": "/route/header/2"
+    }
+  ],
+  "footer": [
+    {
+      "routeId": "route-4",
+      "name": "Route 4",
+      "url": "/route/footer/1"
+    },
+    {
+      "routeId": "route-5",
+      "name": "Route 5",
+      "url": "/route/footer/2"
+    }
+  ],
+  "standalone": [
+    {
+      "routeId": "route-7",
+      "name": "Route 7",
+      "url": "/route/standalone/1"
+    },
+    {
+      "routeId": "route-8",
+      "name": "Route 8",
+      "url": "/route/standalone/2"
+    }
+  ]
+}

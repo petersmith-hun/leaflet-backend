@@ -4,14 +4,12 @@ import hu.psprog.leaflet.api.rest.response.common.SEODataModel;
 import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
-import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -20,15 +18,14 @@ import java.util.stream.Stream;
  * @author Peter Smith
  */
 @Component
-public class SEOResponseFiller implements ResponseFiller {
+public class SEOResponseFiller extends AbstractAjaxRequestAwareResponseFiller {
 
     private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
-    private HttpServletRequest httpServletRequest;
 
     @Autowired
     public SEOResponseFiller(DynamicConfigurationPropertyService dynamicConfigurationPropertyService, HttpServletRequest httpServletRequest) {
+        super(httpServletRequest);
         this.dynamicConfigurationPropertyService = dynamicConfigurationPropertyService;
-        this.httpServletRequest = httpServletRequest;
     }
 
     @Override
@@ -42,13 +39,6 @@ public class SEOResponseFiller implements ResponseFiller {
                 .build();
 
         wrapperBodyDataModelBuilder.withSeo(seoDataModel);
-    }
-
-    @Override
-    public boolean shouldFill() {
-        return Optional.ofNullable(httpServletRequest.getAttribute(RequestParameter.IS_AJAX_REQUEST))
-                .map(attribute -> !Boolean.valueOf(attribute.toString()))
-                .orElse(true);
     }
 
     private String getParameter(String key) {
