@@ -27,9 +27,11 @@ public interface FrontEndRoutingSupportFacade {
      * Generates and returns sitemap.
      * Sitemap contains all static and generated dynamic routes.
      *
+     * @param protocol server's communication protocol
+     * @param host host's domain
      * @return List of {@link FrontEndRouteVO} objects or empty list if no items can be found
      */
-    List<FrontEndRouteVO> getSitemap();
+    List<FrontEndRouteVO> getSitemap(String protocol, String host);
 
     /**
      * Passes front-end route item for persistence layer and returns the newly created one.

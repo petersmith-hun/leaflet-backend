@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link FrontEndRoutingSupportFacade}.
@@ -19,6 +20,9 @@ import java.util.Map;
  */
 @Service
 public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportFacade {
+
+    private static final String URL_MASK = "%s://%s%s";
+    private static final String RELATIVE_URL_PREFIX = "/";
 
     private FrontEndRoutingSupportService frontEndRoutingSupportService;
 
@@ -39,9 +43,19 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
     }
 
     @Override
-    public List<FrontEndRouteVO> getSitemap() {
-        // TODO will be implemented under LFLT-240
-        return null;
+    public List<FrontEndRouteVO> getSitemap(String protocol, String host) {
+
+        List<FrontEndRouteVO> sitemap = frontEndRoutingSupportService.getDynamicRoutes();
+        sitemap.addAll(frontEndRoutingSupportService.getHeaderMenu());
+        sitemap.addAll(frontEndRoutingSupportService.getFooterMenu());
+        sitemap.addAll(frontEndRoutingSupportService.getStandaloneRoutes());
+
+        return sitemap.stream()
+                .distinct()
+                .map(route -> FrontEndRouteVO.getBuilder()
+                        .withUrl(buildAbsoluteURL(protocol, host, route.getUrl()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -87,5 +101,11 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
         }
 
         return frontEndRoutingSupportService.getOne(id);
+    }
+
+    private String buildAbsoluteURL(String protocol, String host, String relativeURL) {
+        return String.format(URL_MASK, protocol, host, relativeURL.startsWith(RELATIVE_URL_PREFIX)
+                ? relativeURL
+                : RELATIVE_URL_PREFIX + relativeURL);
     }
 }

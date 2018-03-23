@@ -42,7 +42,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/entries/page/*",
             "/entries/*/page/*",
             "/files/*/*",
-            "/tags/public"};
+            "/tags/public",
+            "/sitemap.xml"};
     private static final String[] PUBLIC_POST_ENDPOINTS = {
             "/comments",
             "/users/claim",

@@ -39,6 +39,7 @@ public class BaseController {
     static final String BASE_PATH_ATTACHMENTS = "/attachments";
     static final String BASE_PATH_TAGS = "/tags";
     static final String BASE_PATH_ROUTES = "/routes";
+    static final String BASE_PATH_SITEMAP = "/sitemap.xml";
 
     static final String PATH_VARIABLE_ID = "id";
     static final String PATH_VARIABLE_PAGE = "page";

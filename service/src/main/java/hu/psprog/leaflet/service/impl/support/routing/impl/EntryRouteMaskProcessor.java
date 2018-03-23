@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 @Component
 public class EntryRouteMaskProcessor implements RouteMaskProcessor {
 
+    private static final String ROUTE_MASK = "%s/%s";
+
     private EntryFacade entryFacade;
 
     @Autowired
@@ -50,7 +52,7 @@ public class EntryRouteMaskProcessor implements RouteMaskProcessor {
 
         String url;
         if (Objects.nonNull(frontEndRouteVO.getUrl())) {
-            url = String.format(frontEndRouteVO.getUrl(), entryVO.getLink());
+            url = String.format(ROUTE_MASK, frontEndRouteVO.getUrl(), entryVO.getLink());
         } else {
             url = StringUtils.EMPTY;
         }
