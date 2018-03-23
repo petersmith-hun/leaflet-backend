@@ -4,6 +4,7 @@ import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
+import hu.psprog.leaflet.api.rest.response.common.MenuDataModel;
 import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryDataModel;
@@ -79,6 +80,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertMenu(result);
     }
 
     @Test
@@ -92,6 +94,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertMenu(result);
     }
 
     @Test
@@ -105,6 +108,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertMenu(result);
     }
 
     @Test
@@ -238,6 +242,10 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                 .sorted(comparator)
                 .collect(Collectors.toList())
                 .equals(result.getBody().getEntries()), is(true));
+    }
+
+    private void assertMenu(WrapperBodyDataModel<EntryListDataModel> result) {
+        assertThat(result.getMenu(), equalTo(getControl(CONTROL_MENU, MenuDataModel.class)));
     }
 
     private Comparator<EntryDataModel> getComparator(OrderBy.Entry orderBy, OrderDirection orderDirection) {

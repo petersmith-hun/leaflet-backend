@@ -39,6 +39,7 @@ public abstract class AbstractParameterizedBaseTest extends AbstractTransactiona
     private static final String CONTROL_MODELS = "control_models/control-%s%s.json";
     private static final String DATABASE_INIT_SCRIPT_LOCATION = "classpath:data.sql";
 
+    static final String CONTROL_MENU = "menu";
     static final String CONTROL_SUFFIX_EDIT = "edit";
     static final String CONTROL_SUFFIX_MODIFY = "modify";
     static final String CONTROL_SUFFIX_CREATE = "create";
