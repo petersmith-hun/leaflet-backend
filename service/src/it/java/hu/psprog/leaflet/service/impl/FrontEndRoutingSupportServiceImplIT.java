@@ -100,7 +100,7 @@ public class FrontEndRoutingSupportServiceImplIT {
         List<FrontEndRouteVO> result = frontEndRoutingSupportService.getDynamicRoutes();
 
         // then
-        assertThat(result.size(), equalTo(2));
+        assertThat(result.size(), equalTo(3));
         assertThat(result.containsAll(EXPECTED_DYNAMIC_ROUTES), is(true));
     }
 

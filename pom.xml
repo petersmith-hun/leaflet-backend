@@ -195,6 +195,11 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
             
             <!-- logging -->
             <dependency>
@@ -404,6 +409,7 @@
                     <excludes>
                         <exclude>**/vo/**</exclude>
                         <exclude>**/domain/**</exclude>
+                        <exclude>**/model/**</exclude>
                         <exclude>**/config/**</exclude>
                     </excludes>
                 </configuration>

@@ -16,7 +16,7 @@ public class FilenameGeneratorUtil {
         return doCleanFilename(fileInputVO.getOriginalFilename());
     }
 
-    private String doCleanFilename(String filename) {
+    public String doCleanFilename(String filename) {
         return StringUtils.stripAccents(filename)
                 .toLowerCase()
                 .trim()

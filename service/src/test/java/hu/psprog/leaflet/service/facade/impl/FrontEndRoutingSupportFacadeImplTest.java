@@ -4,18 +4,21 @@ import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -25,18 +28,27 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(JUnitParamsRunner.class)
 public class FrontEndRoutingSupportFacadeImplTest {
 
-    private static final List<FrontEndRouteVO> FRONT_END_ROUTE_VO_LIST = Collections.singletonList(FrontEndRouteVO.getBuilder().build());
     private static final Long CONTROL_ID = 1L;
-    private static final FrontEndRouteVO FRONT_END_ROUTE_VO = FrontEndRouteVO.getBuilder().build();
+    private static final String PROTOCOL = "http";
+    private static final String HOST = "localhost";
+    private static final String URL = "url-1";
+    private static final String EXPECTED_GENERATED_URL = PROTOCOL + "://" + HOST + "/" + URL;
+    private static final FrontEndRouteVO FRONT_END_ROUTE_VO = FrontEndRouteVO.getBuilder().withUrl(URL).build();
+    private static final List<FrontEndRouteVO> FRONT_END_ROUTE_VO_LIST = Collections.singletonList(FRONT_END_ROUTE_VO);
 
     @Mock
     private FrontEndRoutingSupportService frontEndRoutingSupportService;
 
     @InjectMocks
     private FrontEndRoutingSupportFacadeImpl frontEndRoutingSupportFacade;
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
 
     @Test
     public void shouldGetStaticRoutes() {
@@ -56,13 +68,25 @@ public class FrontEndRoutingSupportFacadeImplTest {
     }
 
     @Test
-    public void shouldGetSitemap() {
+    @Parameters({URL, "/" + URL})
+    public void shouldGetSitemap(String url) {
+
+        // given
+        FrontEndRouteVO inputRouteMask = FrontEndRouteVO.getBuilder()
+                .withUrl(url)
+                .build();
+        List<FrontEndRouteVO> inputRoutes = Collections.singletonList(inputRouteMask);
+        given(frontEndRoutingSupportService.getHeaderMenu()).willReturn(inputRoutes);
+        given(frontEndRoutingSupportService.getFooterMenu()).willReturn(inputRoutes);
+        given(frontEndRoutingSupportService.getStandaloneRoutes()).willReturn(inputRoutes);
 
         // when
-        List<FrontEndRouteVO> result = frontEndRoutingSupportFacade.getSitemap();
+        List<FrontEndRouteVO> result = frontEndRoutingSupportFacade.getSitemap(PROTOCOL, HOST);
 
         // then
-        assertThat(result, nullValue());
+        assertThat(result, notNullValue());
+        assertThat(result.size(), equalTo(1));
+        assertThat(result.get(0).getUrl(), equalTo(EXPECTED_GENERATED_URL));
     }
 
     @Test
