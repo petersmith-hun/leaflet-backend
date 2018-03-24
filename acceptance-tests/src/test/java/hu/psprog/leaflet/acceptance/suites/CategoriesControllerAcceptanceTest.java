@@ -5,7 +5,6 @@ import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
-import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.CategoryBridgeService;
@@ -51,12 +50,12 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
     public void shouldGetPublicCategories() throws CommunicationFailureException {
 
         // when
-        WrapperBodyDataModel<CategoryListDataModel> result = categoryBridgeService.getPublicCategories();
+        CategoryListDataModel result = categoryBridgeService.getPublicCategories();
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getBody().getCategories().size(), equalTo(NUMBER_OF_PUBLIC_CATEGORIES));
-        assertThat(result.getBody().getCategories().stream().allMatch(CategoryDataModel::isEnabled), is(true));
+        assertThat(result.getCategories().size(), equalTo(NUMBER_OF_PUBLIC_CATEGORIES));
+        assertThat(result.getCategories().stream().allMatch(CategoryDataModel::isEnabled), is(true));
     }
 
     @Test
