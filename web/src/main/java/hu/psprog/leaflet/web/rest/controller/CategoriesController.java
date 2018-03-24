@@ -8,7 +8,6 @@ import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CategoryFacade;
 import hu.psprog.leaflet.service.vo.CategoryVO;
-import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.slf4j.Logger;
@@ -74,7 +73,6 @@ public class CategoriesController extends BaseController {
      *
      * @return list of public categories
      */
-    @FillResponse
     @RequestMapping(value = PATH_PUBLIC, method = RequestMethod.GET)
     @Timed
     public ResponseEntity<CategoryListDataModel> getPublicCategories() {
