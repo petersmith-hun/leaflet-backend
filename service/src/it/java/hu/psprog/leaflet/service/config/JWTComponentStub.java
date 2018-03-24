@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.service.config;
 
 import hu.psprog.leaflet.security.jwt.JWTComponent;
-import hu.psprog.leaflet.security.jwt.exception.InvalidAuthorizationHeaderException;
 import hu.psprog.leaflet.security.jwt.exception.InvalidJWTTokenException;
 import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
 import hu.psprog.leaflet.security.jwt.model.JWTPayload;
@@ -30,7 +29,7 @@ public class JWTComponentStub implements JWTComponent {
     }
 
     @Override
-    public String extractToken(HttpServletRequest httpServletRequest) throws InvalidAuthorizationHeaderException {
+    public String extractToken(HttpServletRequest httpServletRequest) {
         return null;
     }
 }

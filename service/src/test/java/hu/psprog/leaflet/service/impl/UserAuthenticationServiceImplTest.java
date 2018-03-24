@@ -65,14 +65,14 @@ public class UserAuthenticationServiceImplTest {
             .withDeviceID(UUID.randomUUID())
             .withRemoteAddress("localhost")
             .build();
-    private static final ExtendedUserDetails EXTENDED_USER_DETAILS = new ExtendedUserDetails.Builder()
+    private static final ExtendedUserDetails EXTENDED_USER_DETAILS = ExtendedUserDetails.getBuilder()
             .withName(NAME)
             .withID(USER_ID)
             .withUsername(EMAIL_ADDRESS)
             .withAuthorities(Collections.singletonList(Authority.ADMIN))
             .withEnabled(ENABLED)
             .build();
-    private static final ExtendedUserDetails RECLAIM_USER_DETAILS = new ExtendedUserDetails.Builder()
+    private static final ExtendedUserDetails RECLAIM_USER_DETAILS = ExtendedUserDetails.getBuilder()
             .withName(NAME)
             .withID(USER_ID)
             .withUsername(EMAIL_ADDRESS)
@@ -103,8 +103,9 @@ public class UserAuthenticationServiceImplTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        JWTAuthenticationAnswerModel jwtAuthenticationAnswerModel = new JWTAuthenticationAnswerModel();
-        jwtAuthenticationAnswerModel.setToken(TOKEN);
+        JWTAuthenticationAnswerModel jwtAuthenticationAnswerModel = JWTAuthenticationAnswerModel.getBuilder()
+                .withToken(TOKEN)
+                .build();
         given(userDetailsService.loadUserByUsername(anyString())).willReturn(EXTENDED_USER_DETAILS);
         given(jwtComponent.generateToken(any(UserDetails.class))).willReturn(jwtAuthenticationAnswerModel);
         given(jwtComponent.generateToken(any(UserDetails.class), anyInt())).willReturn(jwtAuthenticationAnswerModel);

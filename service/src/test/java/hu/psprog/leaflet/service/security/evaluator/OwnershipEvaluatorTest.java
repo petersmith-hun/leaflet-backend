@@ -168,12 +168,12 @@ public class OwnershipEvaluatorTest {
     }
 
     private void prepareAuthenticationObject(Role role) {
-        JWTPayload jwtPayload = new JWTPayload();
-        jwtPayload.setId(CURRENT_USER_ID.intValue());
-        jwtPayload.setRole(role);
 
         authentication = JWTAuthenticationToken.getBuilder()
-                .withPayload(jwtPayload)
+                .withPayload(JWTPayload.getBuilder()
+                        .withId(CURRENT_USER_ID.intValue())
+                        .withRole(role)
+                        .build())
                 .build();
     }
 
