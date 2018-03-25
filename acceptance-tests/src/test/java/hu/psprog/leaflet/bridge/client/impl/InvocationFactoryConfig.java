@@ -54,7 +54,7 @@ public class InvocationFactoryConfig {
     @Bean
     public RequestAuthentication requestAuthentication() {
 
-        String token = jwtComponent.generateToken(new ExtendedUserDetails.Builder()
+        String token = jwtComponent.generateToken(ExtendedUserDetails.getBuilder()
                 .withAuthorities(AuthorityUtils.createAuthorityList(authority))
                 .withEnabled(TEST_USER_ENABLED)
                 .withID(TEST_USER_ID)

@@ -46,7 +46,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(String.format(USERNAME_NOT_FOUND_MESSAGE_PATTERN, email));
         }
 
-        return new ExtendedUserDetails.Builder()
+        return ExtendedUserDetails.getBuilder()
                 .withUsername(user.getEmail())
                 .withPassword(user.getPassword())
                 .withEnabled(user.isEnabled())

@@ -31,11 +31,10 @@ public class MockedJWTUserSecurityContextFactory implements WithSecurityContextF
 
     private JWTPayload prepareJWTPayload(WithMockedJWTUser withMockedJWTUser) {
 
-        JWTPayload payload = new JWTPayload();
-        payload.setId((int) withMockedJWTUser.userID());
-        payload.setRole(withMockedJWTUser.role());
-        payload.setUsername(USERNAME);
-
-        return payload;
+        return JWTPayload.getBuilder()
+                .withId((int) withMockedJWTUser.userID())
+                .withRole(withMockedJWTUser.role())
+                .withUsername(USERNAME)
+                .build();
     }
 }

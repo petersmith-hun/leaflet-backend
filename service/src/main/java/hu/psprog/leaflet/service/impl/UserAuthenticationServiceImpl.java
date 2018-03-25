@@ -149,7 +149,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
 
     private UserDetails generateReclaimUserDetails(UserDetails originalUserDetails) {
         ExtendedUserDetails userDetails = (ExtendedUserDetails) originalUserDetails;
-        return new ExtendedUserDetails.Builder()
+        return ExtendedUserDetails.getBuilder()
                 .withID(userDetails.getId())
                 .withName(userDetails.getName())
                 .withUsername(userDetails.getUsername())
