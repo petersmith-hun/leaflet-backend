@@ -11,6 +11,8 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.support.routing.RouteMaskProcessor;
 import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupportService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FrontEndRoutingSupportServiceImpl.class);
 
     private static final String COULD_NOT_PERSIST_FRONT_END_ROUTE = "Could not persist FrontEndRoute";
     private static final String A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS = "A route with the specified ID already exists";
@@ -88,6 +92,8 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
             throw new EntityCreationException(FrontEndRoute.class);
         }
 
+        LOGGER.info("New route [{}] has been created with ID [{}]", createdRoute.getRouteId(), createdRoute.getId());
+
         return createdRoute.getId();
     }
 
@@ -97,6 +103,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
 
         assertExisting(id);
         frontEndRouteDAO.delete(id);
+        LOGGER.info("Deleted route of ID [{}]", id);
     }
 
     @Override
@@ -128,6 +135,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
 
         assertExisting(id);
         frontEndRouteDAO.enable(id);
+        LOGGER.info("Enabled route of ID [{}]", id);
     }
 
     @Override
@@ -136,6 +144,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
 
         assertExisting(id);
         frontEndRouteDAO.disable(id);
+        LOGGER.info("Disabled route of ID [{}]", id);
     }
 
     @Override
@@ -154,6 +163,8 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
         if (Objects.isNull(updatedRoute)) {
             throw new EntityNotFoundException(FrontEndRoute.class, id);
         }
+
+        LOGGER.info("Existing route [{}] with ID [{}] has been updated", updatedRoute.getRouteId(), id);
 
         return conversionService.convert(updatedRoute, FrontEndRouteVO.class);
     }

@@ -18,6 +18,7 @@ import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -73,10 +74,19 @@ public class CommentServiceImplTest {
     private CommentVO commentVO;
 
     @Mock
+    private User user;
+
+    @Mock
     private NotificationService notificationService;
 
     @InjectMocks
     private CommentServiceImpl commentService;
+
+    @Before
+    public void setup() {
+        given(user.getId()).willReturn(10L);
+        given(comment.getUser()).willReturn(user);
+    }
 
     @Test
     public void testGetOneWithExistingComment() throws ServiceException {

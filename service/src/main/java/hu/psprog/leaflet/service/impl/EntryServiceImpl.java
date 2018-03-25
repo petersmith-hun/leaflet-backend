@@ -69,6 +69,7 @@ public class EntryServiceImpl implements EntryService {
         }
 
         entryDAO.delete(id);
+        LOGGER.info("Deleted entry of ID [{}]", id);
     }
 
     @Override
@@ -118,6 +119,8 @@ public class EntryServiceImpl implements EntryService {
             throw new EntityCreationException(Entry.class);
         }
 
+        LOGGER.info("New entry [{}] has been created with ID [{}]", savedEntry.getTitle(), savedEntry.getId());
+
         return entry.getId();
     }
 
@@ -137,6 +140,8 @@ public class EntryServiceImpl implements EntryService {
         if (updatedEntry == null) {
             throw new EntityNotFoundException(Entry.class, id);
         }
+
+        LOGGER.info("Existing entry [{}] with ID [{}] has been updated", updatedEntry.getTitle(), id);
 
         return entryToEntryVOConverter.convert(updatedEntry);
     }
@@ -192,6 +197,7 @@ public class EntryServiceImpl implements EntryService {
         }
 
         entryDAO.enable(id);
+        LOGGER.info("Enabled entry of ID [{}]", id);
     }
 
     @Override
@@ -203,6 +209,7 @@ public class EntryServiceImpl implements EntryService {
         }
 
         entryDAO.disable(id);
+        LOGGER.info("Disabled entry of ID [{}]", id);
     }
 
     @Override

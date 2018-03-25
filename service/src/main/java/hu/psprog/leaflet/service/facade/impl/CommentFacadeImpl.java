@@ -99,10 +99,12 @@ public class CommentFacadeImpl implements CommentFacade {
         if (Objects.isNull(entity.getOwner().getId())) {
             UserVO user = userService.silentGetUserByEmail(entity.getOwner().getEmail());
             if (Objects.isNull(user)) {
+                LOGGER.info("Registering anonymous commenter [{}]", entity.getOwner().getEmail());
                 Long id = userService.registerNoLogin(createNoLoginUser(entity.getOwner()));
                 commentToBeCreated = updateCommentOwner(entity, id);
             } else {
                 if (user.getAuthorities().containsAll(NO_LOGIN_AUTHORITY)) {
+                    LOGGER.info("Attaching comment to returning anonymous commenter [{}]", entity.getOwner().getEmail());
                     commentToBeCreated = updateCommentOwner(entity, user.getId());
                 } else {
                     LOGGER.error("Login-enabled user already exists with given email={}", entity.getOwner().getEmail());

@@ -78,6 +78,7 @@ public class FileUploader {
             while (Objects.isNull(uploadedFileVO) && uploadAcceptorIterator.hasNext()) {
                 currentAcceptor = uploadAcceptorIterator.next();
                 if (currentAcceptor.accept(fileInputVO)) {
+                    LOGGER.info("File [{}] of MIME type [{}] accepted as [{}]", fileInputVO.getOriginalFilename(), fileInputVO.getContentType(), currentAcceptor.acceptedAs());
                     uploadedFileVO = doUpload(fileInputVO, uploadAcceptorMap.get(currentAcceptor.getClass()));
                 }
             }
@@ -106,6 +107,8 @@ public class FileUploader {
         String targetFilename = filenameGeneratorUtil.cleanFilename(fileInputVO);
         String fileRelativePath = getNormalizedPathAsString(buildRelativePath(fileInputVO, targetFilename, uploadAcceptor));
         Files.copy(fileInputVO.getFileContentStream(), path.resolve(targetFilename));
+
+        LOGGER.info("Successfully uploaded and stored file [{}] under [{}]", fileInputVO.getOriginalFilename(), fileRelativePath);
 
         return UploadedFileVO.getBuilder()
                 .withOriginalFilename(fileInputVO.getOriginalFilename())

@@ -13,6 +13,8 @@ import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.security.annotation.PermitAuthenticated;
 import hu.psprog.leaflet.service.security.annotation.PermitReclaim;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +37,8 @@ import java.util.Objects;
  */
 @Service
 public class UserAuthenticationServiceImpl implements UserAuthenticationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserAuthenticationServiceImpl.class);
 
     private static final int RECLAIM_TOKEN_EXPIRATION_IN_HOURS = 1;
     private static final String RECLAIM_ROLE = "RECLAIM";
@@ -84,6 +88,8 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @Override
     public void demandPasswordReset(LoginContextVO loginContextVO) {
 
+        LOGGER.info("Password reset process started for user [{}]", loginContextVO.getUsername());
+
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginContextVO.getUsername());
         UserDetails reclaimUserDetails = generateReclaimUserDetails(userDetails);
         JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(reclaimUserDetails, RECLAIM_TOKEN_EXPIRATION_IN_HOURS);
@@ -109,6 +115,8 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
                 .build());
         revokeToken();
 
+        LOGGER.info("Password reset confirmed for user [{}]", userDetails.getUsername());
+
         return userDetails.getId();
     }
 
@@ -116,9 +124,11 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     @PermitAuthenticated
     public String extendSession(LoginContextVO loginContextVO) {
 
-        JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(retrieveAuthenticatedUserDetails());
+        ExtendedUserDetails userDetails = retrieveAuthenticatedUserDetails();
+        JWTAuthenticationAnswerModel authenticationAnswerModel = jwtComponent.generateToken(userDetails);
         revokeToken();
         storeToken(loginContextVO, authenticationAnswerModel);
+        LOGGER.info("Session has been extended for user [{}]", userDetails.getId());
 
         return authenticationAnswerModel.getToken();
     }
