@@ -5,6 +5,8 @@ import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportFacade {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FrontEndRoutingSupportFacadeImpl.class);
 
     private static final String URL_MASK = "%s://%s%s";
     private static final String RELATIVE_URL_PREFIX = "/";
@@ -44,6 +48,8 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
 
     @Override
     public List<FrontEndRouteVO> getSitemap(String protocol, String host) {
+
+        LOGGER.info("Sitemap has been requested");
 
         List<FrontEndRouteVO> sitemap = frontEndRoutingSupportService.getDynamicRoutes();
         sitemap.addAll(frontEndRoutingSupportService.getHeaderMenu());

@@ -154,6 +154,8 @@ public class CommentServiceImpl implements CommentService {
             throw new EntityCreationException(Comment.class);
         }
 
+        LOGGER.info("New comment has been created by user [{}] with ID [{}]", savedComment.getUser().getId(), savedComment.getId());
+
         return savedComment.getId();
     }
 
@@ -167,6 +169,8 @@ public class CommentServiceImpl implements CommentService {
             throw new EntityNotFoundException(Entry.class, id);
         }
 
+        LOGGER.info("Comment of ID [{}] has been updated by user [{}]", id, updatedComment.getUser().getId());
+
         return commentToCommentVOConverter.convert(updatedComment);
     }
 
@@ -179,6 +183,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentDAO.delete(id);
+        LOGGER.info("Deleted comment of ID [{}]", id);
     }
 
     @Override
@@ -190,6 +195,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentDAO.enable(id);
+        LOGGER.info("Enabled comment of ID [{}]", id);
     }
 
     @Override
@@ -201,6 +207,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentDAO.disable(id);
+        LOGGER.info("Disabled comment of ID [{}]", id);
     }
 
     @Override
@@ -212,6 +219,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentDAO.markAsDeleted(entity.getId());
+        LOGGER.info("Marked comment of ID [{}] as logically deleted", entity.getId());
     }
 
     @Override
@@ -223,6 +231,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         commentDAO.revertLogicalDeletion(entity.getId());
+        LOGGER.info("Restored logically deleted comment of ID [{}]", entity.getId());
     }
 
 

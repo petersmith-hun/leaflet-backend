@@ -97,6 +97,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.delete(userID);
+        LOGGER.info("User of ID [{}] has been deleted", userID);
     }
 
     @Override
@@ -117,6 +118,8 @@ public class UserServiceImpl implements UserService {
             throw new EntityCreationException(User.class);
         }
 
+        LOGGER.info("[{}] user has been created with ID [{}]", savedUser.getRole(), savedUser.getId());
+
         return savedUser.getId();
     }
 
@@ -136,6 +139,8 @@ public class UserServiceImpl implements UserService {
         if (updatedUser == null) {
             throw new EntityNotFoundException(User.class, id);
         }
+
+        LOGGER.info("User of ID [{}] has been updated", id);
 
         return userToUserVOConverter.convert(updatedUser);
     }
@@ -169,6 +174,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.updatePassword(id, password);
+        LOGGER.info("Password has been updated for user [{}]", id);
     }
 
     @Override
@@ -186,6 +192,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.updateRole(id, authorityToRoleConverter.convert(grantedAuthority));
+        LOGGER.info("Role of user [{}] has been updated to [{}]", id, grantedAuthority.getAuthority());
     }
 
     @Override
@@ -207,6 +214,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.enable(id);
+        LOGGER.info("Enabled user of ID [{}]", id);
     }
 
 
@@ -219,6 +227,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userDAO.disable(id);
+        LOGGER.info("Disabled user of ID [{}]", id);
     }
 
     @Override

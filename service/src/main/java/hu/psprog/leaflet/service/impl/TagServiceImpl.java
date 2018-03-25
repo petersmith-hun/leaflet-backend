@@ -93,6 +93,8 @@ public class TagServiceImpl implements TagService {
             throw new EntityCreationException(Tag.class);
         }
 
+        LOGGER.info("New tag [{}] has been created with ID [{}]", savedTag.getTitle(), savedTag.getId());
+
         return savedTag.getId();
     }
 
@@ -140,6 +142,8 @@ public class TagServiceImpl implements TagService {
             throw new EntityNotFoundException(Tag.class, id);
         }
 
+        LOGGER.info("Existing tag [{}] with ID [{}] has been updated", updatedTag.getTitle(), id);
+
         return tagToTagVOConverter.convert(updatedTag);
     }
 
@@ -152,6 +156,7 @@ public class TagServiceImpl implements TagService {
         }
 
         tagDAO.delete(id);
+        LOGGER.info("Deleted tag of ID [{}]", id);
     }
 
     @Override
@@ -163,6 +168,7 @@ public class TagServiceImpl implements TagService {
         }
 
         tagDAO.enable(id);
+        LOGGER.info("Enabled tag of ID [{}]", id);
     }
 
     @Override
@@ -174,6 +180,7 @@ public class TagServiceImpl implements TagService {
         }
 
         tagDAO.disable(id);
+        LOGGER.info("Disabled tag of ID [{}]", id);
     }
 
     private List<Tag> getCurrentTags(EntryVO entryVO) {

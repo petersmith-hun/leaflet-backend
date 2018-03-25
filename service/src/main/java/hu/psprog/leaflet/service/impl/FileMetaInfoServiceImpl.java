@@ -12,6 +12,8 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FileMetaInfoServiceImpl implements FileMetaInfoService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileMetaInfoServiceImpl.class);
 
     private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
     private static final String A_FILE_WITH_GIVEN_FILENAME_ALREADY_EXISTS = "A file with given filename already exists";
@@ -73,6 +77,8 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
             throw new EntityCreationException(UploadedFile.class);
         }
 
+        LOGGER.info("File meta info has been stored for [{}]", uploadedFileVO.getStoredFilename());
+
         return storedUploadedFile.getId();
     }
 
@@ -86,6 +92,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
         }
 
         uploadedFileDAO.delete(uploadedFile.getId());
+        LOGGER.info("File meta info has been deleted for file [{}]", uploadedFile.getStoredFilename());
     }
 
     @Override
@@ -100,6 +107,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
         uploadedFile.setOriginalFilename(updateFileMetaInfoVO.getOriginalFilename());
         uploadedFile.setDescription(updateFileMetaInfoVO.getDescription());
         uploadedFileDAO.updateOne(uploadedFile.getId(), uploadedFile);
+        LOGGER.info("File meta info has been updated for file [{}]", uploadedFile.getStoredFilename());
     }
 
     @Override

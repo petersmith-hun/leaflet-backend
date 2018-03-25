@@ -113,6 +113,8 @@ public class DocumentServiceImpl implements DocumentService {
             throw new EntityCreationException(Document.class);
         }
 
+        LOGGER.info("New document [{}] has been created with ID [{}]", savedDocument.getTitle(), savedDocument.getId());
+
         return savedDocument.getId();
     }
 
@@ -133,6 +135,8 @@ public class DocumentServiceImpl implements DocumentService {
             throw new EntityNotFoundException(Document.class, id);
         }
 
+        LOGGER.info("Existing document [{}] with ID [{}] has been updated", updatedDocument.getTitle(), id);
+
         return documentToDocumentVOConverter.convert(updatedDocument);
     }
 
@@ -145,6 +149,7 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         documentDAO.delete(id);
+        LOGGER.info("Deleted document of ID [{}]", id);
     }
 
     @Override
@@ -156,6 +161,7 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         documentDAO.enable(id);
+        LOGGER.info("Enabled document of ID [{}]", id);
     }
 
     @Override
@@ -167,5 +173,6 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         documentDAO.disable(id);
+        LOGGER.info("Disabled document of ID [{}]", id);
     }
 }

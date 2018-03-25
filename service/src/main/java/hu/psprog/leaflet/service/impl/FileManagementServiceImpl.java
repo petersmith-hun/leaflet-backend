@@ -102,6 +102,7 @@ public class FileManagementServiceImpl implements FileManagementService {
                 LOGGER.error("Failed to remove file [{}]", file.getAbsoluteFile());
                 throw new ServiceException("Failed to remove file");
             }
+            LOGGER.info("File [{}] has been removed", file.getAbsolutePath());
         } catch (InvalidPathException exc) {
             LOGGER.error(GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH, path);
             throw new ServiceException(GIVEN_PATH_IS_INVALID, exc);
@@ -118,6 +119,7 @@ public class FileManagementServiceImpl implements FileManagementService {
                 LOGGER.error("Failed to create directory [{}]", file.getAbsolutePath());
                 throw new ServiceException("Failed to create directory");
             }
+            LOGGER.info("Created directory [{}]", file.getAbsolutePath());
         } catch (InvalidPathException exc) {
             LOGGER.error(GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH, parent);
             throw new ServiceException(GIVEN_PATH_IS_INVALID, exc);

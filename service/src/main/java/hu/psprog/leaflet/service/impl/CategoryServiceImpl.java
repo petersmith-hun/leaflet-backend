@@ -89,6 +89,8 @@ public class CategoryServiceImpl implements CategoryService {
             throw new EntityCreationException(Category.class);
         }
 
+        LOGGER.info("New category [{}] has been created with ID [{}]", entity.getTitle(), savedCategory.getId());
+
         return savedCategory.getId();
     }
 
@@ -102,6 +104,8 @@ public class CategoryServiceImpl implements CategoryService {
             throw new EntityNotFoundException(Category.class, id);
         }
 
+        LOGGER.info("Existing category [{}] with ID [{}] has been updated", updatedCategory.getTitle(), id);
+
         return categoryToCategoryVOConverter.convert(updatedCategory);
     }
 
@@ -114,6 +118,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryDAO.delete(id);
+        LOGGER.info("Deleted category of ID [{}]", id);
     }
 
     @Override
@@ -125,6 +130,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryDAO.enable(id);
+        LOGGER.info("Enabled category of ID [{}]", id);
     }
 
     @Override
@@ -136,5 +142,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         categoryDAO.disable(id);
+        LOGGER.info("Disabled category of ID [{}]", id);
     }
 }
