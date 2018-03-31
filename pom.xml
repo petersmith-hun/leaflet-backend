@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.0-dev</version>
+    <version>1.5.1-dev</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -44,6 +44,7 @@
         <leaflet.mailer-component.version>1.1.0</leaflet.mailer-component.version>
         <leaflet.bridge.version>1.8.0</leaflet.bridge.version>
         <leaflet.tlp-appender.version>1.0.0</leaflet.tlp-appender.version>
+        <leaflet.translation-adapter.version>1.0.0</leaflet.translation-adapter.version>
         
         <!-- Spring versions -->
         <spring.boot.version>1.5.4.RELEASE</spring.boot.version>
@@ -115,6 +116,11 @@
                 <groupId>hu.psprog.leaflet</groupId>
                 <artifactId>tlp-appender</artifactId>
                 <version>${leaflet.tlp-appender.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>hu.psprog.leaflet</groupId>
+                <artifactId>translation-message-source</artifactId>
+                <version>${leaflet.translation-adapter.version}</version>
             </dependency>
 
             <!-- Spring dependencies -->
