@@ -5,7 +5,7 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>1.5.0-dev</version>
+        <version>1.5.1-dev</version>
     </parent>
 
     <packaging>jar</packaging>
@@ -25,6 +25,10 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>tlp-appender</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>translation-message-source</artifactId>
         </dependency>
 
         <dependency>
