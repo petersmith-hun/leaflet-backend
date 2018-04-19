@@ -26,13 +26,12 @@ server:
     context-path: /api
     port: 9988
 
-bridge:
-  baseUrl: http://localhost:9988/api
+bridge.clients:
+  tms.host-url: http://localhost:8086/tms
+  leaflet.host-url: http://localhost:9988/api
 
 tms:
   enabled: false
-  host: http://localhost:8086/tms
-  translations-url: ${tms.host}/translations
   packs: acceptance
   forced-locale: en
 

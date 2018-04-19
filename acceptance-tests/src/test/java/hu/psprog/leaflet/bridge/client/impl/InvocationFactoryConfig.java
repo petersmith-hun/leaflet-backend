@@ -15,7 +15,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.client.WebTarget;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +51,7 @@ public class InvocationFactoryConfig {
     private SessionStoreService sessionStoreService;
 
     @Bean
+    @Primary
     public RequestAuthentication requestAuthentication() {
 
         String token = jwtComponent.generateToken(ExtendedUserDetails.getBuilder()
@@ -73,9 +73,9 @@ public class InvocationFactoryConfig {
 
     @Bean
     @Primary
-    public InvocationFactory invocationFactory(WebTarget webTarget, RequestAuthentication requestAuthentication, List<CallStrategy> callStrategyList) {
+    public InvocationFactory invocationFactory(RequestAuthentication requestAuthentication, List<CallStrategy> callStrategyList) {
         Locale.setDefault(Locale.ENGLISH); // making sure, date format is not changed in different environments
-        return new InvocationFactory(webTarget, requestAuthentication, callStrategyList, mockedHttpServletRequest());
+        return new InvocationFactory(requestAuthentication, callStrategyList, mockedHttpServletRequest());
     }
 
     public void setRemoteAddress(String remoteAddress) {
