@@ -35,7 +35,7 @@ public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTe
     @Autowired
     private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
 
-    @Value("${bridge.baseUrl}/sitemap.xml")
+    @Value("${bridge.clients.leaflet.host-url}/sitemap.xml")
     private String serviceURL;
 
     @Test

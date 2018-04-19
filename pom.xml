@@ -7,7 +7,7 @@
     <groupId>hu.psprog.leaflet</groupId>
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>1.5.1-dev</version>
+    <version>1.5.2-dev</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -42,9 +42,9 @@
         <leaflet.rest-api.version>1.3.0</leaflet.rest-api.version>
         <leaflet.jwt-component.version>2.3.0</leaflet.jwt-component.version>
         <leaflet.mailer-component.version>1.1.0</leaflet.mailer-component.version>
-        <leaflet.bridge.version>1.8.0</leaflet.bridge.version>
+        <leaflet.rcp.version>1.0.0</leaflet.rcp.version>
         <leaflet.tlp-appender.version>1.0.0</leaflet.tlp-appender.version>
-        <leaflet.translation-adapter.version>1.0.0</leaflet.translation-adapter.version>
+        <leaflet.translation-adapter.version>2.0.0</leaflet.translation-adapter.version>
         
         <!-- Spring versions -->
         <spring.boot.version>1.5.4.RELEASE</spring.boot.version>
@@ -109,8 +109,8 @@
             </dependency>
             <dependency>
                 <groupId>hu.psprog.leaflet</groupId>
-                <artifactId>leaflet-bridge</artifactId>
-                <version>${leaflet.bridge.version}</version>
+                <artifactId>backend-rest-client</artifactId>
+                <version>${leaflet.rcp.version}</version>
             </dependency>
             <dependency>
                 <groupId>hu.psprog.leaflet</groupId>
@@ -119,7 +119,7 @@
             </dependency>
             <dependency>
                 <groupId>hu.psprog.leaflet</groupId>
-                <artifactId>translation-message-source</artifactId>
+                <artifactId>leaflet-translation-adapter</artifactId>
                 <version>${leaflet.translation-adapter.version}</version>
             </dependency>
 
