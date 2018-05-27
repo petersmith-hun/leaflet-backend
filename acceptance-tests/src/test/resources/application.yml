@@ -30,6 +30,9 @@ bridge.clients:
   tms.host-url: http://localhost:8086/tms
   leaflet.host-url: http://localhost:9988/api
 
+leaflet-link:
+  security-checks-enabled: false
+
 tms:
   enabled: false
   packs: acceptance

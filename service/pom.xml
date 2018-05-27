@@ -5,7 +5,7 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>1.5.2-dev</version>
+        <version>1.6.0-dev</version>
     </parent>
     
     <artifactId>leaflet-service</artifactId>
