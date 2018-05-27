@@ -443,7 +443,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
     }
 
     @Test
-    public void shouldDemandPasswordReset() throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
+    public void shouldDemandPasswordReset() throws RequestCouldNotBeFulfilledException {
 
         // given
         given(loginContextFactory.forPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
@@ -457,7 +457,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
     }
 
     @Test
-    public void shouldDemandPasswordResetWithValidationError() throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
+    public void shouldDemandPasswordResetWithValidationError() throws RequestCouldNotBeFulfilledException {
 
         // given
         givenValidationError();
@@ -469,22 +469,22 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDemandPasswordResetWithUsernameNotFoundException() throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldDemandPasswordResetWithNotExistingUser() throws RequestCouldNotBeFulfilledException {
 
         // given
         given(loginContextFactory.forPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
         doThrow(UsernameNotFoundException.class).when(userFacade).demandPasswordReset(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
 
         // when
-        controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest, bindingResult);
+        ResponseEntity<BaseBodyDataModel> result = controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest, bindingResult);
 
         // then
-        // exception expected
+        assertResponse(result, HttpStatus.CREATED, null);
     }
 
     @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldDemandPasswordResetWithServiceException() throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
+    public void shouldDemandPasswordResetWithServiceException() throws RequestCouldNotBeFulfilledException {
 
         // given
         given(loginContextFactory.forPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);

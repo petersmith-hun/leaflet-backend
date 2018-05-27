@@ -69,7 +69,6 @@ public class UsersController extends BaseController {
     private static final String COULD_NOT_REVOKE_TOKEN = "Could not revoke token.";
     private static final String AN_ERROR_OCCURRED_WHILE_SIGNING_YOU_OUT = "An error occurred while signing you out - please try again later.";
     private static final String FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST = "Failed to process password reset request.";
-    private static final String UNREGISTERED_EMAIL_ADDRESS = "The email address you've specified could not be found. Please check it.";
     private static final String PASSWORD_RESET_FAILURE = "Your password reset request cannot be processed at the moment - please try again later.";
     private static final String FAILED_TO_EXTEND_USER_SESSION = "Failed to extend user session";
 
@@ -354,28 +353,29 @@ public class UsersController extends BaseController {
      * @param bindingResult validation result
      * @return empty response on success, validation results if validation fails
      * @throws RequestCouldNotBeFulfilledException if request cannot be processed
-     * @throws ResourceNotFoundException if no existing user found for given email address
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_RECLAIM)
     public ResponseEntity<BaseBodyDataModel> demandPasswordReset(@RequestBody @Valid PasswordResetDemandRequestModel passwordResetDemandRequestModel,
-                                                    HttpServletRequest httpServletRequest, BindingResult bindingResult)
-            throws RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+                                                                 HttpServletRequest httpServletRequest, BindingResult bindingResult)
+            throws RequestCouldNotBeFulfilledException{
 
         if (bindingResult.hasErrors()) {
             return validationFailureResponse(bindingResult);
         } else {
             try {
                 userFacade.demandPasswordReset(loginContextFactory.forPasswordReset(passwordResetDemandRequestModel, httpServletRequest));
-                return ResponseEntity
-                        .status(HttpStatus.CREATED)
-                        .build();
             } catch (UsernameNotFoundException e) {
+                // to hide the fact that the specified account does not exist, we simply return with HTTP 204
+                // though we log the fact anyways as it might be an attack
                 LOGGER.error(FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST, e);
-                throw new ResourceNotFoundException(UNREGISTERED_EMAIL_ADDRESS);
             } catch (Exception e) {
                 LOGGER.error(FAILED_TO_PROCESS_PASSWORD_RESET_REQUEST, e);
                 throw new RequestCouldNotBeFulfilledException(PASSWORD_RESET_FAILURE);
             }
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .build();
         }
     }
 
