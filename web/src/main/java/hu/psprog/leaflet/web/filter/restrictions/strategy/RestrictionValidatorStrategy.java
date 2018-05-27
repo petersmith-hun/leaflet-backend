@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Client acceptor filter validation strategy interface.
- * Implementations are able to validate if a client's request confirms a specific restriction type.
+ * Implementations are able to validate if a client's request conforms a specific restriction type.
  * Implementations must specify for which restriction type they are providing validation logic,
  * and currently only one implementation for each restriction type can exist at a time.
  *
