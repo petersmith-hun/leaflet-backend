@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 /**
  * Filter to recognize Leaflet client applications and force them using required security measures.
  *
- * Enabled clients can be configured via 'leaflet-link' configuration parameter, which has two main sub-keys:
+ * Enabled clients can be configured via {@code leaflet-link} configuration parameter, which has two main sub-keys:
  *  - security-checks-enabled: by setting this parameter to false, filter can be entirely switched off
  *    Neither client identification, nor forcing required security measures will be done in this case.
  *  - clients: registering clients.
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @ConfigurationProperties(prefix = "leaflet-link")
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @Conditional(ClientAcceptorFilter.ClientAcceptorFilterCondition.class)
 public class ClientAcceptorFilter extends OncePerRequestFilter {
 
