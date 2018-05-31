@@ -29,6 +29,7 @@ server:
 bridge.clients:
   tms.host-url: http://localhost:8086/tms
   leaflet.host-url: http://localhost:9988/api
+  grc.host-url: http://localhost:9999
 
 leaflet-link:
   security-checks-enabled: false
