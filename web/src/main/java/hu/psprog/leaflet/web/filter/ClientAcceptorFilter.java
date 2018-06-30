@@ -129,7 +129,8 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
     private UUID extractClientID(HttpServletRequest request) {
 
         if (StringUtils.isEmpty(request.getHeader(HEADER_CLIENT_ID))) {
-            LOGGER.error("Client ID not found in request from [{} - {}]", request.getRemoteAddr(), request.getHeader(HEADER_USER_AGENT));
+            LOGGER.error("Client ID not found in request from [{} - {}] for resource [{}]", request.getRemoteAddr(),
+                    request.getHeader(HEADER_USER_AGENT), request.getRequestURI());
             throw new MissingClientIDHeaderException();
         }
 
@@ -137,7 +138,8 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
         try {
             clientID = UUID.fromString(request.getHeader(HEADER_CLIENT_ID));
         } catch (IllegalArgumentException exc) {
-            LOGGER.error("Malformed client ID received: [{} | {} - {}]", request.getHeader(HEADER_CLIENT_ID), request.getRemoteAddr(), request.getHeader(HEADER_USER_AGENT), exc);
+            LOGGER.error("Malformed client ID received: [{} | {} - {}] for resource [{}]", request.getHeader(HEADER_CLIENT_ID),
+                    request.getRemoteAddr(), request.getHeader(HEADER_USER_AGENT), request.getRequestURI(), exc);
             throw new MissingClientIDHeaderException();
         }
 
