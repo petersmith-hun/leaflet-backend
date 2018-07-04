@@ -84,7 +84,7 @@
         <javax.el-api.version>3.0.0</javax.el-api.version>
         <junit.params.version>1.0.5</junit.params.version>
         <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
-        <maven-failsafe-plugin.version>2.20</maven-failsafe-plugin.version>
+        <maven-failsafe-plugin.version>2.18.1</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     </properties>
 	
@@ -374,7 +374,7 @@
                             <goal>verify</goal>
                         </goals>
                         <configuration>
-                            <argLine>${argLine.failsafe}</argLine>
+                            <argLine>-Xmx256m ${argLine.failsafe}</argLine>
                         </configuration>
                     </execution>
                 </executions>
