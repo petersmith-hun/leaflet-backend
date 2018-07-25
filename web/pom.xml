@@ -5,7 +5,7 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>1.6.0-dev</version>
+        <version>1.6.1-dev</version>
     </parent>
 
     <packaging>jar</packaging>
@@ -33,6 +33,10 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>recaptcha-rest-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>bridge-spring-integration</artifactId>
         </dependency>
 
         <dependency>

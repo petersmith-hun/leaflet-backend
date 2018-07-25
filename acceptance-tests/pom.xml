@@ -5,7 +5,7 @@
     <parent>
         <artifactId>leaflet</artifactId>
         <groupId>hu.psprog.leaflet</groupId>
-        <version>1.6.0-dev</version>
+        <version>1.6.1-dev</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,6 +25,10 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>backend-rest-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>bridge-spring-integration</artifactId>
         </dependency>
         <dependency>
             <groupId>pl.pragmatists</groupId>
