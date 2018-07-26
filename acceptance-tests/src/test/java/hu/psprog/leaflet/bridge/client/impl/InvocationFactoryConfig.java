@@ -1,7 +1,9 @@
 package hu.psprog.leaflet.bridge.client.impl;
 
+import hu.psprog.leaflet.bridge.client.handler.InvocationFactory;
+import hu.psprog.leaflet.bridge.client.request.RequestAdapter;
 import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
-import hu.psprog.leaflet.bridge.client.request.strategy.CallStrategy;
+import hu.psprog.leaflet.bridge.client.request.impl.HttpServletBasedRequestAdapter;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.model.ExtendedUserDetails;
 import hu.psprog.leaflet.security.sessionstore.domain.ClaimedTokenContext;
@@ -15,14 +17,14 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import static hu.psprog.leaflet.bridge.config.BridgeConfiguration.DEVICE_ID_HEADER;
+import static hu.psprog.leaflet.bridge.client.domain.BridgeConstants.DEVICE_ID_HEADER;
 
 /**
  * {@link InvocationFactory} bean configuration with mocked context.
@@ -73,9 +75,9 @@ public class InvocationFactoryConfig {
 
     @Bean
     @Primary
-    public InvocationFactory invocationFactory(RequestAuthentication requestAuthentication, List<CallStrategy> callStrategyList) {
+    public RequestAdapter requestAdapter(HttpServletResponse httpServletResponse) {
         Locale.setDefault(Locale.ENGLISH); // making sure, date format is not changed in different environments
-        return new InvocationFactory(requestAuthentication, callStrategyList, mockedHttpServletRequest());
+        return new HttpServletBasedRequestAdapter(mockedHttpServletRequest(), httpServletResponse);
     }
 
     public void setRemoteAddress(String remoteAddress) {
