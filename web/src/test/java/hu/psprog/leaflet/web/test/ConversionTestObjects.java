@@ -374,7 +374,6 @@ public abstract class ConversionTestObjects {
     protected static final TagCreateRequestModel TAG_CREATE_REQUEST_MODEL = prepareTagCreateRequestModel();
 
     protected static final EntryVO ENTRY_VO = EntryVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)
@@ -395,7 +394,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final EntryVO ENTRY_VO_FOR_CREATE = EntryVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withEnabled(ENABLED)
             .withLocale(LOCALE)
@@ -411,7 +409,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final EntryVO ENTRY_VO_FOR_UPDATE = EntryVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withEnabled(ENABLED)
             .withLocale(LOCALE)
@@ -449,7 +446,7 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final ExtendedEntryDataModel EXTENDED_ENTRY_DATA_MODEL = ExtendedEntryDataModel.getExtendedBuilder()
-            .withContent(CONTENT)
+            .withRawContent(RAW_CONTENT)
             .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
             .withTitle(TITLE)
             .withLink(LINK)
@@ -544,7 +541,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final DocumentVO DOCUMENT_VO_WITH_OWNER = DocumentVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)
@@ -560,7 +556,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final DocumentVO DOCUMENT_VO_WITH_OWNER_FOR_CREATE = DocumentVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withEnabled(ENABLED)
             .withLocale(LOCALE)
@@ -573,7 +568,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final DocumentVO DOCUMENT_VO_WITHOUT_OWNER_FOR_UPDATE = DocumentVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withEnabled(ENABLED)
             .withLocale(LOCALE)
@@ -592,7 +586,7 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withLink(LINK)
             .withTitle(TITLE)
-            .withContent(CONTENT)
+            .withRawContent(RAW_CONTENT)
             .withCreated(FORMATTED_CREATED_DATE)
             .withLocale(LOCALE.name())
             .withUser(USER_DATA_MODEL)
@@ -602,7 +596,6 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withLink(LINK)
             .withTitle(TITLE)
-            .withContent(CONTENT)
             .withCreated(FORMATTED_CREATED_DATE)
             .withLocale(LOCALE.name())
             .withUser(USER_DATA_MODEL)
@@ -718,7 +711,6 @@ public abstract class ConversionTestObjects {
 
         DocumentUpdateRequestModel documentUpdateRequestModel = new DocumentUpdateRequestModel();
         documentUpdateRequestModel.setTitle(TITLE);
-        documentUpdateRequestModel.setContent(CONTENT);
         documentUpdateRequestModel.setRawContent(RAW_CONTENT);
         documentUpdateRequestModel.setLink(LINK);
         documentUpdateRequestModel.setEnabled(ENABLED);
@@ -735,7 +727,6 @@ public abstract class ConversionTestObjects {
         DocumentCreateRequestModel documentCreateRequestModel = new DocumentCreateRequestModel();
         documentCreateRequestModel.setUserID(ID);
         documentCreateRequestModel.setTitle(TITLE);
-        documentCreateRequestModel.setContent(CONTENT);
         documentCreateRequestModel.setRawContent(RAW_CONTENT);
         documentCreateRequestModel.setLink(LINK);
         documentCreateRequestModel.setEnabled(ENABLED);
@@ -751,7 +742,6 @@ public abstract class ConversionTestObjects {
 
         EntryUpdateRequestModel entryUpdateRequestModel = new EntryUpdateRequestModel();
         entryUpdateRequestModel.setTitle(TITLE);
-        entryUpdateRequestModel.setContent(CONTENT);
         entryUpdateRequestModel.setRawContent(RAW_CONTENT);
         entryUpdateRequestModel.setPrologue(PROLOGUE);
         entryUpdateRequestModel.setCategoryID(ID);
@@ -771,7 +761,6 @@ public abstract class ConversionTestObjects {
         EntryCreateRequestModel entryCreateRequestModel = new EntryCreateRequestModel();
         entryCreateRequestModel.setUserID(ID);
         entryCreateRequestModel.setTitle(TITLE);
-        entryCreateRequestModel.setContent(CONTENT);
         entryCreateRequestModel.setRawContent(RAW_CONTENT);
         entryCreateRequestModel.setPrologue(PROLOGUE);
         entryCreateRequestModel.setCategoryID(ID);

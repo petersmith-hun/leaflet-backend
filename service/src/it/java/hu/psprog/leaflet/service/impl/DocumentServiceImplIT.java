@@ -60,7 +60,7 @@ public class DocumentServiceImplIT {
         DocumentVO result = documentService.getOne(controlDocumentVO.getId());
 
         // then
-        assertThat(result.getContent(), equalTo(controlDocumentVO.getContent()));
+        assertThat(result.getRawContent(), equalTo(controlDocumentVO.getRawContent()));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class DocumentServiceImplIT {
         // then
         assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.size(), equalTo(4));
-        assertThat(result.get(0).getContent(), equalTo(controlDocumentVO.getContent()));
+        assertThat(result.get(0).getRawContent(), equalTo(controlDocumentVO.getRawContent()));
     }
 
     @Test

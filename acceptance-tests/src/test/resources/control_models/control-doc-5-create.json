@@ -1,7 +1,6 @@
 {
   "title": "Doc #5 title",
   "link": "doc-5",
-  "content": "<h1>content-doc-5</h1>",
   "rawContent": "## content-doc-5",
   "locale": "HU",
   "enabled": false,

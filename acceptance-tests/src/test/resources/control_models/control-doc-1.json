@@ -3,7 +3,7 @@
     "id": 1,
     "title": "Doc #1 title",
     "link": "doc-1",
-    "content": "<h1>content-doc-1</h1>",
+    "rawContent": "## content-doc-1",
     "user": {
       "id": 1,
       "username": "Administrator"

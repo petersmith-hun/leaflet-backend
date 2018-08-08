@@ -42,8 +42,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     public EntryVO convert(Entry source) {
 
         EntryVO.EntryVOBuilder builder = EntryVO.getBuilder();
-        builder.withContent(source.getContent())
-                .withRawContent(source.getRawContent())
+        builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withEnabled(source.isEnabled())
                 .withLastModified(source.getLastModified())

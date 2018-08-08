@@ -1,6 +1,5 @@
 -- constants
 set @DEFAULT_DATE = '2016-08-18 10:00:00';
-set @ENTRY_CONTENT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tristique urna libero, et viverra metus tempus nec. Nulla varius quam arcu, ut auctor mauris egestas mollis. Phasellus nec ex nec augue rhoncus vulputate. Nulla tempor diam eget egestas ultrices. Sed dignissim diam posuere sem hendrerit efficitur. Quisque condimentum, arcu vel euismod accumsan, nisi mi volutpat turpis, a pharetra sapien erat ut libero. Integer luctus eu nibh eu volutpat. Proin pulvinar blandit ipsum, ut pretium lorem tincidunt nec.';
 set @ENTRY_TITLE = 'Lorem ipsum dolor sit amet';
 set @ENTRY_LINK = 'lorem-ipsum-dolor-sit-amet-20160818';
 set @COMMON_PROLOGUE = 'Fusce nec tortor vitae lorem volutpat finibus. Fusce condimentum diam sit amet leo pretium tincidunt. Duis vitae interdum dui. Nulla facilisi.';
@@ -26,9 +25,9 @@ values
 
 -- add test entry
 insert into leaflet_entries
-    (id, date_created, is_enabled, date_last_modified, content, link, locale, prologue, seo_description, seo_keywords, seo_title, title, category_id, user_id, status)
+    (id, date_created, is_enabled, date_last_modified, link, locale, prologue, seo_description, seo_keywords, seo_title, title, category_id, user_id, status)
 values
-    (@ENTRY_ID, @DEFAULT_DATE, true, @DEFAULT_DATE, @ENTRY_CONTENT, @ENTRY_LINK, @DEFAULT_LOCALE, @COMMON_PROLOGUE, @ENTRY_TITLE, @ENTRY_TITLE, @ENTRY_TITLE, @ENTRY_TITLE, @CATEGORY_ID, @USER_ID, @STATUS_PUBLIC);
+    (@ENTRY_ID, @DEFAULT_DATE, true, @DEFAULT_DATE, @ENTRY_LINK, @DEFAULT_LOCALE, @COMMON_PROLOGUE, @ENTRY_TITLE, @ENTRY_TITLE, @ENTRY_TITLE, @ENTRY_TITLE, @CATEGORY_ID, @USER_ID, @STATUS_PUBLIC);
 
 -- add some test comments
 insert into leaflet_comments

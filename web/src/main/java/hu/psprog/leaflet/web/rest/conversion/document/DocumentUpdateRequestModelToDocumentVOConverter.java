@@ -30,7 +30,6 @@ public class DocumentUpdateRequestModelToDocumentVOConverter implements Converte
 
         DocumentVO.DocumentVOBuilder builder = DocumentVO.getBuilder()
                 .withTitle(source.getTitle())
-                .withContent(source.getContent())
                 .withRawContent(source.getRawContent())
                 .withLink(source.getLink())
                 .withEnabled(source.isEnabled())

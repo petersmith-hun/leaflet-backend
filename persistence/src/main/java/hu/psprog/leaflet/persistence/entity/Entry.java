@@ -75,9 +75,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_PROLOGUE, columnDefinition = DatabaseConstants.DEF_TEXT)
     private String prologue;
 
-    @Column(name = DatabaseConstants.COLUMN_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
-    private String content;
-
     @Column(name = DatabaseConstants.COLUMN_RAW_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
     private String rawContent;
 
@@ -154,14 +151,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.prologue = prologue;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getRawContent() {
         return rawContent;
     }
@@ -227,7 +216,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(title, entry.title)
                 .append(link, entry.link)
                 .append(prologue, entry.prologue)
-                .append(content, entry.content)
                 .append(rawContent, entry.rawContent)
                 .append(seoTitle, entry.seoTitle)
                 .append(seoDescription, entry.seoDescription)
@@ -248,7 +236,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(title)
                 .append(link)
                 .append(prologue)
-                .append(content)
                 .append(rawContent)
                 .append(seoTitle)
                 .append(seoDescription)
@@ -272,7 +259,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append("title", title)
                 .append("link", link)
                 .append("prologue", prologue)
-                .append("content", content)
                 .append("rawContent", rawContent)
                 .append("seoTitle", seoTitle)
                 .append("seoDescription", seoDescription)
@@ -301,7 +287,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         private String title;
         private String link;
         private String prologue;
-        private String content;
         private String rawContent;
         private String seoTitle;
         private String seoDescription;
@@ -367,11 +352,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
-        public EntryBuilder withContent(String content) {
-            this.content = content;
-            return this;
-        }
-
         public EntryBuilder withRawContent(String rawContent) {
             this.rawContent = rawContent;
             return this;
@@ -415,7 +395,6 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             entry.setTitle(title);
             entry.setLink(link);
             entry.setPrologue(prologue);
-            entry.setContent(content);
             entry.setRawContent(rawContent);
             entry.setSeoTitle(seoTitle);
             entry.setSeoDescription(seoDescription);

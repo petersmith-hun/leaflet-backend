@@ -39,9 +39,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_LINK)
     private String link;
 
-    @Column(name = DatabaseConstants.COLUMN_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
-    private String content;
-
     @Column(name = DatabaseConstants.COLUMN_RAW_CONTENT, columnDefinition = DatabaseConstants.DEF_LONGTEXT)
     private String rawContent;
 
@@ -80,14 +77,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
 
     public void setLink(String link) {
         this.link = link;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public String getRawContent() {
@@ -143,7 +132,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(user, document.user)
                 .append(title, document.title)
                 .append(link, document.link)
-                .append(content, document.content)
                 .append(rawContent, document.rawContent)
                 .append(seoTitle, document.seoTitle)
                 .append(seoDescription, document.seoDescription)
@@ -159,7 +147,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(user)
                 .append(title)
                 .append(link)
-                .append(content)
                 .append(rawContent)
                 .append(seoTitle)
                 .append(seoDescription)
@@ -177,7 +164,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append("title", title)
                 .append("link", link)
                 .append("lastModified", getLastModified())
-                .append("content", content)
                 .append("enabled", isEnabled())
                 .append("rawContent", rawContent)
                 .append("seoTitle", seoTitle)
@@ -202,7 +188,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
         private User user;
         private String title;
         private String link;
-        private String content;
         private String rawContent;
         private String seoTitle;
         private String seoDescription;
@@ -247,11 +232,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
-        public DocumentBuilder withContent(String content) {
-            this.content = content;
-            return this;
-        }
-
         public DocumentBuilder withRawContent(String rawContent) {
             this.rawContent = rawContent;
             return this;
@@ -286,7 +266,6 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
             document.setUser(user);
             document.setTitle(title);
             document.setLink(link);
-            document.setContent(content);
             document.setRawContent(rawContent);
             document.setSeoTitle(seoTitle);
             document.setSeoDescription(seoDescription);

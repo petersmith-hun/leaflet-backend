@@ -85,7 +85,6 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
         Entry currentEntry = jpaRepository.getOne(id);
         if (currentEntry != null) {
             currentEntry.setTitle(updatedEntity.getTitle());
-            currentEntry.setContent(updatedEntity.getContent());
             currentEntry.setRawContent(updatedEntity.getRawContent());
             currentEntry.setPrologue(updatedEntity.getPrologue());
             currentEntry.setSeoTitle(updatedEntity.getSeoTitle());

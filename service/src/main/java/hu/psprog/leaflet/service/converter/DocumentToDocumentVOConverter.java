@@ -25,8 +25,7 @@ public class DocumentToDocumentVOConverter implements Converter<Document, Docume
     public DocumentVO convert(Document source) {
 
         DocumentVO.DocumentVOBuilder builder = DocumentVO.getBuilder();
-        builder.withContent(source.getContent())
-                .withRawContent(source.getRawContent())
+        builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withEnabled(source.isEnabled())
                 .withLastModified(source.getLastModified())
