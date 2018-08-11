@@ -209,7 +209,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     }
     
     private void assertModifiedEntry(Long entryID, EntryUpdateRequestModel expected) throws CommunicationFailureException {
-        assertThat(entryBridgeService.getEntryByLink(expected.getLink()).getBody().getContent(), equalTo(expected.getContent()));
+        assertThat(entryBridgeService.getEntryByLink(expected.getLink()).getBody().getRawContent(), equalTo(expected.getRawContent()));
         WrapperBodyDataModel<EditEntryDataModel> current = entryBridgeService.getEntryByID(entryID);
         assertThat(current.getBody().getCategory().getId(), equalTo(expected.getCategoryID()));
         assertThat(current.getBody().isEnabled(), is(expected.isEnabled()));
@@ -285,7 +285,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                     new Object[] {1, 30, CREATED, ASC,  19, 19, 1, false, false},
                     new Object[] {1, 30, TITLE,   DESC, 19, 19, 1, false, false},
                     new Object[] {2, 8,  TITLE,   ASC,  19, 8,  3, true,  true},
-                    new Object[] {3, 8,  CREATED, DESC, 19, 3,  3, false,  true},
+                    new Object[] {3, 8,  CREATED, DESC, 19, 3,  3, false, true},
             };
         }
 

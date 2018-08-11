@@ -114,7 +114,7 @@ public class EntryServiceImplIT {
                 .withId(id)
                 .withTitle(updatedEntryTitle)
                 .withEntryStatus(entryToUpdate.getEntryStatus())
-                .withContent(entryToUpdate.getContent())
+                .withRawContent(entryToUpdate.getRawContent())
                 .build();
 
         // when
@@ -124,7 +124,7 @@ public class EntryServiceImplIT {
         EntryVO updatedEntryVO = entryService.getOne(id);
         assertThat(result.getTitle(), equalTo(updatedEntryVO.getTitle()));
         assertThat(result.getTitle(), equalTo(updatedEntryTitle));
-        assertThat(updatedEntryVO.getContent(), equalTo(entryToUpdate.getContent()));
+        assertThat(updatedEntryVO.getRawContent(), equalTo(entryToUpdate.getRawContent()));
     }
 
     @Test

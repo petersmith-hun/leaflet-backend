@@ -164,7 +164,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     static final EntryVO ENTRY_VO = EntryVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)
@@ -185,7 +184,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     static final Entry ENTRY_BASE_DATA = Entry.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)
@@ -272,7 +270,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     static final DocumentVO DOCUMENT_VO_WITH_OWNER = DocumentVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)
@@ -288,7 +285,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     static final DocumentVO DOCUMENT_VO_WITHOUT_OWNER = DocumentVO.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)
@@ -303,7 +299,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     static final Document DOCUMENT_WITH_OWNER = Document.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)
@@ -319,7 +314,6 @@ public abstract class ConversionTestObjects {
             .build();
 
     static final Document DOCUMENT_WITHOUT_OWNER = Document.getBuilder()
-            .withContent(CONTENT)
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
             .withEnabled(ENABLED)

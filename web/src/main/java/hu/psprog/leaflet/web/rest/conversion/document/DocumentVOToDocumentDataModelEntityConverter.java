@@ -31,10 +31,10 @@ public class DocumentVOToDocumentDataModelEntityConverter implements Converter<D
     public DocumentDataModel convert(DocumentVO source) {
 
         DocumentDataModel.DocumentDataModelBuilder builder = DocumentDataModel.getBuilder()
+                .withRawContent(source.getRawContent())
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withLink(source.getLink())
-                .withContent(source.getContent())
                 .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
                 .withLocale(source.getLocale().name())
                 .withUser(UserDataModel.getBuilder()

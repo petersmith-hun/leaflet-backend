@@ -34,7 +34,6 @@ public class DocumentVOToEditDocumentDataModelEntityConverter implements Convert
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withLink(source.getLink())
-                .withContent(source.getContent())
                 .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
                 .withRawContent(source.getRawContent())
                 .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))

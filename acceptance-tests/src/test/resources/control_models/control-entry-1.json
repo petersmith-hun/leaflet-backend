@@ -58,7 +58,7 @@
       }
     ],
     "locale": "EN",
-    "content": "<h1>content-entry-1</h1>"
+    "rawContent": "## content-entry-1"
   },
   "pagination": null,
   "seo": {

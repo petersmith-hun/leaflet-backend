@@ -164,7 +164,6 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
 
     private void assertModifiedDocuments(Long documentID, DocumentUpdateRequestModel expected) throws CommunicationFailureException {
         WrapperBodyDataModel<EditDocumentDataModel> current = documentBridgeService.getDocumentByID(documentID);
-        assertThat(current.getBody().getContent(), equalTo(expected.getContent()));
         assertThat(current.getBody().getRawContent(), equalTo(expected.getRawContent()));
         assertThat(current.getBody().getTitle(), equalTo(expected.getTitle()));
         assertThat(current.getBody().getLink(), equalTo(expected.getLink()));

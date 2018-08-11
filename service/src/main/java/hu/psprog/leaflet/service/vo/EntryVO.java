@@ -35,7 +35,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     private String title;
     private String link;
     private String prologue;
-    private String content;
     private String rawContent;
     private String seoTitle;
     private String seoDescription;
@@ -57,10 +56,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
 
     public String getPrologue() {
         return prologue;
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public String getRawContent() {
@@ -124,7 +119,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
                 .append(title, entryVO.title)
                 .append(link, entryVO.link)
                 .append(prologue, entryVO.prologue)
-                .append(content, entryVO.content)
                 .append(rawContent, entryVO.rawContent)
                 .append(seoTitle, entryVO.seoTitle)
                 .append(seoDescription, entryVO.seoDescription)
@@ -145,7 +139,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
                 .append(title)
                 .append(link)
                 .append(prologue)
-                .append(content)
                 .append(rawContent)
                 .append(seoTitle)
                 .append(seoDescription)
@@ -169,7 +162,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
                 .append("title", title)
                 .append("link", link)
                 .append("prologue", prologue)
-                .append("content", content)
                 .append("rawContent", rawContent)
                 .append("seoTitle", seoTitle)
                 .append("seoDescription", seoDescription)
@@ -204,7 +196,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         private String title;
         private String link;
         private String prologue;
-        private String content;
         private String rawContent;
         private String seoTitle;
         private String seoDescription;
@@ -251,11 +242,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
 
         public EntryVOBuilder withPrologue(String prologue) {
             this.prologue = prologue;
-            return this;
-        }
-
-        public EntryVOBuilder withContent(String content) {
-            this.content = content;
             return this;
         }
 
@@ -316,7 +302,6 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
             entryVO.tags = this.tags;
             entryVO.title = this.title;
             entryVO.seoKeywords = this.seoKeywords;
-            entryVO.content = this.content;
             entryVO.category = this.category;
             entryVO.link = this.link;
             entryVO.prologue = this.prologue;

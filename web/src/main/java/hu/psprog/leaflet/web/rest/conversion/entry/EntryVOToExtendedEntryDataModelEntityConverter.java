@@ -41,7 +41,7 @@ public class EntryVOToExtendedEntryDataModelEntityConverter implements Converter
     public ExtendedEntryDataModel convert(EntryVO entryVO) {
 
         ExtendedEntryDataModel.ExtendedEntryDataModelBuilder builder = ExtendedEntryDataModel.getExtendedBuilder()
-                .withContent(entryVO.getContent())
+                .withRawContent(entryVO.getRawContent())
                 .withLastModified(commonFormatter.formatDate(entryVO.getLastModified(), httpServletRequest.getLocale()))
                 .withTitle(entryVO.getTitle())
                 .withLink(entryVO.getLink())

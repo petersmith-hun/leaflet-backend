@@ -40,42 +40,42 @@ values
 
 -- insert test documents
 insert into 
-  leaflet_documents(id, date_created, is_enabled, date_last_modified, content, raw_content, link, locale, seo_description, seo_keywords, seo_title, title, user_id)
+  leaflet_documents(id, date_created, is_enabled, date_last_modified, raw_content, link, locale, seo_description, seo_keywords, seo_title, title, user_id)
 values
-  (1, @CREATED_DATE, true, @CREATED_DATE, '<h1>content-doc-1</h1>', '## content-doc-1', 'doc-1', 'EN', 'Doc #1 SEO Desc', 'Doc #1 SEO Keywords', 'Doc #1 SEO Title', 'Doc #1 title', 1),
-  (2, @CREATED_DATE, true, @CREATED_DATE, '<h1>content-doc-2</h1>', '## content-doc-2', 'doc-2', 'EN', 'Doc #2 SEO Desc', 'Doc #2 SEO Keywords', 'Doc #2 SEO Title', 'Doc #2 title', 1),
-  (3, @CREATED_DATE, false, @CREATED_DATE, '<h1>content-doc-3</h1>', '## content-doc-3', 'doc-3', 'EN', 'Doc #3 SEO Desc', 'Doc #3 SEO Keywords', 'Doc #3 SEO Title', 'Doc #3 title', 3),
-  (4, @CREATED_DATE, true, @CREATED_DATE, '<h1>content-doc-4</h1>', '## content-doc-4', 'doc-4', 'EN', 'Doc #4 SEO Desc', 'Doc #4 SEO Keywords', 'Doc #4 SEO Title', 'Doc #4 title', 3);
+  (1, @CREATED_DATE, true, @CREATED_DATE, '## content-doc-1', 'doc-1', 'EN', 'Doc #1 SEO Desc', 'Doc #1 SEO Keywords', 'Doc #1 SEO Title', 'Doc #1 title', 1),
+  (2, @CREATED_DATE, true, @CREATED_DATE, '## content-doc-2', 'doc-2', 'EN', 'Doc #2 SEO Desc', 'Doc #2 SEO Keywords', 'Doc #2 SEO Title', 'Doc #2 title', 1),
+  (3, @CREATED_DATE, false, @CREATED_DATE, '## content-doc-3', 'doc-3', 'EN', 'Doc #3 SEO Desc', 'Doc #3 SEO Keywords', 'Doc #3 SEO Title', 'Doc #3 title', 3),
+  (4, @CREATED_DATE, true, @CREATED_DATE, '## content-doc-4', 'doc-4', 'EN', 'Doc #4 SEO Desc', 'Doc #4 SEO Keywords', 'Doc #4 SEO Title', 'Doc #4 title', 3);
 
 -- insert test entries
 insert into
-  leaflet_entries(id, category_id, date_created, is_enabled, date_last_modified, content, raw_content, link, locale, seo_description, seo_keywords, seo_title, title, user_id, prologue, status)
+  leaflet_entries(id, category_id, date_created, is_enabled, date_last_modified, raw_content, link, locale, seo_description, seo_keywords, seo_title, title, user_id, prologue, status)
 values
-  (1, 1, '2017-12-13 20:00:01.000', true, @MODIFIED_DATE, '<h1>content-entry-1</h1>', '## content-entry-1', 'entry-1', 'EN', 'Entry #1 SEO Desc', 'Entry #1 SEO Keywords', 'Entry #1 SEO Title', 'Entry #01 title', 1, 'Prologue #1', 'PUBLIC'),
-  (2, 1,'2017-12-13 20:00:02.000', true, @MODIFIED_DATE, '<h1>content-entry-2</h1>', '## content-entry-2', 'entry-2', 'EN', 'Entry #2 SEO Desc', 'Entry #2 SEO Keywords', 'Entry #2 SEO Title', 'Entry #02 title', 1, 'Prologue #2', 'DRAFT'),
-  (3, 1, '2017-12-13 20:00:03.000', false, @MODIFIED_DATE, '<h1>content-entry-3</h1>', '## content-entry-3', 'entry-3', 'EN', 'Entry #3 SEO Desc', 'Entry #3 SEO Keywords', 'Entry #3 SEO Title', 'Entry #03 title', 3, 'Prologue #3', 'PUBLIC'),
-  (4, 1, '2017-12-13 20:00:04.000', true, @MODIFIED_DATE, '<h1>content-entry-4</h1>', '## content-entry-4', 'entry-4', 'EN', 'Entry #4 SEO Desc', 'Entry #4 SEO Keywords', 'Entry #4 SEO Title', 'Entry #04 title', 3, 'Prologue #4', 'REVIEW'),
-  (5, 1, '2017-12-13 20:00:05.000', true, @MODIFIED_DATE, '<h1>content-entry-5</h1>', '## content-entry-5', 'entry-5', 'EN', 'Entry #5 SEO Desc', 'Entry #5 SEO Keywords', 'Entry #5 SEO Title', 'Entry #05 title', 3, 'Prologue #5', 'REVIEW'),
-  (6, 1, '2017-12-13 20:00:06.000', true, @MODIFIED_DATE, '<h1>content-entry-6</h1>', '## content-entry-6', 'entry-6', 'EN', 'Entry #6 SEO Desc', 'Entry #6 SEO Keywords', 'Entry #6 SEO Title', 'Entry #06 title', 3, 'Prologue #6', 'PUBLIC'),
-  (7, 1, '2017-12-13 20:00:07.000', true, @MODIFIED_DATE, '<h1>content-entry-7</h1>', '## content-entry-7', 'entry-7', 'EN', 'Entry #7 SEO Desc', 'Entry #7 SEO Keywords', 'Entry #7 SEO Title', 'Entry #07 title', 3, 'Prologue #7', 'PUBLIC'),
-  (8, 1, '2017-12-13 20:00:08.000', true, @MODIFIED_DATE, '<h1>content-entry-8</h1>', '## content-entry-8', 'entry-8', 'EN', 'Entry #8 SEO Desc', 'Entry #8 SEO Keywords', 'Entry #8 SEO Title', 'Entry #08 title', 3, 'Prologue #8', 'PUBLIC'),
-  (9, 1, '2017-12-13 20:00:09.000', true, @MODIFIED_DATE, '<h1>content-entry-9</h1>', '## content-entry-9', 'entry-9', 'EN', 'Entry #9 SEO Desc', 'Entry #9 SEO Keywords', 'Entry #9 SEO Title', 'Entry #09 title', 3, 'Prologue #9', 'PUBLIC'),
-  (10, 1, '2017-12-13 20:00:10.000', true, @MODIFIED_DATE, '<h1>content-entry-10</h1>', '## content-entry-10', 'entry-10', 'EN', 'Entry #10 SEO Desc', 'Entry #10 SEO Keywords', 'Entry #10 SEO Title', 'Entry #10 title', 3, 'Prologue #10', 'PUBLIC'),
-  (11, 1, '2017-12-13 20:00:11.000', true, @MODIFIED_DATE, '<h1>content-entry-11</h1>', '## content-entry-11', 'entry-11', 'EN', 'Entry #11 SEO Desc', 'Entry #11 SEO Keywords', 'Entry #11 SEO Title', 'Entry #11 title', 3, 'Prologue #11', 'PUBLIC'),
-  (12, 1, '2017-12-13 20:00:12.000', true, @MODIFIED_DATE, '<h1>content-entry-12</h1>', '## content-entry-12', 'entry-12', 'EN', 'Entry #12 SEO Desc', 'Entry #12 SEO Keywords', 'Entry #12 SEO Title', 'Entry #12 title', 1, 'Prologue #12', 'PUBLIC'),
-  (13, 2, '2017-12-13 20:00:13.000', true, @MODIFIED_DATE, '<h1>content-entry-13</h1>', '## content-entry-13', 'entry-13', 'EN', 'Entry #13 SEO Desc', 'Entry #13 SEO Keywords', 'Entry #13 SEO Title', 'Entry #13 title', 1, 'Prologue #13', 'PUBLIC'),
-  (14, 2, '2017-12-13 20:00:14.000', true, @MODIFIED_DATE, '<h1>content-entry-14</h1>', '## content-entry-14', 'entry-14', 'EN', 'Entry #14 SEO Desc', 'Entry #14 SEO Keywords', 'Entry #14 SEO Title', 'Entry #14 title', 3, 'Prologue #14', 'PUBLIC'),
-  (15, 2, '2017-12-13 20:00:15.000', true, @MODIFIED_DATE, '<h1>content-entry-15</h1>', '## content-entry-15', 'entry-15', 'EN', 'Entry #15 SEO Desc', 'Entry #15 SEO Keywords', 'Entry #15 SEO Title', 'Entry #15 title', 1, 'Prologue #15', 'PUBLIC'),
-  (16, 2, '2017-12-13 20:00:16.000', true, @MODIFIED_DATE, '<h1>content-entry-16</h1>', '## content-entry-16', 'entry-16', 'EN', 'Entry #16 SEO Desc', 'Entry #16 SEO Keywords', 'Entry #16 SEO Title', 'Entry #16 title', 1, 'Prologue #16', 'PUBLIC'),
-  (17, 2, '2017-12-13 20:00:17.000', true, @MODIFIED_DATE, '<h1>content-entry-17</h1>', '## content-entry-17', 'entry-17', 'EN', 'Entry #17 SEO Desc', 'Entry #17 SEO Keywords', 'Entry #17 SEO Title', 'Entry #17 title', 3, 'Prologue #17', 'PUBLIC'),
-  (18, 2, '2017-12-13 20:00:18.000', true, @MODIFIED_DATE, '<h1>content-entry-18</h1>', '## content-entry-18', 'entry-18', 'EN', 'Entry #18 SEO Desc', 'Entry #18 SEO Keywords', 'Entry #18 SEO Title', 'Entry #18 title', 3, 'Prologue #18', 'PUBLIC'),
-  (19, 2, '2017-12-13 20:00:19.000', true, @MODIFIED_DATE, '<h1>content-entry-19</h1>', '## content-entry-19', 'entry-19', 'EN', 'Entry #19 SEO Desc', 'Entry #19 SEO Keywords', 'Entry #19 SEO Title', 'Entry #19 title', 3, 'Prologue #19', 'DRAFT'),
-  (20, 2, '2017-12-13 20:00:20.000', true, @MODIFIED_DATE, '<h1>content-entry-20</h1>', '## content-entry-20', 'entry-20', 'EN', 'Entry #20 SEO Desc', 'Entry #20 SEO Keywords', 'Entry #20 SEO Title', 'Entry #20 title', 3, 'Prologue #20', 'DRAFT'),
-  (21, 2, '2017-12-13 20:00:21.000', true, @MODIFIED_DATE, '<h1>content-entry-21</h1>', '## content-entry-21', 'entry-21', 'EN', 'Entry #21 SEO Desc', 'Entry #21 SEO Keywords', 'Entry #21 SEO Title', 'Entry #21 title', 3, 'Prologue #21', 'PUBLIC'),
-  (22, 2, '2017-12-13 20:00:22.000', true, @MODIFIED_DATE, '<h1>content-entry-22</h1>', '## content-entry-22', 'entry-22', 'EN', 'Entry #22 SEO Desc', 'Entry #22 SEO Keywords', 'Entry #22 SEO Title', 'Entry #22 title', 3, 'Prologue #22', 'PUBLIC'),
-  (23, 2, '2017-12-13 20:00:23.000', true, @MODIFIED_DATE, '<h1>content-entry-23</h1>', '## content-entry-23', 'entry-23', 'EN', 'Entry #23 SEO Desc', 'Entry #23 SEO Keywords', 'Entry #23 SEO Title', 'Entry #23 title', 3, 'Prologue #23', 'PUBLIC'),
-  (24, 2, '2017-12-13 20:00:24.000', true, @MODIFIED_DATE, '<h1>content-entry-24</h1>', '## content-entry-24', 'entry-24', 'EN', 'Entry #24 SEO Desc', 'Entry #24 SEO Keywords', 'Entry #24 SEO Title', 'Entry #24 title', 3, 'Prologue #24', 'PUBLIC'),
-  (25, 2, '2017-12-13 20:00:25.000', true, @MODIFIED_DATE, '<h1>content-entry-25</h1>', '## content-entry-25', 'entry-25', 'EN', 'Entry #25 SEO Desc', 'Entry #25 SEO Keywords', 'Entry #25 SEO Title', 'Entry #25 title', 3, 'Prologue #25', 'PUBLIC');
+  (1, 1, '2017-12-13 20:00:01.000', true, @MODIFIED_DATE, '## content-entry-1', 'entry-1', 'EN', 'Entry #1 SEO Desc', 'Entry #1 SEO Keywords', 'Entry #1 SEO Title', 'Entry #01 title', 1, 'Prologue #1', 'PUBLIC'),
+  (2, 1,'2017-12-13 20:00:02.000', true, @MODIFIED_DATE, '## content-entry-2', 'entry-2', 'EN', 'Entry #2 SEO Desc', 'Entry #2 SEO Keywords', 'Entry #2 SEO Title', 'Entry #02 title', 1, 'Prologue #2', 'DRAFT'),
+  (3, 1, '2017-12-13 20:00:03.000', false, @MODIFIED_DATE, '## content-entry-3', 'entry-3', 'EN', 'Entry #3 SEO Desc', 'Entry #3 SEO Keywords', 'Entry #3 SEO Title', 'Entry #03 title', 3, 'Prologue #3', 'PUBLIC'),
+  (4, 1, '2017-12-13 20:00:04.000', true, @MODIFIED_DATE, '## content-entry-4', 'entry-4', 'EN', 'Entry #4 SEO Desc', 'Entry #4 SEO Keywords', 'Entry #4 SEO Title', 'Entry #04 title', 3, 'Prologue #4', 'REVIEW'),
+  (5, 1, '2017-12-13 20:00:05.000', true, @MODIFIED_DATE, '## content-entry-5', 'entry-5', 'EN', 'Entry #5 SEO Desc', 'Entry #5 SEO Keywords', 'Entry #5 SEO Title', 'Entry #05 title', 3, 'Prologue #5', 'REVIEW'),
+  (6, 1, '2017-12-13 20:00:06.000', true, @MODIFIED_DATE, '## content-entry-6', 'entry-6', 'EN', 'Entry #6 SEO Desc', 'Entry #6 SEO Keywords', 'Entry #6 SEO Title', 'Entry #06 title', 3, 'Prologue #6', 'PUBLIC'),
+  (7, 1, '2017-12-13 20:00:07.000', true, @MODIFIED_DATE, '## content-entry-7', 'entry-7', 'EN', 'Entry #7 SEO Desc', 'Entry #7 SEO Keywords', 'Entry #7 SEO Title', 'Entry #07 title', 3, 'Prologue #7', 'PUBLIC'),
+  (8, 1, '2017-12-13 20:00:08.000', true, @MODIFIED_DATE, '## content-entry-8', 'entry-8', 'EN', 'Entry #8 SEO Desc', 'Entry #8 SEO Keywords', 'Entry #8 SEO Title', 'Entry #08 title', 3, 'Prologue #8', 'PUBLIC'),
+  (9, 1, '2017-12-13 20:00:09.000', true, @MODIFIED_DATE, '## content-entry-9', 'entry-9', 'EN', 'Entry #9 SEO Desc', 'Entry #9 SEO Keywords', 'Entry #9 SEO Title', 'Entry #09 title', 3, 'Prologue #9', 'PUBLIC'),
+  (10, 1, '2017-12-13 20:00:10.000', true, @MODIFIED_DATE, '## content-entry-10', 'entry-10', 'EN', 'Entry #10 SEO Desc', 'Entry #10 SEO Keywords', 'Entry #10 SEO Title', 'Entry #10 title', 3, 'Prologue #10', 'PUBLIC'),
+  (11, 1, '2017-12-13 20:00:11.000', true, @MODIFIED_DATE, '## content-entry-11', 'entry-11', 'EN', 'Entry #11 SEO Desc', 'Entry #11 SEO Keywords', 'Entry #11 SEO Title', 'Entry #11 title', 3, 'Prologue #11', 'PUBLIC'),
+  (12, 1, '2017-12-13 20:00:12.000', true, @MODIFIED_DATE, '## content-entry-12', 'entry-12', 'EN', 'Entry #12 SEO Desc', 'Entry #12 SEO Keywords', 'Entry #12 SEO Title', 'Entry #12 title', 1, 'Prologue #12', 'PUBLIC'),
+  (13, 2, '2017-12-13 20:00:13.000', true, @MODIFIED_DATE, '## content-entry-13', 'entry-13', 'EN', 'Entry #13 SEO Desc', 'Entry #13 SEO Keywords', 'Entry #13 SEO Title', 'Entry #13 title', 1, 'Prologue #13', 'PUBLIC'),
+  (14, 2, '2017-12-13 20:00:14.000', true, @MODIFIED_DATE, '## content-entry-14', 'entry-14', 'EN', 'Entry #14 SEO Desc', 'Entry #14 SEO Keywords', 'Entry #14 SEO Title', 'Entry #14 title', 3, 'Prologue #14', 'PUBLIC'),
+  (15, 2, '2017-12-13 20:00:15.000', true, @MODIFIED_DATE, '## content-entry-15', 'entry-15', 'EN', 'Entry #15 SEO Desc', 'Entry #15 SEO Keywords', 'Entry #15 SEO Title', 'Entry #15 title', 1, 'Prologue #15', 'PUBLIC'),
+  (16, 2, '2017-12-13 20:00:16.000', true, @MODIFIED_DATE, '## content-entry-16', 'entry-16', 'EN', 'Entry #16 SEO Desc', 'Entry #16 SEO Keywords', 'Entry #16 SEO Title', 'Entry #16 title', 1, 'Prologue #16', 'PUBLIC'),
+  (17, 2, '2017-12-13 20:00:17.000', true, @MODIFIED_DATE, '## content-entry-17', 'entry-17', 'EN', 'Entry #17 SEO Desc', 'Entry #17 SEO Keywords', 'Entry #17 SEO Title', 'Entry #17 title', 3, 'Prologue #17', 'PUBLIC'),
+  (18, 2, '2017-12-13 20:00:18.000', true, @MODIFIED_DATE, '## content-entry-18', 'entry-18', 'EN', 'Entry #18 SEO Desc', 'Entry #18 SEO Keywords', 'Entry #18 SEO Title', 'Entry #18 title', 3, 'Prologue #18', 'PUBLIC'),
+  (19, 2, '2017-12-13 20:00:19.000', true, @MODIFIED_DATE, '## content-entry-19', 'entry-19', 'EN', 'Entry #19 SEO Desc', 'Entry #19 SEO Keywords', 'Entry #19 SEO Title', 'Entry #19 title', 3, 'Prologue #19', 'DRAFT'),
+  (20, 2, '2017-12-13 20:00:20.000', true, @MODIFIED_DATE, '## content-entry-20', 'entry-20', 'EN', 'Entry #20 SEO Desc', 'Entry #20 SEO Keywords', 'Entry #20 SEO Title', 'Entry #20 title', 3, 'Prologue #20', 'DRAFT'),
+  (21, 2, '2017-12-13 20:00:21.000', true, @MODIFIED_DATE, '## content-entry-21', 'entry-21', 'EN', 'Entry #21 SEO Desc', 'Entry #21 SEO Keywords', 'Entry #21 SEO Title', 'Entry #21 title', 3, 'Prologue #21', 'PUBLIC'),
+  (22, 2, '2017-12-13 20:00:22.000', true, @MODIFIED_DATE, '## content-entry-22', 'entry-22', 'EN', 'Entry #22 SEO Desc', 'Entry #22 SEO Keywords', 'Entry #22 SEO Title', 'Entry #22 title', 3, 'Prologue #22', 'PUBLIC'),
+  (23, 2, '2017-12-13 20:00:23.000', true, @MODIFIED_DATE, '## content-entry-23', 'entry-23', 'EN', 'Entry #23 SEO Desc', 'Entry #23 SEO Keywords', 'Entry #23 SEO Title', 'Entry #23 title', 3, 'Prologue #23', 'PUBLIC'),
+  (24, 2, '2017-12-13 20:00:24.000', true, @MODIFIED_DATE, '## content-entry-24', 'entry-24', 'EN', 'Entry #24 SEO Desc', 'Entry #24 SEO Keywords', 'Entry #24 SEO Title', 'Entry #24 title', 3, 'Prologue #24', 'PUBLIC'),
+  (25, 2, '2017-12-13 20:00:25.000', true, @MODIFIED_DATE, '## content-entry-25', 'entry-25', 'EN', 'Entry #25 SEO Desc', 'Entry #25 SEO Keywords', 'Entry #25 SEO Title', 'Entry #25 title', 3, 'Prologue #25', 'PUBLIC');
 
 -- insert test comments
 insert into 

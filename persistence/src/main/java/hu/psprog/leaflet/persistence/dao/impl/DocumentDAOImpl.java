@@ -41,7 +41,6 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
         Document currentDocument = jpaRepository.getOne(id);
         if (currentDocument != null) {
             currentDocument.setTitle(updatedEntity.getTitle());
-            currentDocument.setContent(updatedEntity.getContent());
             currentDocument.setRawContent(updatedEntity.getRawContent());
             currentDocument.setSeoTitle(updatedEntity.getSeoTitle());
             currentDocument.setSeoDescription(updatedEntity.getSeoDescription());

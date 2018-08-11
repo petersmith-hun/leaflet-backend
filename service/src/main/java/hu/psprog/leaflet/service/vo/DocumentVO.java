@@ -32,7 +32,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
 
     private String title;
     private String link;
-    private String content;
     private String rawContent;
     private String seoTitle;
     private String seoDescription;
@@ -46,10 +45,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
 
     public String getLink() {
         return link;
-    }
-
-    public String getContent() {
-        return content;
     }
 
     public String getRawContent() {
@@ -96,7 +91,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
                 .appendSuper(super.equals(o))
                 .append(title, that.title)
                 .append(link, that.link)
-                .append(content, that.content)
                 .append(rawContent, that.rawContent)
                 .append(seoTitle, that.seoTitle)
                 .append(seoDescription, that.seoDescription)
@@ -112,7 +106,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
                 .appendSuper(super.hashCode())
                 .append(title)
                 .append(link)
-                .append(content)
                 .append(rawContent)
                 .append(seoTitle)
                 .append(seoDescription)
@@ -131,7 +124,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
                 .append("title", title)
                 .append("enabled", enabled)
                 .append("link", link)
-                .append("content", content)
                 .append("rawContent", rawContent)
                 .append("seoTitle", seoTitle)
                 .append("seoDescription", seoDescription)
@@ -161,7 +153,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
         private boolean enabled;
         private String title;
         private String link;
-        private String content;
         private String rawContent;
         private String seoTitle;
         private String seoDescription;
@@ -202,11 +193,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
             return this;
         }
 
-        public DocumentVOBuilder withContent(String content) {
-            this.content = content;
-            return this;
-        }
-
         public DocumentVOBuilder withRawContent(String rawContent) {
             this.rawContent = rawContent;
             return this;
@@ -244,7 +230,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
             documentVO.rawContent = this.rawContent;
             documentVO.locale = this.locale;
             documentVO.link = this.link;
-            documentVO.content = this.content;
             documentVO.title = this.title;
             documentVO.id = this.id;
             documentVO.lastModified = this.lastModified;
