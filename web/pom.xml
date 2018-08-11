@@ -36,6 +36,10 @@
         </dependency>
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>tms-rest-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
             <artifactId>bridge-spring-integration</artifactId>
         </dependency>
 

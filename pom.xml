@@ -125,6 +125,11 @@
             </dependency>
             <dependency>
                 <groupId>hu.psprog.leaflet</groupId>
+                <artifactId>tms-rest-client</artifactId>
+                <version>${leaflet.rcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>hu.psprog.leaflet</groupId>
                 <artifactId>tlp-appender</artifactId>
                 <version>${leaflet.tlp-appender.version}</version>
             </dependency>
