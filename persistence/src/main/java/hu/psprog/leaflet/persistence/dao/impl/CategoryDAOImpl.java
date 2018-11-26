@@ -5,7 +5,6 @@ import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,7 @@ public class CategoryDAOImpl extends SelfStatusAwareDAOImpl<Category, Long> impl
 
     @Override
     public List<Category> findAll(Specification<Category> specification) {
-        return ((JpaSpecificationExecutor<Category>) jpaRepository).findAll(specification);
+        return ((CategoryRepository) jpaRepository).findAll(specification);
     }
 
     @Transactional

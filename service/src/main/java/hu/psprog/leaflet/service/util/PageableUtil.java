@@ -31,7 +31,7 @@ public class PageableUtil {
      */
     public static Pageable createPage(int page, int limit, OrderDirection direction, String orderBy) {
 
-        return new PageRequest(page - 1, limit, direction.getDirection(), orderBy);
+        return PageRequest.of(page - 1, limit, direction.getDirection(), orderBy);
     }
 
     /**
@@ -45,7 +45,7 @@ public class PageableUtil {
      */
     public static <T extends BaseVO, S extends SerializableEntity> EntityPageVO<T> convertPage(Page<S> page, Converter<S, T> converter) {
 
-        Page<T> remappedPage = page.map(converter);
+        Page<T> remappedPage = page.map(converter::convert);
 
         return EntityPageVO.getBuilder()
                 .withPageCount(remappedPage.getTotalPages())

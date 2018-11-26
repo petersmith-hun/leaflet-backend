@@ -61,7 +61,7 @@
         <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
         <commons.lang.version>3.8.1</commons.lang.version>
         <aspectj.weaver.version>1.9.2</aspectj.weaver.version>
-        <mysql-connector-java.version>5.1.47</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.13</mysql-connector-java.version>
         <metrics-spring.version>3.1.3</metrics-spring.version>
         <dropwizard-metrics.version>3.2.3</dropwizard-metrics.version>
 
