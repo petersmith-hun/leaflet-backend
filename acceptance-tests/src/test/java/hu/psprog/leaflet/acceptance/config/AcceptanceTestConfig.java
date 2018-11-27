@@ -45,7 +45,9 @@ public class AcceptanceTestConfig {
     }
 
     @Bean
+    @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
+        // suppressing warning: NoOp password encoding is only used for acceptance tests
         return NoOpPasswordEncoder.getInstance();
     }
 

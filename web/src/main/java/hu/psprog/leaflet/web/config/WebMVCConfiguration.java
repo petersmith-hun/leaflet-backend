@@ -10,7 +10,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Spring MVC configuration for REST web interface.
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  */
 @Configuration
 @EnableWebMvc
-public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
+public class WebMVCConfiguration implements WebMvcConfigurer {
 
     private ResponseFillerInterceptor responseFillerInterceptor;
 
@@ -41,7 +41,6 @@ public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(responseFillerInterceptor);
-        super.addInterceptors(registry);
     }
 
     @Override

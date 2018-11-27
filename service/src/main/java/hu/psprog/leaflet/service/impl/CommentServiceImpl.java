@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -104,7 +104,7 @@ public class CommentServiceImpl implements CommentService {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Entry entry = entryVOToEntryConverter.convert(entryVO);
-        Specifications<Comment> specifications = Specifications
+        Specification<Comment> specifications = Specification
                 .where(CommentSpecification.IS_ENABLED);
         Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 

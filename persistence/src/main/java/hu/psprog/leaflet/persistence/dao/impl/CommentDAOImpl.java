@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class CommentDAOImpl extends LogicallyDeletableSelfStatusAwareDAOImpl<Com
 
     @Override
     public Page<Comment> findByEntry(Specification<Comment> specification, Pageable pageable, Entry entry) {
-        return ((CommentRepository) jpaRepository).findAll(Specifications.where(specification)
+        return ((CommentRepository) jpaRepository).findAll(Specification.where(specification)
                 .and(CommentSpecification.isOwnedByEntry(entry)), pageable);
     }
 

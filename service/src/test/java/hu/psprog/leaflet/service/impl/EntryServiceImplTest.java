@@ -18,13 +18,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,9 +33,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -156,7 +155,7 @@ public class EntryServiceImplTest {
         // given
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
         given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
-        given(entryDAO.findAll(any(Specifications.class), any(Pageable.class))).willReturn(entryPage);
+        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntries(1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
@@ -174,7 +173,7 @@ public class EntryServiceImplTest {
         given(categoryVOToCategoryConverter.convert(any(CategoryVO.class))).willReturn(Category.getBuilder()
                 .withId(1L)
                 .build());
-        given(entryDAO.findAll(any(Specifications.class), any(Pageable.class))).willReturn(entryPage);
+        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(new CategoryVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);

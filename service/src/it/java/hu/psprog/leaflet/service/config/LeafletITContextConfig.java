@@ -216,7 +216,9 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     }
 
     @Bean
+    @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
+        // suppressing warning: NoOp password encoding is only used in tests
         return NoOpPasswordEncoder.getInstance();
     }
 
