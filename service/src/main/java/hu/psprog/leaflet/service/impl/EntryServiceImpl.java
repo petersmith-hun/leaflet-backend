@@ -183,7 +183,7 @@ public class EntryServiceImpl implements EntryService {
     @Override
     public List<EntryVO> getListOfPublicEntries() {
 
-        return entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, null).getContent().stream()
+        return entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, Pageable.unpaged()).getContent().stream()
                 .map(entryToEntryVOConverter::convert)
                 .collect(Collectors.toList());
     }

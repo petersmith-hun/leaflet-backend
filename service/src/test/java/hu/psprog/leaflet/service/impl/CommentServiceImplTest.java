@@ -52,7 +52,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class CommentServiceImplTest {
 
-    @Mock
+    @Mock(lenient = true)
     private CommentDAO commentDAO;
 
     @Mock
@@ -189,11 +189,13 @@ public class CommentServiceImplTest {
 
         // given
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
+        UserVO userVO = new UserVO();
+        given(userVOToUserConverter.convert(userVO)).willReturn(new User());
         given(commentDAO.findByUser(any(Pageable.class), any(User.class))).willReturn(commentPage);
+        given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForUser(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, new UserVO());
+        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForUser(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, userVO);
 
         // then
         assertThat(result, notNullValue());
@@ -272,16 +274,18 @@ public class CommentServiceImplTest {
         // given
         given(commentVOToCommentConverter.convert(commentVO)).willReturn(comment);
         given(commentDAO.save(comment)).willReturn(null);
-        given(comment.getId()).willReturn(1L);
 
         // when
-        commentService.createOne(commentVO);
+        try {
+            commentService.createOne(commentVO);
+        } finally {
 
-        // then
-        // expected exception
-        verify(commentVOToCommentConverter).convert(commentVO);
-        verify(commentDAO).save(comment);
-        verify(comment, never()).getId();
+            // then
+            // expected exception
+            verify(commentVOToCommentConverter).convert(commentVO);
+            verify(commentDAO).save(comment);
+            verify(comment, never()).getId();
+        }
     }
 
     @Test

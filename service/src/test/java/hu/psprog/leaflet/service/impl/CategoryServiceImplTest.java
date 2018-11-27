@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class CategoryServiceImplTest {
     
-    @Mock
+    @Mock(lenient = true)
     private CategoryDAO categoryDAO;
     
     @Mock

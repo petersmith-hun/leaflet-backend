@@ -343,7 +343,7 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
                 .build();
         List<UploadAcceptor> acceptors = Collections.singletonList(new ImageUploadAcceptor());
         given(uploadAcceptors.stream()).willReturn(acceptors.stream());
-        doThrow(IOException.class).when(fileStorage).getAbsolutePath();
+        given(fileStorage.getAbsolutePath()).willReturn("/non/existing/path");
 
         // when
         List<AcceptorInfoVO> result = fileManagementService.getAcceptorInfo();

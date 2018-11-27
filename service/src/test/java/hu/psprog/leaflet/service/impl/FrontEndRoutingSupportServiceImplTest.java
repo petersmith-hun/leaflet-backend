@@ -61,10 +61,10 @@ public class FrontEndRoutingSupportServiceImplTest {
     @Mock
     private ConversionService conversionService;
 
-    @Mock
+    @Mock(lenient = true)
     private RouteMaskProcessor firstRouteMaskProcessor;
 
-    @Mock
+    @Mock(lenient = true)
     private RouteMaskProcessor secondRouteMaskProcessor;
 
     @Mock

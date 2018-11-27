@@ -28,7 +28,7 @@ public class TemporalFileStorageBaseTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    @Mock
+    @Mock(lenient = true)
     protected File fileStorage;
 
     protected void prepareTemporaryStorage() throws IOException {

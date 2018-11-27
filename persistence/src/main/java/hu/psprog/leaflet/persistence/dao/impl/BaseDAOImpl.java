@@ -36,7 +36,8 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
 
     @Override
     public T findOne(ID id) {
-        return jpaRepository.getOne(id);
+        return jpaRepository.findById(id)
+                .orElse(null);
     }
 
     @Override

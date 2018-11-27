@@ -26,7 +26,7 @@ public class UserDetailsServiceImplTest {
     @Mock
     private UserDAO userDAO;
 
-    @Mock
+    @Mock(lenient = true)
     private UserValidatorChain userValidatorChain;
 
     @InjectMocks

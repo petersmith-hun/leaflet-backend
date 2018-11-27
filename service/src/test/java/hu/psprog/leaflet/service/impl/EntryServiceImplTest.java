@@ -49,7 +49,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class EntryServiceImplTest {
 
-    @Mock
+    @Mock(lenient = true)
     private EntryDAO entryDAO;
 
     @Mock
@@ -139,7 +139,7 @@ public class EntryServiceImplTest {
 
         // given
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
         given(entryDAO.findAll(any(Pageable.class))).willReturn(entryPage);
 
         // when
@@ -154,7 +154,7 @@ public class EntryServiceImplTest {
 
         // given
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
         given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
 
         // when
@@ -169,7 +169,7 @@ public class EntryServiceImplTest {
 
         // given
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
         given(categoryVOToCategoryConverter.convert(any(CategoryVO.class))).willReturn(Category.getBuilder()
                 .withId(1L)
                 .build());
@@ -186,7 +186,7 @@ public class EntryServiceImplTest {
     public void testGetListOfPublicEntries() {
 
         // given
-        given(entryDAO.findAll(any(Specification.class), eq(null))).willReturn(new PageImpl<>(Collections.singletonList(entry)));
+        given(entryDAO.findAll(any(Specification.class), eq(Pageable.unpaged()))).willReturn(new PageImpl<>(Collections.singletonList(entry)));
         given(entryToEntryVOConverter.convert(entry)).willReturn(entryVO);
 
         // when
