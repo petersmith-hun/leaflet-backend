@@ -22,7 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CommonFormatterTest {
 
     private static final Date DATE_TO_FORMAT = prepareDate();
-    private static final String FORMATTED_DATE = "Thursday, January 18, 2018 8:28 PM";
+    private static final String FORMATTED_DATE = "Thursday, January 18, 2018, 8:28 PM";
 
     @InjectMocks
     private CommonFormatter commonFormatter;

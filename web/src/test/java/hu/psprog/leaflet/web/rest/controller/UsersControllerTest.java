@@ -354,7 +354,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
 
         // given
         given(loginContextFactory.forLogin(LOGIN_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_LOGIN);
-        doThrow(ServiceException.class).when(userFacade).login(LOGIN_CONTEXT_VO_FOR_LOGIN);
+        doThrow(RuntimeException.class).when(userFacade).login(LOGIN_CONTEXT_VO_FOR_LOGIN);
 
         // when
         controller.claimToken(LOGIN_REQUEST_MODEL, httpServletRequest, bindingResult);
@@ -433,7 +433,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
     public void shouldRevokeTokenWithServiceException() throws RequestCouldNotBeFulfilledException {
 
         // given
-        doThrow(ServiceException.class).when(userFacade).logout();
+        doThrow(RuntimeException.class).when(userFacade).logout();
 
         // when
         controller.revokeToken();
@@ -488,7 +488,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
 
         // given
         given(loginContextFactory.forPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
-        doThrow(ServiceException.class).when(userFacade).demandPasswordReset(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
+        doThrow(RuntimeException.class).when(userFacade).demandPasswordReset(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
 
         // when
         controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest, bindingResult);
@@ -530,7 +530,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
 
         // given
         UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel();
-        doThrow(ServiceException.class).when(userFacade).confirmPasswordReset(userPasswordRequestModel.getPassword());
+        doThrow(RuntimeException.class).when(userFacade).confirmPasswordReset(userPasswordRequestModel.getPassword());
 
         // when
         controller.confirmPasswordReset(userPasswordRequestModel, bindingResult);
@@ -558,7 +558,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
 
         // given
         given(loginContextFactory.forRenewal(httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_RENEWAL);
-        doThrow(ServiceException.class).when(userFacade).extendSession(LOGIN_CONTEXT_VO_FOR_RENEWAL);
+        doThrow(RuntimeException.class).when(userFacade).extendSession(LOGIN_CONTEXT_VO_FOR_RENEWAL);
 
         // when
         controller.renewToken(httpServletRequest);

@@ -6,6 +6,7 @@ import hu.psprog.leaflet.api.rest.response.common.SEODataModel;
 import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.web.rest.controller.EntriesController;
 import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
@@ -41,6 +42,9 @@ public class ResponseFillerAspectTest {
     private static final EntryDataModel ENTRY_DATA_MODEL = EntryDataModel.getBuilder()
             .withLink("entry-link")
             .build();
+    private static final ExtendedEntryDataModel EXTENDED_ENTRY_DATA_MODEL = ExtendedEntryDataModel.getExtendedBuilder()
+            .withLink("entry-link")
+            .build();
     private static final EntryListDataModel ENTRY_LIST_DATA_MODEL = EntryListDataModel.getBuilder()
             .withItem(ENTRY_DATA_MODEL)
             .build();
@@ -74,7 +78,7 @@ public class ResponseFillerAspectTest {
         Object result = responseFillerAspect.aspectToWrapAnswer(proceedingJoinPoint);
 
         // then
-        assertWrappedStandardResponse(result);
+        assertWrappedStandardResponse(result, ENTRY_DATA_MODEL);
     }
 
     @Test
@@ -137,14 +141,13 @@ public class ResponseFillerAspectTest {
 
         // given
         prepareAspect(true);
-        given(proceedingJoinPoint.proceed()).willReturn(prepareStandardResponse());
-        given(conversionService.convert(any(), any())).willReturn(ENTRY_DATA_MODEL);
+        given(conversionService.convert(any(), any())).willReturn(EXTENDED_ENTRY_DATA_MODEL);
 
         // when
         ResponseEntity<?> result = preparePointcut().getEntryByLink("link");
 
         // then
-        assertWrappedStandardResponse(result);
+        assertWrappedStandardResponse(result, EXTENDED_ENTRY_DATA_MODEL);
     }
 
     @Test
@@ -162,12 +165,12 @@ public class ResponseFillerAspectTest {
         assertThat(result, equalTo(ResponseEntity.ok(ENTRY_LIST_DATA_MODEL)));
     }
 
-    private void assertWrappedStandardResponse(Object result) {
+    private void assertWrappedStandardResponse(Object result, EntryDataModel entryDataModel) {
         assertThat(result, notNullValue());
         ResponseEntity<?> responseEntity = (ResponseEntity<?>) result;
         assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(responseEntity.getBody(), equalTo(WrapperBodyDataModel.getBuilder()
-                .withBody(ENTRY_DATA_MODEL)
+                .withBody(entryDataModel)
                 .withSeo(TEST_WRAPPING)
                 .build()));
     }
