@@ -14,7 +14,6 @@
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
             <artifactId>leaflet-persistence</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
