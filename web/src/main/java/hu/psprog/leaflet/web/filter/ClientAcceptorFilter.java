@@ -57,7 +57,7 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
     public static final String HEADER_USER_AGENT = "User-Agent";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientAcceptorFilter.class);
-    private static final String ACCEPTED_CLIENT_LOG_MESSAGE = "Registering client [{}] with ID [{}], requiring security restrictions {}";
+    private static final String ACCEPTED_CLIENT_LOG_MESSAGE = "Registering service [{}] via Leaflet Link with ID [{}], requiring security restrictions {}";
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 

@@ -1,12 +1,14 @@
-module leaflet.app.backend.web {
+open module leaflet.app.backend.web {
     requires leaflet.app.backend.persistence;
     requires leaflet.app.backend.service;
     requires leaflet.component.bridge.api;
     requires leaflet.component.bridge.implementation;
+    requires leaflet.component.bridge.integration.spring;
     requires leaflet.component.rest.backend.api;
     requires leaflet.component.rest.recaptcha.api;
     requires leaflet.component.rest.recaptcha.client;
     requires leaflet.component.security.jwt;
+    requires leaflet.component.tlp.appender;
 
     requires java.annotation;
     requires java.compiler;

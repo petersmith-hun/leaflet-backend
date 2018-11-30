@@ -1,4 +1,4 @@
-module leaflet.app.backend.persistence {
+open module leaflet.app.backend.persistence {
     requires java.persistence;
     requires java.validation;
     requires org.apache.commons.lang3;

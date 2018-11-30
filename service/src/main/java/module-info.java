@@ -1,8 +1,9 @@
-module leaflet.app.backend.service {
+open module leaflet.app.backend.service {
     requires leaflet.app.backend.persistence;
     requires leaflet.component.mail;
     requires leaflet.component.security.jwt;
 
+    requires java.annotation;
     requires java.compiler;
     requires java.persistence;
     requires java.validation;

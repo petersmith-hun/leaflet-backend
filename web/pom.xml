@@ -131,7 +131,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9991</jvmArguments>
                     <arguments>
                         <argument>--spring.profiles.active=${spring.profiles.active}</argument>
                         <argument>--spring.config.location=${spring.config.location}</argument>
