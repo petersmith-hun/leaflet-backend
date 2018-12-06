@@ -5,5 +5,4 @@
           _/  _/        _/    _/    _/      _/  _/          _/         
          _/    _/_/_/    _/_/_/    _/      _/    _/_/_/      _/_/      
 
-            --== Starting Leaflet Backend v${app.version:snapshot} ==--
-            --== Powered by Spring Boot v${spring-boot.version} ==--
+          --== Powered by Spring Boot v${spring-boot.version} ==--
