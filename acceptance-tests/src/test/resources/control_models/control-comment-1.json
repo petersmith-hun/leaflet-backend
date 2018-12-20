@@ -5,8 +5,8 @@
     "username": "Test User 1"
   },
   "content": "Test comment 1",
-  "created": "Wednesday, December 13, 2017 8:00 PM",
-  "lastModified": "Monday, December 18, 2017 8:00 PM",
+  "created": "Wednesday, December 13, 2017, 8:00 PM",
+  "lastModified": "Monday, December 18, 2017, 8:00 PM",
   "deleted": false,
   "enabled": true,
   "associatedEntry": {
@@ -22,22 +22,22 @@
       {
         "id": 1,
         "name": "Tag #1",
-        "created": "Thursday, December 14, 2017 8:00 PM",
-        "lastModified": "Thursday, December 14, 2017 8:00 PM",
+        "created": "Thursday, December 14, 2017, 8:00 PM",
+        "lastModified": "Thursday, December 14, 2017, 8:00 PM",
         "enabled": true
       },
       {
         "id": 2,
         "name": "Tag #2",
-        "created": "Thursday, December 14, 2017 8:00 PM",
-        "lastModified": "Thursday, December 14, 2017 8:00 PM",
+        "created": "Thursday, December 14, 2017, 8:00 PM",
+        "lastModified": "Thursday, December 14, 2017, 8:00 PM",
         "enabled": true
       },
       {
         "id": 3,
         "name": "Tag #3",
-        "created": "Thursday, December 14, 2017 8:00 PM",
-        "lastModified": "Thursday, December 14, 2017 8:00 PM",
+        "created": "Thursday, December 14, 2017, 8:00 PM",
+        "lastModified": "Thursday, December 14, 2017, 8:00 PM",
         "enabled": false
       }
     ],
@@ -49,8 +49,8 @@
       "lastModified": null,
       "enabled": false
     },
-    "created": "Wednesday, December 13, 2017 8:00 PM",
-    "lastModified": "Monday, December 18, 2017 8:00 PM",
+    "created": "Wednesday, December 13, 2017, 8:00 PM",
+    "lastModified": "Monday, December 18, 2017, 8:00 PM",
     "attachments": [
       {
         "originalFilename": "original_filename_1.jpg",

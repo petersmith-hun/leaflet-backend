@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -180,13 +179,14 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
 
         return frontEndRouteDAO.findAll(buildFilter(specification)).stream()
                 .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(FrontEndRouteVO::getSequenceNumber))
                 .collect(Collectors.toList());
     }
 
     private Specification<FrontEndRoute> buildFilter(Specification<FrontEndRoute> specification) {
 
-        return Specifications
+        return Specification
                 .where(FrontEndRouteSpecification.IS_ENABLED)
                 .and(specification);
     }

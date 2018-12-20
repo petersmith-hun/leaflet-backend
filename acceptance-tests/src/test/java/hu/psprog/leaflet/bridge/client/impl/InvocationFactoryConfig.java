@@ -3,7 +3,7 @@ package hu.psprog.leaflet.bridge.client.impl;
 import hu.psprog.leaflet.bridge.client.handler.InvocationFactory;
 import hu.psprog.leaflet.bridge.client.request.RequestAdapter;
 import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
-import hu.psprog.leaflet.bridge.client.request.impl.HttpServletBasedRequestAdapter;
+import hu.psprog.leaflet.bridge.integration.request.adapter.HttpServletBasedRequestAdapter;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.model.ExtendedUserDetails;
 import hu.psprog.leaflet.security.sessionstore.domain.ClaimedTokenContext;

@@ -30,10 +30,10 @@ abstract class AbstractControllerBaseTest extends ConversionTestObjects {
     static final String DIRECTION = "ASC";
     static final String ORDER_BY = "CREATED";
     
-    @Mock
+    @Mock(lenient = true)
     BindingResult bindingResult;
 
-    @Mock
+    @Mock(lenient = true)
     ConversionService conversionService;
 
     @Mock

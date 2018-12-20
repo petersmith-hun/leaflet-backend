@@ -47,7 +47,9 @@ public class SecurityExpressionTest {
     private static final String AUTHORITY_USER = "USER";
     private static final String AUTHORITY_SERVICE = "SERVICE";
 
+    private static final long COMMENT_ID = 8L;
     private static final CommentVO COMMENT = CommentVO.getBuilder()
+            .withId(COMMENT_ID)
             .withOwner(UserVO.getBuilder()
                     .withId(CURRENT_USER_ID)
                     .build())

@@ -21,8 +21,8 @@ import org.springframework.security.core.Authentication;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 
 /**

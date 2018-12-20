@@ -35,10 +35,10 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -147,7 +147,7 @@ public class UserAuthenticationServiceImplTest {
     public void shouldClaimToken() {
 
         // when
-        String result = userAuthenticationService.claimToken(LOGIN_CONTEXT_VO);
+        userAuthenticationService.claimToken(LOGIN_CONTEXT_VO);
 
         // then
         verify(authenticationManager).authenticate(USERNAME_PASSWORD_AUTHENTICATION_TOKEN);

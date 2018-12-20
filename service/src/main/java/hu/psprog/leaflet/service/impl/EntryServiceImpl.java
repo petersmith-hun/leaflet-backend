@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class EntryServiceImpl implements EntryService {
 
     private static final String AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS = "An entry with the specified link already exists.";
     private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
-    private static final Specifications<Entry> PUBLIC_ENTRIES_SPECIFICATION = Specifications
+    private static final Specification<Entry> PUBLIC_ENTRIES_SPECIFICATION = Specification
             .where(EntrySpecification.IS_PUBLIC)
             .and(EntrySpecification.IS_ENABLED);
 
@@ -171,7 +171,7 @@ public class EntryServiceImpl implements EntryService {
     public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Specifications<Entry> specs = Specifications
+        Specification<Entry> specs = Specification
                 .where(EntrySpecification.isUnderCategory(categoryVOToCategoryConverter.convert(categoryVO)))
                 .and(EntrySpecification.IS_PUBLIC)
                 .and(EntrySpecification.IS_ENABLED);
@@ -183,7 +183,7 @@ public class EntryServiceImpl implements EntryService {
     @Override
     public List<EntryVO> getListOfPublicEntries() {
 
-        return entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, null).getContent().stream()
+        return entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, Pageable.unpaged()).getContent().stream()
                 .map(entryToEntryVOConverter::convert)
                 .collect(Collectors.toList());
     }

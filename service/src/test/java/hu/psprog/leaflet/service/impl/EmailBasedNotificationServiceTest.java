@@ -19,11 +19,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verify;
 public class EmailBasedNotificationServiceTest {
 
     private static final Observable<MailDeliveryInfo> DELIVERY_INFO_OBSERVABLE = Observable.empty();
+    private static final String DESTINATION_EMAIL_ADDRESS = "destination-email-address";
 
     @Mock
     private MailClient mailClient;
@@ -86,9 +87,12 @@ public class EmailBasedNotificationServiceTest {
 
         // given
         prepareMockFactory(passwordResetRequestMailFactory);
+        PasswordResetRequest passwordResetRequest = PasswordResetRequest.getBuilder()
+                .withParticipant(DESTINATION_EMAIL_ADDRESS)
+                .build();
 
         // when
-        emailBasedNotificationService.passwordResetRequested(PasswordResetRequest.getBuilder().build());
+        emailBasedNotificationService.passwordResetRequested(passwordResetRequest);
 
         // then
         assertMailSentAndObserverAttached();
@@ -99,9 +103,12 @@ public class EmailBasedNotificationServiceTest {
 
         // given
         prepareMockFactory(passwordResetSuccessMailFactory);
+        PasswordResetSuccess passwordResetSuccess = PasswordResetSuccess.getBuilder()
+                .withParticipant(DESTINATION_EMAIL_ADDRESS)
+                .build();
 
         // when
-        emailBasedNotificationService.successfulPasswordReset(PasswordResetSuccess.getBuilder().build());
+        emailBasedNotificationService.successfulPasswordReset(passwordResetSuccess);
 
         // then
         assertMailSentAndObserverAttached();
@@ -112,9 +119,12 @@ public class EmailBasedNotificationServiceTest {
 
         // given
         prepareMockFactory(commentNotificationMailFactory);
+        CommentNotification commentNotification = CommentNotification.getBuilder()
+                .withAuthorEmail(DESTINATION_EMAIL_ADDRESS)
+                .build();
 
         // when
-        emailBasedNotificationService.commentNotification(CommentNotification.getBuilder().build());
+        emailBasedNotificationService.commentNotification(commentNotification);
 
         // then
         assertMailSentAndObserverAttached();

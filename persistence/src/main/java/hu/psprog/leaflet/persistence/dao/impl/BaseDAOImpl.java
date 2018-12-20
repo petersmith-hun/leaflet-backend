@@ -31,12 +31,13 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
 
     @Override
     public boolean exists(ID id) {
-        return jpaRepository.exists(id);
+        return jpaRepository.existsById(id);
     }
 
     @Override
     public T findOne(ID id) {
-        return jpaRepository.findOne(id);
+        return jpaRepository.findById(id)
+                .orElse(null);
     }
 
     @Override
@@ -51,7 +52,7 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
 
     @Override
     public void delete(ID id) {
-        jpaRepository.delete(id);
+        jpaRepository.deleteById(id);
     }
 
     @Override

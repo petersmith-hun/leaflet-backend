@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -343,7 +343,7 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
                 .build();
         List<UploadAcceptor> acceptors = Collections.singletonList(new ImageUploadAcceptor());
         given(uploadAcceptors.stream()).willReturn(acceptors.stream());
-        doThrow(IOException.class).when(fileStorage).getAbsolutePath();
+        given(fileStorage.getAbsolutePath()).willReturn("/non/existing/path");
 
         // when
         List<AcceptorInfoVO> result = fileManagementService.getAcceptorInfo();

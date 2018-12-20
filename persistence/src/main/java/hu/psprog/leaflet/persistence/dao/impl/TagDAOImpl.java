@@ -5,7 +5,6 @@ import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,7 @@ public class TagDAOImpl extends SelfStatusAwareDAOImpl<Tag, Long> implements Tag
 
     @Override
     public List<Tag> findAll(Specification<Tag> specification) {
-        return ((JpaSpecificationExecutor) jpaRepository).findAll(specification);
+        return ((TagRepository) jpaRepository).findAll(specification);
     }
 
     @Transactional

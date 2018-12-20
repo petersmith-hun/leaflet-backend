@@ -13,14 +13,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -65,6 +65,7 @@ public class CommentFacadeImplTest {
 
         // given
         CommentVO commentVO = prepareCommentVO(REGISTERED_USER_ID);
+        given(commentService.createOne(commentVO)).willReturn(COMMENT_ID);
 
         // when
         commentFacade.createOne(commentVO);
@@ -72,7 +73,7 @@ public class CommentFacadeImplTest {
         // then
         verifyZeroInteractions(userService);
         verify(commentService).createOne(commentVO);
-        verify(commentService).notifyEntryAuthor(anyLong());
+        verify(commentService).notifyEntryAuthor(COMMENT_ID);
     }
 
     @Test
@@ -96,8 +97,10 @@ public class CommentFacadeImplTest {
 
         // given
         CommentVO commentVO = prepareCommentVO(null);
+        CommentVO commentVOWithUserID = prepareCommentVO(NEW_NO_LOGIN_USER_ID);
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(null);
         given(userService.registerNoLogin(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
+        given(commentService.createOne(commentVOWithUserID)).willReturn(COMMENT_ID);
 
         // when
         commentFacade.createOne(commentVO);
@@ -105,8 +108,8 @@ public class CommentFacadeImplTest {
         // then
         verify(userService).silentGetUserByEmail(USER_EMAIL);
         verify(userService).registerNoLogin(any(UserVO.class));
-        verify(commentService).createOne(prepareCommentVO(NEW_NO_LOGIN_USER_ID));
-        verify(commentService).notifyEntryAuthor(anyLong());
+        verify(commentService).createOne(commentVOWithUserID);
+        verify(commentService).notifyEntryAuthor(COMMENT_ID);
     }
 
     @Test
@@ -114,9 +117,10 @@ public class CommentFacadeImplTest {
 
         // given
         CommentVO commentVO = prepareCommentVO(null);
+        CommentVO commentVOWithUserID = prepareCommentVO(REGISTERED_USER_ID);
         UserVO userVO = prepareUserVO(false);
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(userVO);
-        given(userService.createOne(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
+        given(commentService.createOne(commentVOWithUserID)).willReturn(COMMENT_ID);
 
         // when
         commentFacade.createOne(commentVO);
@@ -124,8 +128,8 @@ public class CommentFacadeImplTest {
         // then
         verify(userService).silentGetUserByEmail(USER_EMAIL);
         verify(userService, never()).createOne(any(UserVO.class));
-        verify(commentService).createOne(prepareCommentVO(REGISTERED_USER_ID));
-        verify(commentService).notifyEntryAuthor(anyLong());
+        verify(commentService).createOne(commentVOWithUserID);
+        verify(commentService).notifyEntryAuthor(COMMENT_ID);
     }
 
     @Test(expected = EntityCreationException.class)
@@ -135,17 +139,18 @@ public class CommentFacadeImplTest {
         CommentVO commentVO = prepareCommentVO(null);
         UserVO userVO = prepareUserVO(true);
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(userVO);
-        given(userService.createOne(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
 
         // when
-        commentFacade.createOne(commentVO);
+        try {
+            commentFacade.createOne(commentVO);
+        } finally {
 
-        // then
-        // expected exception
-        verify(userService).silentGetUserByEmail(USER_EMAIL);
-        verify(userService, never()).createOne(any(UserVO.class));
-        verify(commentService, never()).createOne(any(CommentVO.class));
-        assertThat(commentVO.getOwner().getId(), equalTo(REGISTERED_USER_ID));
+            // then
+            // expected exception
+            verify(userService).silentGetUserByEmail(USER_EMAIL);
+            verify(userService, never()).createOne(any(UserVO.class));
+            verify(commentService, never()).createOne(any(CommentVO.class));
+        }
     }
 
     @Test

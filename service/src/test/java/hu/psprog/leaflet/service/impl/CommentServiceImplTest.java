@@ -23,11 +23,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,8 +38,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -52,7 +52,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(MockitoJUnitRunner.class)
 public class CommentServiceImplTest {
 
-    @Mock
+    @Mock(lenient = true)
     private CommentDAO commentDAO;
 
     @Mock
@@ -175,7 +175,7 @@ public class CommentServiceImplTest {
         // given
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
         given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
-        given(commentDAO.findByEntry(any(Specifications.class), any(Pageable.class), any(Entry.class))).willReturn(commentPage);
+        given(commentDAO.findByEntry(any(Specification.class), any(Pageable.class), any(Entry.class))).willReturn(commentPage);
 
         // when
         EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, new EntryVO());
@@ -189,11 +189,13 @@ public class CommentServiceImplTest {
 
         // given
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
+        UserVO userVO = new UserVO();
+        given(userVOToUserConverter.convert(userVO)).willReturn(new User());
         given(commentDAO.findByUser(any(Pageable.class), any(User.class))).willReturn(commentPage);
+        given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForUser(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, new UserVO());
+        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForUser(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, userVO);
 
         // then
         assertThat(result, notNullValue());
@@ -272,16 +274,18 @@ public class CommentServiceImplTest {
         // given
         given(commentVOToCommentConverter.convert(commentVO)).willReturn(comment);
         given(commentDAO.save(comment)).willReturn(null);
-        given(comment.getId()).willReturn(1L);
 
         // when
-        commentService.createOne(commentVO);
+        try {
+            commentService.createOne(commentVO);
+        } finally {
 
-        // then
-        // expected exception
-        verify(commentVOToCommentConverter).convert(commentVO);
-        verify(commentDAO).save(comment);
-        verify(comment, never()).getId();
+            // then
+            // expected exception
+            verify(commentVOToCommentConverter).convert(commentVO);
+            verify(commentDAO).save(comment);
+            verify(comment, never()).getId();
+        }
     }
 
     @Test

@@ -1,30 +1,32 @@
 # acceptance tests configuration
 spring:
-    jpa:
-        database-platform: org.hibernate.dialect.MySQL57Dialect
-        show-sql: false
-        hibernate:
-            ddl-auto: update
-    datasource:
-        url: jdbc:h2:mem:acceptance
-        username: sa
-        password:
-        driver-class-name: org.h2.Driver
-        initialize: true
-    mvc:
-        servlet:
-            load-on-startup: 1
-    http:
-        multipart:
-            location: ${java.io.tmpdir}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL57Dialect
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:h2:mem:acceptance
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  mvc:
+    servlet:
+      load-on-startup: 1
+  servlet:
+    multipart:
+      location: ${java.io.tmpdir}
+  main:
+    allow-bean-definition-overriding: true
 
 files:
-    upload:
-        storage-path: ${java.io.tmpdir}
+  upload:
+    storage-path: ${java.io.tmpdir}
 
 server:
+  servlet:
     context-path: /api
-    port: 9988
+  port: 9988
 
 bridge.clients:
   tms.host-url: http://localhost:8086/tms
@@ -40,50 +42,50 @@ tms:
   forced-locale: en
 
 jwt:
-    secret: acceptance-jwt-secret
-    expire:
-        hours: 1
+  secret: acceptance-jwt-secret
+  expire:
+    hours: 1
 
 usersEnabledByDefault: true
 
 test-auth:
-    username: test-admin@ac-leaflet.local
-    real-name: Administrator
-    authority: ADMIN
-    remote-address: 127.0.0.1
-    device-id: 5b375cd1-543c-48b2-bdee-bbc049aa09e5
+  username: test-admin@ac-leaflet.local
+  real-name: Administrator
+  authority: ADMIN
+  remote-address: 127.0.0.1
+  device-id: 5b375cd1-543c-48b2-bdee-bbc049aa09e5
 
 session-store:
-    auto-cleanup:
-        enabled: false
-        threshold: 5
-        schedule: "0 0 * * * *"
+  auto-cleanup:
+    enabled: false
+    threshold: 5
+    schedule: "0 0 * * * *"
 
 metrics:
-    enabled: false
-    prefix: leaflet
-    host: localhost
-    port: 2003
-    period: 5
-    unit: SECONDS
+  enabled: false
+  prefix: leaflet
+  host: localhost
+  port: 2003
+  period: 5
+  unit: SECONDS
 
 mail:
-    smtp:
-        host: acceptance.no-server
-        port: 25
-        username: acceptance
-        password: 1234
-    notification: leaflet@acceptance
-    sender:
-        address: leaflet@acceptance
-        name: "Leaflet Acceptance"
-    renderer: hu.psprog.leaflet.mail.client.renderer.impl.ThymeleafMailRenderer
-    event:
-        comment-notification:
-            enabled: true
-        startup:
-            enabled: false
-        password-reset:
-            url:
-                elevated: "https://localhost:9988/lms/password-reset/{token}"
-                visitor: "https://localhost:9988/password-reset/{token}"
+  smtp:
+    host: acceptance.no-server
+    port: 25
+    username: acceptance
+    password: 1234
+  notification: leaflet@acceptance
+  sender:
+    address: leaflet@acceptance
+    name: "Leaflet Acceptance"
+  renderer: hu.psprog.leaflet.mail.client.renderer.impl.ThymeleafMailRenderer
+  event:
+    comment-notification:
+      enabled: true
+    startup:
+      enabled: false
+    password-reset:
+      url:
+        elevated: "https://localhost:9988/lms/password-reset/{token}"
+        visitor: "https://localhost:9988/password-reset/{token}"

@@ -4,14 +4,11 @@ import hu.psprog.leaflet.web.filter.restrictions.domain.ClientAcceptorConfigurat
 import hu.psprog.leaflet.web.filter.restrictions.domain.RestrictionType;
 import hu.psprog.leaflet.web.filter.restrictions.strategy.RestrictionValidatorStrategy;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.env.Environment;
 import org.springframework.util.ReflectionUtils;
 
 import javax.servlet.FilterChain;
@@ -32,9 +29,9 @@ import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -81,14 +78,7 @@ public class ClientAcceptorFilterTest {
     @Mock
     private FilterChain filterChain;
 
-    @Mock
-    private ConditionContext conditionContext;
-
-    @Mock
-    private Environment environment;
-
     private ClientAcceptorFilter clientAcceptorFilter;
-    private ClientAcceptorFilter.ClientAcceptorFilterCondition clientAcceptorFilterCondition;
 
     @Before
     public void setup() {
@@ -181,22 +171,6 @@ public class ClientAcceptorFilterTest {
 
         // when
         callFilterForException();
-    }
-
-    @Test
-    @Parameters(value = {"true", "false"})
-    public void shouldControlFilterStatus(boolean filterStatus) {
-
-        // given
-        given(conditionContext.getEnvironment()).willReturn(environment);
-        given(environment.getProperty(SECURITY_CHECKS_ENABLED_PROPERTY, Boolean.class)).willReturn(filterStatus);
-        clientAcceptorFilterCondition = new ClientAcceptorFilter.ClientAcceptorFilterCondition();
-
-        // when
-        boolean result = clientAcceptorFilterCondition.matches(conditionContext, null);
-
-        // then
-        assertThat(result, is(filterStatus));
     }
 
     private void callFilterForException() throws ServletException, IOException {

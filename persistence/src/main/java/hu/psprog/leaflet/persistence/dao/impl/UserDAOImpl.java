@@ -73,6 +73,6 @@ public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements U
     }
 
     private Optional<User> findUser(Long id) {
-        return Optional.ofNullable(jpaRepository.findOne(id));
+        return Optional.ofNullable(jpaRepository.getOne(id));
     }
 }

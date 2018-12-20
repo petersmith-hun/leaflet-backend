@@ -901,13 +901,13 @@ public abstract class ConversionTestObjects {
         return frontEndRouteUpdateRequestModel;
     }
 
-    @Mock
+    @Mock(lenient = true)
     protected CommonFormatter commonFormatter;
 
-    @Mock
+    @Mock(lenient = true)
     protected HttpServletRequest httpServletRequest;
 
-    @Mock
+    @Mock(lenient = true)
     protected JULocaleToLeafletLocaleConverter localeConverter;
 
     @Before

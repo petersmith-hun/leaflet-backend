@@ -10,13 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -53,14 +50,14 @@ import java.util.stream.Collectors;
 @Component
 @ConfigurationProperties(prefix = "leaflet-link")
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-@Conditional(ClientAcceptorFilter.ClientAcceptorFilterCondition.class)
+@ConditionalOnProperty(value = "leaflet-link.security-checks-enabled", havingValue = "true")
 public class ClientAcceptorFilter extends OncePerRequestFilter {
 
     public static final String HEADER_CLIENT_ID = "X-Client-ID";
     public static final String HEADER_USER_AGENT = "User-Agent";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientAcceptorFilter.class);
-    private static final String ACCEPTED_CLIENT_LOG_MESSAGE = "Registering client [{}] with ID [{}], requiring security restrictions {}";
+    private static final String ACCEPTED_CLIENT_LOG_MESSAGE = "Registering service [{}] via Leaflet Link with ID [{}], requiring security restrictions {}";
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
@@ -144,18 +141,5 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
         }
 
         return clientID;
-    }
-
-    /**
-     * Filter condition so it can be switched entirely off by configuration.
-     */
-    static class ClientAcceptorFilterCondition implements Condition {
-
-        private static final String LEAFLET_LINK_SECURITY_CHECKS_ENABLED = "leaflet-link.security-checks-enabled";
-
-        @Override
-        public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-            return context.getEnvironment().getProperty(LEAFLET_LINK_SECURITY_CHECKS_ENABLED, Boolean.class);
-        }
     }
 }
