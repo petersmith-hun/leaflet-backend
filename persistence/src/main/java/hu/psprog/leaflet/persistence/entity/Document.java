@@ -45,7 +45,7 @@ public class Document extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_SEO_TITLE)
     private String seoTitle;
 
-    @Column(name = DatabaseConstants.COLUMN_SEO_DESCRIPTION)
+    @Column(name = DatabaseConstants.COLUMN_SEO_DESCRIPTION, length = 4095)
     private String seoDescription;
 
     @Column(name = DatabaseConstants.COLUMN_SEO_KEYWORDS)
