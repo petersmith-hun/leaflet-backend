@@ -2,10 +2,13 @@ package hu.psprog.leaflet.web.rest.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,7 +19,7 @@ import java.io.PrintWriter;
  *
  * @author Peter Smith
  */
-public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint, AuthenticationFailureHandler {
 
     private static final String UNAUTHORIZED_ACCESS = "Unauthorized access";
     private static final String CONTENT_TYPE = "application/json";
@@ -24,9 +27,22 @@ public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private ExceptionHandlerCounters exceptionHandlerCounters;
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+        handleFailure(request, response, authException);
+    }
 
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        handleFailure(request, response, exception);
+    }
+
+    private void handleFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+
+        exceptionHandlerCounters.authenticationFailure();
         PrintWriter responseWriter = response.getWriter();
         ErrorMessageDataModel errorMessageDataModel = ErrorMessageDataModel.getBuilder()
                 .withMessage(UNAUTHORIZED_ACCESS)
