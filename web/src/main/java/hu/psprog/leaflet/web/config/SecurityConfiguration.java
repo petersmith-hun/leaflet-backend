@@ -5,6 +5,7 @@ import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationProvider;
 import hu.psprog.leaflet.security.jwt.filter.JWTAuthenticationFilter;
 import hu.psprog.leaflet.web.rest.handler.RESTAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,7 +21,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -51,6 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/users/reclaim"};
 
     @Autowired
+    @Qualifier("userDetailsServiceImpl")
     private UserDetailsService userDetailsService;
 
     @Autowired
@@ -74,8 +75,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    AuthenticationEntryPoint restAuthenticationEntryPoint() {
-
+    public RESTAuthenticationEntryPoint restAuthenticationEntryPoint() {
         return new RESTAuthenticationEntryPoint();
     }
 
@@ -126,6 +126,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private JWTAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
         JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtComponent);
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
+        jwtAuthenticationFilter.setAuthenticationFailureHandler(restAuthenticationEntryPoint());
         return jwtAuthenticationFilter;
     }
 }
