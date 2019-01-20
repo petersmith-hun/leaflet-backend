@@ -268,7 +268,7 @@ public class UsersController extends BaseController {
     @RequestMapping(method = RequestMethod.POST, path = PATH_CLAIM_TOKEN)
     @Timed
     public ResponseEntity<BaseBodyDataModel> claimToken(@RequestBody @Valid LoginRequestModel loginRequestModel,
-                                                        HttpServletRequest httpServletRequest, BindingResult bindingResult)
+                                                        BindingResult bindingResult, HttpServletRequest httpServletRequest)
             throws TokenClaimException {
 
         if (bindingResult.hasErrors()) {
@@ -356,7 +356,7 @@ public class UsersController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.POST, path = PATH_RECLAIM)
     public ResponseEntity<BaseBodyDataModel> demandPasswordReset(@RequestBody @Valid PasswordResetDemandRequestModel passwordResetDemandRequestModel,
-                                                                 HttpServletRequest httpServletRequest, BindingResult bindingResult)
+                                                                 BindingResult bindingResult, HttpServletRequest httpServletRequest)
             throws RequestCouldNotBeFulfilledException{
 
         if (bindingResult.hasErrors()) {

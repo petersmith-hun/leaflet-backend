@@ -329,7 +329,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         given(userFacade.login(LOGIN_CONTEXT_VO_FOR_LOGIN)).willReturn(TOKEN);
 
         // when
-        ResponseEntity<BaseBodyDataModel> result = controller.claimToken(LOGIN_REQUEST_MODEL, httpServletRequest, bindingResult);
+        ResponseEntity<BaseBodyDataModel> result = controller.claimToken(LOGIN_REQUEST_MODEL, bindingResult, httpServletRequest);
 
         // then
         assertResponse(result, HttpStatus.OK, LOGIN_RESPONSE_DATA_MODEL_WITH_SUCCESS);
@@ -343,7 +343,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         givenValidationError();
 
         // when
-        ResponseEntity<BaseBodyDataModel> result = controller.claimToken(LOGIN_REQUEST_MODEL, httpServletRequest, bindingResult);
+        ResponseEntity<BaseBodyDataModel> result = controller.claimToken(LOGIN_REQUEST_MODEL, bindingResult, httpServletRequest);
 
         // then
         assertValidationError(result);
@@ -357,7 +357,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         doThrow(RuntimeException.class).when(userFacade).login(LOGIN_CONTEXT_VO_FOR_LOGIN);
 
         // when
-        controller.claimToken(LOGIN_REQUEST_MODEL, httpServletRequest, bindingResult);
+        controller.claimToken(LOGIN_REQUEST_MODEL, bindingResult, httpServletRequest);
 
         // then
         // exception expected
@@ -449,7 +449,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         given(loginContextFactory.forPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
 
         // when
-        ResponseEntity<BaseBodyDataModel> result = controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest, bindingResult);
+        ResponseEntity<BaseBodyDataModel> result = controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, bindingResult, httpServletRequest);
 
         // then
         assertResponse(result, HttpStatus.CREATED, null);
@@ -463,7 +463,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         givenValidationError();
 
         // when
-        ResponseEntity<BaseBodyDataModel> result = controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest, bindingResult);
+        ResponseEntity<BaseBodyDataModel> result = controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, bindingResult, httpServletRequest);
 
         // then
         assertValidationError(result);
@@ -477,7 +477,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         doThrow(UsernameNotFoundException.class).when(userFacade).demandPasswordReset(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
 
         // when
-        ResponseEntity<BaseBodyDataModel> result = controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest, bindingResult);
+        ResponseEntity<BaseBodyDataModel> result = controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, bindingResult, httpServletRequest);
 
         // then
         assertResponse(result, HttpStatus.CREATED, null);
@@ -491,7 +491,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         doThrow(RuntimeException.class).when(userFacade).demandPasswordReset(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
 
         // when
-        controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest, bindingResult);
+        controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, bindingResult, httpServletRequest);
 
         // then
         // exception expected
