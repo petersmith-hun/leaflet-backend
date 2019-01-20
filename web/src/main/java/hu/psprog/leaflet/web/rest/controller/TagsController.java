@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
@@ -127,7 +128,7 @@ public class TagsController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if the tag could not be created
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<BaseBodyDataModel> createTag(@RequestBody TagCreateRequestModel tagCreateRequestModel,
+    public ResponseEntity<BaseBodyDataModel> createTag(@RequestBody @Valid TagCreateRequestModel tagCreateRequestModel,
                                                        BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
@@ -158,7 +159,7 @@ public class TagsController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_PART_ID)
     public ResponseEntity<BaseBodyDataModel> updateTag(@PathVariable(PATH_VARIABLE_ID) Long id,
-                                  @RequestBody TagCreateRequestModel tagCreateRequestModel,
+                                  @RequestBody @Valid TagCreateRequestModel tagCreateRequestModel,
                                   BindingResult bindingResult) throws RequestCouldNotBeFulfilledException {
 
         if (bindingResult.hasErrors()) {
@@ -229,7 +230,7 @@ public class TagsController extends BaseController {
      * @throws ResourceNotFoundException if no tag or entry found under given IDs
      */
     @RequestMapping(method = RequestMethod.POST, value = PATH_ASSIGN_TAG)
-    public ResponseEntity<BaseBodyDataModel> attachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
+    public ResponseEntity<BaseBodyDataModel> attachTag(@RequestBody @Valid TagAssignmentRequestModel tagAssignmentRequestModel,
                                   BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
@@ -257,7 +258,7 @@ public class TagsController extends BaseController {
      * @throws ResourceNotFoundException if no tag or entry found under given IDs
      */
     @RequestMapping(method = RequestMethod.PUT, value = PATH_ASSIGN_TAG)
-    public ResponseEntity<BaseBodyDataModel> detachTag(@RequestBody TagAssignmentRequestModel tagAssignmentRequestModel,
+    public ResponseEntity<BaseBodyDataModel> detachTag(@RequestBody @Valid TagAssignmentRequestModel tagAssignmentRequestModel,
                                   BindingResult bindingResult) throws ResourceNotFoundException {
 
         if (bindingResult.hasErrors()) {
