@@ -29,14 +29,14 @@ public interface CommentFacade {
     /**
      * Returns only enabled comments for given entry.
      *
-     * @param entryID ID of entry to return comments for.
+     * @param entryLink link of entry to return comments for.
      * @param page page number
      * @param limit maximum number of items on a page
      * @param direction order direction
      * @param orderBy order by field
      * @return list of enabled comments under given entry
      */
-    EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(Long entryID, int page, int limit, String direction, String orderBy);
+    EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(String entryLink, int page, int limit, String direction, String orderBy);
 
     /**
      * Returns comments created by given user.

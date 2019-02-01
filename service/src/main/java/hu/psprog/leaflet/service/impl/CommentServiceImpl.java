@@ -32,7 +32,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +46,9 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
+    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.getBuilder()
+            .withEntitiesOnPage(Collections.emptyList())
+            .build();
 
     private CommentDAO commentDAO;
     private CommentToCommentVOConverter commentToCommentVOConverter;
@@ -102,13 +107,18 @@ public class CommentServiceImpl implements CommentService {
     public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction,
                                                                    CommentVO.OrderBy orderBy, EntryVO entryVO) {
 
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Entry entry = entryVOToEntryConverter.convert(entryVO);
-        Specification<Comment> specifications = Specification
-                .where(CommentSpecification.IS_ENABLED);
-        Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
+        EntityPageVO<CommentVO> entityPageVO = EMPTY_ENTITY_PAGE_VO;
+        if (Objects.nonNull(entryVO)) {
+            Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
+            Entry entry = entryVOToEntryConverter.convert(entryVO);
+            Specification<Comment> specifications = Specification
+                    .where(CommentSpecification.IS_ENABLED);
+            Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+            entityPageVO = PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+        }
+
+        return entityPageVO;
     }
 
     @Override
