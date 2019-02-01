@@ -47,8 +47,8 @@ public class CommentsController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentsController.class);
 
-    private static final String PATH_PUBLIC_COMMENTS_FOR_ENTRY = "/entry" + PATH_PART_ID + PATH_PART_PAGE;
-    private static final String PATH_ALL_COMMENTS_FOR_ENTRY = PATH_PUBLIC_COMMENTS_FOR_ENTRY + "/all";
+    private static final String PATH_PUBLIC_COMMENTS_FOR_ENTRY = "/entry" + PATH_PART_LINK + PATH_PART_PAGE;
+    private static final String PATH_ALL_COMMENTS_FOR_ENTRY = "/entry" + PATH_PART_ID + PATH_PART_PAGE + "/all";
     private static final String PATH_PERMANENT_DELETION = PATH_PART_ID + "/permanent";
     private static final String REQUESTED_COMMENT_NOT_FOUND = "Requested comment not found";
     private static final String THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING = "The comment you are looking for is not existing";
@@ -64,11 +64,11 @@ public class CommentsController extends BaseController {
     }
 
     /**
-     * GET /comments/entry/{id}/{page}
+     * GET /comments/entry/{link}/{page}
      * Retrieves given page of public comments for given entry.
      * Should only be used for retrieving page > 1 of comments as first page will be automatically loaded for entry.
      *
-     * @param entryID ID of entry to retrieve comments for
+     * @param entryLink link of entry to retrieve comments for
      * @param page page number
      * @param limit (optional) number of comments on one page; defaults to {@code PAGINATION_DEFAULT_LIMIT}
      * @param orderBy (optional) order by (CREATED|TITLE); defaults to {@code CREATED}
@@ -79,13 +79,13 @@ public class CommentsController extends BaseController {
     @RequestMapping(method = RequestMethod.GET, path = PATH_PUBLIC_COMMENTS_FOR_ENTRY)
     @Timed
     public ResponseEntity<CommentListDataModel> getPageOfPublicCommentsForEntry(
-            @PathVariable(PATH_VARIABLE_ID) Long entryID,
+            @PathVariable(PATH_VARIABLE_LINK) String entryLink,
             @PathVariable(PATH_VARIABLE_PAGE) int page,
             @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
             @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
-        EntityPageVO<CommentVO> comments = commentFacade.getPageOfPublicCommentsForEntry(entryID, page, limit, orderDirection, orderBy);
+        EntityPageVO<CommentVO> comments = commentFacade.getPageOfPublicCommentsForEntry(entryLink, page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()

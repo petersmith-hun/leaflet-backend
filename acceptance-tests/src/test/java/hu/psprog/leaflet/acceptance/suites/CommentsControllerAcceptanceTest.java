@@ -57,6 +57,9 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
     private static final String ANONYMOUS_USER_NAME = "Anonymous User";
     private static final String TEST_USER_1_EMAIL = "test-user-1@ac-leaflet.local";
+    private static final String CONTROL_ENTRY_LINK = "entry-1";
+    private static final String ENTRY_WITHOUT_COMMENTS_LINK = "entry-2";
+    private static final String ENTRY_NON_EXISTING_LINK = "entry-non-existing";
 
     @Autowired
     private CommentBridgeService commentBridgeService;
@@ -93,13 +96,13 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
     @Test
     @Parameters(source = CommentAcceptanceTestDataProvider.class, method = "pageOfPublicComments")
-    public void shouldReturnPublicCommentsForEntry(long entryID, int page, int limit, OrderBy.Comment orderBy, OrderDirection orderDirection,
+    public void shouldReturnPublicCommentsForEntry(String entryLink, int page, int limit, OrderBy.Comment orderBy, OrderDirection orderDirection,
                                                    long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious,
                                                    int expectedLogicallyDeletedCount)
             throws CommunicationFailureException {
 
         // when
-        WrapperBodyDataModel<CommentListDataModel> result = commentBridgeService.getPageOfPublicCommentsForEntry(entryID, page, limit, orderBy, orderDirection);
+        WrapperBodyDataModel<CommentListDataModel> result = commentBridgeService.getPageOfPublicCommentsForEntry(entryLink, page, limit, orderBy, orderDirection);
 
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
@@ -210,7 +213,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
         // then
         assertThat(commentBridgeService.getComment(CONTROL_COMMENT_ID).isEnabled(), is(false));
-        assertThat(commentBridgeService.getPageOfPublicCommentsForEntry(1L, 1, 20, CREATED, ASC).getBody().getComments().stream()
+        assertThat(commentBridgeService.getPageOfPublicCommentsForEntry(CONTROL_ENTRY_LINK, 1, 20, CREATED, ASC).getBody().getComments().stream()
                 .noneMatch(commentDataModel -> CONTROL_COMMENT_ID.equals(commentDataModel.getId())), is(true));
     }
 
@@ -289,11 +292,12 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         public static Object[] pageOfPublicComments() {
             return new Object[] {
                     // entry ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted
-                    new Object[] {1, 1, 4, CREATED, ASC, 7, 4, 2, true, false, 1},
-                    new Object[] {1, 2, 4, CREATED, ASC, 7, 3, 2, false, true, 3},
-                    new Object[] {1, 3, 4, CREATED, ASC, 7, 0, 2, false, true, 0},
-                    new Object[] {2, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
-                    new Object[] {1, 1, 20, CREATED, DESC, 7, 7, 1, false, false, 4}
+                    new Object[] {CONTROL_ENTRY_LINK, 1, 4, CREATED, ASC, 7, 4, 2, true, false, 1},
+                    new Object[] {CONTROL_ENTRY_LINK, 2, 4, CREATED, ASC, 7, 3, 2, false, true, 3},
+                    new Object[] {CONTROL_ENTRY_LINK, 3, 4, CREATED, ASC, 7, 0, 2, false, true, 0},
+                    new Object[] {ENTRY_WITHOUT_COMMENTS_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
+                    new Object[] {ENTRY_NON_EXISTING_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
+                    new Object[] {CONTROL_ENTRY_LINK, 1, 20, CREATED, DESC, 7, 7, 1, false, false, 4}
             };
         }
     }

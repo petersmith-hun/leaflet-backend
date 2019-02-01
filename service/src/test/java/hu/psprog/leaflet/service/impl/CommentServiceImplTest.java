@@ -43,6 +43,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
  * Unit tests for {@link CommentServiceImpl} class.
@@ -51,6 +52,10 @@ import static org.mockito.Mockito.verify;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class CommentServiceImplTest {
+
+    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.getBuilder()
+            .withEntitiesOnPage(Collections.emptyList())
+            .build();
 
     @Mock(lenient = true)
     private CommentDAO commentDAO;
@@ -182,6 +187,21 @@ public class CommentServiceImplTest {
 
         // then
         assertThat(result, notNullValue());
+    }
+
+    @Test
+    public void testGetPageOfPublicCommentsForEntryShouldReturnEmptyEntityPageForMissingEntry() {
+
+        // given
+        EntryVO entryVO = null;
+
+        // when
+        EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, entryVO);
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result, equalTo(EMPTY_ENTITY_PAGE_VO));
+        verifyZeroInteractions(entryVOToEntryConverter, commentDAO);
     }
 
     @Test

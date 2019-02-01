@@ -1,9 +1,11 @@
 package hu.psprog.leaflet.service.facade.impl;
 
 import hu.psprog.leaflet.service.CommentService;
+import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
+import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentVO;
@@ -21,6 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -38,6 +41,7 @@ public class CommentFacadeImplTest {
     private static final String USER_EMAIL = "lflt123test@leaflet.dev";
     private static final long COMMENT_ID = 5L;
     private static final long ENTRY_ID = 4L;
+    private static final String ENTRY_LINK = "entry-link";
     private static final CommentVO COMMENT_VO = CommentVO.wrapMinimumVO(COMMENT_ID);
     private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(ENTRY_ID);
     private static final UserVO USER_VO = UserVO.wrapMinimumVO(REGISTERED_USER_ID);
@@ -53,11 +57,14 @@ public class CommentFacadeImplTest {
     @Mock
     private CommentService commentService;
 
+    @Mock
+    private EntryService entryService;
+
     private CommentFacade commentFacade;
 
     @Before
     public void setup() {
-        commentFacade = new CommentFacadeImpl(commentService, userService, true);
+        commentFacade = new CommentFacadeImpl(commentService, userService, entryService, true);
     }
 
     @Test
@@ -80,7 +87,7 @@ public class CommentFacadeImplTest {
     public void testCreateOneWithRegisteredUserWithoutNotification() throws ServiceException {
 
         // given
-        commentFacade = new CommentFacadeImpl(commentService, userService, false);
+        commentFacade = new CommentFacadeImpl(commentService, userService, entryService, false);
         CommentVO commentVO = prepareCommentVO(REGISTERED_USER_ID);
 
         // when
@@ -263,13 +270,29 @@ public class CommentFacadeImplTest {
     }
 
     @Test
-    public void shouldGetPageOfPublicCommentsForEntry() {
+    public void shouldGetPageOfPublicCommentsForEntry() throws EntityNotFoundException {
+
+        // given
+        given(entryService.findByLink(ENTRY_LINK)).willReturn(ENTRY_VO);
 
         // when
-        commentFacade.getPageOfPublicCommentsForEntry(ENTRY_ID, PAGE, LIMIT, DIRECTION, ORDER_BY);
+        commentFacade.getPageOfPublicCommentsForEntry(ENTRY_LINK, PAGE, LIMIT, DIRECTION, ORDER_BY);
 
         // then
         verify(commentService).getPageOfPublicCommentsForEntry(PAGE, LIMIT, OrderDirection.DESC, CommentVO.OrderBy.ID, ENTRY_VO);
+    }
+
+    @Test
+    public void shouldGetPageOfPublicCommentsForEntryHandleException() throws EntityNotFoundException {
+
+        // given
+        doThrow(EntityNotFoundException.class).when(entryService).findByLink(ENTRY_LINK);
+
+        // when
+        commentFacade.getPageOfPublicCommentsForEntry(ENTRY_LINK, PAGE, LIMIT, DIRECTION, ORDER_BY);
+
+        // then
+        verify(commentService).getPageOfPublicCommentsForEntry(PAGE, LIMIT, OrderDirection.DESC, CommentVO.OrderBy.ID, null);
     }
 
     @Test

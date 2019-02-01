@@ -4,9 +4,11 @@ import hu.psprog.leaflet.persistence.entity.Comment;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.service.CommentService;
+import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
+import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentVO;
@@ -38,13 +40,15 @@ public class CommentFacadeImpl implements CommentFacade {
 
     private CommentService commentService;
     private UserService userService;
+    private EntryService entryService;
     private boolean commentNotificationEnabled;
 
     @Autowired
-    public CommentFacadeImpl(CommentService commentService, UserService userService,
+    public CommentFacadeImpl(CommentService commentService, UserService userService, EntryService entryService,
                              @Value(COMMENT_NOTIFICATION_ENABLED) boolean commentNotificationEnabled) {
         this.commentService = commentService;
         this.userService = userService;
+        this.entryService = entryService;
         this.commentNotificationEnabled = commentNotificationEnabled;
     }
 
@@ -132,8 +136,16 @@ public class CommentFacadeImpl implements CommentFacade {
     }
 
     @Override
-    public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(Long entryID, int page, int limit, String direction, String orderBy) {
-        return commentService.getPageOfPublicCommentsForEntry(page, limit, parseDirection(direction), parseOrderBy(orderBy), EntryVO.wrapMinimumVO(entryID));
+    public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(String entryLink, int page, int limit, String direction, String orderBy) {
+
+        EntryVO entryVO = null;
+        try {
+            entryVO = entryService.findByLink(entryLink);
+        } catch (EntityNotFoundException e) {
+            LOGGER.warn("Comments requested for non-existing entry by link [{}].", entryLink, e);
+        }
+
+        return commentService.getPageOfPublicCommentsForEntry(page, limit, parseDirection(direction), parseOrderBy(orderBy), entryVO);
     }
 
     @Override
