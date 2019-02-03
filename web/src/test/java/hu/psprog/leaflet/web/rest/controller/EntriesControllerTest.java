@@ -38,9 +38,11 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
 
     private static final List<EntryVO> ENTRY_VO_LIST = Collections.singletonList(ENTRY_VO);
     private static final long CATEGORY_ID = 5L;
+    private static final long TAG_ID = 6L;
     private static final String ENTRY_LINK = "entry-link";
     private static final long ENTRY_ID = 1L;
     private static final String LOCATION_HEADER = "/entries/" + ENTRY_ID;
+    private static final String CONTENT = "content";
 
     @Mock
     private EntryFacade entryFacade;
@@ -109,6 +111,36 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
 
         // when
         ResponseEntity<EntryListDataModel> result = controller.getPageOfPublicEntriesByCategory(CATEGORY_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
+
+        // then
+        assertResponse(result, HttpStatus.OK, ENTRY_LIST_DATA_MODEL);
+    }
+
+    @Test
+    public void shouldGetPageOfPublicEntriesByTag() {
+
+        // given
+        given(entryFacade.getPageOfPublicEntriesUnderTag(TAG_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+                .withEntitiesOnPage(ENTRY_VO_LIST)
+                .build());
+
+        // when
+        ResponseEntity<EntryListDataModel> result = controller.getPageOfPublicEntriesByTag(TAG_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
+
+        // then
+        assertResponse(result, HttpStatus.OK, ENTRY_LIST_DATA_MODEL);
+    }
+
+    @Test
+    public void shouldGetPageOfPublicEntriesByContent() {
+
+        // given
+        given(entryFacade.getPageOfPublicEntriesByContent(CONTENT, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+                .withEntitiesOnPage(ENTRY_VO_LIST)
+                .build());
+
+        // when
+        ResponseEntity<EntryListDataModel> result = controller.getPageOfPublicEntriesByContent(CONTENT, PAGE, LIMIT, ORDER_BY, DIRECTION);
 
         // then
         assertResponse(result, HttpStatus.OK, ENTRY_LIST_DATA_MODEL);

@@ -66,6 +66,31 @@ public interface EntryFacade {
     EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(Long categoryID, int page, int limit, String direction, String orderBy);
 
     /**
+     * Returns a page of public entries under given tag.
+     *
+     * @param tagID tag ID to filter entries by
+     * @param page page number
+     * @param limit maximum number of items on a page
+     * @param direction order direction
+     * @param orderBy order by field
+     * @return page of public entries under given tag
+     */
+    EntityPageVO<EntryVO> getPageOfPublicEntriesUnderTag(Long tagID, int page, int limit, String direction, String orderBy);
+
+    /**
+     * Returns a page of public entries by given content.
+     * Content expressions will be looked up in entry's title, prologue and full content.
+     *
+     * @param content content expression to filter entries by
+     * @param page page number
+     * @param limit maximum number of items on a page
+     * @param direction order direction
+     * @param orderBy order by field
+     * @return page of public entries by given content expression
+     */
+    EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, String direction, String orderBy);
+
+    /**
      * Passes entry for persistence layer and returns ID of newly created entry.
      *
      * @param entity {@link EntryVO} value object

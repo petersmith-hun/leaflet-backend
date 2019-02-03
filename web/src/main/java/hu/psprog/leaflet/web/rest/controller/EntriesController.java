@@ -47,7 +47,9 @@ public class EntriesController extends BaseController {
 
     private static final String PATH_PAGE_OF_ENTRIES = "/page" + PATH_PART_PAGE;
     private static final String PATH_PAGE_OF_ENTRIES_NON_FILTERED = "/page" + PATH_PART_PAGE + "/all";
-    private static final String PATH_PAGE_OF_ENTRIES_BY_CATEGORY = PATH_PART_ID + "/page" + PATH_PART_PAGE;
+    private static final String PATH_PAGE_OF_ENTRIES_BY_CATEGORY = "/category" + PATH_PART_ID + "/page" + PATH_PART_PAGE;
+    private static final String PATH_PAGE_OF_ENTRIES_BY_TAG = "/tag" + PATH_PART_ID + "/page" + PATH_PART_PAGE;
+    private static final String PATH_PAGE_OF_ENTRIES_BY_CONTENT = "/content" + "/page" + PATH_PART_PAGE;
     private static final String PATH_ENTRY_BY_LINK = "/link" + PATH_PART_LINK;
 
     private static final String ENTRY_COULD_NOT_BE_CREATED = "Entry could not be created. See details: ";
@@ -134,7 +136,7 @@ public class EntriesController extends BaseController {
     }
 
     /**
-     * GET /entries/{id}/page/{page}
+     * GET /entries/category/{id}/page/{page}
      * Returns basic information of given page of public entries filtered by given category ID.
      *
      * @param id category ID to filter by
@@ -155,6 +157,63 @@ public class EntriesController extends BaseController {
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<EntryVO> entryPage = entryFacade.getPageOfPublicEntriesUnderCategory(id, page, limit, orderDirection, orderBy);
+
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
+    }
+
+    /**
+     * GET /entries/tag/{id}/page/{page}
+     * Returns basic information of given page of public entries filtered by given tag ID.
+     *
+     * @param id tag ID to filter by
+     * @param page page number (page indexing starts at 1)
+     * @param limit (optional) number of entries on one page; defaults to {@code PAGINATION_DEFAULT_LIMIT}
+     * @param orderBy (optional) order by (CREATED|TITLE); defaults to {@code CREATED}
+     * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
+     * @return page of public entries
+     */
+    @FillResponse
+    @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_BY_TAG)
+    @Timed
+    public ResponseEntity<EntryListDataModel> getPageOfPublicEntriesByTag(
+            @PathVariable(BaseController.PATH_VARIABLE_ID) Long id,
+            @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
+            @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
+
+        EntityPageVO<EntryVO> entryPage = entryFacade.getPageOfPublicEntriesUnderTag(id, page, limit, orderDirection, orderBy);
+
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
+    }
+
+    /**
+     * GET /entries/content/page/{page}?content
+     * Returns basic information of given page of public entries filtered by given content expression.
+     *
+     *
+     * @param content content expression to filter by
+     * @param page page number (page indexing starts at 1)
+     * @param limit (optional) number of entries on one page; defaults to {@code PAGINATION_DEFAULT_LIMIT}
+     * @param orderBy (optional) order by (CREATED|TITLE); defaults to {@code CREATED}
+     * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
+     * @return page of public entries
+     */
+    @FillResponse
+    @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_BY_CONTENT)
+    @Timed
+    public ResponseEntity<EntryListDataModel> getPageOfPublicEntriesByContent(
+            @RequestParam(name = REQUEST_PARAMETER_CONTENT) String content,
+            @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
+            @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
+
+        EntityPageVO<EntryVO> entryPage = entryFacade.getPageOfPublicEntriesByContent(content, page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()

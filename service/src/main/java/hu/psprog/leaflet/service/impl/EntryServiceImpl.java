@@ -1,13 +1,16 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
+import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.repository.specification.EntrySpecification;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
+import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
@@ -18,6 +21,7 @@ import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.TagVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +54,16 @@ public class EntryServiceImpl implements EntryService {
     private EntryToEntryVOConverter entryToEntryVOConverter;
     private EntryVOToEntryConverter entryVOToEntryConverter;
     private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+    private TagVOToTagConverter tagVOToTagConverter;
 
     @Autowired
-    public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter,
-                            EntryVOToEntryConverter entryVOToEntryConverter, CategoryVOToCategoryConverter categoryVOToCategoryConverter) {
+    public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter, EntryVOToEntryConverter entryVOToEntryConverter,
+                            CategoryVOToCategoryConverter categoryVOToCategoryConverter, TagVOToTagConverter tagVOToTagConverter) {
         this.entryDAO = entryDAO;
         this.entryToEntryVOConverter = entryToEntryVOConverter;
         this.entryVOToEntryConverter = entryVOToEntryConverter;
         this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
+        this.tagVOToTagConverter = tagVOToTagConverter;
     }
 
     @Override
@@ -169,15 +175,19 @@ public class EntryServiceImpl implements EntryService {
 
     @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
+        Category category = categoryVOToCategoryConverter.convert(categoryVO);
+        return getPageWithWhereSpecification(page, limit, direction, orderBy, EntrySpecification.isUnderCategory(category));
+    }
 
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Specification<Entry> specs = Specification
-                .where(EntrySpecification.isUnderCategory(categoryVOToCategoryConverter.convert(categoryVO)))
-                .and(EntrySpecification.IS_PUBLIC)
-                .and(EntrySpecification.IS_ENABLED);
-        Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
+    @Override
+    public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderTag(TagVO tagVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
+        Tag tag = tagVOToTagConverter.convert(tagVO);
+        return getPageWithWhereSpecification(page, limit, direction, orderBy, EntrySpecification.isUnderTag(tag));
+    }
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+    @Override
+    public EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
+        return getPageWithWhereSpecification(page, limit, direction, orderBy, EntrySpecification.containsExpression(content));
     }
 
     @Override
@@ -218,6 +228,18 @@ public class EntryServiceImpl implements EntryService {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Page<Entry> entityPage = entryDAO.findAll(pageable);
+
+        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+    }
+
+    private EntityPageVO<EntryVO> getPageWithWhereSpecification(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy, Specification<Entry> whereSpecification) {
+
+        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
+        Specification<Entry> specs = Specification
+                .where(whereSpecification)
+                .and(EntrySpecification.IS_PUBLIC)
+                .and(EntrySpecification.IS_ENABLED);
+        Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }

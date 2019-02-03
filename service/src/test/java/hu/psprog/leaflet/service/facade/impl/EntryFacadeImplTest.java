@@ -6,6 +6,7 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.TagVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -33,8 +34,11 @@ public class EntryFacadeImplTest {
     private static final String ORDER_BY = "TITLE";
     private static final String NON_EXISTING = "non-existing";
     private static final long CATEGORY_ID = 9L;
+    private static final long TAG_ID = 8L;
     private static final CategoryVO CATEGORY_VO = CategoryVO.wrapMinimumVO(CATEGORY_ID);
-    
+    private static final TagVO TAG_VO = TagVO.wrapMinimumVO(TAG_ID);
+    private static final String CONTENT = "content";
+
     @Mock
     private EntryService entryService;
     
@@ -192,12 +196,32 @@ public class EntryFacadeImplTest {
     }
 
     @Test
-    public void shouldPageOfPublicEntriesUnderCategory() {
+    public void shouldGetPageOfPublicEntriesUnderCategory() {
 
         // when
         entryFacade.getPageOfPublicEntriesUnderCategory(CATEGORY_ID, PAGE, LIMIT, DIRECTION, ORDER_BY);
 
         // then
         verify(entryService).getPageOfPublicEntriesUnderCategory(CATEGORY_VO, PAGE, LIMIT, OrderDirection.DESC, EntryVO.OrderBy.TITLE);
+    }
+
+    @Test
+    public void shouldGetPageOfPublicEntriesUnderTag() {
+
+        // when
+        entryFacade.getPageOfPublicEntriesUnderTag(TAG_ID, PAGE, LIMIT, DIRECTION, ORDER_BY);
+
+        // then
+        verify(entryService).getPageOfPublicEntriesUnderTag(TAG_VO, PAGE, LIMIT, OrderDirection.DESC, EntryVO.OrderBy.TITLE);
+    }
+
+    @Test
+    public void shouldGetPageOfPublicEntriesByContent() {
+
+        // when
+        entryFacade.getPageOfPublicEntriesByContent(CONTENT, PAGE, LIMIT, DIRECTION, ORDER_BY);
+
+        // then
+        verify(entryService).getPageOfPublicEntriesByContent(CONTENT, PAGE, LIMIT, OrderDirection.DESC, EntryVO.OrderBy.TITLE);
     }
 }
