@@ -67,20 +67,20 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @param limit maximum number of items on a page
      * @param direction order direction
      * @param orderBy order by field
-     * @return page of public entries under given category
+     * @return page of public entries under given tag
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesUnderTag(TagVO tagVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
 
     /**
      * Returns a page of public entries by given content.
-     * Content expressions will be looked up in entry's title, prologue and full content.
+     * Content expressions will be looked up in the entry's title, prologue and full content.
      *
      * @param content content expression to filter entries by
      * @param page page number
      * @param limit maximum number of items on a page
      * @param direction order direction
      * @param orderBy order by field
-     * @return page of public entries under given category
+     * @return page of public entries by given content
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
 

@@ -73,7 +73,7 @@ public interface EntryFacade {
      * @param limit maximum number of items on a page
      * @param direction order direction
      * @param orderBy order by field
-     * @return page of public entries under given category
+     * @return page of public entries under given tag
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesUnderTag(Long tagID, int page, int limit, String direction, String orderBy);
 
@@ -86,7 +86,7 @@ public interface EntryFacade {
      * @param limit maximum number of items on a page
      * @param direction order direction
      * @param orderBy order by field
-     * @return page of public entries under given category
+     * @return page of public entries by given content expression
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, String direction, String orderBy);
 

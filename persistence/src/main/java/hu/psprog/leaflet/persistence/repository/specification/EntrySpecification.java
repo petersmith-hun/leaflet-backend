@@ -30,14 +30,33 @@ public class EntrySpecification {
 
     private EntrySpecification() {}
 
+    /**
+     * {@link Specification} implementation to check if an entry is created under the given category.
+     *
+     * @param category category object
+     * @return built {@link Specification}
+     */
     public static Specification<Entry> isUnderCategory(Category category) {
         return (root, query, builder) -> builder.equal(root.get(Entry_.category), category);
     }
 
+    /**
+     * {@link Specification} implementation to check if an entry is created under the given tag.
+     *
+     * @param tag tag object
+     * @return built {@link Specification}
+     */
     public static Specification<Entry> isUnderTag(Tag tag) {
         return (root, query, builder) -> builder.isMember(tag, root.get(Entry_.tags));
     }
 
+    /**
+     * {@link Specification} implementation to check if an entry's title, prologue, or raw content contains the given expression.
+     * The provided expression will be modified to include the required wildcard (%) for SQL LIKE queries.
+     *
+     * @param expression expression as {@link String}
+     * @return built {@link Specification}
+     */
     public static Specification<Entry> containsExpression(String expression) {
         String likeExpression = createLikeExpression(expression);
         return (root, query, builder) -> builder.or(
