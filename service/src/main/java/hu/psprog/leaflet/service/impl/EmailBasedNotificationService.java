@@ -7,11 +7,13 @@ import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.mail.impl.CommentNotificationMailFactory;
+import hu.psprog.leaflet.service.mail.impl.ContactRequestMailFactory;
 import hu.psprog.leaflet.service.mail.impl.MailFactoryRegistry;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetRequestMailFactory;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetSuccessMailFactory;
 import hu.psprog.leaflet.service.mail.impl.SystemStartupMailFactory;
 import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
+import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +65,14 @@ public class EmailBasedNotificationService implements NotificationService {
         Mail mail = mailFactoryRegistry
                 .getFactory(CommentNotificationMailFactory.class)
                 .buildMail(commentNotification, commentNotification.getAuthorEmail());
+        sendMailAndAttachObserver(mail);
+    }
+
+    @Override
+    public void contactRequestReceived(ContactRequestVO contactRequestVO) {
+        Mail mail = mailFactoryRegistry
+                .getFactory(ContactRequestMailFactory.class)
+                .buildMail(contactRequestVO);
         sendMailAndAttachObserver(mail);
     }
 

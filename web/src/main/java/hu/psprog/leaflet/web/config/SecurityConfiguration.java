@@ -48,6 +48,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/sitemap.xml"};
     private static final String[] PUBLIC_POST_ENDPOINTS = {
             "/comments",
+            "/contact",
             "/users/claim",
             "/users/register",
             "/users/reclaim"};

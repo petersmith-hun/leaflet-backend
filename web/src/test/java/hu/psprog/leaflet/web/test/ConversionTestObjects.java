@@ -4,6 +4,7 @@ import hu.psprog.leaflet.api.rest.request.attachment.AttachmentRequestModel;
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.comment.CommentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
+import hu.psprog.leaflet.api.rest.request.contact.ContactRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
@@ -56,6 +57,7 @@ import hu.psprog.leaflet.service.vo.AuthRequestVO;
 import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
+import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
@@ -135,6 +137,7 @@ public abstract class ConversionTestObjects {
     private static final String URL = "/test/route";
     private static final int SEQUENCE_NUMBER = 5;
     private static final String TYPE = "HEADER_MENU";
+    private static final String MESSAGE = "contact message";
 
     protected static final String TOKEN = "token";
     protected static final String PASSWORD = "test-pw";
@@ -657,6 +660,14 @@ public abstract class ConversionTestObjects {
 
     protected static final FrontEndRouteUpdateRequestModel FRONT_END_ROUTE_UPDATE_REQUEST_MODEL = prepareFrontEndRouteUpdateRequestModel();
 
+    protected static final ContactRequestModel CONTACT_REQUEST_MODEL = prepareContactRequestModel();
+
+    protected static final ContactRequestVO CONTACT_REQUEST_VO = ContactRequestVO.getBuilder()
+            .withName(USERNAME)
+            .withEmail(EMAIL)
+            .withMessage(MESSAGE)
+            .build();
+
     private static ObjectError prepareObjectError(boolean withFieldError) {
 
         ObjectError error;
@@ -861,6 +872,17 @@ public abstract class ConversionTestObjects {
         passwordResetDemandRequestModel.setEmail(EMAIL);
 
         return passwordResetDemandRequestModel;
+    }
+
+
+    private static ContactRequestModel prepareContactRequestModel() {
+
+        ContactRequestModel contactRequestModel = new ContactRequestModel();
+        contactRequestModel.setName(USERNAME);
+        contactRequestModel.setEmail(EMAIL);
+        contactRequestModel.setMessage(MESSAGE);
+
+        return contactRequestModel;
     }
 
     private static Date createDate(int dayOffset) {
