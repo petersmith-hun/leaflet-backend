@@ -112,6 +112,34 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     }
 
     @Test
+    @Parameters(source = EntryAcceptanceTestDataProvider.class, method = "pageOfPublicEntriesByTag")
+    public void shouldReturnPageOfPublicEntriesByTag(Long tagID, int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
+                                                          long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
+            throws CommunicationFailureException {
+
+        // when
+        WrapperBodyDataModel<EntryListDataModel> result = entryBridgeService.getPageOfPublicEntriesByTag(tagID, page, limit, orderBy, orderDirection);
+
+        // then
+        assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertMenu(result);
+    }
+
+    @Test
+    @Parameters(source = EntryAcceptanceTestDataProvider.class, method = "pageOfPublicEntriesByContent")
+    public void shouldReturnPageOfPublicEntriesByContent(String content, int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
+                                                     long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
+            throws CommunicationFailureException {
+
+        // when
+        WrapperBodyDataModel<EntryListDataModel> result = entryBridgeService.getPageOfPublicEntriesByContent(content, page, limit, orderBy, orderDirection);
+
+        // then
+        assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertMenu(result);
+    }
+
+    @Test
     public void shouldReturnExistingEntryByLink() throws CommunicationFailureException {
 
         // given
@@ -300,6 +328,26 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                     new Object[] {2L, 1, 30, CREATED, ASC,  11, 11, 1, false, false},
                     new Object[] {1L, 1, 30, TITLE,   DESC, 8,  8,  1, false, false},
                     new Object[] {1L, 2, 3,  TITLE,   ASC,  8,  3,  3, true,  true}
+            };
+        }
+
+        public static Object[] pageOfPublicEntriesByTag() {
+            return new Object[] {
+                    new Object[] {1L, 1, 5,  CREATED, ASC, 1, 1, 1, false, false},
+                    new Object[] {2L, 1, 2,  CREATED, ASC, 1, 1, 1, false, false},
+                    new Object[] {2L, 2, 2,  CREATED, ASC, 1, 0, 1, false, true},
+                    new Object[] {0L, 1, 10, CREATED, ASC, 0, 0, 0, false, false},
+                    new Object[] {9L, 1, 10, CREATED, ASC, 0, 0, 0, false, false}
+            };
+        }
+
+        public static Object[] pageOfPublicEntriesByContent() {
+            return new Object[] {
+                    new Object[] {"content 7",       1, 5, CREATED, ASC, 2,  2, 1, false, false},
+                    new Object[] {"non existing",    1, 5, CREATED, ASC, 0,  0, 0, false, false},
+                    new Object[] {"Prologue #25",    1, 5, CREATED, ASC, 1,  1, 1, false, false},
+                    new Object[] {"Entry #21 title", 1, 5, CREATED, ASC, 1,  1, 1, false, false},
+                    new Object[] {"content entry",   3, 5, CREATED, ASC, 19, 5, 4, true,  true}
             };
         }
     }

@@ -3,10 +3,12 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
+import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
@@ -14,6 +16,7 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.TagVO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -60,6 +63,9 @@ public class EntryServiceImplTest {
 
     @Mock
     private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+
+    @Mock
+    private TagVOToTagConverter tagVOToTagConverter;
 
     @Mock
     private Entry entry;
@@ -177,6 +183,39 @@ public class EntryServiceImplTest {
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(new CategoryVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+
+        // then
+        assertThat(result, notNullValue());
+    }
+
+    @Test
+    public void testGetPageOfPublicEntriesUnderTag() {
+
+        // given
+        Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(tagVOToTagConverter.convert(any(TagVO.class))).willReturn(Tag.getBuilder()
+                .withId(1L)
+                .build());
+        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
+
+        // when
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(new TagVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+
+        // then
+        assertThat(result, notNullValue());
+    }
+
+    @Test
+    public void testGetPageOfPublicEntriesByContent() {
+
+        // given
+        Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
+
+        // when
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesByContent("content",1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
 
         // then
         assertThat(result, notNullValue());

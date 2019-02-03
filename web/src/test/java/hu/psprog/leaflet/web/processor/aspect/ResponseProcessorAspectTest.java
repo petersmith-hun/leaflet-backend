@@ -7,6 +7,7 @@ import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
+import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.EntryServiceImpl;
@@ -61,6 +62,9 @@ public class ResponseProcessorAspectTest {
 
     @Mock
     private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+
+    @Mock
+    private TagVOToTagConverter tagVOToTagConverter;
 
     @InjectMocks
     private ResponseProcessorAspect responseProcessorAspect;
@@ -130,6 +134,6 @@ public class ResponseProcessorAspectTest {
     }
 
     private EntryService prepareEntryServiceMock() {
-        return new EntryServiceImpl(entryDAO, entryToEntryVOConverter, entryVOToEntryConverter, categoryVOToCategoryConverter);
+        return new EntryServiceImpl(entryDAO, entryToEntryVOConverter, entryVOToEntryConverter, categoryVOToCategoryConverter, tagVOToTagConverter);
     }
 }

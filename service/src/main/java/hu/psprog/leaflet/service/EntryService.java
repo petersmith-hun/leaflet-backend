@@ -11,6 +11,7 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.TagVO;
 
 import java.util.List;
 
@@ -57,6 +58,31 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @return page of public entries under given category
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
+
+    /**
+     * Returns a page of public entries under given tag.
+     *
+     * @param tagVO tag to filter entries by
+     * @param page page number
+     * @param limit maximum number of items on a page
+     * @param direction order direction
+     * @param orderBy order by field
+     * @return page of public entries under given category
+     */
+    EntityPageVO<EntryVO> getPageOfPublicEntriesUnderTag(TagVO tagVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
+
+    /**
+     * Returns a page of public entries by given content.
+     * Content expressions will be looked up in entry's title, prologue and full content.
+     *
+     * @param content content expression to filter entries by
+     * @param page page number
+     * @param limit maximum number of items on a page
+     * @param direction order direction
+     * @param orderBy order by field
+     * @return page of public entries under given category
+     */
+    EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
 
     /**
      * Returns an un-paged list of public entries.
