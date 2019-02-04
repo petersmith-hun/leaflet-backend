@@ -8,11 +8,13 @@ import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.mail.impl.CommentNotificationMailFactory;
+import hu.psprog.leaflet.service.mail.impl.ContactRequestMailFactory;
 import hu.psprog.leaflet.service.mail.impl.MailFactoryRegistry;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetRequestMailFactory;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetSuccessMailFactory;
 import hu.psprog.leaflet.service.mail.impl.SystemStartupMailFactory;
 import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
+import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import io.reactivex.Observable;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +59,9 @@ public class EmailBasedNotificationServiceTest {
 
     @Mock
     private CommentNotificationMailFactory commentNotificationMailFactory;
+
+    @Mock
+    private ContactRequestMailFactory contactRequestMailFactory;
 
     @Mock
     private Mail mockMail;
@@ -125,6 +130,20 @@ public class EmailBasedNotificationServiceTest {
 
         // when
         emailBasedNotificationService.commentNotification(commentNotification);
+
+        // then
+        assertMailSentAndObserverAttached();
+    }
+
+    @Test
+    public void shouldSendContactRequestNotification() {
+
+        // given
+        prepareMockFactory(contactRequestMailFactory);
+        ContactRequestVO contactRequestVO = ContactRequestVO.getBuilder().build();
+
+        // when
+        emailBasedNotificationService.contactRequestReceived(contactRequestVO);
 
         // then
         assertMailSentAndObserverAttached();

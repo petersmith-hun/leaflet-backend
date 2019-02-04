@@ -4,6 +4,7 @@ import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
+import hu.psprog.leaflet.service.vo.ContactRequestVO;
 
 /**
  * Mock {@link NotificationService} implementation.
@@ -15,6 +16,7 @@ public class MockNotificationService implements NotificationService {
     private PasswordResetRequest passwordResetRequest;
     private PasswordResetSuccess passwordResetSuccess;
     private CommentNotification commentNotification;
+    private ContactRequestVO contactRequestVO;
 
     @Override
     public void startupFinished(String version) {
@@ -36,6 +38,11 @@ public class MockNotificationService implements NotificationService {
         this.commentNotification = commentNotification;
     }
 
+    @Override
+    public void contactRequestReceived(ContactRequestVO contactRequestVO) {
+        this.contactRequestVO = contactRequestVO;
+    }
+
     public PasswordResetRequest getPasswordResetRequest() {
         return passwordResetRequest;
     }
@@ -48,9 +55,14 @@ public class MockNotificationService implements NotificationService {
         return commentNotification;
     }
 
+    public ContactRequestVO getContactRequestVO() {
+        return contactRequestVO;
+    }
+
     public void reset() {
         passwordResetSuccess = null;
         passwordResetRequest = null;
         commentNotification = null;
+        contactRequestVO = null;
     }
 }

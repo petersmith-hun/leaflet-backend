@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
+import hu.psprog.leaflet.service.vo.ContactRequestVO;
 
 /**
  * System notification handler service.
@@ -38,4 +39,11 @@ public interface NotificationService {
      * @param commentNotification domain object holding required parameters
      */
     void commentNotification(CommentNotification commentNotification);
+
+    /**
+     * Sends notification about contact requests.
+     *
+     * @param contactRequestVO domain object holding required parameters
+     */
+    void contactRequestReceived(ContactRequestVO contactRequestVO);
 }
