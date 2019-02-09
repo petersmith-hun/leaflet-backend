@@ -12,22 +12,22 @@
       {
         "id": 1,
         "name": "Tag #1",
-        "created": "Thursday, December 14, 2017, 8:00 PM",
-        "lastModified": "Thursday, December 14, 2017, 8:00 PM",
+        "created": "2017-12-14T20:00:00+01:00",
+        "lastModified": "2017-12-14T20:00:00+01:00",
         "enabled": true
       },
       {
         "id": 2,
         "name": "Tag #2",
-        "created": "Thursday, December 14, 2017, 8:00 PM",
-        "lastModified": "Thursday, December 14, 2017, 8:00 PM",
+        "created": "2017-12-14T20:00:00+01:00",
+        "lastModified": "2017-12-14T20:00:00+01:00",
         "enabled": true
       },
       {
         "id": 3,
         "name": "Tag #3",
-        "created": "Thursday, December 14, 2017, 8:00 PM",
-        "lastModified": "Thursday, December 14, 2017, 8:00 PM",
+        "created": "2017-12-14T20:00:00+01:00",
+        "lastModified": "2017-12-14T20:00:00+01:00",
         "enabled": false
       }
     ],
@@ -39,8 +39,8 @@
       "lastModified": null,
       "enabled": false
     },
-    "created": "Wednesday, December 13, 2017, 8:00 PM",
-    "lastModified": "Monday, December 18, 2017, 8:00 PM",
+    "created": "2017-12-13T20:00:01+01:00",
+    "lastModified": "2017-12-18T20:00:00+01:00",
     "attachments": [
       {
         "originalFilename": "original_filename_1.jpg",

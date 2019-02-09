@@ -3,12 +3,10 @@ package hu.psprog.leaflet.web.rest.conversion.document;
 import hu.psprog.leaflet.api.rest.response.document.EditDocumentDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.service.vo.DocumentVO;
-import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
+import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Converts {@link DocumentVO} value object to {@link EditDocumentDataModel} model.
@@ -18,13 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class DocumentVOToEditDocumentDataModelEntityConverter implements Converter<DocumentVO, EditDocumentDataModel> {
 
-    private CommonFormatter commonFormatter;
-    private HttpServletRequest httpServletRequest;
+    private DateConverter dateConverter;
 
     @Autowired
-    public DocumentVOToEditDocumentDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
-        this.commonFormatter = commonFormatter;
-        this.httpServletRequest = httpServletRequest;
+    public DocumentVOToEditDocumentDataModelEntityConverter(DateConverter dateConverter) {
+        this.dateConverter = dateConverter;
     }
 
     @Override
@@ -34,9 +30,9 @@ public class DocumentVOToEditDocumentDataModelEntityConverter implements Convert
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withLink(source.getLink())
-                .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
+                .withCreated(dateConverter.convert(source.getCreated()))
                 .withRawContent(source.getRawContent())
-                .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
+                .withLastModified(dateConverter.convert(source.getLastModified()))
                 .withEnabled(source.isEnabled())
                 .withLocale(source.getLocale().name())
                 .withUser(UserDataModel.getBuilder()
