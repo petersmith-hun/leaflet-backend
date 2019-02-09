@@ -68,7 +68,7 @@ import hu.psprog.leaflet.service.vo.TagVO;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
+import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import hu.psprog.leaflet.web.rest.conversion.JULocaleToLeafletLocaleConverter;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -79,6 +79,8 @@ import org.springframework.validation.ObjectError;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -121,9 +123,9 @@ public abstract class ConversionTestObjects {
     private static final String FIELD = "invalid-field";
     private static final String FIELD_VALIDATION_FAILED = "Field validation failed";
     private static final String VALIDATION_FAILED = "Validation failed";
-    private static final String FORMATTED_CREATED_DATE = "formatted-created-date";
-    private static final String FORMATTED_LAST_MODIFIED_DATE = "formatted-last-modified-date";
-    private static final String FORMATTED_LAST_LOGIN_DATE = "formatted-last-login-date";
+    private static final ZonedDateTime ZONED_DATE_TIME_CREATED = ZonedDateTime.of(2019, 2, 7, 19, 0, 0, 0, ZoneId.systemDefault());
+    private static final ZonedDateTime ZONED_DATE_TIME_LAST_MODIFIED = ZonedDateTime.of(2019, 2, 8, 19, 0, 0, 0, ZoneId.systemDefault());
+    private static final ZonedDateTime ZONED_DATE_TIME_LAST_LOGIN = ZonedDateTime.of(2019, 2, 1, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final String IMAGE = "IMAGE";
     private static final String SUB_1 = "sub1";
     private static final String SUB_2 = "sub2";
@@ -190,8 +192,8 @@ public abstract class ConversionTestObjects {
             .withID(ID)
             .withTitle(TITLE)
             .withDescription(DESCRIPTION)
-            .withCreated(FORMATTED_CREATED_DATE)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withEnabled(ENABLED)
             .build();
 
@@ -213,11 +215,11 @@ public abstract class ConversionTestObjects {
 
     protected static final ExtendedUserDataModel EXTENDED_USER_DATA_MODEL = ExtendedUserDataModel.getExtendedBuilder()
             .withId(ID)
-            .withCreated(FORMATTED_CREATED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
             .withUsername(USERNAME)
             .withLocale(LOCALE.name())
             .withEmail(EMAIL)
-            .withLastLogin(FORMATTED_LAST_LOGIN_DATE)
+            .withLastLogin(ZONED_DATE_TIME_LAST_LOGIN)
             .withRole(ADMIN)
             .build();
 
@@ -355,8 +357,8 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withName(TITLE)
             .withEnabled(ENABLED)
-            .withCreated(FORMATTED_CREATED_DATE)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .build();
 
     protected static final TagListDataModel TAG_LIST_DATA_MODEL = TagListDataModel.getBuilder()
@@ -432,11 +434,11 @@ public abstract class ConversionTestObjects {
     protected static final EntryCreateRequestModel ENTRY_CREATE_REQUEST_MODEL = prepareEntryCreateRequestModel();
 
     protected static final EntryDataModel ENTRY_DATA_MODEL = EntryDataModel.getBuilder()
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withTitle(TITLE)
             .withLink(LINK)
             .withPrologue(PROLOGUE)
-            .withCreated(FORMATTED_CREATED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
@@ -450,11 +452,11 @@ public abstract class ConversionTestObjects {
 
     protected static final ExtendedEntryDataModel EXTENDED_ENTRY_DATA_MODEL = ExtendedEntryDataModel.getExtendedBuilder()
             .withRawContent(RAW_CONTENT)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withTitle(TITLE)
             .withLink(LINK)
             .withPrologue(PROLOGUE)
-            .withCreated(FORMATTED_CREATED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
@@ -470,11 +472,11 @@ public abstract class ConversionTestObjects {
             .withRawContent(RAW_CONTENT)
             .withEnabled(ENABLED)
             .withEntryStatus(ENTRY_STATUS)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withTitle(TITLE)
             .withLink(LINK)
             .withPrologue(PROLOGUE)
-            .withCreated(FORMATTED_CREATED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
@@ -524,8 +526,8 @@ public abstract class ConversionTestObjects {
             .withOwner(USER_DATA_MODEL)
             .withContent(CONTENT)
             .withDeleted(false)
-            .withCreated(FORMATTED_CREATED_DATE)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .build();
 
     protected static final CommentListDataModel COMMENT_LIST_DATA_MODEL = CommentListDataModel.getBuilder()
@@ -537,8 +539,8 @@ public abstract class ConversionTestObjects {
             .withOwner(USER_DATA_MODEL)
             .withContent(CONTENT)
             .withDeleted(false)
-            .withCreated(FORMATTED_CREATED_DATE)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withEnabled(ENABLED)
             .withAssociatedEntry(ENTRY_DATA_MODEL)
             .build();
@@ -590,7 +592,7 @@ public abstract class ConversionTestObjects {
             .withLink(LINK)
             .withTitle(TITLE)
             .withRawContent(RAW_CONTENT)
-            .withCreated(FORMATTED_CREATED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
             .withLocale(LOCALE.name())
             .withUser(USER_DATA_MODEL)
             .build();
@@ -599,10 +601,10 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withLink(LINK)
             .withTitle(TITLE)
-            .withCreated(FORMATTED_CREATED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
             .withLocale(LOCALE.name())
             .withUser(USER_DATA_MODEL)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withEnabled(ENABLED)
             .withRawContent(RAW_CONTENT)
             .build();
@@ -634,8 +636,8 @@ public abstract class ConversionTestObjects {
 
     protected static final ExtendedFrontEndRouteDataModel EXTENDED_FRONT_END_ROUTE_DATA_MODEL = ExtendedFrontEndRouteDataModel.getExtendedBuilder()
             .withId(ID)
-            .withCreated(FORMATTED_CREATED_DATE)
-            .withLastModified(FORMATTED_LAST_MODIFIED_DATE)
+            .withCreated(ZONED_DATE_TIME_CREATED)
+            .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withEnabled(ENABLED)
             .withRouteId(ROUTE_ID)
             .withName(NAME)
@@ -924,7 +926,7 @@ public abstract class ConversionTestObjects {
     }
 
     @Mock(lenient = true)
-    protected CommonFormatter commonFormatter;
+    protected DateConverter dateConverter;
 
     @Mock(lenient = true)
     protected HttpServletRequest httpServletRequest;
@@ -935,9 +937,9 @@ public abstract class ConversionTestObjects {
     @Before
     public void setup() {
         given(httpServletRequest.getLocale()).willReturn(java.util.Locale.ENGLISH);
-        given(commonFormatter.formatDate(CREATED, java.util.Locale.ENGLISH)).willReturn(FORMATTED_CREATED_DATE);
-        given(commonFormatter.formatDate(LAST_MODIFIED, java.util.Locale.ENGLISH)).willReturn(FORMATTED_LAST_MODIFIED_DATE);
-        given(commonFormatter.formatDate(LAST_LOGIN, java.util.Locale.ENGLISH)).willReturn(FORMATTED_LAST_LOGIN_DATE);
+        given(dateConverter.convert(CREATED)).willReturn(ZONED_DATE_TIME_CREATED);
+        given(dateConverter.convert(LAST_MODIFIED)).willReturn(ZONED_DATE_TIME_LAST_MODIFIED);
+        given(dateConverter.convert(LAST_LOGIN)).willReturn(ZONED_DATE_TIME_LAST_LOGIN);
         given(localeConverter.convert(java.util.Locale.ENGLISH)).willReturn(LOCALE);
     }
 }

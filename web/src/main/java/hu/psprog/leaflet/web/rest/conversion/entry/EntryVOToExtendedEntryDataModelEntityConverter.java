@@ -4,14 +4,13 @@ import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
+import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import hu.psprog.leaflet.web.rest.conversion.file.UploadedFileVOToFileDataModelConverter;
 import hu.psprog.leaflet.web.rest.conversion.tag.TagVOToTagDataModelEntityConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Collectors;
 
 /**
@@ -22,19 +21,16 @@ import java.util.stream.Collectors;
 @Component
 public class EntryVOToExtendedEntryDataModelEntityConverter implements Converter<EntryVO, ExtendedEntryDataModel> {
 
-    private CommonFormatter commonFormatter;
-    private HttpServletRequest httpServletRequest;
     private UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter;
     private TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter;
+    private DateConverter dateConverter;
 
     @Autowired
-    public EntryVOToExtendedEntryDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest,
-                                                          UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter,
-                                                          TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter) {
-        this.commonFormatter = commonFormatter;
-        this.httpServletRequest = httpServletRequest;
+    public EntryVOToExtendedEntryDataModelEntityConverter(UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter,
+                                                          TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter, DateConverter dateConverter) {
         this.uploadedFileVOToFileDataModelConverter = uploadedFileVOToFileDataModelConverter;
         this.tagVOToTagDataModelEntityConverter = tagVOToTagDataModelEntityConverter;
+        this.dateConverter = dateConverter;
     }
 
     @Override
@@ -42,11 +38,11 @@ public class EntryVOToExtendedEntryDataModelEntityConverter implements Converter
 
         ExtendedEntryDataModel.ExtendedEntryDataModelBuilder builder = ExtendedEntryDataModel.getExtendedBuilder()
                 .withRawContent(entryVO.getRawContent())
-                .withLastModified(commonFormatter.formatDate(entryVO.getLastModified(), httpServletRequest.getLocale()))
+                .withLastModified(dateConverter.convert(entryVO.getLastModified()))
                 .withTitle(entryVO.getTitle())
                 .withLink(entryVO.getLink())
                 .withPrologue(entryVO.getPrologue())
-                .withCreated(commonFormatter.formatDate(entryVO.getCreated(), httpServletRequest.getLocale()))
+                .withCreated(dateConverter.convert(entryVO.getCreated()))
                 .withId(entryVO.getId())
                 .withLocale(entryVO.getLocale().name())
                 .withCategory(CategoryDataModel.getBuilder()

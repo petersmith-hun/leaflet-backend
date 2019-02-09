@@ -2,12 +2,10 @@ package hu.psprog.leaflet.web.rest.conversion.tag;
 
 import hu.psprog.leaflet.api.rest.response.tag.TagDataModel;
 import hu.psprog.leaflet.service.vo.TagVO;
-import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
+import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Converts {@link TagVO} to {@link TagDataModel}.
@@ -17,22 +15,20 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class TagVOToTagDataModelEntityConverter implements Converter<TagVO, TagDataModel> {
 
-    private CommonFormatter commonFormatter;
-    private HttpServletRequest httpServletRequest;
+    private DateConverter dateConverter;
 
     @Autowired
-    public TagVOToTagDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
-        this.commonFormatter = commonFormatter;
-        this.httpServletRequest = httpServletRequest;
+    public TagVOToTagDataModelEntityConverter(DateConverter dateConverter) {
+        this.dateConverter = dateConverter;
     }
 
     @Override
     public TagDataModel convert(TagVO source) {
         return TagDataModel.getBuilder()
                 .withId(source.getId())
-                .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
+                .withCreated(dateConverter.convert(source.getCreated()))
                 .withEnabled(source.isEnabled())
-                .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
+                .withLastModified(dateConverter.convert(source.getLastModified()))
                 .withName(source.getTitle())
                 .build();
     }

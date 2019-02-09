@@ -2,12 +2,10 @@ package hu.psprog.leaflet.web.rest.conversion.routing;
 
 import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteDataModel;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
+import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Converts {@link FrontEndRouteVO} to {@link ExtendedFrontEndRouteDataModel}.
@@ -17,13 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter implements Converter<FrontEndRouteVO, ExtendedFrontEndRouteDataModel> {
 
-    private CommonFormatter commonFormatter;
-    private HttpServletRequest httpServletRequest;
+    private DateConverter dateConverter;
 
     @Autowired
-    public FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
-        this.commonFormatter = commonFormatter;
-        this.httpServletRequest = httpServletRequest;
+    public FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter(DateConverter dateConverter) {
+        this.dateConverter = dateConverter;
     }
 
     @Override
@@ -37,8 +33,8 @@ public class FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter implements
                 .withSequenceNumber(source.getSequenceNumber())
                 .withId(source.getId())
                 .withType(source.getType().name())
-                .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
-                .withLastModified(commonFormatter.formatDate(source.getLastModified(), httpServletRequest.getLocale()))
+                .withCreated(dateConverter.convert(source.getCreated()))
+                .withLastModified(dateConverter.convert(source.getLastModified()))
                 .build();
     }
 }

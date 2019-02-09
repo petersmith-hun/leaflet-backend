@@ -18,6 +18,9 @@ spring:
       location: ${java.io.tmpdir}
   main:
     allow-bean-definition-overriding: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 
 files:
   upload:

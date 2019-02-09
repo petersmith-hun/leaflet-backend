@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -76,7 +75,6 @@ public class InvocationFactoryConfig {
     @Bean
     @Primary
     public RequestAdapter requestAdapter(HttpServletResponse httpServletResponse) {
-        Locale.setDefault(Locale.ENGLISH); // making sure, date format is not changed in different environments
         return new HttpServletBasedRequestAdapter(mockedHttpServletRequest(), httpServletResponse);
     }
 

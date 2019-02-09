@@ -3,12 +3,10 @@ package hu.psprog.leaflet.web.rest.conversion.document;
 import hu.psprog.leaflet.api.rest.response.document.DocumentDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.service.vo.DocumentVO;
-import hu.psprog.leaflet.web.rest.conversion.CommonFormatter;
+import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Converts {@link DocumentVO} value object to {@link DocumentDataModel} model.
@@ -18,13 +16,11 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class DocumentVOToDocumentDataModelEntityConverter implements Converter<DocumentVO, DocumentDataModel> {
 
-    private CommonFormatter commonFormatter;
-    private HttpServletRequest httpServletRequest;
+    private DateConverter dateConverter;
 
     @Autowired
-    public DocumentVOToDocumentDataModelEntityConverter(CommonFormatter commonFormatter, HttpServletRequest httpServletRequest) {
-        this.commonFormatter = commonFormatter;
-        this.httpServletRequest = httpServletRequest;
+    public DocumentVOToDocumentDataModelEntityConverter(DateConverter dateConverter) {
+        this.dateConverter = dateConverter;
     }
 
     @Override
@@ -35,7 +31,7 @@ public class DocumentVOToDocumentDataModelEntityConverter implements Converter<D
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withLink(source.getLink())
-                .withCreated(commonFormatter.formatDate(source.getCreated(), httpServletRequest.getLocale()))
+                .withCreated(dateConverter.convert(source.getCreated()))
                 .withLocale(source.getLocale().name())
                 .withUser(UserDataModel.getBuilder()
                         .withId(source.getOwner().getId())

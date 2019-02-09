@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.web.interceptor.ResponseFillerInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -18,7 +16,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Peter Smith
  */
 @Configuration
-@EnableWebMvc
 public class WebMVCConfiguration implements WebMvcConfigurer {
 
     private ResponseFillerInterceptor responseFillerInterceptor;
@@ -26,11 +23,6 @@ public class WebMVCConfiguration implements WebMvcConfigurer {
     @Autowired
     public WebMVCConfiguration(ResponseFillerInterceptor responseFillerInterceptor) {
         this.responseFillerInterceptor = responseFillerInterceptor;
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
     }
 
     @Bean

@@ -2,7 +2,7 @@
   "id": 1,
   "title": "Test category #1",
   "description": "Description for test category #1",
-  "created": "Thursday, December 14, 2017, 8:00 PM",
-  "lastModified": "",
+  "created": "2017-12-14T20:00:00+01:00",
+  "lastModified": null,
   "enabled": true
 }
