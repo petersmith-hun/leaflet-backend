@@ -39,6 +39,7 @@ public class FrontEndRouteDAOImpl extends SelfStatusAwareDAOImpl<FrontEndRoute, 
             entity.setUrl(updatedEntity.getUrl());
             entity.setSequenceNumber(updatedEntity.getSequenceNumber());
             entity.setType(updatedEntity.getType());
+            entity.setAuthRequirement(updatedEntity.getAuthRequirement());
             entity.setEnabled(updatedEntity.isEnabled());
             entity.setLastModified(new Date());
             jpaRepository.flush();

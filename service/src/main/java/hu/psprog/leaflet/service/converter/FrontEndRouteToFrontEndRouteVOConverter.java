@@ -26,6 +26,7 @@ public class FrontEndRouteToFrontEndRouteVOConverter implements Converter<FrontE
                 .withEnabled(source.isEnabled())
                 .withCreated(source.getCreated())
                 .withLastModified(source.getLastModified())
+                .withAuthRequirement(source.getAuthRequirement())
                 .build();
     }
 }

@@ -16,4 +16,5 @@ public class FrontEndRoute_ extends SelfStatusAwareIdentifiableEntity_ {
     public static volatile SingularAttribute<FrontEndRoute, String> url;
     public static volatile SingularAttribute<FrontEndRoute, Integer> sequenceNumber;
     public static volatile SingularAttribute<FrontEndRoute, FrontEndRouteType> type;
+    public static volatile SingularAttribute<FrontEndRoute, FrontEndRouteAuthRequirement> authRequirement;
 }

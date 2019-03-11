@@ -48,6 +48,7 @@ import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.service.common.Authority;
@@ -140,6 +141,7 @@ public abstract class ConversionTestObjects {
     private static final int SEQUENCE_NUMBER = 5;
     private static final String TYPE = "HEADER_MENU";
     private static final String MESSAGE = "contact message";
+    private static final FrontEndRouteAuthRequirement AUTH_REQUIREMENT = FrontEndRouteAuthRequirement.AUTHENTICATED;
 
     protected static final String TOKEN = "token";
     protected static final String PASSWORD = "test-pw";
@@ -623,6 +625,7 @@ public abstract class ConversionTestObjects {
             .withEnabled(ENABLED)
             .withCreated(CREATED)
             .withLastModified(LAST_MODIFIED)
+            .withAuthRequirement(AUTH_REQUIREMENT)
             .build();
 
     protected static final FrontEndRouteVO FRONT_END_ROUTE_VO_CREATE = FrontEndRouteVO.getBuilder()
@@ -632,6 +635,7 @@ public abstract class ConversionTestObjects {
             .withSequenceNumber(SEQUENCE_NUMBER)
             .withType(FrontEndRouteType.valueOf(TYPE))
             .withEnabled(true)
+            .withAuthRequirement(AUTH_REQUIREMENT)
             .build();
 
     protected static final ExtendedFrontEndRouteDataModel EXTENDED_FRONT_END_ROUTE_DATA_MODEL = ExtendedFrontEndRouteDataModel.getExtendedBuilder()
@@ -644,12 +648,14 @@ public abstract class ConversionTestObjects {
             .withUrl(URL)
             .withSequenceNumber(SEQUENCE_NUMBER)
             .withType(TYPE)
+            .withAuthRequirement(AUTH_REQUIREMENT.name())
             .build();
 
     protected static final FrontEndRouteDataModel FRONT_END_ROUTE_DATA_MODEL = FrontEndRouteDataModel.getBuilder()
             .withRouteId(ROUTE_ID)
             .withName(NAME)
             .withUrl(URL)
+            .withAuthRequirement(AUTH_REQUIREMENT.name())
             .build();
 
     protected static final ExtendedFrontEndRouteListDataModel EXTENDED_FRONT_END_ROUTE_LIST_DATA_MODEL = ExtendedFrontEndRouteListDataModel.getExtendedBuilder()
@@ -921,6 +927,7 @@ public abstract class ConversionTestObjects {
         frontEndRouteUpdateRequestModel.setSequenceNumber(SEQUENCE_NUMBER);
         frontEndRouteUpdateRequestModel.setType(TYPE);
         frontEndRouteUpdateRequestModel.setUrl(URL);
+        frontEndRouteUpdateRequestModel.setAuthRequirement(AUTH_REQUIREMENT.name());
 
         return frontEndRouteUpdateRequestModel;
     }

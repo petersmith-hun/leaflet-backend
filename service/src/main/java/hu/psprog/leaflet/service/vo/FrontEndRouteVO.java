@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.service.vo;
 
 import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -20,6 +21,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
     private String url;
     private Integer sequenceNumber;
     private FrontEndRouteType type;
+    private FrontEndRouteAuthRequirement authRequirement;
 
     public String getRouteId() {
         return routeId;
@@ -41,6 +43,10 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
         return type;
     }
 
+    public FrontEndRouteAuthRequirement getAuthRequirement() {
+        return authRequirement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -56,6 +62,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
                 .append(url, that.url)
                 .append(sequenceNumber, that.sequenceNumber)
                 .append(type, that.type)
+                .append(authRequirement, that.authRequirement)
                 .isEquals();
     }
 
@@ -68,6 +75,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
                 .append(url)
                 .append(sequenceNumber)
                 .append(type)
+                .append(authRequirement)
                 .toHashCode();
     }
 
@@ -83,6 +91,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
                 .append("lastModified", lastModified)
                 .append("enabled", enabled)
                 .append("id", id)
+                .append("authRequirement", authRequirement)
                 .toString();
     }
 
@@ -103,6 +112,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
         private String url;
         private Integer sequenceNumber;
         private FrontEndRouteType type;
+        private FrontEndRouteAuthRequirement authRequirement;
 
         private FrontEndRouteVOBuilder() {
         }
@@ -152,6 +162,11 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
             return this;
         }
 
+        public FrontEndRouteVOBuilder withAuthRequirement(FrontEndRouteAuthRequirement authRequirement) {
+            this.authRequirement = authRequirement;
+            return this;
+        }
+
         public FrontEndRouteVO build() {
             FrontEndRouteVO frontEndRouteVO = new FrontEndRouteVO();
             frontEndRouteVO.routeId = this.routeId;
@@ -163,6 +178,7 @@ public class FrontEndRouteVO extends SelfStatusAwareIdentifiableVO<Long, FrontEn
             frontEndRouteVO.name = this.name;
             frontEndRouteVO.type = this.type;
             frontEndRouteVO.created = this.created;
+            frontEndRouteVO.authRequirement = this.authRequirement;
             return frontEndRouteVO;
         }
     }

@@ -6,6 +6,7 @@ import hu.psprog.leaflet.persistence.entity.Document;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
@@ -68,6 +69,7 @@ public abstract class ConversionTestObjects {
     private static final String URL = "/test/route";
     private static final int SEQUENCE_NUMBER = 5;
     private static final FrontEndRouteType TYPE = FrontEndRouteType.HEADER_MENU;
+    private static final FrontEndRouteAuthRequirement AUTH_REQUIREMENT = FrontEndRouteAuthRequirement.AUTHENTICATED;
 
     static final CategoryVO CATEGORY_VO = CategoryVO.getBuilder()
             .withCreated(CREATED)
@@ -343,6 +345,7 @@ public abstract class ConversionTestObjects {
             .withEnabled(ENABLED)
             .withCreated(CREATED)
             .withLastModified(LAST_MODIFIED)
+            .withAuthRequirement(AUTH_REQUIREMENT)
             .build();
 
     static final FrontEndRoute FRONT_END_ROUTE_MINIMUM = FrontEndRoute.getBuilder()
@@ -352,6 +355,7 @@ public abstract class ConversionTestObjects {
             .withSequenceNumber(SEQUENCE_NUMBER)
             .withType(TYPE)
             .withEnabled(ENABLED)
+            .withAuthRequirement(AUTH_REQUIREMENT)
             .build();
 
     static final FrontEndRouteVO FRONT_END_ROUTE_VO = FrontEndRouteVO.getBuilder()
@@ -364,6 +368,7 @@ public abstract class ConversionTestObjects {
             .withEnabled(ENABLED)
             .withCreated(CREATED)
             .withLastModified(LAST_MODIFIED)
+            .withAuthRequirement(AUTH_REQUIREMENT)
             .build();
 
     private static Date createDate(int dayOffset) {

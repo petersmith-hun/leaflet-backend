@@ -22,6 +22,7 @@ public class FrontEndRouteVOToFrontEndRouteConverter implements Converter<FrontE
                 .withUrl(source.getUrl())
                 .withSequenceNumber(source.getSequenceNumber())
                 .withType(source.getType())
+                .withAuthRequirement(source.getAuthRequirement())
                 .withEnabled(source.isEnabled())
                 .build();
     }

@@ -19,6 +19,7 @@ public class FrontEndRouteVOToFrontEndRouteDataModelConverter implements Convert
                 .withRouteId(source.getRouteId())
                 .withName(source.getName())
                 .withUrl(source.getUrl())
+                .withAuthRequirement(source.getAuthRequirement().name())
                 .build();
     }
 }
