@@ -59,6 +59,7 @@ public final class DatabaseConstants {
     static final String COLUMN_SEQUENCE_NUMBER = "sequence_number";
     static final String COLUMN_NAME = "name";
     static final String COLUMN_ROUTE_ID = "route_id";
+    static final String COLUMN_AUTH_REQUIREMENT = "auth_requirement";
 
     static final String FK_NM_ENTRIES_UPLOADED_FILES_ENTRY = "FK_NM_ENTRIES_UPLOADED_FILES_ENTRY";
     static final String FK_NM_ENTRIES_UPLOADED_FILES_UPLOADED_FILE = "FK_NM_ENTRIES_UPLOADED_FILES_UPLOADED_FILE";

@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.rest.conversion.routing;
 
 import hu.psprog.leaflet.api.rest.request.routing.FrontEndRouteUpdateRequestModel;
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.springframework.core.convert.converter.Converter;
@@ -25,6 +26,7 @@ public class FrontEndRouteUpdateRequestModelToFrontEndRouteVOConverter implement
                 .withUrl(source.getUrl())
                 .withSequenceNumber(source.getSequenceNumber())
                 .withType(FrontEndRouteType.valueOf(source.getType()))
+                .withAuthRequirement(FrontEndRouteAuthRequirement.valueOf(source.getAuthRequirement()))
                 .withEnabled(ENABLED_BY_DEFAULT)
                 .build();
     }

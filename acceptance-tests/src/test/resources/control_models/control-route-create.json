@@ -3,5 +3,6 @@
   "name": "Test route acceptance",
   "url": "/test/standalone/acceptance",
   "sequenceNumber": 30,
-  "type": "STANDALONE"
+  "type": "STANDALONE",
+  "authRequirement": "AUTHENTICATED"
 }

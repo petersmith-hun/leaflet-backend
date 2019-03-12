@@ -3,36 +3,42 @@
     {
       "routeId": "route-1",
       "name": "Route 1",
-      "url": "/route/header/1"
+      "url": "/route/header/1",
+      "authRequirement": "AUTHENTICATED"
     },
     {
       "routeId": "route-2",
       "name": "Route 2",
-      "url": "/route/header/2"
+      "url": "/route/header/2",
+      "authRequirement": "SHOW_ALWAYS"
     }
   ],
   "footer": [
     {
       "routeId": "route-4",
       "name": "Route 4",
-      "url": "/route/footer/1"
+      "url": "/route/footer/1",
+      "authRequirement": "ANONYMOUS"
     },
     {
       "routeId": "route-5",
       "name": "Route 5",
-      "url": "/route/footer/2"
+      "url": "/route/footer/2",
+      "authRequirement": "SHOW_ALWAYS"
     }
   ],
   "standalone": [
     {
       "routeId": "route-7",
       "name": "Route 7",
-      "url": "/route/standalone/1"
+      "url": "/route/standalone/1",
+      "authRequirement": "SHOW_ALWAYS"
     },
     {
       "routeId": "route-8",
       "name": "Route 8",
-      "url": "/route/standalone/2"
+      "url": "/route/standalone/2",
+      "authRequirement": "SHOW_ALWAYS"
     }
   ]
 }

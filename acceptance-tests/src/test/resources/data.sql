@@ -141,18 +141,18 @@ values
 
 -- insert test routes
 insert into leaflet_front_end_routes
-(id, date_created, is_enabled, date_last_modified, name, route_id, url, sequence_number, type)
+(id, date_created, is_enabled, date_last_modified, name, route_id, url, sequence_number, type, auth_requirement)
 values
-  (1, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 1', 'route-1', '/route/header/1', 1, 'HEADER_MENU'),
-  (2, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 2', 'route-2', '/route/header/2', 2, 'HEADER_MENU'),
-  (3, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 3', 'route-3', '/route/header/3', 3, 'HEADER_MENU'),
-  (4, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 4', 'route-4', '/route/footer/1', 4, 'FOOTER_MENU'),
-  (5, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 5', 'route-5', '/route/footer/2', 5, 'FOOTER_MENU'),
-  (6, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 6', 'route-6', '/route/footer/3', 6, 'FOOTER_MENU'),
-  (7, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 7', 'route-7', '/route/standalone/1', 7, 'STANDALONE'),
-  (8, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 8', 'route-8', '/route/standalone/2', 8, 'STANDALONE'),
-  (9, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 9', 'route-9', '/route/standalone/3', 9, 'STANDALONE'),
-  (10, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 10', 'route-10', '/route/dynamic/entry-pattern-1', 10, 'ENTRY_ROUTE_MASK'),
-  (11, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 11', 'route-11', '/route/dynamic/category', 11, 'CATEGORY_ROUTE_MASK'),
-  (12, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 12', 'route-12', '/route/dynamic/entry-pattern-2', 12, 'ENTRY_ROUTE_MASK'),
-  (13, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 13', 'route-13', '/route/dynamic/entry-pattern-3', 13, 'ENTRY_ROUTE_MASK');
+  (1, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 1', 'route-1', '/route/header/1', 1, 'HEADER_MENU', 'AUTHENTICATED'),
+  (2, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 2', 'route-2', '/route/header/2', 2, 'HEADER_MENU', 'SHOW_ALWAYS'),
+  (3, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 3', 'route-3', '/route/header/3', 3, 'HEADER_MENU', 'SHOW_ALWAYS'),
+  (4, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 4', 'route-4', '/route/footer/1', 4, 'FOOTER_MENU', 'ANONYMOUS'),
+  (5, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 5', 'route-5', '/route/footer/2', 5, 'FOOTER_MENU', 'SHOW_ALWAYS'),
+  (6, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 6', 'route-6', '/route/footer/3', 6, 'FOOTER_MENU', 'SHOW_ALWAYS'),
+  (7, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 7', 'route-7', '/route/standalone/1', 7, 'STANDALONE', 'SHOW_ALWAYS'),
+  (8, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 8', 'route-8', '/route/standalone/2', 8, 'STANDALONE', 'SHOW_ALWAYS'),
+  (9, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 9', 'route-9', '/route/standalone/3', 9, 'STANDALONE', 'SHOW_ALWAYS'),
+  (10, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 10', 'route-10', '/route/dynamic/entry-pattern-1', 10, 'ENTRY_ROUTE_MASK', 'SHOW_ALWAYS'),
+  (11, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 11', 'route-11', '/route/dynamic/category', 11, 'CATEGORY_ROUTE_MASK', 'SHOW_ALWAYS'),
+  (12, @CREATED_DATE, true, @MODIFIED_DATE, 'Route 12', 'route-12', '/route/dynamic/entry-pattern-2', 12, 'ENTRY_ROUTE_MASK', 'AUTHENTICATED'),
+  (13, @CREATED_DATE, false, @MODIFIED_DATE, 'Route 13', 'route-13', '/route/dynamic/entry-pattern-3', 13, 'ENTRY_ROUTE_MASK', 'ANONYMOUS');

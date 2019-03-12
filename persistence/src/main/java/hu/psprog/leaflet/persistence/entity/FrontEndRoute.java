@@ -38,6 +38,10 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
     @Enumerated(EnumType.STRING)
     private FrontEndRouteType type;
 
+    @Column(name = DatabaseConstants.COLUMN_AUTH_REQUIREMENT)
+    @Enumerated(EnumType.STRING)
+    private FrontEndRouteAuthRequirement authRequirement;
+
     public String getRouteId() {
         return routeId;
     }
@@ -78,6 +82,14 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
         this.type = type;
     }
 
+    public FrontEndRouteAuthRequirement getAuthRequirement() {
+        return authRequirement;
+    }
+
+    public void setAuthRequirement(FrontEndRouteAuthRequirement authRequirement) {
+        this.authRequirement = authRequirement;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -93,6 +105,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(name, that.name)
                 .append(url, that.url)
                 .append(type, that.type)
+                .append(authRequirement, that.authRequirement)
                 .isEquals();
     }
 
@@ -105,6 +118,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(url)
                 .append(sequenceNumber)
                 .append(type)
+                .append(authRequirement)
                 .toHashCode();
     }
 
@@ -116,6 +130,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append("url", url)
                 .append("sequenceNumber", sequenceNumber)
                 .append("type", type)
+                .append("authRequirement", authRequirement)
                 .append("created", getCreated())
                 .append("lastModified", getLastModified())
                 .append("enabled", isEnabled())
@@ -139,6 +154,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
         private Integer sequenceNumber;
         private Date lastModified;
         private FrontEndRouteType type;
+        private FrontEndRouteAuthRequirement authRequirement;
         private boolean enabled;
 
         private FrontEndRouteBuilder() {
@@ -184,6 +200,11 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
             return this;
         }
 
+        public FrontEndRouteBuilder withAuthRequirement(FrontEndRouteAuthRequirement authRequirement) {
+            this.authRequirement = authRequirement;
+            return this;
+        }
+
         public FrontEndRouteBuilder withEnabled(boolean enabled) {
             this.enabled = enabled;
             return this;
@@ -199,6 +220,7 @@ public class FrontEndRoute extends SelfStatusAwareIdentifiableEntity<Long> {
             frontEndRoute.setSequenceNumber(sequenceNumber);
             frontEndRoute.setLastModified(lastModified);
             frontEndRoute.setType(type);
+            frontEndRoute.setAuthRequirement(authRequirement);
             frontEndRoute.setEnabled(enabled);
             return frontEndRoute;
         }

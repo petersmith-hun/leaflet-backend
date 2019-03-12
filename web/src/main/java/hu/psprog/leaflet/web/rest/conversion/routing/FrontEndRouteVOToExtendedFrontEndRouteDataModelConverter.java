@@ -33,6 +33,7 @@ public class FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter implements
                 .withSequenceNumber(source.getSequenceNumber())
                 .withId(source.getId())
                 .withType(source.getType().name())
+                .withAuthRequirement(source.getAuthRequirement().name())
                 .withCreated(dateConverter.convert(source.getCreated()))
                 .withLastModified(dateConverter.convert(source.getLastModified()))
                 .build();
