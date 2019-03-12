@@ -6,6 +6,7 @@ import hu.psprog.leaflet.persistence.repository.FrontEndRouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,7 @@ public class FrontEndRouteDAOImpl extends SelfStatusAwareDAOImpl<FrontEndRoute, 
         return ((FrontEndRouteRepository) jpaRepository).findAll(specification);
     }
 
+    @Transactional
     @Override
     public FrontEndRoute updateOne(Long id, FrontEndRoute updatedEntity) {
 
