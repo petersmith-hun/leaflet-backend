@@ -49,6 +49,7 @@ public class CommentsController extends BaseController {
 
     private static final String PATH_PUBLIC_COMMENTS_FOR_ENTRY = "/entry" + PATH_PART_LINK + PATH_PART_PAGE;
     private static final String PATH_ALL_COMMENTS_FOR_ENTRY = "/entry" + PATH_PART_ID + PATH_PART_PAGE + "/all";
+    private static final String PATH_ALL_COMMENTS_FOR_USER = "/user" + PATH_PART_ID + PATH_PART_PAGE;
     private static final String PATH_PERMANENT_DELETION = PATH_PART_ID + "/permanent";
     private static final String REQUESTED_COMMENT_NOT_FOUND = "Requested comment not found";
     private static final String THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING = "The comment you are looking for is not existing";
@@ -115,6 +116,35 @@ public class CommentsController extends BaseController {
             @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
 
         EntityPageVO<CommentVO> comments = commentFacade.getPageOfCommentsForEntry(entryID, page, limit, orderDirection, orderBy);
+
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(comments.getEntitiesOnPage(), CommentListDataModel.class));
+    }
+
+    /**
+     * GET /comments/user/{id}/{page}
+     * Retrieves given page of comments for given user (public and non-public comments as well).
+     * Should be used for admin and user profile operations.
+     *
+     * @param userID ID of user to retrieve comments for
+     * @param page page number
+     * @param limit (optional) number of comments on one page; defaults to {@code PAGINATION_DEFAULT_LIMIT}
+     * @param orderBy (optional) order by (CREATED|TITLE); defaults to {@code CREATED}
+     * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
+     * @return list of comments
+     */
+    @FillResponse(fill = ResponseFillMode.AJAX)
+    @RequestMapping(method = RequestMethod.GET, path = PATH_ALL_COMMENTS_FOR_USER)
+    @Timed
+    public ResponseEntity<CommentListDataModel> getPageOfCommentsForUser(
+            @PathVariable(PATH_VARIABLE_ID) Long userID,
+            @PathVariable(PATH_VARIABLE_PAGE) int page,
+            @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_BY, defaultValue = PAGINATION_DEFAULT_ORDER_BY) String orderBy,
+            @RequestParam(name = REQUEST_PARAMETER_ORDER_DIRECTION, defaultValue = PAGINATION_DEFAULT_ORDER_DIRECTION) String orderDirection) {
+
+        EntityPageVO<CommentVO> comments = commentFacade.getPageOfCommentsForUser(userID, page, limit, orderDirection, orderBy);
 
         return ResponseEntity
                 .ok()

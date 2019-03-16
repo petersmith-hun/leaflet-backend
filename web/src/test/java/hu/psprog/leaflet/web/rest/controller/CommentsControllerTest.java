@@ -36,6 +36,7 @@ import static org.mockito.Mockito.verify;
 public class CommentsControllerTest extends AbstractControllerBaseTest {
 
     private static final long ENTRY_ID = 1L;
+    private static final long USER_ID = 2L;
     private static final String ENTRY_LINK = "entry-link";
     private static final long COMMENT_ID = 2L;
     private static final String LOCATION_HEADER = "/comments/" + COMMENT_ID;
@@ -81,6 +82,21 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
 
         // when
         ResponseEntity<CommentListDataModel> result = controller.getPageOfCommentsForEntry(ENTRY_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
+
+        // then
+        assertResponse(result, HttpStatus.OK, COMMENT_LIST_DATA_MODEL);
+    }
+
+    @Test
+    public void shouldGetPageOfCommentsForUser() {
+
+        // given
+        given(commentFacade.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+                .withEntitiesOnPage(COMMENT_VO_LIST)
+                .build());
+
+        // when
+        ResponseEntity<CommentListDataModel> result = controller.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
 
         // then
         assertResponse(result, HttpStatus.OK, COMMENT_LIST_DATA_MODEL);

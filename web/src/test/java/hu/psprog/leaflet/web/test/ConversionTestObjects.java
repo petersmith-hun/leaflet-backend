@@ -528,6 +528,7 @@ public abstract class ConversionTestObjects {
             .withOwner(USER_DATA_MODEL)
             .withContent(CONTENT)
             .withDeleted(false)
+            .withEnabled(ENABLED)
             .withCreated(ZONED_DATE_TIME_CREATED)
             .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .build();

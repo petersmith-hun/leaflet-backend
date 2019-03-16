@@ -33,6 +33,7 @@ public class CommentVOToCommentDataModelConverter implements Converter<CommentVO
                         .build())
                 .withContent(source.getContent())
                 .withDeleted(source.isDeleted())
+                .withEnabled(source.isEnabled())
                 .withCreated(dateConverter.convert(source.getCreated()))
                 .withLastModified(dateConverter.convert(source.getLastModified()))
                 .build();

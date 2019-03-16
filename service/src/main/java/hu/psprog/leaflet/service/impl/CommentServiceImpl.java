@@ -93,8 +93,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @PermitEditorOrAdmin
-    public EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction,
-                                                             CommentVO.OrderBy orderBy, EntryVO entryVO) {
+    public EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, EntryVO entryVO) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         Entry entry = entryVOToEntryConverter.convert(entryVO);
@@ -104,8 +103,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction,
-                                                                   CommentVO.OrderBy orderBy, EntryVO entryVO) {
+    public EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, EntryVO entryVO) {
 
         EntityPageVO<CommentVO> entityPageVO = EMPTY_ENTITY_PAGE_VO;
         if (Objects.nonNull(entryVO)) {
@@ -122,9 +120,8 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
-    public EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction,
-                                                            CommentVO.OrderBy orderBy, UserVO userVO) {
+    @PermitSelf.UserOrModerator
+    public EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, UserVO userVO) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         User user = userVOToUserConverter.convert(userVO);

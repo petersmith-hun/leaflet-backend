@@ -111,6 +111,23 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
     }
 
     @Test
+    @Parameters(source = CommentAcceptanceTestDataProvider.class, method = "pageOfCommentsForUser")
+    public void shouldReturnCommentsForUser(long userID, int page, int limit, OrderBy.Comment orderBy, OrderDirection orderDirection,
+                                            long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious,
+                                            int expectedLogicallyDeletedCount, int expectedEnabledCount)
+            throws CommunicationFailureException {
+
+        // when
+        WrapperBodyDataModel<CommentListDataModel> result = commentBridgeService.getPageOfCommentsForUser(userID, page, limit, orderBy, orderDirection);
+
+        // then
+        assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertLogicallyDeletedComments(result, expectedLogicallyDeletedCount);
+        assertEnabledComments(result, expectedEnabledCount);
+        assertThat(result.getMenu(), nullValue());
+    }
+
+    @Test
     @ResetDatabase
     public void shouldCreateCommentWithAuthenticatedUser() throws CommunicationFailureException {
 
@@ -118,7 +135,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         CommentCreateRequestModel control = getControl(CONTROL_COMMENT_AUTH, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
 
         // when
-        CommentDataModel result = commentBridgeService.createComment(control);
+        CommentDataModel result = commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
 
         // then
         assertThat(result, notNullValue());
@@ -139,7 +156,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         CommentCreateRequestModel control = getControl(CONTROL_COMMENT_ANON, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
 
         // when
-        CommentDataModel result = commentBridgeService.createComment(control);
+        CommentDataModel result = commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
 
         // then
         assertThat(result, notNullValue());
@@ -163,7 +180,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
         // when
         try {
-            commentBridgeService.createComment(control);
+            commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
             fail("Test case should have thrown exception.");
         } catch (ConflictingRequestException e) {
 
@@ -182,7 +199,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         control.setAuthenticatedUserId(2L);
 
         // when
-        commentBridgeService.createComment(control);
+        commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
 
         // then
         // exception expected
@@ -251,6 +268,12 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
                 .allMatch(commentDataModel -> DELETED_COMMENT.equals(commentDataModel.getContent())), is(true));
     }
 
+    private void assertEnabledComments(WrapperBodyDataModel<CommentListDataModel> result, int expectedLogicallyDeletedCount) {
+        assertThat(result.getBody().getComments().stream()
+                .filter(CommentDataModel::isEnabled)
+                .count(), equalTo((long) expectedLogicallyDeletedCount));
+    }
+
     private Comparator<CommentDataModel> getComparator(OrderBy.Comment orderBy, OrderDirection orderDirection) {
 
         if (orderBy == CREATED && orderDirection == ASC) {
@@ -298,6 +321,16 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
                     new Object[] {ENTRY_WITHOUT_COMMENTS_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
                     new Object[] {ENTRY_NON_EXISTING_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
                     new Object[] {CONTROL_ENTRY_LINK, 1, 20, CREATED, DESC, 7, 7, 1, false, false, 4}
+            };
+        }
+
+        public static Object[] pageOfCommentsForUser() {
+            return new Object[] {
+                    // user ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted, enabled
+                    new Object[] {1, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0, 0},
+                    new Object[] {2, 1, 4, CREATED, ASC, 6, 4, 2, true, false, 1, 4},
+                    new Object[] {2, 2, 4, CREATED, ASC, 6, 2, 2, false, true, 2, 2},
+                    new Object[] {4, 1, 10, CREATED, ASC, 4, 4, 1, false, false, 1, 1}
             };
         }
     }
