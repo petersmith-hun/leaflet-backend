@@ -6,6 +6,7 @@ import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentDataModel;
+import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -137,7 +138,7 @@ public class CommentsController extends BaseController {
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_ALL_COMMENTS_FOR_USER)
     @Timed
-    public ResponseEntity<CommentListDataModel> getPageOfCommentsForUser(
+    public ResponseEntity<ExtendedCommentListDataModel> getPageOfCommentsForUser(
             @PathVariable(PATH_VARIABLE_ID) Long userID,
             @PathVariable(PATH_VARIABLE_PAGE) int page,
             @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
@@ -148,7 +149,7 @@ public class CommentsController extends BaseController {
 
         return ResponseEntity
                 .ok()
-                .body(conversionService.convert(comments.getEntitiesOnPage(), CommentListDataModel.class));
+                .body(conversionService.convert(comments.getEntitiesOnPage(), ExtendedCommentListDataModel.class));
     }
 
     /**

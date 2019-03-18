@@ -7,6 +7,7 @@ import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentDataModel;
+import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.bridge.client.domain.OrderBy;
 import hu.psprog.leaflet.bridge.client.domain.OrderDirection;
@@ -23,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static hu.psprog.leaflet.bridge.client.domain.OrderBy.Comment.CREATED;
@@ -90,7 +92,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
-        assertLogicallyDeletedComments(result, expectedLogicallyDeletedCount);
+        assertLogicallyDeletedComments(result.getBody().getComments(), expectedLogicallyDeletedCount);
         assertThat(result.getMenu(), nullValue());
     }
 
@@ -106,7 +108,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
-        assertLogicallyDeletedComments(result, expectedLogicallyDeletedCount);
+        assertLogicallyDeletedComments(result.getBody().getComments(), expectedLogicallyDeletedCount);
         assertThat(result.getMenu(), nullValue());
     }
 
@@ -118,12 +120,12 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
             throws CommunicationFailureException {
 
         // when
-        WrapperBodyDataModel<CommentListDataModel> result = commentBridgeService.getPageOfCommentsForUser(userID, page, limit, orderBy, orderDirection);
+        WrapperBodyDataModel<ExtendedCommentListDataModel> result = commentBridgeService.getPageOfCommentsForUser(userID, page, limit, orderBy, orderDirection);
 
         // then
-        assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
-        assertLogicallyDeletedComments(result, expectedLogicallyDeletedCount);
-        assertEnabledComments(result, expectedEnabledCount);
+        assertPaginatedExtendedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertLogicallyDeletedComments(result.getBody().getComments(), expectedLogicallyDeletedCount);
+        assertEnabledComments(result.getBody().getComments(), expectedEnabledCount);
         assertThat(result.getMenu(), nullValue());
     }
 
@@ -259,17 +261,17 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         commentBridgeService.getComment(CONTROL_COMMENT_ID);
     }
 
-    private void assertLogicallyDeletedComments(WrapperBodyDataModel<CommentListDataModel> result, int expectedLogicallyDeletedCount) {
-        assertThat(result.getBody().getComments().stream()
+    private void assertLogicallyDeletedComments(List<? extends CommentDataModel> result, int expectedLogicallyDeletedCount) {
+        assertThat(result.stream()
                 .filter(CommentDataModel::isDeleted)
                 .count(), equalTo((long) expectedLogicallyDeletedCount));
-        assertThat(result.getBody().getComments().stream()
+        assertThat(result.stream()
                 .filter(CommentDataModel::isDeleted)
                 .allMatch(commentDataModel -> DELETED_COMMENT.equals(commentDataModel.getContent())), is(true));
     }
 
-    private void assertEnabledComments(WrapperBodyDataModel<CommentListDataModel> result, int expectedLogicallyDeletedCount) {
-        assertThat(result.getBody().getComments().stream()
+    private void assertEnabledComments(List<? extends CommentDataModel> result, int expectedLogicallyDeletedCount) {
+        assertThat(result.stream()
                 .filter(CommentDataModel::isEnabled)
                 .count(), equalTo((long) expectedLogicallyDeletedCount));
     }
@@ -287,16 +289,33 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
                                        long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious) {
 
         assertThat(result, notNullValue());
+        assertPagination(result, expectedEntityCount, expectedPageCount, expectedHasNext, expectedHasPrevious);
         assertThat(result.getBody().getComments().size(), equalTo(expectedBodySize));
+        assertThat(result.getBody().getComments().stream()
+                .sorted(comparator)
+                .collect(Collectors.toList())
+                .equals(result.getBody().getComments()), is(true));
+    }
+
+    private void assertPaginatedExtendedResult(WrapperBodyDataModel<ExtendedCommentListDataModel> result, Comparator<CommentDataModel> comparator,
+                                               long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious) {
+
+        assertThat(result, notNullValue());
+        assertPagination(result, expectedEntityCount, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertThat(result.getBody().getComments().size(), equalTo(expectedBodySize));
+        assertThat(result.getBody().getComments().stream()
+                .sorted(comparator)
+                .collect(Collectors.toList())
+                .equals(result.getBody().getComments()), is(true));
+    }
+
+    private void assertPagination(WrapperBodyDataModel<?> result, long expectedEntityCount,
+                                  int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious) {
         assertThat(result.getPagination(), notNullValue());
         assertThat(result.getPagination().getPageCount(), equalTo(expectedPageCount));
         assertThat(result.getPagination().isHasNext(), equalTo(expectedHasNext));
         assertThat(result.getPagination().isHasPrevious(), equalTo(expectedHasPrevious));
         assertThat(result.getPagination().getEntityCount(), equalTo(expectedEntityCount));
-        assertThat(result.getBody().getComments().stream()
-                .sorted(comparator)
-                .collect(Collectors.toList())
-                .equals(result.getBody().getComments()), is(true));
     }
 
     public static class CommentAcceptanceTestDataProvider {

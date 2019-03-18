@@ -3,6 +3,7 @@ package hu.psprog.leaflet.web.rest.controller;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentDataModel;
+import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -53,6 +54,7 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
     public void setup() {
         super.setup();
         given(conversionService.convert(COMMENT_VO_LIST, CommentListDataModel.class)).willReturn(COMMENT_LIST_DATA_MODEL);
+        given(conversionService.convert(COMMENT_VO_LIST, ExtendedCommentListDataModel.class)).willReturn(EXTENDED_COMMENT_LIST_DATA_MODEL);
         given(conversionService.convert(COMMENT_VO, ExtendedCommentDataModel.class)).willReturn(EXTENDED_COMMENT_DATA_MODEL);
         given(conversionService.convert(COMMENT_VO, CommentDataModel.class)).willReturn(COMMENT_DATA_MODEL);
     }
@@ -96,10 +98,10 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
                 .build());
 
         // when
-        ResponseEntity<CommentListDataModel> result = controller.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
+        ResponseEntity<ExtendedCommentListDataModel> result = controller.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
 
         // then
-        assertResponse(result, HttpStatus.OK, COMMENT_LIST_DATA_MODEL);
+        assertResponse(result, HttpStatus.OK, EXTENDED_COMMENT_LIST_DATA_MODEL);
     }
 
     @Test
