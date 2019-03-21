@@ -32,8 +32,7 @@ public interface CommentService extends CreateOperationCapableService<CommentVO,
      * @param entryVO {@link EntryVO} object to return comments for.
      * @return list of all comments under given entry
      */
-    EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction,
-                                                             CommentVO.OrderBy orderBy, EntryVO entryVO);
+    EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, EntryVO entryVO);
 
     /**
      * Returns only enabled comments for given entry.
@@ -45,8 +44,7 @@ public interface CommentService extends CreateOperationCapableService<CommentVO,
      * @param entryVO {@link EntryVO} object to return comments for.
      * @return list of enabled comments under given entry
      */
-    EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction,
-                                                                   CommentVO.OrderBy orderBy, EntryVO entryVO);
+    EntityPageVO<CommentVO> getPageOfPublicCommentsForEntry(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, EntryVO entryVO);
 
     /**
      * Returns comments created by given user.
@@ -56,10 +54,9 @@ public interface CommentService extends CreateOperationCapableService<CommentVO,
      * @param direction order direction
      * @param orderBy order by field
      * @param userVO {@link UserVO} object to return comments for.
-     * @return
+     * @return list of all comments for given user
      */
-    EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction,
-                                                            CommentVO.OrderBy orderBy, UserVO userVO);
+    EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, UserVO userVO);
 
     /**
      * Sends email notification for the author of an entry under a comment has been created.

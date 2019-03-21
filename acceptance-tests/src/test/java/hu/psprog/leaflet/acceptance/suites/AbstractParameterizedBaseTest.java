@@ -44,6 +44,8 @@ public abstract class AbstractParameterizedBaseTest extends AbstractTransactiona
     static final String CONTROL_SUFFIX_MODIFY = "modify";
     static final String CONTROL_SUFFIX_CREATE = "create";
 
+    static final String RECAPTCHA_TOKEN = "recaptcha-token";
+
     private static final String[] DATABASE_TABLES = {
             "leaflet_dynamic_config_properties",
             "leaflet_documents",

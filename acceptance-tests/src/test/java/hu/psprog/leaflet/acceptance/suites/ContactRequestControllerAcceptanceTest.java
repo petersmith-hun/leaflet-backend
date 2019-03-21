@@ -23,7 +23,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class ContactRequestControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
     private static final ContactRequestModel CONTACT_REQUEST_MODEL = new ContactRequestModel();
-    private static final String RECAPTCHA_TOKEN = "recaptcha-token";
     private static final String NAME = "name";
     private static final String EMAIL = "test@local.dev";
     private static final String MESSAGE = "contact-message";

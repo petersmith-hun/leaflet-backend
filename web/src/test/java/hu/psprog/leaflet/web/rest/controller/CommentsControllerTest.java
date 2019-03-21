@@ -3,6 +3,7 @@ package hu.psprog.leaflet.web.rest.controller;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentDataModel;
+import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.verify;
 public class CommentsControllerTest extends AbstractControllerBaseTest {
 
     private static final long ENTRY_ID = 1L;
+    private static final long USER_ID = 2L;
     private static final String ENTRY_LINK = "entry-link";
     private static final long COMMENT_ID = 2L;
     private static final String LOCATION_HEADER = "/comments/" + COMMENT_ID;
@@ -52,6 +54,7 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
     public void setup() {
         super.setup();
         given(conversionService.convert(COMMENT_VO_LIST, CommentListDataModel.class)).willReturn(COMMENT_LIST_DATA_MODEL);
+        given(conversionService.convert(COMMENT_VO_LIST, ExtendedCommentListDataModel.class)).willReturn(EXTENDED_COMMENT_LIST_DATA_MODEL);
         given(conversionService.convert(COMMENT_VO, ExtendedCommentDataModel.class)).willReturn(EXTENDED_COMMENT_DATA_MODEL);
         given(conversionService.convert(COMMENT_VO, CommentDataModel.class)).willReturn(COMMENT_DATA_MODEL);
     }
@@ -84,6 +87,21 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
 
         // then
         assertResponse(result, HttpStatus.OK, COMMENT_LIST_DATA_MODEL);
+    }
+
+    @Test
+    public void shouldGetPageOfCommentsForUser() {
+
+        // given
+        given(commentFacade.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+                .withEntitiesOnPage(COMMENT_VO_LIST)
+                .build());
+
+        // when
+        ResponseEntity<ExtendedCommentListDataModel> result = controller.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
+
+        // then
+        assertResponse(result, HttpStatus.OK, EXTENDED_COMMENT_LIST_DATA_MODEL);
     }
 
     @Test

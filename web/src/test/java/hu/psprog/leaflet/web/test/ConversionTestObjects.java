@@ -25,6 +25,7 @@ import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentDataModel;
+import hu.psprog.leaflet.api.rest.response.comment.ExtendedCommentListDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.api.rest.response.document.DocumentDataModel;
@@ -528,6 +529,7 @@ public abstract class ConversionTestObjects {
             .withOwner(USER_DATA_MODEL)
             .withContent(CONTENT)
             .withDeleted(false)
+            .withEnabled(ENABLED)
             .withCreated(ZONED_DATE_TIME_CREATED)
             .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .build();
@@ -545,6 +547,10 @@ public abstract class ConversionTestObjects {
             .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withEnabled(ENABLED)
             .withAssociatedEntry(ENTRY_DATA_MODEL)
+            .build();
+
+    protected static final ExtendedCommentListDataModel EXTENDED_COMMENT_LIST_DATA_MODEL = ExtendedCommentListDataModel.getBuilder()
+            .withItem(EXTENDED_COMMENT_DATA_MODEL)
             .build();
 
     protected static final DocumentVO DOCUMENT_VO_WITH_OWNER = DocumentVO.getBuilder()

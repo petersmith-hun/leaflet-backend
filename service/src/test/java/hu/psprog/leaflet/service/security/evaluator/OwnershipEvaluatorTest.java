@@ -80,6 +80,20 @@ public class OwnershipEvaluatorTest {
     }
 
     @Test
+    @Parameters(method = "isSelfOrModerator", source = OwnershipEvaluatorParameterProvider.class)
+    public void shouldValidateSelfOrModerator(Long userID, Role role, boolean expectedResult) {
+
+        // given
+        prepareAuthenticationObject(role);
+
+        // when
+        boolean result = ownershipEvaluator.isSelfOrModerator(authentication, UserVO.wrapMinimumVO(userID));
+
+        // then
+        assertThat(result, is(expectedResult));
+    }
+
+    @Test
     @Parameters(method = "isOwnEntryOrAdmin", source = OwnershipEvaluatorParameterProvider.class)
     public void shouldValidateEntry(Role role, Long ownerID, boolean expectedResult) throws ServiceException {
 
@@ -190,6 +204,15 @@ public class OwnershipEvaluatorTest {
             return new Object[] {
                     new Object[] {CURRENT_USER_ID, Role.USER, true},
                     new Object[] {2L, Role.ADMIN, true},
+                    new Object[] {2L, Role.USER, false}
+            };
+        }
+
+        public static Object[] isSelfOrModerator() {
+            return new Object[] {
+                    new Object[] {CURRENT_USER_ID, Role.USER, true},
+                    new Object[] {2L, Role.ADMIN, true},
+                    new Object[] {2L, Role.EDITOR, true},
                     new Object[] {2L, Role.USER, false}
             };
         }

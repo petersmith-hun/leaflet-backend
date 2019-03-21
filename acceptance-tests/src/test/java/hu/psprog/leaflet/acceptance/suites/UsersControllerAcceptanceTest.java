@@ -246,7 +246,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         passwordResetDemandRequestModel.setEmail(TEST_USER_3_EMAIL);
 
         // when
-        userBridgeService.demandPasswordReset(passwordResetDemandRequestModel);
+        userBridgeService.demandPasswordReset(passwordResetDemandRequestModel, RECAPTCHA_TOKEN);
 
         // then
         assertThat(notificationService.getPasswordResetRequest(), notNullValue());
@@ -263,7 +263,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(true);
 
         // when
-        userBridgeService.confirmPasswordReset(userPasswordRequestModel);
+        userBridgeService.confirmPasswordReset(userPasswordRequestModel, RECAPTCHA_TOKEN);
 
         // then
         LoginResponseDataModel loginResponse = userBridgeService.claimToken(prepareLoginRequestModel(TEST_EDITOR_4_EMAIL, UPDATED_PASSWORD));
@@ -368,7 +368,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         UserInitializeRequestModel userInitializeRequestModel = getControl(CONTROL_USER_REGISTER, UserInitializeRequestModel.class);
 
         // when
-        ExtendedUserDataModel result = userBridgeService.signUp(userInitializeRequestModel);
+        ExtendedUserDataModel result = userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN);
 
         // then
         assertCreatedUser(userInitializeRequestModel, result.getId());
@@ -383,7 +383,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         userInitializeRequestModel.setEmail(TEST_USER_1_EMAIL);
 
         // when
-        userBridgeService.signUp(userInitializeRequestModel);
+        userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN);
 
         // then
         // exception expected
@@ -449,7 +449,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         PasswordResetDemandRequestModel passwordResetDemandRequestModel = new PasswordResetDemandRequestModel();
         passwordResetDemandRequestModel.setEmail(email);
-        userBridgeService.demandPasswordReset(passwordResetDemandRequestModel);
+        userBridgeService.demandPasswordReset(passwordResetDemandRequestModel, RECAPTCHA_TOKEN);
 
         return notificationService.getPasswordResetRequest().getToken();
     }

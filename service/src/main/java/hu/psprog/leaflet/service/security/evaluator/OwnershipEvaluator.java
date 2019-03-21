@@ -8,6 +8,7 @@ import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,21 @@ public class OwnershipEvaluator {
 
         return extractPayload(authentication)
                 .map(jwtPayload -> jwtPayload.getId().equals(id.intValue()) || isAdmin(jwtPayload))
+                .orElse(false);
+    }
+
+    /**
+     * Validates that a user is accessing their own user entry or an admin/editor is accessing user information.
+     *
+     * @param authentication current {@link Authentication} object
+     * @param userVO user VO
+     * @return {@code true} if the given user ID is the same as in the one in the {@link Authentication} object,
+     * or the authenticated user is either an admin or an editor, {@code false} otherwise
+     */
+    public boolean isSelfOrModerator(Authentication authentication, UserVO userVO) {
+
+        return extractPayload(authentication)
+                .map(jwtPayload -> jwtPayload.getId().equals(userVO.getId().intValue()) || isModerator(jwtPayload))
                 .orElse(false);
     }
 
