@@ -1,14 +1,27 @@
 package hu.psprog.leaflet.acceptance.suites;
 
 import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
+import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
+import hu.psprog.leaflet.api.rest.response.sitemap.SitemapLocationItem;
+import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
+import hu.psprog.leaflet.bridge.service.SitemapBridgeService;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
+import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import junitparams.JUnitParamsRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -33,16 +46,24 @@ public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTe
     private TestRestTemplate testRestTemplate;
 
     @Autowired
+    private SitemapBridgeService sitemapBridgeService;
+
+    @Autowired
     private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
 
     @Value("${bridge.clients.leaflet.host-url}/sitemap.xml")
     private String serviceURL;
 
     @Test
-    public void shouldGetSitemap() {
+    public void shouldGetSitemapAsXML() {
+
+        // given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 
         // when
-        ResponseEntity<String> result = testRestTemplate.getForEntity(serviceURL, String.class);
+        ResponseEntity<String> result = testRestTemplate.exchange(serviceURL, HttpMethod.GET, httpEntity, String.class);
 
         // then
         assertThat(result, notNullValue());
@@ -50,5 +71,27 @@ public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result.getBody().endsWith(URLSET_END_TAG), is(true));
         frontEndRoutingSupportFacade.getSitemap(PROTOCOL, HOST)
                 .forEach(route -> assertThat(result.getBody().contains(String.format(SITEMAP_LOCATION_NODE_PATTERN, route.getUrl())), is(true)));
+    }
+
+    @Test
+    public void shouldGetSitemapAsJSON() throws CommunicationFailureException {
+
+        // given
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
+        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+        // when
+        Sitemap result = sitemapBridgeService.getSitemap();
+
+        // then
+        assertThat(result, notNullValue());
+        List<String> frontEndRouteVOList = frontEndRoutingSupportFacade.getSitemap(PROTOCOL, HOST).stream()
+                .map(FrontEndRouteVO::getUrl)
+                .collect(Collectors.toList());
+        List<String> locations = result.getSitemapLocationItemList().stream()
+                .map(SitemapLocationItem::getLocation)
+                .collect(Collectors.toList());
+        assertThat(locations.containsAll(frontEndRouteVOList), is(true));
     }
 }

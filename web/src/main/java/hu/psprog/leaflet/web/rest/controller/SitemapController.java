@@ -1,8 +1,8 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import hu.psprog.leaflet.web.rest.model.Sitemap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,7 @@ public class SitemapController extends BaseController {
      * @param request {@link HttpServletRequest} object to extract protocol and host's domain
      * @return generated sitemap
      */
-    @RequestMapping(path = BaseController.BASE_PATH_SITEMAP, method = RequestMethod.GET, produces = MediaType.APPLICATION_XML_VALUE)
+    @RequestMapping(path = BaseController.BASE_PATH_SITEMAP, method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Sitemap> getSitemap(HttpServletRequest request) {
 
         List<FrontEndRouteVO> routes = frontEndRoutingSupportFacade.getSitemap(request.getScheme(), request.getServerName());
