@@ -30,5 +30,10 @@ public enum FrontEndRouteType {
     /**
      * Route item is a standalone dynamic mask for a group of category routes.
      */
-    CATEGORY_ROUTE_MASK
+    CATEGORY_ROUTE_MASK,
+
+    /**
+     * Route item is a standalone dynamic mask for a group of tag routes.
+     */
+    TAG_ROUTE_MASK
 }

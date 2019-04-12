@@ -44,6 +44,7 @@ public class EntryRouteMaskProcessor implements RouteMaskProcessor {
                 .map(entryVO -> FrontEndRouteVO.getBuilder()
                         .withName(entryVO.getTitle())
                         .withUrl(prepareURL(entryVO, frontEndRouteVO))
+                        .withAuthRequirement(frontEndRouteVO.getAuthRequirement())
                         .build())
                 .collect(Collectors.toList());
     }

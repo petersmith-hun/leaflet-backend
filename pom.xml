@@ -392,7 +392,7 @@
                         <exclude>**/*IT.java</exclude>
                         <exclude>**/*AcceptanceTest.java</exclude>
                     </excludes>
-                    <forkCount>0</forkCount>
+                    <forkCount>1</forkCount>
                 </configuration>
             </plugin>
             <plugin>

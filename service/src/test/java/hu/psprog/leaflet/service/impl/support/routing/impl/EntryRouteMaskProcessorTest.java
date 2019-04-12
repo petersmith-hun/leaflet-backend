@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service.impl.support.routing.impl;
 
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -42,18 +43,22 @@ public class EntryRouteMaskProcessorTest {
     private static final FrontEndRouteVO EXPECTED_ROUTE_1 = FrontEndRouteVO.getBuilder()
             .withName(ENTRY_1)
             .withUrl("/entry/entry-1")
+            .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
             .build();
     private static final FrontEndRouteVO EXPECTED_ROUTE_2 = FrontEndRouteVO.getBuilder()
             .withName(ENTRY_2)
             .withUrl("/entry/entry-2")
+            .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
             .build();
     private static final FrontEndRouteVO EXPECTED_ROUTE_1_WITHOUT_URL = FrontEndRouteVO.getBuilder()
             .withName(ENTRY_1)
             .withUrl(StringUtils.EMPTY)
+            .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
             .build();
     private static final FrontEndRouteVO EXPECTED_ROUTE_2_WITHOUT_URL = FrontEndRouteVO.getBuilder()
             .withName(ENTRY_2)
             .withUrl(StringUtils.EMPTY)
+            .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
             .build();
 
     private static final List<EntryVO> ENTRY_VO_LIST = Arrays.asList(ENTRY_VO_1, ENTRY_VO_2);
@@ -94,6 +99,7 @@ public class EntryRouteMaskProcessorTest {
         given(entryFacade.getListOfPublicEntries()).willReturn(ENTRY_VO_LIST);
         FrontEndRouteVO routeMask = FrontEndRouteVO.getBuilder()
                 .withUrl("/entry")
+                .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
                 .build();
 
         // when
@@ -110,7 +116,9 @@ public class EntryRouteMaskProcessorTest {
         given(entryFacade.getListOfPublicEntries()).willReturn(ENTRY_VO_LIST);
 
         // when
-        List<FrontEndRouteVO> result = entryRouteMaskProcessor.process(FrontEndRouteVO.getBuilder().build());
+        List<FrontEndRouteVO> result = entryRouteMaskProcessor.process(FrontEndRouteVO.getBuilder()
+                .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
+                .build());
 
         // then
         assertThat(result.containsAll(FRONT_END_ROUTE_VO_LIST_WITHOUT_URL), is(true));
@@ -122,6 +130,7 @@ public class EntryRouteMaskProcessorTest {
             return new Object[] {
                     new Object[] {FrontEndRouteType.ENTRY_ROUTE_MASK,    true},
                     new Object[] {FrontEndRouteType.CATEGORY_ROUTE_MASK, false},
+                    new Object[] {FrontEndRouteType.TAG_ROUTE_MASK,      false},
                     new Object[] {FrontEndRouteType.HEADER_MENU,         false},
                     new Object[] {FrontEndRouteType.FOOTER_MENU,         false},
                     new Object[] {FrontEndRouteType.STANDALONE,          false},

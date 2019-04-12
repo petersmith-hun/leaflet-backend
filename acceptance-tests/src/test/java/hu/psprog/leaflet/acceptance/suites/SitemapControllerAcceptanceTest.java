@@ -36,8 +36,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @LeafletAcceptanceSuite
 public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
-    private static final String PROTOCOL = "http";
-    private static final String HOST = "localhost";
     private static final String SITEMAP_LOCATION_NODE_PATTERN = "<url><loc>%s</loc></url>";
     private static final String URLSET_START_TAG = "<urlset>";
     private static final String URLSET_END_TAG = "</urlset>";
@@ -69,24 +67,19 @@ public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result, notNullValue());
         assertThat(result.getBody().startsWith(URLSET_START_TAG), is(true));
         assertThat(result.getBody().endsWith(URLSET_END_TAG), is(true));
-        frontEndRoutingSupportFacade.getSitemap(PROTOCOL, HOST)
+        frontEndRoutingSupportFacade.getSitemap()
                 .forEach(route -> assertThat(result.getBody().contains(String.format(SITEMAP_LOCATION_NODE_PATTERN, route.getUrl())), is(true)));
     }
 
     @Test
     public void shouldGetSitemapAsJSON() throws CommunicationFailureException {
 
-        // given
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_XML));
-        HttpEntity<String> httpEntity = new HttpEntity<>(headers);
-
         // when
         Sitemap result = sitemapBridgeService.getSitemap();
 
         // then
         assertThat(result, notNullValue());
-        List<String> frontEndRouteVOList = frontEndRoutingSupportFacade.getSitemap(PROTOCOL, HOST).stream()
+        List<String> frontEndRouteVOList = frontEndRoutingSupportFacade.getSitemap().stream()
                 .map(FrontEndRouteVO::getUrl)
                 .collect(Collectors.toList());
         List<String> locations = result.getSitemapLocationItemList().stream()

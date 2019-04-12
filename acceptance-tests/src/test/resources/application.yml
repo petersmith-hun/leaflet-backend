@@ -51,6 +51,8 @@ jwt:
 
 usersEnabledByDefault: true
 
+sitemap.server-name: http://localhost:9988
+
 test-auth:
   username: test-admin@ac-leaflet.local
   real-name: Administrator

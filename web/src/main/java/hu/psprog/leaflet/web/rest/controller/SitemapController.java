@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -32,13 +31,12 @@ public class SitemapController extends BaseController {
      * GET /sitemap.xml
      * Returns sitemap.
      *
-     * @param request {@link HttpServletRequest} object to extract protocol and host's domain
      * @return generated sitemap
      */
     @RequestMapping(path = BaseController.BASE_PATH_SITEMAP, method = RequestMethod.GET, produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Sitemap> getSitemap(HttpServletRequest request) {
+    public ResponseEntity<Sitemap> getSitemap() {
 
-        List<FrontEndRouteVO> routes = frontEndRoutingSupportFacade.getSitemap(request.getScheme(), request.getServerName());
+        List<FrontEndRouteVO> routes = frontEndRoutingSupportFacade.getSitemap();
 
         return ResponseEntity
                 .ok(conversionService.convert(routes, Sitemap.class));

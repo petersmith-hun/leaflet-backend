@@ -27,8 +27,6 @@ public class SitemapControllerTest extends AbstractControllerBaseTest {
     private static final String URL_1 = "url-1";
     private static final List<FrontEndRouteVO> FRONT_END_ROUTE_VO_LIST = Collections.singletonList(FrontEndRouteVO.getBuilder().withUrl(URL_1).build());
     private static final Sitemap SITEMAP = Sitemap.getBuilder().withLocation(URL_1).build();
-    private static final String PROTOCOL = "http";
-    private static final String HOST = "localhost";
 
     @Mock
     private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
@@ -40,13 +38,11 @@ public class SitemapControllerTest extends AbstractControllerBaseTest {
     public void shouldGetSitemap() {
 
         // given
-        given(httpServletRequest.getScheme()).willReturn(PROTOCOL);
-        given(httpServletRequest.getServerName()).willReturn(HOST);
-        given(frontEndRoutingSupportFacade.getSitemap(PROTOCOL, HOST)).willReturn(FRONT_END_ROUTE_VO_LIST);
+        given(frontEndRoutingSupportFacade.getSitemap()).willReturn(FRONT_END_ROUTE_VO_LIST);
         given(conversionService.convert(FRONT_END_ROUTE_VO_LIST, Sitemap.class)).willReturn(SITEMAP);
 
         // then
-        ResponseEntity<Sitemap> result = sitemapController.getSitemap(httpServletRequest);
+        ResponseEntity<Sitemap> result = sitemapController.getSitemap();
 
         // then
         assertResponse(result, HttpStatus.OK, SITEMAP);
