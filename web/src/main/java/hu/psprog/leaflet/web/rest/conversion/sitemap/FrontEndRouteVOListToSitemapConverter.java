@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.web.rest.conversion.sitemap;
 
+import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import hu.psprog.leaflet.web.rest.model.Sitemap;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

@@ -89,6 +89,7 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
         Properties properties = new Properties();
         properties.setProperty("files.upload.storage-path", "${java.io.tmpdir}");
         properties.setProperty("mail.event.comment-notification.enabled", "false");
+        properties.setProperty("sitemap.server-name", "http://localhost:9999");
 
         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
         configurer.setProperties(properties);

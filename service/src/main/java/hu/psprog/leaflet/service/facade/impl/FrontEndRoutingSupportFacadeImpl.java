@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service.facade.impl;
 
+import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
 import hu.psprog.leaflet.service.exception.ServiceException;
@@ -8,6 +9,7 @@ import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -25,14 +27,16 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FrontEndRoutingSupportFacadeImpl.class);
 
-    private static final String URL_MASK = "%s://%s%s";
     private static final String RELATIVE_URL_PREFIX = "/";
 
     private FrontEndRoutingSupportService frontEndRoutingSupportService;
+    private String serverName;
 
     @Autowired
-    public FrontEndRoutingSupportFacadeImpl(FrontEndRoutingSupportService frontEndRoutingSupportService) {
+    public FrontEndRoutingSupportFacadeImpl(FrontEndRoutingSupportService frontEndRoutingSupportService,
+                                            @Value("${sitemap.server-name}") String serverName) {
         this.frontEndRoutingSupportService = frontEndRoutingSupportService;
+        this.serverName = stripTrailingSlash(serverName);
     }
 
     @Override
@@ -47,7 +51,7 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
     }
 
     @Override
-    public List<FrontEndRouteVO> getSitemap(String protocol, String host) {
+    public List<FrontEndRouteVO> getSitemap() {
 
         LOGGER.info("Sitemap has been requested");
 
@@ -58,8 +62,9 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
 
         return sitemap.stream()
                 .distinct()
+                .filter(frontEndRouteVO -> frontEndRouteVO.getAuthRequirement() == FrontEndRouteAuthRequirement.SHOW_ALWAYS)
                 .map(route -> FrontEndRouteVO.getBuilder()
-                        .withUrl(buildAbsoluteURL(protocol, host, route.getUrl()))
+                        .withUrl(buildAbsoluteURL(route.getUrl()))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -109,9 +114,19 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
         return frontEndRoutingSupportService.getOne(id);
     }
 
-    private String buildAbsoluteURL(String protocol, String host, String relativeURL) {
-        return String.format(URL_MASK, protocol, host, relativeURL.startsWith(RELATIVE_URL_PREFIX)
+    private String stripTrailingSlash(String serverName) {
+        return serverName.endsWith(RELATIVE_URL_PREFIX)
+                ? serverName.substring(0, serverName.length() - 1)
+                : serverName;
+    }
+
+    private String buildAbsoluteURL(String relativeURL) {
+        return serverName + normalizeRelativeURL(relativeURL);
+    }
+
+    private String normalizeRelativeURL(String relativeURL) {
+        return relativeURL.startsWith(RELATIVE_URL_PREFIX)
                 ? relativeURL
-                : RELATIVE_URL_PREFIX + relativeURL);
+                : RELATIVE_URL_PREFIX + relativeURL;
     }
 }

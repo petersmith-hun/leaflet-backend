@@ -37,9 +37,10 @@ public class FrontEndRouteSpecification {
     public static final Specification<FrontEndRoute> IS_FOOTER = (root, query, builder) -> builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.FOOTER_MENU);
 
     /**
-     * Filter to list routes of type {@link FrontEndRouteType#ENTRY_ROUTE_MASK} and {@link FrontEndRouteType#CATEGORY_ROUTE_MASK}.
+     * Filter to list routes of type {@link FrontEndRouteType#ENTRY_ROUTE_MASK}, {@link FrontEndRouteType#TAG_ROUTE_MASK} and {@link FrontEndRouteType#CATEGORY_ROUTE_MASK}.
      */
     public static final Specification<FrontEndRoute> IS_MASK = (root, query, builder) -> builder.or(
             builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.CATEGORY_ROUTE_MASK),
-            builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.ENTRY_ROUTE_MASK));
+            builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.ENTRY_ROUTE_MASK),
+            builder.equal(root.get(FrontEndRoute_.type), FrontEndRouteType.TAG_ROUTE_MASK));
 }
