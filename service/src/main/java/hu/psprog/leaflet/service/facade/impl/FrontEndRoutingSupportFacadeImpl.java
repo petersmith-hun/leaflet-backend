@@ -61,11 +61,11 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
         sitemap.addAll(frontEndRoutingSupportService.getStandaloneRoutes());
 
         return sitemap.stream()
-                .distinct()
                 .filter(frontEndRouteVO -> frontEndRouteVO.getAuthRequirement() == FrontEndRouteAuthRequirement.SHOW_ALWAYS)
                 .map(route -> FrontEndRouteVO.getBuilder()
                         .withUrl(buildAbsoluteURL(route.getUrl()))
                         .build())
+                .distinct()
                 .collect(Collectors.toList());
     }
 
