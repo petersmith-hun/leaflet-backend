@@ -74,18 +74,31 @@ public class FrontEndRoutingSupportFacadeImplTest {
     public void shouldGetSitemap(String hostName, String url) {
 
         // given
-        FrontEndRouteVO inputRouteMask = FrontEndRouteVO.getBuilder()
+        FrontEndRouteVO inputHeaderRouteMask = FrontEndRouteVO.getBuilder()
                 .withUrl(url)
                 .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
+                .withType(FrontEndRouteType.HEADER_MENU)
                 .build();
-        FrontEndRouteVO inputRouteMaskToBeSkipped = FrontEndRouteVO.getBuilder()
+        FrontEndRouteVO inputHeaderRouteMaskToBeSkipped = FrontEndRouteVO.getBuilder()
                 .withUrl("/url-skipped")
                 .withAuthRequirement(FrontEndRouteAuthRequirement.AUTHENTICATED)
+                .withType(FrontEndRouteType.HEADER_MENU)
                 .build();
-        List<FrontEndRouteVO> inputRoutes = Arrays.asList(inputRouteMask, inputRouteMaskToBeSkipped);
-        given(frontEndRoutingSupportService.getHeaderMenu()).willReturn(inputRoutes);
-        given(frontEndRoutingSupportService.getFooterMenu()).willReturn(inputRoutes);
-        given(frontEndRoutingSupportService.getStandaloneRoutes()).willReturn(inputRoutes);
+        FrontEndRouteVO inputFooterRouteMask = FrontEndRouteVO.getBuilder()
+                .withUrl(url)
+                .withAuthRequirement(FrontEndRouteAuthRequirement.SHOW_ALWAYS)
+                .withType(FrontEndRouteType.FOOTER_MENU)
+                .build();
+        FrontEndRouteVO inputFooterRouteMaskToBeSkipped = FrontEndRouteVO.getBuilder()
+                .withUrl("/url-skipped")
+                .withAuthRequirement(FrontEndRouteAuthRequirement.AUTHENTICATED)
+                .withType(FrontEndRouteType.FOOTER_MENU)
+                .build();
+        List<FrontEndRouteVO> inputHeaderRoutes = Arrays.asList(inputHeaderRouteMask, inputHeaderRouteMaskToBeSkipped);
+        List<FrontEndRouteVO> inputFooterRoutes = Arrays.asList(inputFooterRouteMask, inputFooterRouteMaskToBeSkipped);
+        given(frontEndRoutingSupportService.getHeaderMenu()).willReturn(inputHeaderRoutes);
+        given(frontEndRoutingSupportService.getFooterMenu()).willReturn(inputFooterRoutes);
+        given(frontEndRoutingSupportService.getStandaloneRoutes()).willReturn(inputHeaderRoutes);
         frontEndRoutingSupportFacade = new FrontEndRoutingSupportFacadeImpl(frontEndRoutingSupportService, hostName);
 
         // when
