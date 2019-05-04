@@ -23,6 +23,7 @@ public final class DatabaseConstants {
 
     static final String COLUMN_DATE_CREATED = "date_created";
     static final String COLUMN_DATE_LAST_MODIFIED = "date_last_modified";
+    static final String COLUMN_DATE_PUBLISHED = "date_published";
     static final String COLUMN_IS_ENABLED = "is_enabled";
     static final String COLUMN_USERNAME = "username";
     static final String COLUMN_EMAIL = "email";

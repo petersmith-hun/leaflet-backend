@@ -83,7 +83,7 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
     public Entry updateOne(Long id, Entry updatedEntity) {
 
         Entry currentEntry = jpaRepository.getOne(id);
-        if (currentEntry != null) {
+        if (Objects.nonNull(currentEntry)) {
             currentEntry.setTitle(updatedEntity.getTitle());
             currentEntry.setRawContent(updatedEntity.getRawContent());
             currentEntry.setPrologue(updatedEntity.getPrologue());
@@ -96,6 +96,7 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
             currentEntry.setStatus(updatedEntity.getStatus());
             currentEntry.setEnabled(updatedEntity.isEnabled());
             currentEntry.setLocale(updatedEntity.getLocale());
+            currentEntry.setPublished(updatedEntity.getPublished());
             jpaRepository.flush();
         }
 

@@ -44,6 +44,7 @@ public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO
                 .withCreated(dateConverter.convert(entryVO.getCreated()))
                 .withLastModified(dateConverter.convert(entryVO.getLastModified()))
                 .withLocale(entryVO.getLocale().name())
+                .withPublished(dateConverter.convert(entryVO.getPublished()))
                 .withCategory(CategoryDataModel.getBuilder()
                         .withTitle(entryVO.getCategory().getTitle())
                         .withID(entryVO.getCategory().getId())

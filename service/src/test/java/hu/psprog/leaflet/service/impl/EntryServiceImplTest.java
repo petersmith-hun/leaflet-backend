@@ -13,6 +13,7 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.util.PublishHandler;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -25,7 +26,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Arrays;
@@ -72,6 +75,9 @@ public class EntryServiceImplTest {
 
     @Mock
     private EntryVO entryVO;
+
+    @Mock
+    public PublishHandler publishHandler;
 
     @InjectMocks
     private EntryServiceImpl entryService;
@@ -159,12 +165,13 @@ public class EntryServiceImplTest {
     public void testGetPageOfPublicEntries() {
 
         // given
+        Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "published", "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
-        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
+        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
-        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntries(1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntries(1, 10, OrderDirection.ASC, EntryVO.OrderBy.PUBLISHED);
 
         // then
         assertThat(result, notNullValue());
@@ -174,12 +181,13 @@ public class EntryServiceImplTest {
     public void testGetPageOfPublicEntriesUnderCategory() {
 
         // given
+        Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
         given(categoryVOToCategoryConverter.convert(any(CategoryVO.class))).willReturn(Category.getBuilder()
                 .withId(1L)
                 .build());
-        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
+        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(new CategoryVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
@@ -192,12 +200,13 @@ public class EntryServiceImplTest {
     public void testGetPageOfPublicEntriesUnderTag() {
 
         // given
+        Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
         given(tagVOToTagConverter.convert(any(TagVO.class))).willReturn(Tag.getBuilder()
                 .withId(1L)
                 .build());
-        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
+        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(new TagVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
@@ -210,9 +219,10 @@ public class EntryServiceImplTest {
     public void testGetPageOfPublicEntriesByContent() {
 
         // given
+        Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
-        given(entryDAO.findAll(any(Specification.class), any(Pageable.class))).willReturn(entryPage);
+        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesByContent("content",1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
@@ -250,6 +260,7 @@ public class EntryServiceImplTest {
         assertThat(result, equalTo(entry.getId()));
         verify(entryVOToEntryConverter).convert(entryVO);
         verify(entryDAO).save(entry);
+        verify(publishHandler).updatePublishDate(entry);
     }
 
     @Test(expected = EntityCreationException.class)
@@ -313,6 +324,7 @@ public class EntryServiceImplTest {
         verify(entryVOToEntryConverter).convert(entryVO);
         verify(entryToEntryVOConverter).convert(entry);
         verify(entryDAO).updateOne(id, entry);
+        verify(publishHandler).updatePublishDate(id, entry);
     }
 
     @Test(expected = EntityNotFoundException.class)

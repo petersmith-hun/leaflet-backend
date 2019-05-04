@@ -37,7 +37,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
     private static final String SITEMAP_LOCATION_NODE_PATTERN = "<url><loc>%s</loc></url>";
-    private static final String URLSET_START_TAG = "<urlset>";
+    private static final String URLSET_START_TAG = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
     private static final String URLSET_END_TAG = "</urlset>";
 
     @Autowired

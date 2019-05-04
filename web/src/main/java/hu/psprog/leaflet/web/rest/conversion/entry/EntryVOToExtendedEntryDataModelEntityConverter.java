@@ -43,6 +43,7 @@ public class EntryVOToExtendedEntryDataModelEntityConverter implements Converter
                 .withLink(entryVO.getLink())
                 .withPrologue(entryVO.getPrologue())
                 .withCreated(dateConverter.convert(entryVO.getCreated()))
+                .withPublished(dateConverter.convert(entryVO.getPublished()))
                 .withId(entryVO.getId())
                 .withLocale(entryVO.getLocale().name())
                 .withCategory(CategoryDataModel.getBuilder()

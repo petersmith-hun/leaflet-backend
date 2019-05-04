@@ -19,7 +19,8 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     public enum OrderBy {
         ID("id"),
         TITLE("title"),
-        CREATED("created");
+        CREATED("created"),
+        PUBLISHED("published");
 
         private String field;
 
@@ -45,6 +46,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
     private Locale locale;
     private List<UploadedFileVO> attachments;
     private List<TagVO> tags;
+    private Date published;
 
     public String getTitle() {
         return title;
@@ -101,6 +103,10 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         return tags;
     }
 
+    public Date getPublished() {
+        return published;
+    }
+
     @Override
     public EntryVO getEntity() {
         return this;
@@ -129,6 +135,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
                 .append(locale, entryVO.locale)
                 .append(attachments, entryVO.attachments)
                 .append(tags, entryVO.tags)
+                .append(published, entryVO.published)
                 .isEquals();
     }
 
@@ -149,6 +156,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
                 .append(locale)
                 .append(attachments)
                 .append(tags)
+                .append(published)
                 .toHashCode();
     }
 
@@ -172,6 +180,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
                 .append("locale", locale)
                 .append("attachments", attachments)
                 .append("tags", tags)
+                .append("published", published)
                 .toString();
     }
 
@@ -206,6 +215,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
         private Locale locale;
         private List<UploadedFileVO> attachments;
         private List<TagVO> tags;
+        private Date published;
 
         private EntryVOBuilder() {
         }
@@ -295,6 +305,11 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
             return this;
         }
 
+        public EntryVOBuilder withPublished(Date published) {
+            this.published = published;
+            return this;
+        }
+
         public EntryVO build() {
             EntryVO entryVO = new EntryVO();
             entryVO.seoDescription = this.seoDescription;
@@ -314,6 +329,7 @@ public class EntryVO extends SelfStatusAwareIdentifiableVO<Long, Entry> implemen
             entryVO.rawContent = this.rawContent;
             entryVO.owner = this.owner;
             entryVO.attachments = this.attachments;
+            entryVO.published = this.published;
             return entryVO;
         }
     }

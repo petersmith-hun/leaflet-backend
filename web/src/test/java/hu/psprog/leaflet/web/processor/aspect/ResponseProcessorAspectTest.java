@@ -11,6 +11,7 @@ import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.EntryServiceImpl;
+import hu.psprog.leaflet.service.util.PublishHandler;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.processor.impl.CustomSEODataProviderResponseProcessor;
@@ -65,6 +66,9 @@ public class ResponseProcessorAspectTest {
 
     @Mock
     private TagVOToTagConverter tagVOToTagConverter;
+
+    @Mock
+    private PublishHandler publishHandler;
 
     @InjectMocks
     private ResponseProcessorAspect responseProcessorAspect;
@@ -134,6 +138,6 @@ public class ResponseProcessorAspectTest {
     }
 
     private EntryService prepareEntryServiceMock() {
-        return new EntryServiceImpl(entryDAO, entryToEntryVOConverter, entryVOToEntryConverter, categoryVOToCategoryConverter, tagVOToTagConverter);
+        return new EntryServiceImpl(entryDAO, entryToEntryVOConverter, entryVOToEntryConverter, categoryVOToCategoryConverter, tagVOToTagConverter, publishHandler);
     }
 }

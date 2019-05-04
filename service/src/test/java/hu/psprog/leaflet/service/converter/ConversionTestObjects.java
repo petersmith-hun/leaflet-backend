@@ -38,6 +38,7 @@ import java.util.UUID;
 public abstract class ConversionTestObjects {
 
     private static final Date CREATED = createDate(-5);
+    private static final Date PUBLISHED = createDate(2);
     private static final Date LAST_MODIFIED = createDate(-3);
     private static final String DESCRIPTION = "Description";
     private static final boolean ENABLED = true;
@@ -168,6 +169,7 @@ public abstract class ConversionTestObjects {
     static final EntryVO ENTRY_VO = EntryVO.getBuilder()
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
+            .withPublished(PUBLISHED)
             .withEnabled(ENABLED)
             .withLastModified(LAST_MODIFIED)
             .withLocale(LOCALE)
@@ -188,6 +190,7 @@ public abstract class ConversionTestObjects {
     static final Entry ENTRY_BASE_DATA = Entry.getBuilder()
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
+            .withPublished(PUBLISHED)
             .withEnabled(ENABLED)
             .withLastModified(LAST_MODIFIED)
             .withLocale(LOCALE)
