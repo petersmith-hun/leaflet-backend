@@ -18,6 +18,7 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
 import hu.psprog.leaflet.service.security.annotation.PermitSelf;
 import hu.psprog.leaflet.service.util.PageableUtil;
+import hu.psprog.leaflet.service.util.PublishHandler;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -55,15 +56,17 @@ public class EntryServiceImpl implements EntryService {
     private EntryVOToEntryConverter entryVOToEntryConverter;
     private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
     private TagVOToTagConverter tagVOToTagConverter;
+    private PublishHandler publishHandler;
 
     @Autowired
     public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter, EntryVOToEntryConverter entryVOToEntryConverter,
-                            CategoryVOToCategoryConverter categoryVOToCategoryConverter, TagVOToTagConverter tagVOToTagConverter) {
+                            CategoryVOToCategoryConverter categoryVOToCategoryConverter, TagVOToTagConverter tagVOToTagConverter, PublishHandler publishHandler) {
         this.entryDAO = entryDAO;
         this.entryToEntryVOConverter = entryToEntryVOConverter;
         this.entryVOToEntryConverter = entryVOToEntryConverter;
         this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
         this.tagVOToTagConverter = tagVOToTagConverter;
+        this.publishHandler = publishHandler;
     }
 
     @Override
@@ -112,6 +115,7 @@ public class EntryServiceImpl implements EntryService {
     public Long createOne(EntryVO entity) throws ServiceException {
 
         Entry entry = entryVOToEntryConverter.convert(entity);
+        publishHandler.updatePublishDate(entry);
         Entry savedEntry;
         try {
             savedEntry = entryDAO.save(entry);
@@ -136,7 +140,9 @@ public class EntryServiceImpl implements EntryService {
 
         Entry updatedEntry;
         try {
-            updatedEntry = entryDAO.updateOne(id, entryVOToEntryConverter.convert(updatedEntity));
+            Entry updatedEntryData = entryVOToEntryConverter.convert(updatedEntity);
+            publishHandler.updatePublishDate(id, updatedEntryData);
+            updatedEntry = entryDAO.updateOne(id, updatedEntryData);
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
         } catch (Exception e) {

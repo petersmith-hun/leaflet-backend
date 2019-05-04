@@ -95,6 +95,9 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     @Enumerated(EnumType.STRING)
     private EntryStatus status;
 
+    @Column(name = DatabaseConstants.COLUMN_DATE_PUBLISHED)
+    private Date published;
+
     public User getUser() {
         return user;
     }
@@ -199,6 +202,14 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
         this.status = status;
     }
 
+    public Date getPublished() {
+        return published;
+    }
+
+    public void setPublished(Date published) {
+        this.published = published;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -222,6 +233,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(seoKeywords, entry.seoKeywords)
                 .append(locale, entry.locale)
                 .append(status, entry.status)
+                .append(published, entry.published)
                 .isEquals();
     }
 
@@ -242,6 +254,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append(seoKeywords)
                 .append(locale)
                 .append(status)
+                .append(published)
                 .toHashCode();
     }
 
@@ -265,6 +278,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
                 .append("seoKeywords", seoKeywords)
                 .append("locale", locale)
                 .append("status", status)
+                .append("published", published)
                 .toString();
     }
 
@@ -278,6 +292,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
     public static final class EntryBuilder {
         private Date created;
         private Date lastModified;
+        private Date published;
         private boolean enabled;
         private Long id;
         private User user;
@@ -304,6 +319,11 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
 
         public EntryBuilder withLastModified(Date lastModified) {
             this.lastModified = lastModified;
+            return this;
+        }
+
+        public EntryBuilder withPublished(Date published) {
+            this.published = published;
             return this;
         }
 
@@ -386,6 +406,7 @@ public class Entry extends SelfStatusAwareIdentifiableEntity<Long> {
             Entry entry = new Entry();
             entry.setCreated(created);
             entry.setLastModified(lastModified);
+            entry.setPublished(published);
             entry.setEnabled(enabled);
             entry.setId(id);
             entry.setUser(user);

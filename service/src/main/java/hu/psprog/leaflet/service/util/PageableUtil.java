@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.entity.SerializableEntity;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.vo.BaseVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntryVO;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,10 @@ import org.springframework.data.domain.Pageable;
  * @author Peter Smith
  */
 public class PageableUtil {
+
+    private static final String ORDER_BY_PUBLISH_DATE_FIELD = EntryVO.OrderBy.PUBLISHED.getField();
+    private static final String ORDER_BY_CREATION_DATE_FIELD = EntryVO.OrderBy.CREATED.getField();
+    private static final String[] ORDER_BY_PUBLISHED = new String[] {ORDER_BY_PUBLISH_DATE_FIELD, ORDER_BY_CREATION_DATE_FIELD};
 
     private PageableUtil() {
         // utility class - prevent initialization
@@ -31,7 +36,7 @@ public class PageableUtil {
      */
     public static Pageable createPage(int page, int limit, OrderDirection direction, String orderBy) {
 
-        return PageRequest.of(page - 1, limit, direction.getDirection(), orderBy);
+        return PageRequest.of(page - 1, limit, direction.getDirection(), fixOrdering(orderBy));
     }
 
     /**
@@ -59,5 +64,12 @@ public class PageableUtil {
                 .withHasPrevious(remappedPage.hasPrevious())
                 .withEntitiesOnPage(remappedPage.getContent())
                 .build();
+    }
+
+    private static String[] fixOrdering(String orderBy) {
+
+        return ORDER_BY_PUBLISH_DATE_FIELD.equals(orderBy)
+                ? ORDER_BY_PUBLISHED
+                : new String[] {orderBy};
     }
 }

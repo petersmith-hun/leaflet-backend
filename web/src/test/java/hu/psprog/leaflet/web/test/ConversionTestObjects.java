@@ -102,6 +102,7 @@ public abstract class ConversionTestObjects {
 
     private static final Date CREATED = createDate(-5);
     private static final Date LAST_MODIFIED = createDate(-3);
+    private static final Date PUBLISHED = createDate(2);
     private static final String DESCRIPTION = "Description";
     private static final boolean ENABLED = true;
     private static final long ID = 1L;
@@ -126,6 +127,7 @@ public abstract class ConversionTestObjects {
     private static final String FIELD_VALIDATION_FAILED = "Field validation failed";
     private static final String VALIDATION_FAILED = "Validation failed";
     private static final ZonedDateTime ZONED_DATE_TIME_CREATED = ZonedDateTime.of(2019, 2, 7, 19, 0, 0, 0, ZoneId.systemDefault());
+    private static final ZonedDateTime ZONED_DATE_TIME_PUBLISHED = ZonedDateTime.of(2019, 2, 14, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final ZonedDateTime ZONED_DATE_TIME_LAST_MODIFIED = ZonedDateTime.of(2019, 2, 8, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final ZonedDateTime ZONED_DATE_TIME_LAST_LOGIN = ZonedDateTime.of(2019, 2, 1, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final String IMAGE = "IMAGE";
@@ -384,6 +386,7 @@ public abstract class ConversionTestObjects {
     protected static final EntryVO ENTRY_VO = EntryVO.getBuilder()
             .withRawContent(RAW_CONTENT)
             .withCreated(CREATED)
+            .withPublished(PUBLISHED)
             .withEnabled(ENABLED)
             .withLastModified(LAST_MODIFIED)
             .withLocale(LOCALE)
@@ -442,6 +445,7 @@ public abstract class ConversionTestObjects {
             .withLink(LINK)
             .withPrologue(PROLOGUE)
             .withCreated(ZONED_DATE_TIME_CREATED)
+            .withPublished(ZONED_DATE_TIME_PUBLISHED)
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
@@ -460,6 +464,7 @@ public abstract class ConversionTestObjects {
             .withLink(LINK)
             .withPrologue(PROLOGUE)
             .withCreated(ZONED_DATE_TIME_CREATED)
+            .withPublished(ZONED_DATE_TIME_PUBLISHED)
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
@@ -480,6 +485,7 @@ public abstract class ConversionTestObjects {
             .withLink(LINK)
             .withPrologue(PROLOGUE)
             .withCreated(ZONED_DATE_TIME_CREATED)
+            .withPublished(ZONED_DATE_TIME_PUBLISHED)
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
@@ -953,6 +959,7 @@ public abstract class ConversionTestObjects {
         given(dateConverter.convert(CREATED)).willReturn(ZONED_DATE_TIME_CREATED);
         given(dateConverter.convert(LAST_MODIFIED)).willReturn(ZONED_DATE_TIME_LAST_MODIFIED);
         given(dateConverter.convert(LAST_LOGIN)).willReturn(ZONED_DATE_TIME_LAST_LOGIN);
+        given(dateConverter.convert(PUBLISHED)).willReturn(ZONED_DATE_TIME_PUBLISHED);
         given(localeConverter.convert(java.util.Locale.ENGLISH)).willReturn(LOCALE);
     }
 }
