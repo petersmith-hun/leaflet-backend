@@ -240,6 +240,9 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
     @ResetDatabase
     public void shouldDeleteCommentLogically() throws CommunicationFailureException {
 
+        // given
+        assertThat(commentBridgeService.getComment(CONTROL_COMMENT_ID).getLastModified().getYear(), equalTo(2017));
+
         // when
         commentBridgeService.deleteCommentLogically(CONTROL_COMMENT_ID);
 
@@ -247,6 +250,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         ExtendedCommentDataModel current = commentBridgeService.getComment(CONTROL_COMMENT_ID);
         assertThat(current.isDeleted(), is(true));
         assertThat(current.getContent(), equalTo(DELETED_COMMENT));
+        assertThat(current.getLastModified().getYear() >= 2019, is(true));
     }
 
     @Test(expected = ResourceNotFoundException.class)
