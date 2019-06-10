@@ -5,7 +5,7 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>1.9.5-dev</version>
+        <version>1.9.6-dev</version>
     </parent>
 
     <packaging>jar</packaging>
@@ -58,6 +58,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
@@ -143,6 +147,11 @@
                         <configuration>
                             <classifier>exec</classifier>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
