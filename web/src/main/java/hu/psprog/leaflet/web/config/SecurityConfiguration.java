@@ -34,6 +34,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final String[] PUBLIC_GET_ENDPOINTS = {
+            "/actuator/info",
             "/categories/public",
             "/comments/entry/*/*",
             "/documents/link/*",
