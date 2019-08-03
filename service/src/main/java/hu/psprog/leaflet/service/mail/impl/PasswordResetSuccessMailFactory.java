@@ -2,6 +2,8 @@ package hu.psprog.leaflet.service.mail.impl;
 
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.mail.MailFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -16,13 +18,18 @@ import java.util.Objects;
  * @author Peter Smith
  */
 @Component
-public class PasswordResetSuccessMailFactory implements MailFactory<String> {
+public class PasswordResetSuccessMailFactory extends AbstractMailFactory<String> {
 
-    private static final String PASSWORD_RESET_CONFIRM_MAIL_SUBJECT = "Password successfully reset";
+    private static final String PASSWORD_RESET_CONFIRM_MAIL_SUBJECT = "mail.user.pwreset.confirm.subject";
     private static final String PASSWORD_RESET_CONFIRM_MAIL_TEMPLATE = "pw_reset_confirm.html";
 
     private static final String GENERATED_AT = "generatedAt";
     private static final String USERNAME = "username";
+
+    @Autowired
+    public PasswordResetSuccessMailFactory(MessageSource messageSource) {
+        super(messageSource);
+    }
 
     @Override
     public Mail buildMail(String content, String... recipient) {
@@ -31,7 +38,7 @@ public class PasswordResetSuccessMailFactory implements MailFactory<String> {
 
         return Mail.getBuilder()
                 .withRecipient(recipient[0])
-                .withSubject(PASSWORD_RESET_CONFIRM_MAIL_SUBJECT)
+                .withSubject(translateSubject(PASSWORD_RESET_CONFIRM_MAIL_SUBJECT))
                 .withTemplate(PASSWORD_RESET_CONFIRM_MAIL_TEMPLATE)
                 .withContentMap(createContentMap(content))
                 .build();

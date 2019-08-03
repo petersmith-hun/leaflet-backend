@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
 
 import java.util.Arrays;
 
@@ -24,7 +25,10 @@ public class MailFactoryRegistryTest {
     @Mock
     private CommentNotificationMailFactory commentNotificationMailFactory;
 
-    private SystemStartupMailFactory systemStartupMailFactory = new SystemStartupMailFactory();
+    @Mock
+    private MessageSource messageSource;
+
+    private SystemStartupMailFactory systemStartupMailFactory = new SystemStartupMailFactory(messageSource);
 
     private MailFactoryRegistry mailFactoryRegistry;
 

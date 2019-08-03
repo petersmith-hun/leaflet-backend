@@ -3,6 +3,8 @@ package hu.psprog.leaflet.service.mail.impl;
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.mail.MailFactory;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -15,9 +17,9 @@ import java.util.Map;
  * @author Peter Smith
  */
 @Component
-public class ContactRequestMailFactory implements MailFactory<ContactRequestVO> {
+public class ContactRequestMailFactory extends AbstractMailFactory<ContactRequestVO> {
 
-    private static final String CONTACT_REQUEST_MAIL_SUBJECT = "Contact request";
+    private static final String CONTACT_REQUEST_MAIL_SUBJECT = "mail.user.notification.contact.subject";
     private static final String CONTACT_REQUEST_MAIL_TEMPLATE = "contact_request.html";
 
     private static final String NAME = "name";
@@ -25,11 +27,16 @@ public class ContactRequestMailFactory implements MailFactory<ContactRequestVO> 
     private static final String MESSAGE = "message";
     private static final String GENERATED_AT = "generatedAt";
 
+    @Autowired
+    public ContactRequestMailFactory(MessageSource messageSource) {
+        super(messageSource);
+    }
+
     @Override
     public Mail buildMail(ContactRequestVO content, String... recipient) {
 
         return Mail.getBuilder()
-                .withSubject(CONTACT_REQUEST_MAIL_SUBJECT)
+                .withSubject(translateSubject(CONTACT_REQUEST_MAIL_SUBJECT))
                 .withTemplate(CONTACT_REQUEST_MAIL_TEMPLATE)
                 .withReplyTo(content.getEmail())
                 .withContentMap(createContentMap(content))

@@ -38,12 +38,12 @@
         </style>
     </head>
     <body>
-        <h1>Leaflet backend application</h1>
-        <h2>System Event Notification</h2>
+        <h1 th:text="#{mail.system.app.leaflet}">app</h1>
+        <h2 th:text="#{mail.system.event.notification}">mail_subject</h2>
         <div id="content">
-            <p style="font-weight: bold;">Leaflet backend application successfully loaded.</p>
-            <p style="font-style: italic;">Running version v<span th:text="${version}">0.0.0</span></p>
-            <p id="genDate">Event sent at <span th:text="${generatedAt}">2017. 06. 27. 22:52</span></p>
+            <p style="font-weight: bold;" th:text="#{mail.system.event.startup.message}">loaded_msg</p>
+            <p style="font-style: italic;" th:text="#{mail.system.event.startup.version(${version})}">version</p>
+            <p id="genDate" th:text="#{mail.system.event.startup.timestamp(${generatedAt})}">timestamp</p>
         </div>
     </body>
 </html>

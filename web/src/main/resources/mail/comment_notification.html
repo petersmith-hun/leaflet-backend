@@ -46,17 +46,17 @@
     </style>
 </head>
 <body>
-<h1>Comment notification</h1>
-<h2>A new comment has been added to your article</h2>
+<h1 th:text="#{mail.user.notification.comment.title}">title</h1>
+<h2 th:text="#{mail.user.notification.comment.sub}">sub</h2>
 <div id="content">
-    <p style="font-weight: bold; margin-bottom: 10px;">Hi <span th:text="${authorName}">author</span>,</p>
-    <p>A visitor commented on one of your articles, '<span style="font-style: italic;" th:text="${entryTitle}">article title</span>'.</p>
+    <p style="font-weight: bold; margin-bottom: 10px;" th:text="#{mail.user.notification.comment.greeting(${authorName})}">greeting</p>
+    <p th:text="#{mail.user.notification.comment.article(${entryTitle})}">article</p>
     <p>
-        <span th:text="${username}">username</span> (<span th:text="${email}">email</span>) says...<br />
+        <span th:text="#{mail.user.notification.comment.by(${username}, ${email})}">by</span><br />
         <blockquote th:text="${content}">comment</blockquote>
     </p>
 
-    <p id="genDate">Event sent at <span th:text="${generatedAt}">2017. 06. 27. 22:52</span></p>
+    <p id="genDate" th:text="#{mail.user.notification.comment.timestamp(${generatedAt})}">timestamp</p>
 </div>
 </body>
 </html>

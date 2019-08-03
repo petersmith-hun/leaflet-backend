@@ -6,11 +6,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.MessageSource;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.BDDMockito.given;
 
 /**
  * Unit tests for {@link PasswordResetRequestMailFactory}.
@@ -20,7 +25,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class PasswordResetRequestMailFactoryTest {
 
-    private static final String SUBJECT = "Password reset requested";
+    private static final String SUBJECT = "mail.user.pwreset.demand.subject";
+    private static final String TRANSLATED_SUBJECT = "Password reset requested";
     private static final String TEMPLATE = "pw_reset_request.html";
     private static final String RECIPIENT = "test@local.dev";
 
@@ -32,6 +38,10 @@ public class PasswordResetRequestMailFactoryTest {
 
     private static final String ELEVATED_RESET_URL = "elevated-reset-url";
     private static final String VISITOR_RESET_URL = "visitor-reset-url";
+    private static final Locale FORCED_LOCALE = Locale.ENGLISH;
+
+    @Mock
+    private MessageSource messageSource;
 
     @InjectMocks
     private PasswordResetRequestMailFactory passwordResetRequestMailFactory;
@@ -40,6 +50,7 @@ public class PasswordResetRequestMailFactoryTest {
     public void setup() {
         passwordResetRequestMailFactory.setElevated(ELEVATED_RESET_URL);
         passwordResetRequestMailFactory.setVisitor(VISITOR_RESET_URL);
+        passwordResetRequestMailFactory.setForcedLocale(FORCED_LOCALE);
     }
 
     @Test
@@ -47,6 +58,7 @@ public class PasswordResetRequestMailFactoryTest {
 
         // given
         PasswordResetRequest passwordResetRequest = preparePasswordResetRequest(true);
+        given(messageSource.getMessage(SUBJECT, null, FORCED_LOCALE)).willReturn(TRANSLATED_SUBJECT);
 
         // when
         Mail result = passwordResetRequestMailFactory.buildMail(passwordResetRequest, RECIPIENT);
@@ -60,6 +72,7 @@ public class PasswordResetRequestMailFactoryTest {
 
         // given
         PasswordResetRequest passwordResetRequest = preparePasswordResetRequest(false);
+        given(messageSource.getMessage(SUBJECT, null, FORCED_LOCALE)).willReturn(TRANSLATED_SUBJECT);
 
         // when
         Mail result = passwordResetRequestMailFactory.buildMail(passwordResetRequest, RECIPIENT);
@@ -91,7 +104,7 @@ public class PasswordResetRequestMailFactoryTest {
     private void assertGeneratedMail(Mail result, PasswordResetRequest passwordResetRequest, boolean withElevatedResetURL) {
         assertThat(result, notNullValue());
         assertThat(result.getRecipient(), equalTo(RECIPIENT));
-        assertThat(result.getSubject(), equalTo(SUBJECT));
+        assertThat(result.getSubject(), equalTo(TRANSLATED_SUBJECT));
         assertThat(result.getTemplate(), equalTo(TEMPLATE));
         assertThat(result.getContentMap().get(TOKEN), equalTo(passwordResetRequest.getToken()));
         assertThat(result.getContentMap().get(USERNAME), equalTo(passwordResetRequest.getUsername()));
