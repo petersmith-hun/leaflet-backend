@@ -21,7 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Controller for file related endpoints.
@@ -52,10 +55,13 @@ public class FilesController extends BaseController {
     private static final String PATH_FULLY_IDENTIFIED_FILE = PATH_PART_FILE_IDENTIFIER + PATH_PART_FILENAME;
     private static final String PATH_DIRECTORIES = "/directories";
 
+    private int resourceMaxAgeInDays;
     private FileManagementFacade fileManagementFacade;
 
     @Autowired
-    public FilesController(final FileManagementFacade fileManagementFacade) {
+    public FilesController(@Value("${files.cache.max-age-in-days}") int resourceMaxAgeInDays,
+                           final FileManagementFacade fileManagementFacade) {
+        this.resourceMaxAgeInDays = resourceMaxAgeInDays;
         this.fileManagementFacade = fileManagementFacade;
     }
 
@@ -94,6 +100,7 @@ public class FilesController extends BaseController {
             return ResponseEntity.ok()
                     .contentLength(downloadableFileWrapperVO.getLength())
                     .contentType(MediaType.parseMediaType(downloadableFileWrapperVO.getMimeType()))
+                    .cacheControl(CacheControl.maxAge(resourceMaxAgeInDays, TimeUnit.DAYS))
                     .body(downloadableFileWrapperVO.getFileContent());
         } catch (ServiceException e) {
             LOGGER.error("Failed to download given file.", e);
