@@ -46,16 +46,16 @@
     </style>
 </head>
 <body>
-<h1>Contact request notification</h1>
+<h1 th:text="#{mail.user.notification.contact.title}">title</h1>
 <div id="content">
-    <p>Hi,</p>
-    <p style="font-weight: bold; margin-bottom: 10px;">A visitor wants to get in touch with you.</p>
+    <p th:text="#{mail.user.notification.contact.greeting}">greeting</p>
+    <p style="font-weight: bold; margin-bottom: 10px;" th:text="#{mail.user.notification.contact.content}">content</p>
     <p>
-        <span th:text="${name}">name</span> (<span th:text="${email}">email</span>) says...<br />
+        <span th:text="#{mail.user.notification.contact.by(${name}, ${email})}">by</span><br />
         <blockquote th:text="${message}">message</blockquote>
     </p>
 
-    <p id="genDate">Event sent at <span th:text="${generatedAt}">2017. 06. 27. 22:52</span></p>
+    <p id="genDate" th:text="#{mail.user.notification.contact.timestamp(${generatedAt})}">timestamp</p>
 </div>
 </body>
 </html>

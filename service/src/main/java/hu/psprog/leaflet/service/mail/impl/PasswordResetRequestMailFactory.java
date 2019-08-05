@@ -3,7 +3,9 @@ package hu.psprog.leaflet.service.mail.impl;
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.mail.MailFactory;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -19,9 +21,9 @@ import java.util.Objects;
  */
 @Component
 @ConfigurationProperties(prefix = "mail.event.password-reset.url", ignoreUnknownFields = false)
-public class PasswordResetRequestMailFactory implements MailFactory<PasswordResetRequest> {
+public class PasswordResetRequestMailFactory extends AbstractMailFactory<PasswordResetRequest> {
 
-    private static final String PASSWORD_RESET_REQUEST_MAIL_SUBJECT = "Password reset requested";
+    private static final String PASSWORD_RESET_REQUEST_MAIL_SUBJECT = "mail.user.pwreset.demand.subject";
     private static final String PASSWORD_RESET_REQUEST_MAIL_TEMPLATE = "pw_reset_request.html";
 
     private static final String GENERATED_AT = "generatedAt";
@@ -33,6 +35,11 @@ public class PasswordResetRequestMailFactory implements MailFactory<PasswordRese
     private String elevated;
     private String visitor;
 
+    @Autowired
+    public PasswordResetRequestMailFactory(MessageSource messageSource) {
+        super(messageSource);
+    }
+
     @Override
     public Mail buildMail(PasswordResetRequest content, String... recipient) {
 
@@ -40,7 +47,7 @@ public class PasswordResetRequestMailFactory implements MailFactory<PasswordRese
 
         return Mail.getBuilder()
                 .withRecipient(recipient[0])
-                .withSubject(PASSWORD_RESET_REQUEST_MAIL_SUBJECT)
+                .withSubject(translateSubject(PASSWORD_RESET_REQUEST_MAIL_SUBJECT))
                 .withTemplate(PASSWORD_RESET_REQUEST_MAIL_TEMPLATE)
                 .withContentMap(createContentMap(content))
                 .build();

@@ -38,14 +38,12 @@
         </style>
 </head>
 <body>
-<h1>User account notification</h1>
-<h2>Password reset requested</h2>
+<h1 th:text="#{mail.user.pwreset.demand.title}">title</h1>
+<h2 th:text="#{mail.user.pwreset.demand.sub}">sub</h2>
 <div id="content">
-    <p style="font-weight: bold; margin-bottom: 10px;">Hi <span th:text="${username}">username</span>,</p>
-    <p>You, or someone in your name requested a password reset. If it wasn't you, please ignore this message (or contact the administrator if you think this could be an attempt of stealing your account).</p>
-    <p>Otherwise, please <a th:href="@{${resetLink}(token=${token})}">click on this link</a> to continue your password reset request. This link will navigate you to a page, where you have to provide your new password.</p>
-    <p>Please note, that the link above can be used for only <span th:text="${expiration}">0</span> hour from the generation of this email (you can see it below).</p>
-    <p id="genDate">Event sent at <span th:text="${generatedAt}">2017. 06. 27. 22:52</span></p>
+    <p style="font-weight: bold; margin-bottom: 10px;" th:text="#{mail.user.pwreset.demand.greeting(${username})}">greeting</p>
+    <th:block th:utext="#{mail.user.pwreset.demand.content(@{${resetLink}(token=${token})}, ${expiration})}">content</th:block>
+    <p id="genDate" th:text="#{mail.user.pwreset.demand.timestamp(${generatedAt})}">timestamp</p>
 </div>
 </body>
 </html>
