@@ -17,7 +17,6 @@ import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ByteArrayResource;
@@ -25,11 +24,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -49,16 +51,19 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
     private static final ByteArrayResource FILE_CONTENT = new ByteArrayResource(CONTENT_BYTE_ARRAY);
     private static final String MIME_TYPE = "image/jpeg";
     private static final String LOCATION_HEADER = "/files" + FILE_DATA_MODEL.getReference();
+    private static final int RESOURCE_MAX_AGE_IN_DAYS = 90;
+    private static final String EXPECTED_CACHE_CONTROL_FOR_FILE_DOWNLOAD = "max-age=7776000";
 
     @Mock
     private FileManagementFacade fileManagementFacade;
 
-    @InjectMocks
     private FilesController controller;
 
     @Before
     public void setup() {
         super.setup();
+        controller = new FilesController(RESOURCE_MAX_AGE_IN_DAYS, fileManagementFacade);
+        prepareConversionServiceMock();
         given(conversionService.convert(UPLOADED_FILE_VO_LIST, FileListDataModel.class)).willReturn(FILE_LIST_DATA_MODEL);
         given(conversionService.convert(UPLOADED_FILE_VO, FileDataModel.class)).willReturn(FILE_DATA_MODEL);
     }
@@ -89,6 +94,7 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         assertThat(result.getBody(), equalTo(FILE_CONTENT));
         assertThat(result.getHeaders().getContentLength(), equalTo((long) CONTENT_BYTE_ARRAY.length));
         assertThat(result.getHeaders().getContentType(), equalTo(MediaType.IMAGE_JPEG));
+        assertThat(result.getHeaders().getCacheControl(), equalTo(EXPECTED_CACHE_CONTROL_FOR_FILE_DOWNLOAD));
         assertThat(result.getStatusCode(), equalTo(HttpStatus.OK));
     }
 
@@ -292,6 +298,17 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
 
         // then
         assertResponse(result, HttpStatus.OK, DIRECTORY_LIST_DATA_MODEL);
+    }
+
+    private void prepareConversionServiceMock() {
+
+        Field conversionServiceField = ReflectionUtils.findField(FilesController.class, "conversionService");
+        conversionServiceField.setAccessible(true);
+        try {
+            conversionServiceField.set(controller, conversionService);
+        } catch (IllegalAccessException e) {
+            fail("Failed to prepare test case");
+        }
     }
 
     private DirectoryCreationRequestModel prepareDirectoryCreationRequestModel() {
