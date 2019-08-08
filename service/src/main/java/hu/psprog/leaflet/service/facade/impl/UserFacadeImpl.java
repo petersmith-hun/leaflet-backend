@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service.facade.impl;
 
+import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
@@ -7,6 +8,7 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ReAuthenticationFailureException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.UserFacade;
+import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +29,15 @@ public class UserFacadeImpl implements UserFacade {
     private UserService userService;
     private UserAuthenticationService authenticationService;
     private PasswordEncoder passwordEncoder;
+    private NotificationService notificationService;
 
     @Autowired
-    public UserFacadeImpl(UserService userService, UserAuthenticationService authenticationService, PasswordEncoder passwordEncoder) {
+    public UserFacadeImpl(UserService userService, UserAuthenticationService authenticationService,
+                          PasswordEncoder passwordEncoder, NotificationService notificationService) {
         this.userService = userService;
         this.authenticationService = authenticationService;
         this.passwordEncoder = passwordEncoder;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -91,7 +96,12 @@ public class UserFacadeImpl implements UserFacade {
 
     @Override
     public Long register(UserVO userData) throws ServiceException {
-        return userService.register(rebuildUserDataWithHashedPassword(userData));
+
+        UserVO rebuiltUserVO = rebuildUserDataWithHashedPassword(userData);
+        Long registeredUserID = userService.register(rebuiltUserVO);
+        notificationService.signUpConfirmation(new SignUpConfirmation(userData.getUsername(), userData.getEmail()));
+
+        return registeredUserID;
     }
 
     @Override

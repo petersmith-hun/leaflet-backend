@@ -1,11 +1,13 @@
 package hu.psprog.leaflet.service.facade.impl;
 
+import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ReAuthenticationFailureException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import junitparams.JUnitParamsRunner;
@@ -58,6 +60,9 @@ public class UserFacadeImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private UserFacadeImpl userFacade;
@@ -184,12 +189,14 @@ public class UserFacadeImplTest {
 
         // given
         given(passwordEncoder.encode(PASSWORD)).willReturn(ENCODED_PASSWORD);
+        SignUpConfirmation expectedSignUpConfirmation = new SignUpConfirmation(USER_TO_CREATE.getUsername(), USER_TO_CREATE.getEmail());
 
         // when
         userFacade.register(USER_TO_CREATE);
 
         // then
         verify(userService).register(REBUILT_USER);
+        verify(notificationService).signUpConfirmation(expectedSignUpConfirmation);
     }
 
     @Test

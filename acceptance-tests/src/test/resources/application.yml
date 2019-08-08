@@ -25,6 +25,8 @@ spring:
 files:
   upload:
     storage-path: ${java.io.tmpdir}
+  cache:
+    max-age-in-days: 90
 
 server:
   servlet:

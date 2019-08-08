@@ -7,11 +7,13 @@ import hu.psprog.leaflet.service.mail.MailFactory;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
+import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import hu.psprog.leaflet.service.mail.impl.CommentNotificationMailFactory;
 import hu.psprog.leaflet.service.mail.impl.ContactRequestMailFactory;
 import hu.psprog.leaflet.service.mail.impl.MailFactoryRegistry;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetRequestMailFactory;
 import hu.psprog.leaflet.service.mail.impl.PasswordResetSuccessMailFactory;
+import hu.psprog.leaflet.service.mail.impl.SignUpConfirmationMailFactory;
 import hu.psprog.leaflet.service.mail.impl.SystemStartupMailFactory;
 import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
@@ -62,6 +64,9 @@ public class EmailBasedNotificationServiceTest {
 
     @Mock
     private ContactRequestMailFactory contactRequestMailFactory;
+
+    @Mock
+    private SignUpConfirmationMailFactory signUpConfirmationMailFactory;
 
     @Mock
     private Mail mockMail;
@@ -144,6 +149,21 @@ public class EmailBasedNotificationServiceTest {
 
         // when
         emailBasedNotificationService.contactRequestReceived(contactRequestVO);
+
+        // then
+        assertMailSentAndObserverAttached();
+    }
+
+    @Test
+    public void shouldSendSignUpConfirmation() {
+
+        // given
+        SignUpConfirmation signUpConfirmation = new SignUpConfirmation("username", "email");
+        given(mailFactoryRegistry.getFactory(SignUpConfirmationMailFactory.class)).willReturn(signUpConfirmationMailFactory);
+        given(signUpConfirmationMailFactory.buildMail(signUpConfirmation, signUpConfirmation.getEmail())).willReturn(mockMail);
+
+        // when
+        emailBasedNotificationService.signUpConfirmation(signUpConfirmation);
 
         // then
         assertMailSentAndObserverAttached();
