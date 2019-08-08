@@ -22,6 +22,7 @@ import hu.psprog.leaflet.bridge.client.exception.UnauthorizedAccessException;
 import hu.psprog.leaflet.bridge.service.UserBridgeService;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
+import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import junitparams.JUnitParamsRunner;
 import org.junit.After;
 import org.junit.Test;
@@ -366,12 +367,14 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         // given
         UserInitializeRequestModel userInitializeRequestModel = getControl(CONTROL_USER_REGISTER, UserInitializeRequestModel.class);
+        SignUpConfirmation signUpConfirmation = new SignUpConfirmation(userInitializeRequestModel.getUsername(), userInitializeRequestModel.getEmail());
 
         // when
         ExtendedUserDataModel result = userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN);
 
         // then
         assertCreatedUser(userInitializeRequestModel, result.getId());
+        assertThat(notificationService.getSignUpConfirmation(), equalTo(signUpConfirmation));
     }
 
     @Test(expected = ConflictingRequestException.class)

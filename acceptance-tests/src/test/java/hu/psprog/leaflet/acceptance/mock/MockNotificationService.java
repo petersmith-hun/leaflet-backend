@@ -47,7 +47,7 @@ public class MockNotificationService implements NotificationService {
 
     @Override
     public void signUpConfirmation(SignUpConfirmation signUpConfirmation) {
-
+        this.signUpConfirmation = signUpConfirmation;
     }
 
     public PasswordResetRequest getPasswordResetRequest() {
