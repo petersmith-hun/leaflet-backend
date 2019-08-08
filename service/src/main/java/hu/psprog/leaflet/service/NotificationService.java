@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
+import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 
 /**
@@ -46,4 +47,11 @@ public interface NotificationService {
      * @param contactRequestVO domain object holding required parameters
      */
     void contactRequestReceived(ContactRequestVO contactRequestVO);
+
+    /**
+     * Sends notification about successful sign-up.
+     *
+     * @param signUpConfirmation {@link SignUpConfirmation} domain object holding required parameters
+     */
+    void signUpConfirmation(SignUpConfirmation signUpConfirmation);
 }
