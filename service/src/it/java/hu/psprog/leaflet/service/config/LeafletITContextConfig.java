@@ -46,7 +46,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -151,7 +150,7 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 
         Properties jpaProperties = new Properties();
-        jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect");
 
         vendorAdapter.setGenerateDdl(true);
         factoryBean.setJpaProperties(jpaProperties);
@@ -204,7 +203,7 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     @Bean
     public AuthenticationManager authenticationManager() {
 
-        return new ProviderManager(Arrays.asList(authenticationProvider()));
+        return new ProviderManager(Collections.singletonList(authenticationProvider()));
     }
 
     @Bean
