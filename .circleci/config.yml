@@ -35,7 +35,7 @@ commands:
           name: "Publish Release on GitHub"
           command: |
             VERSION=v$(cat /tmp/ws_store/version)-<< parameters.release-type >>
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/ws_store/leaflet-backend-exec.jar
 
 jobs:
 
@@ -140,11 +140,20 @@ workflows:
               only:
                 - master
 
-      - deploy:
+      - deploy-approval:
           context: leaflet_ci
           type: approval
           requires:
             - build
+          filters:
+            branches:
+              only:
+                - master
+
+      - deploy:
+          context: leaflet_ci
+          requires:
+            - deploy-approval
           filters:
             branches:
               only:
