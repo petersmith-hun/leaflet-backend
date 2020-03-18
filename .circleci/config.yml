@@ -136,29 +136,17 @@ workflows:
           context: leaflet_ci
           requires:
             - build
-          filters:
-            branches:
-              only:
-                - master
 
       - deploy-approval:
           context: leaflet_ci
           type: approval
           requires:
             - publish-github-rc
-          filters:
-            branches:
-              only:
-                - master
 
       - deploy:
           context: leaflet_ci
           requires:
             - deploy-approval
-          filters:
-            branches:
-              only:
-                - master
           post-steps:
             - jira/notify:
                 environment_type: production
@@ -168,8 +156,5 @@ workflows:
           context: leaflet_ci
           requires:
             - deploy
-          filters:
-            branches:
-              only:
-                - master
+
   version: 2.1
