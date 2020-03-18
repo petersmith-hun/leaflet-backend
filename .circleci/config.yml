@@ -145,7 +145,7 @@ workflows:
           context: leaflet_ci
           type: approval
           requires:
-            - build
+            - publish-github-rc
           filters:
             branches:
               only:
