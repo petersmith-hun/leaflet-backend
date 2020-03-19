@@ -97,7 +97,6 @@ jobs:
             domino_response=$(curl \
                  -s -w "%{http_code}" \
                  --header "Authorization: Bearer ${LEAFLET_CI_DOMINO_AUTH_TOKEN}" \
-                 -v \
                  -F 'executable=@/tmp/ws_store/leaflet-backend-exec.jar' \
                  ${LEAFLET_CI_DOMINO_HOST}/upload/<< pipeline.parameters.app_name >>/${PROJECT_VERSION}?autodeploy=<< pipeline.parameters.auto_deploy >>&autostart=<< pipeline.parameters.auto_start >>)
 
