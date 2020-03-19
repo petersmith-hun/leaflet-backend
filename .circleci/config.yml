@@ -133,6 +133,8 @@ workflows:
           branches:
             only:
                - master
+          tags:
+            ignore: /.*/
          post-steps:
            - jira/notify:
                environment_type: development
