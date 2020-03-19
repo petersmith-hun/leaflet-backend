@@ -94,11 +94,23 @@ jobs:
           name: Set build version
       - run:
           command: |
-            DOMINO_RESULT=$(curl --header "Authorization: Bearer ${LEAFLET_CI_DOMINO_AUTH_TOKEN}" \
+            domino_response=$(curl
+                 -s -w "%{http_code}"
+                 --header "Authorization: Bearer ${LEAFLET_CI_DOMINO_AUTH_TOKEN}" \
                  -v \
                  -F 'executable=@/tmp/ws_store/leaflet-backend-exec.jar' \
                  ${LEAFLET_CI_DOMINO_HOST}/upload/<< pipeline.parameters.app_name >>/${PROJECT_VERSION}?autodeploy=<< pipeline.parameters.auto_deploy >>&autostart=<< pipeline.parameters.auto_start >>)
-            echo $DOMINO_RESULT
+
+            case $domino_response in
+              201 | 202)
+                exit 0
+                ;;
+              *)
+                echo "Domino returned with status code $domino_response"
+                exit 1
+                ;;
+            esac
+
           name: Send executable to Domino
 
   # Leaflet Backend - Publish tag (and release) on GitHub for RC versions
