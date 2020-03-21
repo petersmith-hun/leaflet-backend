@@ -133,8 +133,6 @@ workflows:
           branches:
             only:
                - master
-          tags:
-            ignore: /.*/
          post-steps:
            - jira/notify:
                environment_type: development
@@ -165,4 +163,4 @@ workflows:
           requires:
             - deploy
 
-  version: 2.1
+  version: 2
