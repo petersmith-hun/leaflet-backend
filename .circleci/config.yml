@@ -106,7 +106,7 @@ jobs:
                  --silent --write-out "%{http_code}" --output /dev/null \
                  --header "Authorization: Bearer ${LEAFLET_CI_DOMINO_AUTH_TOKEN}" \
                  --form 'executable=@/tmp/ws_store/leaflet-backend-exec.jar' \
-                 '${LEAFLET_CI_DOMINO_HOST}/upload/<< pipeline.parameters.app_name >>/${PROJECT_VERSION}?autodeploy=<< pipeline.parameters.auto_deploy >>&autostart=<< pipeline.parameters.auto_start >>')
+                 "${LEAFLET_CI_DOMINO_HOST}/upload/<< pipeline.parameters.app_name >>/${PROJECT_VERSION}?autodeploy=<< pipeline.parameters.auto_deploy >>&autostart=<< pipeline.parameters.auto_start >>")
 
             case $domino_response in
               201 | 202) exit 0 ;;
