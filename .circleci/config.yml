@@ -8,9 +8,9 @@ parameters:
   app_name:
     type: string
     default: "leaflet"
-  jenkins_build_offset:
-    type: integer
-    default: 67
+  release_tag_pattern:
+    type: string
+    default: 's/v[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)-release/\1/'
   auto_deploy:
     type: boolean
     default: true
@@ -34,7 +34,8 @@ commands:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            VERSION=v$(cat /tmp/ws_store/version)-<< parameters.release-type >>
+            [[ "<< parameters.release-type >>" = "release" ]] && VERSION_QUALIFIER="-release" || VERSION_QUALIFIER=""
+            VERSION=v$(cat /tmp/ws_store/version)$VERSION_QUALIFIER
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/ws_store/leaflet-backend-exec.jar
 
 jobs:
@@ -46,8 +47,14 @@ jobs:
     steps:
       - checkout
       - run:
-          command: echo 'export BUILD_NUMBER="$((<< pipeline.number >> + << pipeline.parameters.jenkins_build_offset >>))"' >> $BASH_ENV
-          name: Set build version
+          command: |
+            case $CIRCLE_BRANCH in
+              master) echo 'export BUILD_NUMBER="rc.<< pipeline.number >>"' >> $BASH_ENV ;;
+              deploy) echo 'export BUILD_NUMBER="$((`git tag --sort=-taggerdate | grep release | head -n 1 | sed -E << pipeline.parameters.release_tag_pattern >>` + 1))"' >> $BASH_ENV ;;
+              *) echo 'export BUILD_NUMBER="snapshot"' >> $BASH_ENV ;;
+            esac
+            echo "Determined BUILD_NUMBER=$BUILD_NUMBER"
+          name: Set build number
       - run:
           command: mvn build-helper:parse-version versions:set -DnewVersion="\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}.${BUILD_NUMBER}"
           name: Set project version
@@ -90,8 +97,8 @@ jobs:
       - attach_workspace:
           at: /tmp/ws_store
       - run:
-          command: echo 'export BUILD_NUMBER="$((<< pipeline.number >> + << pipeline.parameters.jenkins_build_offset >>))"' >> $BASH_ENV
-          name: Set build version
+          command: echo 'export PROJECT_VERSION="$(cat /tmp/ws_store/version)"' >> $BASH_ENV
+          name: Set project version
       - run:
           command: |
             domino_response=$(curl \
@@ -124,7 +131,8 @@ jobs:
           release-type: release
 
 workflows:
-  leaflet-backend:
+
+  leaflet-backend-rc:
     jobs:
 
       - build:
@@ -143,11 +151,25 @@ workflows:
           requires:
             - build
 
+  leaflet-backend-release:
+    jobs:
+
+      - build:
+          context: leaflet_ci
+          filters:
+            branches:
+              only:
+                - deploy
+          post-steps:
+            - jira/notify:
+                environment_type: development
+                job_type: build
+
       - deploy-approval:
           context: leaflet_ci
           type: approval
           requires:
-            - publish-github-rc
+            - build
 
       - deploy:
           context: leaflet_ci
