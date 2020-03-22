@@ -50,11 +50,7 @@ jobs:
           command: |
             case $CIRCLE_BRANCH in
               master) echo 'export BUILD_NUMBER="rc.<< pipeline.number >>"' >> $BASH_ENV ;;
-              deploy)
-                git fetch --tags
-                LATEST_BUILD_NUMBER=$(git tag --sort=-taggerdate | grep release | head -n 1 | sed -E '<< pipeline.parameters.release_tag_pattern >>')
-                echo 'export BUILD_NUMBER=$(($LATEST_BUILD_NUMBER + 1))' >> $BASH_ENV
-                ;;
+              deploy) echo 'export BUILD_NUMBER=$((`git fetch --tags && git tag --sort=-taggerdate | grep release | head -n 1 | sed -E "<< pipeline.parameters.release_tag_pattern >>"` + 1))' >> $BASH_ENV ;;
               *) echo 'export BUILD_NUMBER="snapshot"' >> $BASH_ENV ;;
             esac
             source $BASH_ENV
