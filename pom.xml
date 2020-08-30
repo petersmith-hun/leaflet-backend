@@ -66,6 +66,14 @@
         <dropwizard-metrics.version>3.2.3</dropwizard-metrics.version>
         <javassist.version>3.23.1-GA</javassist.version>
         <asm.version>7.0</asm.version>
+        <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
+        <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+
+        <!-- Docker build configuration -->
+        <!--suppress UnresolvedMavenProperty -->
+        <docker.repository>${LEAFLET_DOCKER_REGISTRY_HOST}</docker.repository>
+        <docker.image-name>leaflet</docker.image-name>
+        <docker.skip>true</docker.skip>
 
         <!-- Spring Boot overrides -->
         <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
@@ -389,6 +397,14 @@
                         <exclude>**/*AcceptanceTest.java</exclude>
                     </excludes>
                     <forkCount>1</forkCount>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven-deploy-plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
             <plugin>
