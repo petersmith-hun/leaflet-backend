@@ -1,10 +1,11 @@
 # acceptance tests configuration
 spring:
   jpa:
-    database-platform: org.hibernate.dialect.MySQL57Dialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     show-sql: false
     hibernate:
       ddl-auto: update
+    open-in-view: false
   datasource:
     url: jdbc:h2:mem:acceptance
     username: sa
