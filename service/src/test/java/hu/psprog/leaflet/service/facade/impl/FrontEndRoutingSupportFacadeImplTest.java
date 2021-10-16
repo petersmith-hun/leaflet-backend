@@ -5,18 +5,20 @@ import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -29,13 +31,13 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FrontEndRoutingSupportFacadeImplTest {
 
     private static final Long CONTROL_ID = 1L;
     private static final String URL = "url-1";
     private static final String URL_WITH_LEADING_SLASH = "/" + URL;
-    private static final String SERVER_NAME = "http://host:1234";
+    private static final String SERVER_NAME = "https://host:1234";
     private static final String SERVER_NAME_WITH_TRAILING_SLASH = SERVER_NAME + "/";
     private static final String EXPECTED_GENERATED_URL = SERVER_NAME + "/" + URL;
     private static final FrontEndRouteVO FRONT_END_ROUTE_VO = FrontEndRouteVO.getBuilder().withUrl(URL).build();
@@ -46,9 +48,8 @@ public class FrontEndRoutingSupportFacadeImplTest {
 
     private FrontEndRoutingSupportFacadeImpl frontEndRoutingSupportFacade;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
         frontEndRoutingSupportFacade = new FrontEndRoutingSupportFacadeImpl(frontEndRoutingSupportService, SERVER_NAME);
     }
 
@@ -69,8 +70,8 @@ public class FrontEndRoutingSupportFacadeImplTest {
         assertThat(result.get(FrontEndRouteType.STANDALONE), equalTo(FRONT_END_ROUTE_VO_LIST));
     }
 
-    @Test
-    @Parameters(source = SitemapDataProvider.class)
+    @ParameterizedTest
+    @MethodSource("sitemapDataProvider")
     public void shouldGetSitemap(String hostName, String url) {
 
         // given
@@ -213,15 +214,13 @@ public class FrontEndRoutingSupportFacadeImplTest {
         verify(frontEndRoutingSupportService).enable(CONTROL_ID);
     }
 
-    public static class SitemapDataProvider {
+    private static Stream<Arguments> sitemapDataProvider() {
 
-        public static Object[] provide() {
-            return new Object[] {
-                    new Object[] {SERVER_NAME, URL},
-                    new Object[] {SERVER_NAME_WITH_TRAILING_SLASH, URL},
-                    new Object[] {SERVER_NAME, URL_WITH_LEADING_SLASH},
-                    new Object[] {SERVER_NAME_WITH_TRAILING_SLASH, URL_WITH_LEADING_SLASH},
-            };
-        }
+        return Stream.of(
+                Arguments.of(SERVER_NAME, URL),
+                Arguments.of(SERVER_NAME_WITH_TRAILING_SLASH, URL),
+                Arguments.of(SERVER_NAME, URL_WITH_LEADING_SLASH),
+                Arguments.of(SERVER_NAME_WITH_TRAILING_SLASH, URL_WITH_LEADING_SLASH)
+        );
     }
 }

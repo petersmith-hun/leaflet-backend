@@ -9,12 +9,13 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,22 +35,22 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AttachmentServiceImplTest {
 
     private static final Long ENTRY_ID = 1L;
     private static final Long UPLOADED_FILE_ID = 15L;
 
-    @Mock
+    @Mock(lenient = true)
     private EntryDAO entryDAO;
 
-    @Mock
+    @Mock(lenient = true)
     private UploadedFileDAO uploadedFileDAO;
 
-    @Mock
+    @Mock(lenient = true)
     private UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
 
-    @Mock
+    @Mock(lenient = true)
     private Entry mockedEntry;
 
     @InjectMocks
@@ -60,7 +61,7 @@ public class AttachmentServiceImplTest {
     private UploadedFile controlUploadedFile;
     private List<UploadedFile> attachments;
 
-    @Before
+    @BeforeEach
     public void setup() {
         entryVO = EntryVO.getBuilder()
                 .withId(ENTRY_ID)
@@ -131,57 +132,57 @@ public class AttachmentServiceImplTest {
         assertResults(5, false, true);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnAttachIfUploadedFileDoesNotExist() throws EntityNotFoundException {
+    @Test
+    public void shouldThrowExceptionOnAttachIfUploadedFileDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(false);
 
         // when
-        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.attachFileToEntry(uploadedFileVO, entryVO));
 
         // then
         // expected exception
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnAttachIfEntryDoesNotExist() throws EntityNotFoundException {
+    @Test
+    public void shouldThrowExceptionOnAttachIfEntryDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.attachFileToEntry(uploadedFileVO, entryVO));
 
         // then
         // expected exception
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnDetachIfUploadedFileDoesNotExist() throws EntityNotFoundException {
+    @Test
+    public void shouldThrowExceptionOnDetachIfUploadedFileDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(false);
 
         // when
-        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.detachFileFromEntry(uploadedFileVO, entryVO));
 
         // then
         // expected exception
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnDetachIfEntryDoesNotExist() throws EntityNotFoundException {
+    @Test
+    public void shouldThrowExceptionOnDetachIfEntryDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.detachFileFromEntry(uploadedFileVO, entryVO));
 
         // then
         // expected exception

@@ -23,10 +23,9 @@ import hu.psprog.leaflet.bridge.service.UserBridgeService;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
-import junitparams.JUnitParamsRunner;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -40,7 +39,7 @@ import static hu.psprog.leaflet.security.jwt.model.Role.RECLAIM;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -48,7 +47,6 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
@@ -83,7 +81,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     @Autowired
     private JWTComponent jwtComponent;
 
-    @After
+    @AfterEach
     public void tearDown() {
         Mockito.reset(requestAuthentication);
     }
@@ -125,7 +123,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertThat(userBridgeService.getUserByID(userID).getRole(), equalTo(Role.EDITOR.name()));
     }
 
-    @Test(expected = ForbiddenOperationException.class)
+    @Test
     public void shouldNotUpdateSelfRole() throws CommunicationFailureException {
 
         // given
@@ -133,7 +131,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         UpdateRoleRequestModel updateRoleRequestModel = prepareUpdateRoleRequestModel();
 
         // when
-        userBridgeService.updateRole(TEST_USER_1_ID, updateRoleRequestModel);
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.updateRole(TEST_USER_1_ID, updateRoleRequestModel));
 
         // then
         // exception expected
@@ -156,14 +154,14 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertThat(userData.getLocale().toLowerCase(), equalTo(updateProfileRequestModel.getDefaultLocale().getLanguage()));
     }
 
-    @Test(expected = ForbiddenOperationException.class)
-    public void shouldFailUpdatingDifferentUserProfile() throws CommunicationFailureException {
+    @Test
+    public void shouldFailUpdatingDifferentUserProfile() {
 
         // given
         UpdateProfileRequestModel updateProfileRequestModel = prepareUpdateProfileRequestModel();
 
         // when
-        userBridgeService.updateProfile(TEST_USER_1_ID, updateProfileRequestModel);
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.updateProfile(TEST_USER_1_ID, updateProfileRequestModel));
 
         // then
         // exception expected
@@ -184,28 +182,28 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertThat(loginResponse.getStatus(), equalTo(AUTH_SUCCESS));
     }
 
-    @Test(expected = ForbiddenOperationException.class)
-    public void shouldFailUpdatingPasswordWithIncorrectCurrentPassword() throws CommunicationFailureException {
+    @Test
+    public void shouldFailUpdatingPasswordWithIncorrectCurrentPassword() {
 
         // given
         UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
         ((PasswordChangeRequestModel) userPasswordRequestModel).setCurrentPassword("incorrect-password");
 
         // when
-        userBridgeService.updatePassword(ADMIN_USER_ID, userPasswordRequestModel);
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.updatePassword(ADMIN_USER_ID, userPasswordRequestModel));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ForbiddenOperationException.class)
-    public void shouldFailUpdatingDifferentUserPassword() throws CommunicationFailureException {
+    @Test
+    public void shouldFailUpdatingDifferentUserPassword() {
 
         // given
         UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
 
         // when
-        userBridgeService.updatePassword(TEST_USER_1_ID, userPasswordRequestModel);
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.updatePassword(TEST_USER_1_ID, userPasswordRequestModel));
 
         // then
         // exception expected
@@ -226,14 +224,14 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertThat(result.getToken(), notNullValue());
     }
 
-    @Test(expected = UnauthorizedAccessException.class)
-    public void shouldClaimTokenWithNonExistingUser() throws CommunicationFailureException {
+    @Test
+    public void shouldClaimTokenWithNonExistingUser() {
 
         // given
         LoginRequestModel loginRequestModel = prepareLoginRequestModel(NON_EXISTING_USER_EMAIL, TEST_PASSWORD);
 
         // when
-        userBridgeService.claimToken(loginRequestModel);
+        Assertions.assertThrows(UnauthorizedAccessException.class, () -> userBridgeService.claimToken(loginRequestModel));
 
         // then
         // exception expected
@@ -272,7 +270,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertThat(notificationService.getPasswordResetSuccess().getParticipant(), equalTo(TEST_EDITOR_4_EMAIL));
     }
 
-    @Test(expected = UnauthorizedAccessException.class)
+    @Test
     public void shouldRevokeToken() throws CommunicationFailureException {
 
         // given
@@ -290,7 +288,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         // then
         // this call should fail and cause exception
-        userBridgeService.getUserByID(TEST_EDITOR_5_ID);
+        Assertions.assertThrows(UnauthorizedAccessException.class, () -> userBridgeService.getUserByID(TEST_EDITOR_5_ID));
     }
 
     @Test
@@ -308,7 +306,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertThat(result.getStatus(), equalTo(AUTH_SUCCESS));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     @ResetDatabase
     public void shouldDeleteSelfUser() throws CommunicationFailureException {
 
@@ -320,14 +318,14 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         // then
         // this call should fail and cause exception
-        userBridgeService.getUserByID(TEST_USER_7_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> userBridgeService.getUserByID(TEST_USER_7_ID));
     }
 
-    @Test(expected = ForbiddenOperationException.class)
-    public void shouldNotDeleteDifferentUser() throws CommunicationFailureException {
+    @Test
+    public void shouldNotDeleteDifferentUser() {
 
         // when
-        userBridgeService.deleteUser(TEST_USER_7_ID);
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.deleteUser(TEST_USER_7_ID));
 
         // then
         // exception expected
@@ -347,7 +345,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertCreatedUser(userCreateRequestModel, result.getId());
     }
 
-    @Test(expected = ForbiddenOperationException.class)
+    @Test
     public void shouldFailCreatingUserIfNonAdminUserCalls() throws CommunicationFailureException {
 
         // given
@@ -355,7 +353,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         UserCreateRequestModel userCreateRequestModel = getControl(CONTROL_USER_CREATE, UserCreateRequestModel.class);
 
         // when
-        userBridgeService.createUser(userCreateRequestModel);
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.createUser(userCreateRequestModel));
 
         // then
         // exception expected
@@ -377,16 +375,16 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         assertThat(notificationService.getSignUpConfirmation(), equalTo(signUpConfirmation));
     }
 
-    @Test(expected = ConflictingRequestException.class)
+    @Test
     @ResetDatabase
-    public void shouldNotRegisterWithAlreadyRegisteredEmail() throws CommunicationFailureException {
+    public void shouldNotRegisterWithAlreadyRegisteredEmail() {
 
         // given
         UserInitializeRequestModel userInitializeRequestModel = getControl(CONTROL_USER_REGISTER, UserInitializeRequestModel.class);
         userInitializeRequestModel.setEmail(TEST_USER_1_EMAIL);
 
         // when
-        userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN);
+        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN));
 
         // then
         // exception expected

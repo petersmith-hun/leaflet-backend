@@ -5,9 +5,7 @@ import hu.psprog.leaflet.api.rest.request.contact.ContactRequestModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.service.ContactBridgeService;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
-import junitparams.JUnitParamsRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -18,7 +16,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class ContactRequestControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 

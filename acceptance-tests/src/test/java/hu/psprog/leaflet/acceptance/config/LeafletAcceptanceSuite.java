@@ -1,5 +1,9 @@
 package hu.psprog.leaflet.acceptance.config;
 
+import hu.psprog.leaflet.acceptance.extension.ClearStorageExtension;
+import hu.psprog.leaflet.acceptance.extension.ResetDatabaseExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.Extensions;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,6 +29,10 @@ import java.lang.annotation.Target;
         classes = AcceptanceTestConfig.class)
 @ActiveProfiles(LeafletAcceptanceSuite.PROFILE_ACCEPTANCE)
 @Rollback(false)
+@Extensions({
+        @ExtendWith(ClearStorageExtension.class),
+        @ExtendWith(ResetDatabaseExtension.class)
+})
 public @interface LeafletAcceptanceSuite {
 
     String PROFILE_ACCEPTANCE = "acceptance";

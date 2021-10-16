@@ -7,23 +7,20 @@ import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteDataMode
 import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteListDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.service.FrontEndRoutingSupportBridgeService;
-import junitparams.JUnitParamsRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Acceptance tests for {@code /routes} endpoints.
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class FrontEndRoutingSupportControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 

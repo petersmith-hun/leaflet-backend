@@ -43,7 +43,7 @@ public class TestObjectReader {
         ENTITY("entity/"),
         VO("vo/");
 
-        private String directoryName;
+        private final String directoryName;
 
         ObjectDirectory(String directoryName) {
             this.directoryName = directoryName;

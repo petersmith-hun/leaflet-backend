@@ -1,11 +1,12 @@
 package hu.psprog.leaflet.service.mail.impl;
 
 import hu.psprog.leaflet.service.mail.MailFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import java.util.Arrays;
@@ -19,7 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MailFactoryRegistryTest {
 
     @Mock
@@ -28,11 +29,11 @@ public class MailFactoryRegistryTest {
     @Mock
     private MessageSource messageSource;
 
-    private SystemStartupMailFactory systemStartupMailFactory = new SystemStartupMailFactory(messageSource);
+    private final SystemStartupMailFactory systemStartupMailFactory = new SystemStartupMailFactory(messageSource);
 
     private MailFactoryRegistry mailFactoryRegistry;
 
-    @Before
+    @BeforeEach
     public void setup() {
         mailFactoryRegistry = new MailFactoryRegistry(Arrays.asList(commentNotificationMailFactory, systemStartupMailFactory));
     }
@@ -48,11 +49,11 @@ public class MailFactoryRegistryTest {
         assertThat(result, equalTo(systemStartupMailFactory));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowIllegalArgumentExceptionForUnknownFactory() {
 
         // when
-        mailFactoryRegistry.getFactory(PasswordResetRequestMailFactory.class);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> mailFactoryRegistry.getFactory(PasswordResetRequestMailFactory.class));
 
         // then
         // exception expected

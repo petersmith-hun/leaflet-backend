@@ -3,18 +3,19 @@ package hu.psprog.leaflet.service.util;
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -26,7 +27,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PublishHandlerTest {
 
     private static final Long ENTRY_ID = 1L;
@@ -44,13 +45,8 @@ public class PublishHandlerTest {
     @InjectMocks
     private PublishHandler publishHandler;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    @Parameters(source = PublishHandlerDataProvider.class, method = "forCreation")
+    @ParameterizedTest
+    @MethodSource("forCreation")
     public void shouldUpdatePublishDateSetPublishDateUponCreation(Entry entryToBeUpdated, boolean expectPublishDateSet) {
 
         // when
@@ -64,8 +60,8 @@ public class PublishHandlerTest {
         }
     }
 
-    @Test
-    @Parameters(source = PublishHandlerDataProvider.class, method = "forUpdate")
+    @ParameterizedTest
+    @MethodSource("forUpdate")
     public void shouldUpdatePublishDateSetPublishDateUponUpdate(Entry storedEntry, Entry entryToBeUpdated, String expectedPublishDate) {
 
         // given
@@ -87,7 +83,6 @@ public class PublishHandlerTest {
 
         // given
         Entry entry = new Entry();
-        given(entryDAO.findOne(ENTRY_ID)).willReturn(null);
 
         // when
         publishHandler.updatePublishDate(entry);
@@ -96,42 +91,39 @@ public class PublishHandlerTest {
         assertThat(entry.getPublished(), nullValue());
     }
 
-    public static class PublishHandlerDataProvider {
+    private static Stream<Arguments> forCreation() {
 
-        public static Object[] forCreation() {
+        return Stream.of(
+                Arguments.of(prepareEntry(false), false),
+                Arguments.of(prepareEntry(true), true)
+        );
+    }
 
-            return new Object[] {
-                    new Object[] {prepareEntry(false), false},
-                    new Object[] {prepareEntry(true), true}
-            };
-        }
+    private static Stream<Arguments> forUpdate() {
 
-        public static Object[] forUpdate() {
+        return Stream.of(
+                Arguments.of(prepareEntry(false), prepareEntry(false), NULL_STRING),
+                Arguments.of(prepareEntry(false), prepareEntry(true), PUBLISH_DATE_AS_STRING),
+                Arguments.of(prepareAlreadyPublishedEntry(), prepareEntry(false), ALREADY_PUBLIC_PUBLISH_DATE_AS_STRING),
+                Arguments.of(prepareAlreadyPublishedEntry(), prepareEntry(true), ALREADY_PUBLIC_PUBLISH_DATE_AS_STRING)
+        );
+    }
 
-            return new Object[] {
-                    new Object[] {prepareEntry(false), prepareEntry(false), NULL_STRING},
-                    new Object[] {prepareEntry(false), prepareEntry(true), PUBLISH_DATE_AS_STRING},
-                    new Object[] {prepareAlreadyPublishedEntry(), prepareEntry(false), ALREADY_PUBLIC_PUBLISH_DATE_AS_STRING},
-                    new Object[] {prepareAlreadyPublishedEntry(), prepareEntry(true), ALREADY_PUBLIC_PUBLISH_DATE_AS_STRING}
-            };
-        }
+    private static Entry prepareEntry(boolean published) {
 
-        private static Entry prepareEntry(boolean published) {
+        Entry entry = new Entry();
+        entry.setStatus(published
+                ? EntryStatus.PUBLIC
+                : EntryStatus.DRAFT);
 
-            Entry entry = new Entry();
-            entry.setStatus(published
-                    ? EntryStatus.PUBLIC
-                    : EntryStatus.DRAFT);
+        return entry;
+    }
 
-            return entry;
-        }
+    private static Entry prepareAlreadyPublishedEntry() {
 
-        private static Entry prepareAlreadyPublishedEntry() {
+        Entry entry = prepareEntry(true);
+        entry.setPublished(ALREADY_PUBLIC_PUBLISH_DATE);
 
-            Entry entry = prepareEntry(true);
-            entry.setPublished(ALREADY_PUBLIC_PUBLISH_DATE);
-
-            return entry;
-        }
+        return entry;
     }
 }

@@ -8,12 +8,13 @@ import hu.psprog.leaflet.service.facade.CategoryFacade;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CategoriesControllerTest extends AbstractControllerBaseTest {
 
     private static final long CATEGORY_ID = 1L;
@@ -42,7 +43,7 @@ public class CategoriesControllerTest extends AbstractControllerBaseTest {
     @InjectMocks
     private CategoriesController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         given(conversionService.convert(Collections.emptyList(), CategoryListDataModel.class)).willReturn(CATEGORY_LIST_DATA_MODEL);
@@ -88,14 +89,14 @@ public class CategoriesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, CATEGORY_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetCategoryWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetCategoryWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(categoryFacade).getOne(CATEGORY_ID);
 
         // when
-        controller.getCategory(CATEGORY_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getCategory(CATEGORY_ID));
 
         // then
         // exception expected
@@ -115,14 +116,14 @@ public class CategoriesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, CATEGORY_DATA_MODEL, LOCATION_HEADER);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateWithServiceException() throws ServiceException {
 
         // when
         doThrow(ServiceException.class).when(categoryFacade).createOne(any());
 
         // when
-        controller.createCategory(CATEGORY_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createCategory(CATEGORY_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -155,14 +156,14 @@ public class CategoriesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, CATEGORY_DATA_MODEL, LOCATION_HEADER);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateWithServiceException() throws ServiceException {
 
         // when
         doThrow(ServiceException.class).when(categoryFacade).updateOne(anyLong(), any());
 
         // when
-        controller.updateCategory(CATEGORY_ID, CATEGORY_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updateCategory(CATEGORY_ID, CATEGORY_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -194,14 +195,14 @@ public class CategoriesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, CATEGORY_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldChangeStatusWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldChangeStatusWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(categoryFacade).changeStatus(CATEGORY_ID);
 
         // when
-        controller.changeStatus(CATEGORY_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changeStatus(CATEGORY_ID));
 
         // then
         // exception expected
@@ -217,14 +218,14 @@ public class CategoriesControllerTest extends AbstractControllerBaseTest {
         verify(categoryFacade).deletePermanently(CATEGORY_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteCategoryWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteCategoryWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(categoryFacade).deletePermanently(CATEGORY_ID);
 
         // when
-        controller.deleteCategory(CATEGORY_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteCategory(CATEGORY_ID));
 
         // then
         // exception expected

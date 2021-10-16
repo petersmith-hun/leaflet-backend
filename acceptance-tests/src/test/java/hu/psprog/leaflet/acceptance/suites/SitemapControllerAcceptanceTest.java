@@ -7,9 +7,7 @@ import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.service.SitemapBridgeService;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import junitparams.JUnitParamsRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -32,7 +30,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 

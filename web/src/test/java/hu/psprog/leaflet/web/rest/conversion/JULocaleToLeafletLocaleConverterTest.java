@@ -1,13 +1,14 @@
 package hu.psprog.leaflet.web.rest.conversion;
 
 import hu.psprog.leaflet.persistence.entity.Locale;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,19 +18,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JULocaleToLeafletLocaleConverterTest {
 
     @InjectMocks
     private JULocaleToLeafletLocaleConverter converter;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    @Parameters(source = LocaleConverterParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("localConverterDataProvider")
     public void shouldConvert(String localeCode, Locale expectedLocale) {
 
         // given
@@ -42,14 +38,12 @@ public class JULocaleToLeafletLocaleConverterTest {
         assertThat(result, equalTo(expectedLocale));
     }
 
-    public static class LocaleConverterParameterProvider {
+    private static Stream<Arguments> localConverterDataProvider() {
 
-        public static Object[] provide() {
-            return new Object[] {
-                    new Object[] {"hu", Locale.HU},
-                    new Object[] {"en", Locale.EN},
-                    new Object[] {"unknown", Locale.EN}
-            };
-        }
+        return Stream.of(
+                Arguments.of("hu", Locale.HU),
+                Arguments.of("en", Locale.EN),
+                Arguments.of("unknown", Locale.EN)
+        );
     }
 }

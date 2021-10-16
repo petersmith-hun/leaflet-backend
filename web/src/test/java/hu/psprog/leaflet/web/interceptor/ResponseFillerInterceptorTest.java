@@ -3,18 +3,20 @@ package hu.psprog.leaflet.web.interceptor;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,7 +26,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ResponseFillerInterceptorTest {
 
     private HttpServletRequest request;
@@ -32,14 +34,13 @@ public class ResponseFillerInterceptorTest {
     @InjectMocks
     private ResponseFillerInterceptor responseFillerInterceptor;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
         request = new MockHttpServletRequest();
     }
 
-    @Test
-    @Parameters(source = AJAXParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("preHandleDataProvider")
     public void shouldPutAJAXFlag(String methodName, boolean expected) throws Exception {
 
         // given
@@ -85,14 +86,12 @@ public class ResponseFillerInterceptorTest {
     private void testMethodWithoutFillResponse() {
     }
 
-    public static class AJAXParameterProvider {
+    private static Stream<Arguments> preHandleDataProvider() {
 
-        public static Object[] provide() {
-            return new Object[] {
-                    new Object[] {"testMethodWithFillResponseInAJAXFillMode", true},
-                    new Object[] {"testMethodWithFillResponseInDefaultFillMode", false},
-                    new Object[] {"testMethodWithoutFillResponse", false}
-            };
-        }
+        return Stream.of(
+                Arguments.of("testMethodWithFillResponseInAJAXFillMode", true),
+                Arguments.of("testMethodWithFillResponseInDefaultFillMode", false),
+                Arguments.of("testMethodWithoutFillResponse", false)
+        );
     }
 }

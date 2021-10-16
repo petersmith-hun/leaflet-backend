@@ -72,7 +72,8 @@ import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import hu.psprog.leaflet.web.rest.conversion.JULocaleToLeafletLocaleConverter;
-import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.GrantedAuthority;
@@ -90,7 +91,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static junit.framework.TestCase.fail;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -926,7 +926,7 @@ public abstract class ConversionTestObjects {
                     .withDescription(DESCRIPTION)
                     .build();
         } catch (IOException e) {
-            fail("Failed to init test");
+            Assertions.fail("Failed to init test");
             return null;
         }
     }
@@ -953,7 +953,7 @@ public abstract class ConversionTestObjects {
     @Mock(lenient = true)
     protected JULocaleToLeafletLocaleConverter localeConverter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         given(httpServletRequest.getLocale()).willReturn(java.util.Locale.ENGLISH);
         given(dateConverter.convert(CREATED)).willReturn(ZONED_DATE_TIME_CREATED);

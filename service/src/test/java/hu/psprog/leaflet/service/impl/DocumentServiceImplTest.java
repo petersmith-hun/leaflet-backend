@@ -11,11 +11,12 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.DocumentVO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Arrays;
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DocumentServiceImplTest {
 
     @Mock
@@ -79,15 +80,15 @@ public class DocumentServiceImplTest {
         verify(documentToDocumentVOConverter).convert(document);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testGetOneWithNonExistingDocument() throws ServiceException {
+    @Test
+    public void testGetOneWithNonExistingDocument() {
 
         // given
         Long id = 1L;
         given(documentDAO.findOne(id)).willReturn(null);
 
         // when
-        documentService.getOne(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.getOne(id));
 
         // then
         // expected exception
@@ -175,19 +176,18 @@ public class DocumentServiceImplTest {
         verify(documentToDocumentVOConverter).convert(document);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testGetByLinkWithNonExistingDocument() throws ServiceException {
+    @Test
+    public void testGetByLinkWithNonExistingDocument() {
 
         // given
         String link = "document-link";
         given(documentDAO.findByLink(link)).willReturn(null);
 
         // when
-        DocumentVO result = documentService.getByLink(link);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.getByLink(link));
 
         // then
         // expected exception
-        assertThat(result, equalTo(documentVO));
         verify(documentDAO).findByLink(link);
         verify(documentToDocumentVOConverter, never()).convert(any(Document.class));
     }
@@ -210,15 +210,15 @@ public class DocumentServiceImplTest {
         verify(document, atLeastOnce()).getId();
     }
 
-    @Test(expected = EntityCreationException.class)
-    public void testCreateOneWithFailure() throws ServiceException {
+    @Test
+    public void testCreateOneWithFailure() {
 
         // given
         given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
         given(documentDAO.save(document)).willReturn(null);
 
         // when
-        documentService.createOne(documentVO);
+        Assertions.assertThrows(EntityCreationException.class, () -> documentService.createOne(documentVO));
 
         // then
         // expected exception
@@ -227,29 +227,29 @@ public class DocumentServiceImplTest {
         verify(document, never()).getId();
     }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testCreateShouldThrowConstraintViolationException() throws ServiceException {
+    @Test
+    public void testCreateShouldThrowConstraintViolationException() {
 
         // given
         given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
         doThrow(DataIntegrityViolationException.class).when(documentDAO).save(document);
 
         // when
-        documentService.createOne(documentVO);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> documentService.createOne(documentVO));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ServiceException.class)
-    public void testCreateShouldThrowServiceException() throws ServiceException {
+    @Test
+    public void testCreateShouldThrowServiceException() {
 
         // given
         given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
         doThrow(IllegalArgumentException.class).when(documentDAO).save(document);
 
         // when
-        documentService.createOne(documentVO);
+        Assertions.assertThrows(ServiceException.class, () -> documentService.createOne(documentVO));
 
         // then
         // exception expected
@@ -274,8 +274,8 @@ public class DocumentServiceImplTest {
         verify(documentDAO).updateOne(id, document);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testUpdateOneWithFailure() throws ServiceException {
+    @Test
+    public void testUpdateOneWithFailure() {
 
         // given
         Long id = 1L;
@@ -283,7 +283,7 @@ public class DocumentServiceImplTest {
         given(documentDAO.updateOne(id, document)).willReturn(null);
 
         // when
-        documentService.updateOne(id, documentVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.updateOne(id, documentVO));
 
         // then
         // expected exception
@@ -292,8 +292,8 @@ public class DocumentServiceImplTest {
         verify(documentDAO).updateOne(id, document);
     }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateShouldThrowConstraintViolationException() throws ServiceException {
+    @Test
+    public void testUpdateShouldThrowConstraintViolationException() {
 
         // given
         Long id = 1L;
@@ -301,14 +301,14 @@ public class DocumentServiceImplTest {
         doThrow(DataIntegrityViolationException.class).when(documentDAO).updateOne(id, document);
 
         // when
-        documentService.updateOne(id, documentVO);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> documentService.updateOne(id, documentVO));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateShouldThrowServiceException() throws ServiceException {
+    @Test
+    public void testUpdateShouldThrowServiceException() {
 
         // given
         Long id = 1L;
@@ -316,7 +316,7 @@ public class DocumentServiceImplTest {
         doThrow(IllegalArgumentException.class).when(documentDAO).updateOne(id, document);
 
         // when
-        documentService.updateOne(id, documentVO);
+        Assertions.assertThrows(ServiceException.class, () -> documentService.updateOne(id, documentVO));
 
         // then
         // exception expected
@@ -337,15 +337,15 @@ public class DocumentServiceImplTest {
     }
 
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByIDWithNonExistingDocument() throws ServiceException {
+    @Test
+    public void testDeleteByIDWithNonExistingDocument() {
 
         // given
         Long id = 1L;
         given(documentDAO.exists(id)).willReturn(false);
 
         // when
-        documentService.deleteByID(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.deleteByID(id));
 
         // then
         // expected exception
@@ -366,15 +366,15 @@ public class DocumentServiceImplTest {
         verify(documentDAO).enable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testEnableWithFailure() throws EntityNotFoundException {
+    @Test
+    public void testEnableWithFailure() {
 
         // given
         Long id = 1L;
         given(documentDAO.exists(id)).willReturn(false);
 
         // when
-        documentService.enable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.enable(id));
 
         // then
         verify(documentDAO).exists(id);
@@ -396,15 +396,15 @@ public class DocumentServiceImplTest {
         verify(documentDAO).disable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testDisableWithFailure() throws EntityNotFoundException {
+    @Test
+    public void testDisableWithFailure() {
 
         // given
         Long id = 1L;
         given(documentDAO.exists(id)).willReturn(false);
 
         // when
-        documentService.disable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.disable(id));
 
         // then
         verify(documentDAO).exists(id);

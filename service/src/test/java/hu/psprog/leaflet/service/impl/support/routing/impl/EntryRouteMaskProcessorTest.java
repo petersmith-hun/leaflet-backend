@@ -5,18 +5,19 @@ import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -27,7 +28,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EntryRouteMaskProcessorTest {
 
     private static final String ENTRY_1 = "Entry 1";
@@ -71,13 +72,8 @@ public class EntryRouteMaskProcessorTest {
     @InjectMocks
     private EntryRouteMaskProcessor entryRouteMaskProcessor;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    @Parameters(source = SupportParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("supportDataProvider")
     public void shouldSupport(FrontEndRouteType type, boolean expectedResult) {
 
         // given
@@ -124,18 +120,16 @@ public class EntryRouteMaskProcessorTest {
         assertThat(result.containsAll(FRONT_END_ROUTE_VO_LIST_WITHOUT_URL), is(true));
     }
 
-    public static class SupportParameterProvider {
-
-        public static Object[] provide() {
-            return new Object[] {
-                    new Object[] {FrontEndRouteType.ENTRY_ROUTE_MASK,    true},
-                    new Object[] {FrontEndRouteType.CATEGORY_ROUTE_MASK, false},
-                    new Object[] {FrontEndRouteType.TAG_ROUTE_MASK,      false},
-                    new Object[] {FrontEndRouteType.HEADER_MENU,         false},
-                    new Object[] {FrontEndRouteType.FOOTER_MENU,         false},
-                    new Object[] {FrontEndRouteType.STANDALONE,          false},
-                    new Object[] {null,                                  false}
-            };
-        }
+    public static Stream<Arguments> supportDataProvider() {
+        
+        return Stream.of(
+                Arguments.of(FrontEndRouteType.ENTRY_ROUTE_MASK,    true),
+                Arguments.of(FrontEndRouteType.CATEGORY_ROUTE_MASK, false),
+                Arguments.of(FrontEndRouteType.TAG_ROUTE_MASK,      false),
+                Arguments.of(FrontEndRouteType.HEADER_MENU,         false),
+                Arguments.of(FrontEndRouteType.FOOTER_MENU,         false),
+                Arguments.of(FrontEndRouteType.STANDALONE,          false),
+                Arguments.of(null,                                  false)
+        );
     }
 }

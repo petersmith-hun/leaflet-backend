@@ -10,17 +10,20 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,7 +37,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UserFacadeImplTest {
 
     private static final long USER_ID = 11L;
@@ -66,11 +69,6 @@ public class UserFacadeImplTest {
 
     @InjectMocks
     private UserFacadeImpl userFacade;
-
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void shouldGetUserList() {
@@ -117,8 +115,8 @@ public class UserFacadeImplTest {
         verify(userService).deleteByID(USER_ID);
     }
 
-    @Test
-    @Parameters(source = UserFacadeTestParameterProvider.class, method = "authority")
+    @ParameterizedTest
+    @MethodSource("authorityDataProvider")
     public void shouldChangeAuthority(String authorityName, GrantedAuthority expectedAuthority) throws ServiceException {
 
         // when
@@ -155,14 +153,14 @@ public class UserFacadeImplTest {
         verify(userService).getOne(USER_ID);
     }
 
-    @Test(expected = ReAuthenticationFailureException.class)
-    public void shouldUpdatePasswordWithReAuthenticationException() throws ServiceException {
+    @Test
+    public void shouldUpdatePasswordWithReAuthenticationException() {
 
         // given
         doThrow(BadCredentialsException.class).when(authenticationService).reAuthenticate(PASSWORD);
 
         // when
-        userFacade.updateUserPassword(USER_ID, PASSWORD, NEW_PASSWORD);
+        Assertions.assertThrows(ReAuthenticationFailureException.class, () -> userFacade.updateUserPassword(USER_ID, PASSWORD, NEW_PASSWORD));
 
         // then
         // exception expected
@@ -243,16 +241,14 @@ public class UserFacadeImplTest {
         verify(authenticationService).extendSession(LOGIN_CONTEXT);
     }
 
-    public static class UserFacadeTestParameterProvider {
-
-        public static Object[] authority() {
-            return new Object[] {
-                    new Object[] {"ADMIN", Authority.ADMIN},
-                    new Object[] {"EDITOR", Authority.EDITOR},
-                    new Object[] {"SERVICE", Authority.SERVICE},
-                    new Object[] {"NO_LOGIN", Authority.NO_LOGIN},
-                    new Object[] {"USER", Authority.USER}
-            };
-        }
+    private static Stream<Arguments> authorityDataProvider() {
+        
+        return Stream.of(
+                Arguments.of("ADMIN", Authority.ADMIN),
+                Arguments.of("EDITOR", Authority.EDITOR),
+                Arguments.of("SERVICE", Authority.SERVICE),
+                Arguments.of("NO_LOGIN", Authority.NO_LOGIN),
+                Arguments.of("USER", Authority.USER)
+        );
     }
 }

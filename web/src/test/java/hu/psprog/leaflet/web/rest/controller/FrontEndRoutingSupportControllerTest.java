@@ -10,12 +10,13 @@ import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FrontEndRoutingSupportControllerTest extends AbstractControllerBaseTest {
 
     private static final long CONTROL_ID = 1L;
@@ -47,7 +48,7 @@ public class FrontEndRoutingSupportControllerTest extends AbstractControllerBase
     @InjectMocks
     private FrontEndRoutingSupportController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         given(conversionService.convert(FRONT_END_ROUTE_VO, ExtendedFrontEndRouteDataModel.class)).willReturn(EXTENDED_FRONT_END_ROUTE_DATA_MODEL);
@@ -81,14 +82,14 @@ public class FrontEndRoutingSupportControllerTest extends AbstractControllerBase
         assertResponse(result, HttpStatus.OK, EXTENDED_FRONT_END_ROUTE_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetRouteByIDThrowResourceNotFoundException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetRouteByIDThrowResourceNotFoundException() throws ServiceException {
 
         // given
         doThrow(EntityNotFoundException.class).when(frontEndRoutingSupportFacade).getOne(CONTROL_ID);
 
         // when
-        controller.getRouteByID(CONTROL_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getRouteByID(CONTROL_ID));
 
         // then
         // exception expected
@@ -120,27 +121,27 @@ public class FrontEndRoutingSupportControllerTest extends AbstractControllerBase
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateRouteWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateRouteWithConstraintViolation() throws ServiceException {
 
         // given
         doThrow(ConstraintViolationException.class).when(frontEndRoutingSupportFacade).createOne(FRONT_END_ROUTE_VO);
 
         // when
-        controller.createRoute(FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createRoute(FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateRouteWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateRouteWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(frontEndRoutingSupportFacade).createOne(FRONT_END_ROUTE_VO);
 
         // when
-        controller.createRoute(FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createRoute(FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -172,27 +173,28 @@ public class FrontEndRoutingSupportControllerTest extends AbstractControllerBase
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldUpdateRouteWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateRouteWithConstraintViolation() throws ServiceException {
 
         // given
         doThrow(ConstraintViolationException.class).when(frontEndRoutingSupportFacade).updateOne(CONTROL_ID, FRONT_END_ROUTE_VO);
 
         // when
-        controller.updateRoute(CONTROL_ID, FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class,
+                () -> controller.updateRoute(CONTROL_ID, FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateRouteWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateRouteWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(frontEndRoutingSupportFacade).updateOne(CONTROL_ID, FRONT_END_ROUTE_VO);
 
         // when
-        controller.updateRoute(CONTROL_ID, FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updateRoute(CONTROL_ID, FRONT_END_ROUTE_UPDATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -211,14 +213,14 @@ public class FrontEndRoutingSupportControllerTest extends AbstractControllerBase
         assertResponse(result, HttpStatus.CREATED, EXTENDED_FRONT_END_ROUTE_DATA_MODEL, LOCATION_HEADER);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldChangeStatusWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldChangeStatusWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(frontEndRoutingSupportFacade).changeStatus(CONTROL_ID);
 
         // when
-        controller.changeStatus(CONTROL_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changeStatus(CONTROL_ID));
 
         // then
         // exception expected
@@ -234,14 +236,14 @@ public class FrontEndRoutingSupportControllerTest extends AbstractControllerBase
         verify(frontEndRoutingSupportFacade).deletePermanently(CONTROL_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteRouteWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteRouteWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(frontEndRoutingSupportFacade).deletePermanently(CONTROL_ID);
 
         // when
-        controller.deleteRoute(CONTROL_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteRoute(CONTROL_ID));
 
         // then
         // exception expected

@@ -6,18 +6,17 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,8 +26,9 @@ import static org.hamcrest.Matchers.equalTo;
  *
  * @author Peter Smith
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = LeafletITContextConfig.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        classes = LeafletITContextConfig.class)
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class EntryServiceImplIT {
 
@@ -43,7 +43,7 @@ public class EntryServiceImplIT {
 
     private EntryVO controlEntryVO;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         controlEntryVO = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
     }
@@ -69,7 +69,7 @@ public class EntryServiceImplIT {
         List<EntryVO> result = entryService.getAll();
 
         // then
-        assertThat(result.stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.get(0).getTitle(), equalTo(controlEntryVO.getTitle()));
     }
 

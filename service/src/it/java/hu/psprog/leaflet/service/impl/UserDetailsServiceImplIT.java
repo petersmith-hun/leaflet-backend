@@ -1,16 +1,15 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,8 +20,9 @@ import static org.hamcrest.Matchers.equalTo;
  *
  * @author Peter Smith
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = LeafletITContextConfig.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        classes = LeafletITContextConfig.class)
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class UserDetailsServiceImplIT {
 
@@ -43,7 +43,7 @@ public class UserDetailsServiceImplIT {
         assertThat(result.getUsername(), equalTo(USER_ID1_EMAIL));
     }
 
-    @Test(expected = UsernameNotFoundException.class)
+    @Test
     @Transactional
     @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
     public void testLoadByUsernameWithNonExistingUser() {
@@ -52,7 +52,7 @@ public class UserDetailsServiceImplIT {
         String email = "nonexisting@user.dev";
 
         // when
-        userDetailsService.loadUserByUsername(email);
+        Assertions.assertThrows(UsernameNotFoundException.class, () -> userDetailsService.loadUserByUsername(email));
 
         // then
         // expected exception

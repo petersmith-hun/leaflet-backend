@@ -9,12 +9,13 @@ import hu.psprog.leaflet.service.vo.TagAssignmentVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -30,7 +31,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TagsControllerTest extends AbstractControllerBaseTest {
 
     private static final List<TagVO> TAG_VO_LIST = Collections.singletonList(TAG_VO);
@@ -43,7 +44,7 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
     @InjectMocks
     private TagsController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         given(conversionService.convert(TAG_VO_LIST, TagListDataModel.class)).willReturn(TAG_LIST_DATA_MODEL);
@@ -89,14 +90,14 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, TAG_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetTagWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetTagWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(tagFacade).getOne(TAG_ID);
 
         // when
-        controller.getTag(TAG_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getTag(TAG_ID));
 
         // then
         // exception expected
@@ -129,15 +130,15 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateTagWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateTagWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(TAG_CREATE_REQUEST_MODEL, TagVO.class)).willReturn(TAG_VO);
         doThrow(ServiceException.class).when(tagFacade).createOne(TAG_VO);
 
         // when
-        controller.createTag(TAG_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createTag(TAG_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -170,15 +171,15 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldUpdateTagWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldUpdateTagWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(TAG_CREATE_REQUEST_MODEL, TagVO.class)).willReturn(TAG_VO);
         doThrow(ServiceException.class).when(tagFacade).updateOne(TAG_ID, TAG_VO);
 
         // when
-        controller.updateTag(TAG_ID, TAG_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.updateTag(TAG_ID, TAG_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -194,14 +195,14 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
         verify(tagFacade).deletePermanently(TAG_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteTagWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteTagWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(tagFacade).deletePermanently(TAG_ID);
 
         // when
-        controller.deleteTag(TAG_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteTag(TAG_ID));
 
         // then
         // exception expected
@@ -220,14 +221,14 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, TAG_DATA_MODEL, LOCATION_HEADER);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldChangeStatusWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldChangeStatusWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(tagFacade).changeStatus(TAG_ID);
 
         // when
-        controller.changeStatus(TAG_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changeStatus(TAG_ID));
 
         // then
         // exception expected
@@ -260,15 +261,15 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldAttachTagWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldAttachTagWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(TAG_ASSIGNMENT_REQUEST_MODEL, TagAssignmentVO.class)).willReturn(TAG_ASSIGNMENT_VO);
         doThrow(ServiceException.class).when(tagFacade).attachTagToEntry(TAG_ASSIGNMENT_VO);
 
         // when
-        controller.attachTag(TAG_ASSIGNMENT_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.attachTag(TAG_ASSIGNMENT_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -301,15 +302,15 @@ public class TagsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDetachTagWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDetachTagWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(TAG_ASSIGNMENT_REQUEST_MODEL, TagAssignmentVO.class)).willReturn(TAG_ASSIGNMENT_VO);
         doThrow(ServiceException.class).when(tagFacade).detachTagFromEntry(TAG_ASSIGNMENT_VO);
 
         // when
-        controller.detachTag(TAG_ASSIGNMENT_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.detachTag(TAG_ASSIGNMENT_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected

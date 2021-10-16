@@ -12,12 +12,13 @@ import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommentsControllerTest extends AbstractControllerBaseTest {
 
     private static final long ENTRY_ID = 1L;
@@ -50,7 +51,7 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
     @InjectMocks
     private CommentsController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         given(conversionService.convert(COMMENT_VO_LIST, CommentListDataModel.class)).willReturn(COMMENT_LIST_DATA_MODEL);
@@ -117,14 +118,14 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, EXTENDED_COMMENT_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetCommentsByIdWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetCommentsByIdWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(commentFacade).getOne(COMMENT_ID);
 
         // when
-        controller.getCommentById(COMMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getCommentById(COMMENT_ID));
 
         // then
         // exception expected
@@ -157,29 +158,29 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateCommentWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateCommentWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(COMMENT_CREATE_REQUEST_MODEL, CommentVO.class)).willReturn(COMMENT_VO);
         doThrow(ConstraintViolationException.class).when(commentFacade).createOne(COMMENT_VO);
 
         // when
-        controller.createComment(COMMENT_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createComment(COMMENT_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateCommentWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateCommentWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(COMMENT_CREATE_REQUEST_MODEL, CommentVO.class)).willReturn(COMMENT_VO);
         doThrow(ServiceException.class).when(commentFacade).createOne(COMMENT_VO);
 
         // when
-        controller.createComment(COMMENT_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createComment(COMMENT_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -212,15 +213,15 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateCommentWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateCommentWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(COMMENT_UPDATE_REQUEST_MODEL, CommentVO.class)).willReturn(COMMENT_VO);
         doThrow(ServiceException.class).when(commentFacade).updateOne(COMMENT_ID, COMMENT_VO);
 
         // when
-        controller.updateComment(COMMENT_ID, COMMENT_UPDATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updateComment(COMMENT_ID, COMMENT_UPDATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -239,14 +240,14 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, EXTENDED_COMMENT_DATA_MODEL, LOCATION_HEADER);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldChangeCommentStatusWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldChangeCommentStatusWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(commentFacade).changeStatus(COMMENT_ID);
 
         // when
-        controller.changeCommentStatus(COMMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changeCommentStatus(COMMENT_ID));
 
         // then
         // exception expected
@@ -262,14 +263,14 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
         verify(commentFacade).deleteLogically(COMMENT_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteCommentLogicallyWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteCommentLogicallyWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(commentFacade).deleteLogically(COMMENT_ID);
 
         // when
-        controller.deleteCommentLogically(COMMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteCommentLogically(COMMENT_ID));
 
         // then
         // exception expected
@@ -285,14 +286,14 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
         verify(commentFacade).deletePermanently(COMMENT_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteCommentPermanentlyWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteCommentPermanentlyWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(commentFacade).deletePermanently(COMMENT_ID);
 
         // when
-        controller.deleteCommentPermanently(COMMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteCommentPermanently(COMMENT_ID));
 
         // then
         // exception expected

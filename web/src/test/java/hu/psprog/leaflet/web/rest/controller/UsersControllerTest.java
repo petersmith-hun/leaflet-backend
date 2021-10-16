@@ -17,12 +17,13 @@ import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.exception.TokenClaimException;
 import hu.psprog.leaflet.web.rest.conversion.user.LoginContextFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,7 +43,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UsersControllerTest extends AbstractControllerBaseTest {
 
     private static final List<UserVO> USER_VO_LIST = Collections.singletonList(USER_VO);
@@ -58,7 +59,7 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
     @InjectMocks
     private UsersController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         given(conversionService.convert(USER_VO_LIST, UserListDataModel.class)).willReturn(USER_LIST_DATA_MODEL);
@@ -105,29 +106,29 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateUserWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateUserWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(USER_CREATE_REQUEST_MODEL, UserVO.class)).willReturn(USER_VO);
         doThrow(ConstraintViolationException.class).when(userFacade).createUser(USER_VO);
 
         // when
-        controller.createUser(USER_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createUser(USER_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateUserWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateUserWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(USER_CREATE_REQUEST_MODEL, UserVO.class)).willReturn(USER_VO);
         doThrow(ServiceException.class).when(userFacade).createUser(USER_VO);
 
         // when
-        controller.createUser(USER_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createUser(USER_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -146,14 +147,14 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, EXTENDED_USER_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetUserByIDWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetUserByIDWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(userFacade).getUserByID(USER_ID);
 
         // when
-        controller.getUserByID(USER_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getUserByID(USER_ID));
 
         // then
         // exception expected
@@ -169,14 +170,14 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         verify(userFacade).deleteUserByID(USER_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteUserWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteUserWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(userFacade).deleteUserByID(USER_ID);
 
         // when
-        controller.deleteUser(USER_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteUser(USER_ID));
 
         // then
         // exception expected
@@ -210,15 +211,15 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateRoleWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateRoleWithServiceException() throws ServiceException {
 
         // given
         UpdateRoleRequestModel updateRoleRequestModel = prepareUpdateRoleRequestModel();
         doThrow(ServiceException.class).when(userFacade).changeAuthority(USER_ID, updateRoleRequestModel.getRole());
 
         // when
-        controller.updateRole(USER_ID, updateRoleRequestModel, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updateRole(USER_ID, updateRoleRequestModel, bindingResult));
 
         // then
         // exception expected
@@ -251,29 +252,29 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldUpdateProfileWithConstraintViolation() throws ResourceNotFoundException, RequestCouldNotBeFulfilledException, ServiceException {
+    @Test
+    public void shouldUpdateProfileWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(UPDATE_PROFILE_REQUEST_MODEL, UserVO.class)).willReturn(USER_VO);
         doThrow(ConstraintViolationException.class).when(userFacade).updateUserProfile(USER_ID, USER_VO);
 
         // when
-        controller.updateProfile(USER_ID, UPDATE_PROFILE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.updateProfile(USER_ID, UPDATE_PROFILE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateProfileWithServiceException() throws ResourceNotFoundException, RequestCouldNotBeFulfilledException, ServiceException {
+    @Test
+    public void shouldUpdateProfileWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(UPDATE_PROFILE_REQUEST_MODEL, UserVO.class)).willReturn(USER_VO);
         doThrow(ServiceException.class).when(userFacade).updateUserProfile(USER_ID, USER_VO);
 
         // when
-        controller.updateProfile(USER_ID, UPDATE_PROFILE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updateProfile(USER_ID, UPDATE_PROFILE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -307,15 +308,15 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdatePasswordWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdatePasswordWithServiceException() throws ServiceException {
 
         // given
         PasswordChangeRequestModel passwordChangeRequestModel = preparePasswordChangeRequestModel();
         doThrow(ServiceException.class).when(userFacade).updateUserPassword(USER_ID, passwordChangeRequestModel.getCurrentPassword(), passwordChangeRequestModel.getPassword());
 
         // when
-        controller.updatePassword(USER_ID, passwordChangeRequestModel, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updatePassword(USER_ID, passwordChangeRequestModel, bindingResult));
 
         // then
         // exception expected
@@ -349,15 +350,15 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = TokenClaimException.class)
-    public void shouldClaimTokenWithServiceException() throws EntityNotFoundException, TokenClaimException {
+    @Test
+    public void shouldClaimTokenWithServiceException() throws EntityNotFoundException {
 
         // given
         given(loginContextFactory.forLogin(LOGIN_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_LOGIN);
         doThrow(RuntimeException.class).when(userFacade).login(LOGIN_CONTEXT_VO_FOR_LOGIN);
 
         // when
-        controller.claimToken(LOGIN_REQUEST_MODEL, bindingResult, httpServletRequest);
+        Assertions.assertThrows(TokenClaimException.class, () -> controller.claimToken(LOGIN_REQUEST_MODEL, bindingResult, httpServletRequest));
 
         // then
         // exception expected
@@ -390,29 +391,29 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldSignUpWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldSignUpWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(USER_INITIALIZE_REQUEST_MODEL, UserVO.class)).willReturn(USER_VO);
         doThrow(ConstraintViolationException.class).when(userFacade).register(USER_VO);
 
         // when
-        controller.signUp(USER_INITIALIZE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.signUp(USER_INITIALIZE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldSignUpWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldSignUpWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(USER_INITIALIZE_REQUEST_MODEL, UserVO.class)).willReturn(USER_VO);
         doThrow(ServiceException.class).when(userFacade).register(USER_VO);
 
         // when
-        controller.signUp(USER_INITIALIZE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.signUp(USER_INITIALIZE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -429,14 +430,14 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         verify(userFacade).logout();
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldRevokeTokenWithServiceException() throws RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldRevokeTokenWithServiceException() {
 
         // given
         doThrow(RuntimeException.class).when(userFacade).logout();
 
         // when
-        controller.revokeToken();
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.revokeToken());
 
         // then
         // exception expected
@@ -483,15 +484,16 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, null);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldDemandPasswordResetWithServiceException() throws RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldDemandPasswordResetWithServiceException() {
 
         // given
         given(loginContextFactory.forPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
         doThrow(RuntimeException.class).when(userFacade).demandPasswordReset(LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET);
 
         // when
-        controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, bindingResult, httpServletRequest);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class,
+                () -> controller.demandPasswordReset(PASSWORD_RESET_DEMAND_REQUEST_MODEL, bindingResult, httpServletRequest));
 
         // then
         // exception expected
@@ -525,15 +527,15 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldConfirmPasswordResetWithServiceError() throws RequestCouldNotBeFulfilledException, EntityNotFoundException {
+    @Test
+    public void shouldConfirmPasswordResetWithServiceError() throws EntityNotFoundException {
 
         // given
         UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel();
         doThrow(RuntimeException.class).when(userFacade).confirmPasswordReset(userPasswordRequestModel.getPassword());
 
         // when
-        controller.confirmPasswordReset(userPasswordRequestModel, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.confirmPasswordReset(userPasswordRequestModel, bindingResult));
 
         // then
         // exception expected
@@ -553,15 +555,15 @@ public class UsersControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, LOGIN_RESPONSE_DATA_MODEL_WITH_SUCCESS);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldRenewTokenWithServiceException() throws RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldRenewTokenWithServiceException() {
 
         // given
         given(loginContextFactory.forRenewal(httpServletRequest)).willReturn(LOGIN_CONTEXT_VO_FOR_RENEWAL);
         doThrow(RuntimeException.class).when(userFacade).extendSession(LOGIN_CONTEXT_VO_FOR_RENEWAL);
 
         // when
-        controller.renewToken(httpServletRequest);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.renewToken(httpServletRequest));
 
         // then
         // exception expected

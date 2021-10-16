@@ -3,10 +3,10 @@ package hu.psprog.leaflet.web.rest.conversion.sitemap;
 import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.web.test.ConversionTestObjects;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FrontEndRouteVOListToSitemapConverterTest extends ConversionTestObjects {
 
     private static final String URL_1 = "url-1";

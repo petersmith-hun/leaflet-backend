@@ -14,11 +14,12 @@ import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FilesControllerTest extends AbstractControllerBaseTest {
 
     private static final List<UploadedFileVO> UPLOADED_FILE_VO_LIST = Collections.singletonList(UPLOADED_FILE_VO);
@@ -59,7 +59,7 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
 
     private FilesController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         controller = new FilesController(RESOURCE_MAX_AGE_IN_DAYS, fileManagementFacade);
@@ -98,14 +98,14 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         assertThat(result.getStatusCode(), equalTo(HttpStatus.OK));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDownloadFileWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldDownloadFileWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(fileManagementFacade).download(UPLOADED_FILE_VO.getPathUUID());
 
         // when
-        controller.downloadFile(UPLOADED_FILE_VO.getPathUUID(), null);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.downloadFile(UPLOADED_FILE_VO.getPathUUID(), null));
 
         // then
         // exception expected
@@ -138,15 +138,15 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldUploadFileWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldUploadFileWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(FILE_UPLOAD_REQUEST_MODEL, FileInputVO.class)).willReturn(FILE_INPUT_VO);
         doThrow(ServiceException.class).when(fileManagementFacade).upload(FILE_INPUT_VO);
 
         // when
-        controller.uploadFile(FILE_UPLOAD_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.uploadFile(FILE_UPLOAD_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -162,14 +162,14 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         verify(fileManagementFacade).remove(UPLOADED_FILE_VO.getPathUUID());
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteFileWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldDeleteFileWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(fileManagementFacade).remove(UPLOADED_FILE_VO.getPathUUID());
 
         // when
-        controller.deleteFile(UPLOADED_FILE_VO.getPathUUID());
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteFile(UPLOADED_FILE_VO.getPathUUID()));
 
         // then
         // exception expected
@@ -203,15 +203,15 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateDirectoryWithServiceException() throws RequestCouldNotBeFulfilledException, ServiceException {
+    @Test
+    public void shouldCreateDirectoryWithServiceException() throws ServiceException {
 
         // given
         DirectoryCreationRequestModel directoryCreationRequestModel = prepareDirectoryCreationRequestModel();
         doThrow(ServiceException.class).when(fileManagementFacade).createDirectory(directoryCreationRequestModel.getParent(), directoryCreationRequestModel.getName());
 
         // when
-        controller.createDirectory(directoryCreationRequestModel, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createDirectory(directoryCreationRequestModel, bindingResult));
 
         // then
         // exception expected
@@ -245,15 +245,16 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateFileMetaInfoWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldUpdateFileMetaInfoWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(UPDATE_FILE_META_INFO_REQUEST_MODEL, UpdateFileMetaInfoVO.class)).willReturn(UPDATE_FILE_META_INFO_VO);
         doThrow(ServiceException.class).when(fileManagementFacade).updateMetaInfo(UPLOADED_FILE_VO.getPathUUID(), UPDATE_FILE_META_INFO_VO);
 
         // when
-        controller.updateFileMetaInfo(UPLOADED_FILE_VO.getPathUUID(), UPDATE_FILE_META_INFO_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> controller.updateFileMetaInfo(UPLOADED_FILE_VO.getPathUUID(), UPDATE_FILE_META_INFO_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -272,14 +273,14 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, FILE_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetFileDetailsWithNonExistingFile() throws ResourceNotFoundException {
+    @Test
+    public void shouldGetFileDetailsWithNonExistingFile() {
 
         // given
         given(fileManagementFacade.getCheckedMetaInfo(UPLOADED_FILE_VO.getPathUUID())).willReturn(Optional.empty());
 
         // when
-        controller.getFileDetails(UPLOADED_FILE_VO.getPathUUID());
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getFileDetails(UPLOADED_FILE_VO.getPathUUID()));
 
         // then
         // exception expected
@@ -307,7 +308,7 @@ public class FilesControllerTest extends AbstractControllerBaseTest {
         try {
             conversionServiceField.set(controller, conversionService);
         } catch (IllegalAccessException e) {
-            fail("Failed to prepare test case");
+            Assertions.fail("Failed to prepare test case");
         }
     }
 

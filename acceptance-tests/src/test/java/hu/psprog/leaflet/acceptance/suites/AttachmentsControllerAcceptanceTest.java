@@ -7,9 +7,7 @@ import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.service.AttachmentBridgeService;
 import hu.psprog.leaflet.bridge.service.EntryBridgeService;
-import junitparams.JUnitParamsRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
@@ -22,7 +20,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class AttachmentsControllerAcceptanceTest extends AbstractTempFileHandlingParameterizedBaseTest {
 

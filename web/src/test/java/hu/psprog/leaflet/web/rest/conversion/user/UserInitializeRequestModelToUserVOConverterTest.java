@@ -3,10 +3,10 @@ package hu.psprog.leaflet.web.rest.conversion.user;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.test.ConversionTestObjects;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -18,14 +18,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UserInitializeRequestModelToUserVOConverterTest extends ConversionTestObjects {
 
     private static final boolean ENABLED_BY_DEFAULT = true;
 
     private UserInitializeRequestModelToUserVOConverter converter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         converter = new UserInitializeRequestModelToUserVOConverter(ENABLED_BY_DEFAULT, localeConverter);

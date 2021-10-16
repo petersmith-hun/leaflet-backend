@@ -8,9 +8,8 @@ import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.CategoryBridgeService;
-import junitparams.JUnitParamsRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -23,7 +22,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
@@ -115,7 +113,7 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
         assertThat(categoryBridgeService.getCategory(CONTROL_CATEGORY_ID).isEnabled(), is(false));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     @ResetDatabase
     public void shouldDeleteCategory() throws CommunicationFailureException {
 
@@ -127,7 +125,7 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
 
         // then
         // this call should cause exception
-        categoryBridgeService.getCategory(categoryIDToDelete);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> categoryBridgeService.getCategory(categoryIDToDelete));
     }
 
     private void assertModifiedCategory(Long categoryID, CategoryCreateRequestModel expected) throws CommunicationFailureException {

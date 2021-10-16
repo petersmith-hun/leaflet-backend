@@ -5,14 +5,15 @@ import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import hu.psprog.leaflet.service.vo.DocumentVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -30,8 +31,9 @@ import static org.hamcrest.Matchers.notNullValue;
  *
  * @author Peter Smith
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = LeafletITContextConfig.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        classes = LeafletITContextConfig.class)
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class DocumentServiceImplIT {
 
@@ -46,7 +48,7 @@ public class DocumentServiceImplIT {
 
     private DocumentVO controlDocumentVO;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         controlDocumentVO = testObjectReader.read(DOCUMENT_1, TestObjectReader.ObjectDirectory.VO, DocumentVO.class);
     }

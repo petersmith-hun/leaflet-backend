@@ -11,9 +11,8 @@ import hu.psprog.leaflet.api.rest.response.document.EditDocumentDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.DocumentBridgeService;
-import junitparams.JUnitParamsRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.core.GenericType;
@@ -28,7 +27,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
@@ -81,14 +79,14 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
         assertThat(result, equalTo(control));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDocumentByLinkReturnHTTP404ForNonExistingDocument() throws CommunicationFailureException {
+    @Test
+    public void shouldDocumentByLinkReturnHTTP404ForNonExistingDocument() {
 
         // given
         String nonExistingDocument = "doc-non-existing";
 
         // when
-        documentBridgeService.getDocumentByLink(nonExistingDocument);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> documentBridgeService.getDocumentByLink(nonExistingDocument));
 
         // then
         // exception expected

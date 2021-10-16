@@ -12,9 +12,8 @@ import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.EntryBridgeService;
 import hu.psprog.leaflet.bridge.service.TagBridgeService;
-import junitparams.JUnitParamsRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -27,7 +26,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
@@ -80,14 +78,14 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
         assertThat(result, equalTo(control));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetTagByIDThrowResourceNotFoundIfTagDoesNotExist() throws CommunicationFailureException {
+    @Test
+    public void shouldGetTagByIDThrowResourceNotFoundIfTagDoesNotExist() {
 
         // given
         Long nonExistingTagID = 20L;
 
         // when
-        tagBridgeService.getTag(nonExistingTagID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> tagBridgeService.getTag(nonExistingTagID));
 
         // then
         // exception expected

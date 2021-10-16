@@ -1,20 +1,14 @@
 package hu.psprog.leaflet.acceptance.suites;
 
-import hu.psprog.leaflet.acceptance.config.ClearStorage;
-import org.junit.AfterClass;
-import org.junit.Rule;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.AfterAll;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Objects;
 
-import static junit.framework.TestCase.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Creates temporal files for tests.
@@ -34,9 +28,6 @@ public abstract class AbstractTempFileHandlingParameterizedBaseTest extends Abst
     private static File tempFileForFile3;
     private static File tempDirectoryForFile3;
     private static File tempImagesRoot;
-
-    @Rule
-    public ClearStorageRule clearStorageRule = new ClearStorageRule();
 
     @Value("${java.io.tmpdir}")
     private String baseDirectory;
@@ -68,7 +59,7 @@ public abstract class AbstractTempFileHandlingParameterizedBaseTest extends Abst
         }
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() throws IOException {
 
         // remove files
@@ -84,30 +75,6 @@ public abstract class AbstractTempFileHandlingParameterizedBaseTest extends Abst
 
         if (!tempImagesRoot.delete()) {
             fail("Could not remove all test files.");
-        }
-    }
-
-    public class ClearStorageRule implements MethodRule {
-
-        @Override
-        public Statement apply(Statement base, FrameworkMethod method, Object target) {
-            return new Statement() {
-
-                @Override
-                public void evaluate() throws Throwable {
-                    try {
-                        base.evaluate();
-                    } finally {
-                        ClearStorage clearStorage = method.getAnnotation(ClearStorage.class);
-                        if (Objects.nonNull(clearStorage)) {
-                            File fileToDelete = new File(baseDirectory, clearStorage.path());
-                            if (fileToDelete.exists() && !fileToDelete.delete()) {
-                                fail("File [" + clearStorage.path() + "] created by test could not be removed.");
-                            }
-                        }
-                    }
-                }
-            };
         }
     }
 }

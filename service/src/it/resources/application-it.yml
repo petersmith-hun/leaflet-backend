@@ -1,0 +1,7 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+files:
+  upload:
+    storage-path: ${java.io.tmpdir}/leaflet-storage-temp

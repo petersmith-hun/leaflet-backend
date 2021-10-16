@@ -3,7 +3,6 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.mail.client.MailClient;
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
-import hu.psprog.leaflet.service.mail.MailFactory;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
@@ -18,15 +17,13 @@ import hu.psprog.leaflet.service.mail.impl.SystemStartupMailFactory;
 import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import io.reactivex.Observable;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -35,11 +32,13 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EmailBasedNotificationServiceTest {
 
     private static final Observable<MailDeliveryInfo> DELIVERY_INFO_OBSERVABLE = Observable.empty();
     private static final String DESTINATION_EMAIL_ADDRESS = "destination-email-address";
+    private static final String USER_1 = "user1";
+    private static final String VERSION = "v1";
 
     @Mock
     private MailClient mailClient;
@@ -74,7 +73,7 @@ public class EmailBasedNotificationServiceTest {
     @InjectMocks
     private EmailBasedNotificationService emailBasedNotificationService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         given(mailClient.sendMail(mockMail)).willReturn(DELIVERY_INFO_OBSERVABLE);
     }
@@ -83,10 +82,11 @@ public class EmailBasedNotificationServiceTest {
     public void shouldSendStartupFinishedNotification() {
 
         // given
-        prepareMockFactory(systemStartupMailFactory);
+        given(mailFactoryRegistry.getFactory(SystemStartupMailFactory.class)).willReturn(systemStartupMailFactory);
+        given(systemStartupMailFactory.buildMail(VERSION)).willReturn(mockMail);
 
         // when
-        emailBasedNotificationService.startupFinished("v1");
+        emailBasedNotificationService.startupFinished(VERSION);
 
         // then
         assertMailSentAndObserverAttached();
@@ -96,10 +96,11 @@ public class EmailBasedNotificationServiceTest {
     public void shouldSendPasswordResetRequestedNotification() {
 
         // given
-        prepareMockFactory(passwordResetRequestMailFactory);
         PasswordResetRequest passwordResetRequest = PasswordResetRequest.getBuilder()
                 .withParticipant(DESTINATION_EMAIL_ADDRESS)
                 .build();
+        given(mailFactoryRegistry.getFactory(PasswordResetRequestMailFactory.class)).willReturn(passwordResetRequestMailFactory);
+        given(passwordResetRequestMailFactory.buildMail(passwordResetRequest, passwordResetRequest.getParticipant())).willReturn(mockMail);
 
         // when
         emailBasedNotificationService.passwordResetRequested(passwordResetRequest);
@@ -112,10 +113,12 @@ public class EmailBasedNotificationServiceTest {
     public void shouldSendPasswordResetConfirmationNotification() {
 
         // given
-        prepareMockFactory(passwordResetSuccessMailFactory);
         PasswordResetSuccess passwordResetSuccess = PasswordResetSuccess.getBuilder()
+                .withUsername(USER_1)
                 .withParticipant(DESTINATION_EMAIL_ADDRESS)
                 .build();
+        given(mailFactoryRegistry.getFactory(PasswordResetSuccessMailFactory.class)).willReturn(passwordResetSuccessMailFactory);
+        given(passwordResetSuccessMailFactory.buildMail(passwordResetSuccess.getUsername(), passwordResetSuccess.getParticipant())).willReturn(mockMail);
 
         // when
         emailBasedNotificationService.successfulPasswordReset(passwordResetSuccess);
@@ -128,10 +131,11 @@ public class EmailBasedNotificationServiceTest {
     public void shouldSendCommentNotification() {
 
         // given
-        prepareMockFactory(commentNotificationMailFactory);
         CommentNotification commentNotification = CommentNotification.getBuilder()
                 .withAuthorEmail(DESTINATION_EMAIL_ADDRESS)
                 .build();
+        given(mailFactoryRegistry.getFactory(CommentNotificationMailFactory.class)).willReturn(commentNotificationMailFactory);
+        given(commentNotificationMailFactory.buildMail(commentNotification, commentNotification.getAuthorEmail())).willReturn(mockMail);
 
         // when
         emailBasedNotificationService.commentNotification(commentNotification);
@@ -144,8 +148,9 @@ public class EmailBasedNotificationServiceTest {
     public void shouldSendContactRequestNotification() {
 
         // given
-        prepareMockFactory(contactRequestMailFactory);
         ContactRequestVO contactRequestVO = ContactRequestVO.getBuilder().build();
+        given(mailFactoryRegistry.getFactory(ContactRequestMailFactory.class)).willReturn(contactRequestMailFactory);
+        given(contactRequestMailFactory.buildMail(contactRequestVO)).willReturn(mockMail);
 
         // when
         emailBasedNotificationService.contactRequestReceived(contactRequestVO);
@@ -172,11 +177,5 @@ public class EmailBasedNotificationServiceTest {
     private void assertMailSentAndObserverAttached() {
         verify(mailClient).sendMail(mockMail);
         verify(loggingMailObserverHandler).attachObserver(DELIVERY_INFO_OBSERVABLE);
-    }
-
-    private void prepareMockFactory(MailFactory<?> mockFactory) {
-        given(mailFactoryRegistry.getFactory(any())).willReturn(mockFactory);
-        given(mockFactory.buildMail(any())).willReturn(mockMail);
-        given(mockFactory.buildMail(any(), anyString())).willReturn(mockMail);
     }
 }

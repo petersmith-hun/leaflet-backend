@@ -15,7 +15,8 @@ import hu.psprog.leaflet.security.sessionstore.domain.SessionStoreValidationStat
 import hu.psprog.leaflet.security.sessionstore.service.SessionStoreService;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import io.reactivex.Observable;
-import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
@@ -41,11 +42,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.util.FileSystemUtils;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -61,6 +62,8 @@ import java.util.Properties;
 @ComponentScan(basePackages = LeafletITContextConfig.COMPONENT_SCAN_PACKAGE)
 @EnableJpaRepositories(basePackages = LeafletITContextConfig.REPOSITORY_PACKAGE)
 public class LeafletITContextConfig implements ApplicationListener<ContextClosedEvent> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LeafletITContextConfig.class);
 
     public static final String INTEGRATION_TEST_DB_SCRIPT_USERS = "classpath:/service_it_db_script_users.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_ENTRIES = "classpath:/service_it_db_script_entries.sql";
@@ -79,8 +82,6 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
 
     @Autowired
     private UserDetailsService userDetailsService;
-
-    private TemporaryFolder temporaryFolder;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer placeholderConfigurer() {
@@ -150,7 +151,8 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
 
         Properties jpaProperties = new Properties();
-        jpaProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect");
+        jpaProperties.setProperty("generate-ddl", "true");
+        jpaProperties.setProperty("defer-datasource-initialization", "true");
 
         vendorAdapter.setGenerateDdl(true);
         factoryBean.setJpaProperties(jpaProperties);
@@ -207,13 +209,6 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     }
 
     @Bean
-    public File fileStorage() throws IOException {
-        temporaryFolder = new TemporaryFolder();
-        temporaryFolder.create();
-        return temporaryFolder.getRoot();
-    }
-
-    @Bean
     @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
         // suppressing warning: NoOp password encoding is only used in tests
@@ -232,6 +227,14 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
 
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
-        temporaryFolder.delete();
+
+        File temporalFileStorage = event.getApplicationContext()
+                .getBean("fileStorage", File.class);
+
+        FileSystemUtils.deleteRecursively(temporalFileStorage);
+
+        if (temporalFileStorage.exists()) {
+            LOGGER.warn("Failed to delete temporal file storage at '{}'", temporalFileStorage.getAbsolutePath());
+        }
     }
 }

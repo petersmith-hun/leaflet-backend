@@ -3,12 +3,13 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.DynamicConfigurationPropertyDAO;
 import hu.psprog.leaflet.persistence.entity.DynamicConfigurationProperty;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.ReflectionUtils;
 
 import javax.persistence.PersistenceException;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DynamicConfigurationPropertyServiceImplTest {
 
     private static final String KEY_1 = "KEY_1";
@@ -52,7 +53,7 @@ public class DynamicConfigurationPropertyServiceImplTest {
     @InjectMocks
     private DynamicConfigurationPropertyServiceImpl dynamicConfigurationPropertyService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Field dcpStore = ReflectionUtils.findField(DynamicConfigurationPropertyServiceImpl.class, "dcpStore");
         dcpStore.setAccessible(true);
@@ -118,14 +119,14 @@ public class DynamicConfigurationPropertyServiceImplTest {
         assertThat(dynamicConfigurationPropertyService.getAll().containsKey(NEW_KEY), is(true));
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldAddThrowServiceExceptionIfPropertyCouldNotBeSaved() throws ServiceException {
+    @Test
+    public void shouldAddThrowServiceExceptionIfPropertyCouldNotBeSaved() {
 
         // given
         doThrow(PersistenceException.class).when(dynamicConfigurationPropertyDAO).save(any(DynamicConfigurationProperty.class));
 
         // when
-        dynamicConfigurationPropertyService.add(NEW_KEY, NEW_VALUE);
+        Assertions.assertThrows(ServiceException.class, () -> dynamicConfigurationPropertyService.add(NEW_KEY, NEW_VALUE));
 
         // then
         // exception expected
@@ -142,14 +143,14 @@ public class DynamicConfigurationPropertyServiceImplTest {
         assertThat(dynamicConfigurationPropertyService.get(KEY_1), equalTo(NEW_VALUE));
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldUpdateThrowServiceExceptionIfPropertyCouldNotBeUpdated() throws ServiceException {
+    @Test
+    public void shouldUpdateThrowServiceExceptionIfPropertyCouldNotBeUpdated() {
 
         // given
         doThrow(PersistenceException.class).when(dynamicConfigurationPropertyDAO).updateOne(anyString(), any(DynamicConfigurationProperty.class));
 
         // when
-        dynamicConfigurationPropertyService.update(KEY_1, NEW_VALUE);
+        Assertions.assertThrows(ServiceException.class, () -> dynamicConfigurationPropertyService.update(KEY_1, NEW_VALUE));
 
         // then
         // exception expected
@@ -166,14 +167,14 @@ public class DynamicConfigurationPropertyServiceImplTest {
         assertThat(dynamicConfigurationPropertyService.get(KEY_1), nullValue());
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldDeleteThrowServiceExceptionIfPropertyCouldNotBeDeleted() throws ServiceException {
+    @Test
+    public void shouldDeleteThrowServiceExceptionIfPropertyCouldNotBeDeleted() {
 
         // given
         doThrow(PersistenceException.class).when(dynamicConfigurationPropertyDAO).delete(anyString());
 
         // when
-        dynamicConfigurationPropertyService.delete(KEY_1);
+        Assertions.assertThrows(ServiceException.class, () -> dynamicConfigurationPropertyService.delete(KEY_1));
 
         // then
         // exception expected

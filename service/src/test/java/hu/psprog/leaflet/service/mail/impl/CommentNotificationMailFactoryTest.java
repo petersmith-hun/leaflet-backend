@@ -2,11 +2,12 @@ package hu.psprog.leaflet.service.mail.impl;
 
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
@@ -21,7 +22,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommentNotificationMailFactoryTest {
 
     private static final String SUBJECT = "mail.user.notification.comment.subject";
@@ -74,21 +75,22 @@ public class CommentNotificationMailFactoryTest {
         assertThat(result.getContentMap().get(GENERATED_AT), notNullValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionOnNullRecipient() {
 
         // given
-        commentNotificationMailFactory.buildMail(CommentNotification.getBuilder().build());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> commentNotificationMailFactory.buildMail(CommentNotification.getBuilder().build()));
 
         // then
         // exception expected
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionOnMultipleRecipients() {
 
         // given
-        commentNotificationMailFactory.buildMail(CommentNotification.getBuilder().build(), RECIPIENT, RECIPIENT);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> commentNotificationMailFactory.buildMail(CommentNotification.getBuilder().build(), RECIPIENT, RECIPIENT));
 
         // then
         // exception expected

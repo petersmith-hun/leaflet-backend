@@ -9,20 +9,18 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -39,8 +37,9 @@ import static org.hamcrest.Matchers.nullValue;
  *
  * @author Peter Smith
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = LeafletITContextConfig.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        classes = LeafletITContextConfig.class)
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class UserServiceImplIT {
 
@@ -60,7 +59,7 @@ public class UserServiceImplIT {
     private static final Locale USER_ID6_LOCALE = Locale.EN;
     private static final boolean USER_ID6_ENABLED = true;
     private static final Date USER_ID6_CREATED = new Timestamp(1471514400000L);
-    private static final Collection<GrantedAuthority> ADMIN_AUTHORITY = Arrays.asList(new SimpleGrantedAuthority("ADMIN"));
+    private static final Collection<GrantedAuthority> ADMIN_AUTHORITY = List.of(new SimpleGrantedAuthority("ADMIN"));
 
     @Autowired
     private UserService userService;
@@ -68,7 +67,7 @@ public class UserServiceImplIT {
     private UserVO controlUserVO;
     private UserVO createdUserVO;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         controlUserVO = UserVO.getBuilder()
@@ -107,16 +106,16 @@ public class UserServiceImplIT {
         assertThat(result, equalTo(controlUserVO));
     }
 
-    @Test(expected = EntityNotFoundException.class)
+    @Test
     @Transactional
     @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
-    public void testGetOneWithNonExistingUser() throws ServiceException {
+    public void testGetOneWithNonExistingUser() {
 
         // given
         long nonExistingUserID = 6L;
 
         // when
-        userService.getOne(nonExistingUserID);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getOne(nonExistingUserID));
 
         // then
         // expected exception
