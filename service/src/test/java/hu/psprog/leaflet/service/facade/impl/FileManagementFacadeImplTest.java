@@ -9,11 +9,12 @@ import hu.psprog.leaflet.service.vo.DownloadableFileWrapperVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
 
     private static final String ORIGINAL_FILENAME = "Original Filename.jpg";
@@ -87,7 +88,7 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
         assertThat(result.getFileContent().getByteArray(), equalTo(TEST_DATA.getBytes()));
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldThrowExceptionOnDownloadWhenFileNotExists() throws IOException, ServiceException {
 
         // given
@@ -97,7 +98,7 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
         given(fileManagementService.download(uploadedFileVO.getPath())).willReturn(new File("not_existing_file.jpg"));
 
         // when
-        DownloadableFileWrapperVO result = fileManagementFacade.download(uploadedFileVO.getPathUUID());
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementFacade.download(uploadedFileVO.getPathUUID()));
 
         // then
         // expected exception
@@ -150,7 +151,7 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
     }
 
     @Test
-    public void shouldReturnCheckedMetaInfo() throws IOException, ServiceException {
+    public void shouldReturnCheckedMetaInfo() throws ServiceException {
 
         // given
         UUID pathUUID = UUID.randomUUID();
@@ -167,7 +168,7 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
     }
 
     @Test
-    public void shouldReturnEmptyOptionalIfMetaInfoDoesNotExist() throws IOException, ServiceException {
+    public void shouldReturnEmptyOptionalIfMetaInfoDoesNotExist() throws ServiceException {
 
         // given
         UUID pathUUID = UUID.randomUUID();
@@ -181,7 +182,7 @@ public class FileManagementFacadeImplTest extends TemporalFileStorageBaseTest {
     }
 
     @Test
-    public void shouldReturnEmptyOptionalIfFileDoesNotExist() throws IOException, ServiceException {
+    public void shouldReturnEmptyOptionalIfFileDoesNotExist() throws ServiceException {
 
         // given
         UUID pathUUID = UUID.randomUUID();

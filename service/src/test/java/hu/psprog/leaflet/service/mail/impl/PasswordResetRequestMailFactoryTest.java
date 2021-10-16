@@ -2,12 +2,13 @@ package hu.psprog.leaflet.service.mail.impl;
 
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
@@ -22,7 +23,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PasswordResetRequestMailFactoryTest {
 
     private static final String SUBJECT = "mail.user.pwreset.demand.subject";
@@ -46,7 +47,7 @@ public class PasswordResetRequestMailFactoryTest {
     @InjectMocks
     private PasswordResetRequestMailFactory passwordResetRequestMailFactory;
 
-    @Before
+    @BeforeEach
     public void setup() {
         passwordResetRequestMailFactory.setElevated(ELEVATED_RESET_URL);
         passwordResetRequestMailFactory.setVisitor(VISITOR_RESET_URL);
@@ -81,21 +82,23 @@ public class PasswordResetRequestMailFactoryTest {
         assertGeneratedMail(result, passwordResetRequest, false);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionOnNullRecipient() {
 
         // given
-        passwordResetRequestMailFactory.buildMail(PasswordResetRequest.getBuilder().build());
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> passwordResetRequestMailFactory.buildMail(PasswordResetRequest.getBuilder().build()));
 
         // then
         // exception expected
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionOnMultipleRecipients() {
 
         // given
-        passwordResetRequestMailFactory.buildMail(PasswordResetRequest.getBuilder().build(), RECIPIENT, RECIPIENT);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> passwordResetRequestMailFactory.buildMail(PasswordResetRequest.getBuilder().build(), RECIPIENT, RECIPIENT));
 
         // then
         // exception expected

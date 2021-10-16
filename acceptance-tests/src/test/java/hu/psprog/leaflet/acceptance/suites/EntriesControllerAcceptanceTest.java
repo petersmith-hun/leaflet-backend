@@ -15,15 +15,17 @@ import hu.psprog.leaflet.bridge.client.domain.OrderDirection;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.EntryBridgeService;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.core.GenericType;
 import java.util.Comparator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static hu.psprog.leaflet.bridge.client.domain.OrderBy.Entry.CREATED;
 import static hu.psprog.leaflet.bridge.client.domain.OrderBy.Entry.TITLE;
@@ -39,7 +41,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
@@ -69,8 +70,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result.getEntries().size(), equalTo(NUMBER_OF_ALL_ENTRIES));
     }
 
-    @Test
-    @Parameters(source = EntryAcceptanceTestDataProvider.class, method = "pageOfEntries")
+    @ParameterizedTest
+    @MethodSource("pageOfEntriesDataProvider")
     public void shouldReturnPageOfEntries(int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
                                           long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
             throws CommunicationFailureException {
@@ -83,8 +84,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertMenu(result);
     }
 
-    @Test
-    @Parameters(source = EntryAcceptanceTestDataProvider.class, method = "pageOfPublicEntries")
+    @ParameterizedTest
+    @MethodSource("pageOfPublicEntriesDataProvider")
     public void shouldReturnPageOfPublicEntries(int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
                                                 long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
             throws CommunicationFailureException {
@@ -97,8 +98,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertMenu(result);
     }
 
-    @Test
-    @Parameters(source = EntryAcceptanceTestDataProvider.class, method = "pageOfPublicEntriesByCategory")
+    @ParameterizedTest
+    @MethodSource("pageOfPublicEntriesByCategoryDataProvider")
     public void shouldReturnPageOfPublicEntriesByCategory(Long categoryID, int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
                                                           long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
             throws CommunicationFailureException {
@@ -111,8 +112,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertMenu(result);
     }
 
-    @Test
-    @Parameters(source = EntryAcceptanceTestDataProvider.class, method = "pageOfPublicEntriesByTag")
+    @ParameterizedTest
+    @MethodSource("pageOfPublicEntriesByTagDataProvider")
     public void shouldReturnPageOfPublicEntriesByTag(Long tagID, int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
                                                           long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
             throws CommunicationFailureException {
@@ -125,8 +126,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertMenu(result);
     }
 
-    @Test
-    @Parameters(source = EntryAcceptanceTestDataProvider.class, method = "pageOfPublicEntriesByContent")
+    @ParameterizedTest
+    @MethodSource("pageOfPublicEntriesByContentDataProvider")
     public void shouldReturnPageOfPublicEntriesByContent(String content, int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
                                                      long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
             throws CommunicationFailureException {
@@ -167,14 +168,14 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result, equalTo(control));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldEntryByLinkReturnHTTP404ForNonExistingEntry() throws CommunicationFailureException {
+    @Test
+    public void shouldEntryByLinkReturnHTTP404ForNonExistingEntry() {
 
         // given
         String link = "entry-non-existing-1";
 
         // when
-        entryBridgeService.getEntryByLink(link);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> entryBridgeService.getEntryByLink(link));
 
         // then
         // exception expected
@@ -221,7 +222,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                 .noneMatch(entryDataModel -> CONTROL_ENTRY_LINK.equals(entryDataModel.getLink())), is(true));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     @ResetDatabase
     public void shouldDeleteEntry() throws CommunicationFailureException {
 
@@ -233,7 +234,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         // then
         // this call should result in exception
-        entryBridgeService.getEntryByID(entryToDelete);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> entryBridgeService.getEntryByID(entryToDelete));
     }
     
     private void assertModifiedEntry(Long entryID, EntryUpdateRequestModel expected) throws CommunicationFailureException {
@@ -289,66 +290,63 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         }
     }
 
-    public static class EntryAcceptanceTestDataProvider {
+    private static Stream<Arguments> pageOfEntriesDataProvider() {
+        return Stream.of(
+                // page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
+                Arguments.of(1, 10, CREATED, ASC,  25, 10, 3, true,  false),
+                Arguments.of(2, 10, CREATED, ASC,  25, 10, 3, true,  true),
+                Arguments.of(3, 10, CREATED, ASC,  25, 5,  3, false, true),
+                Arguments.of(1, 30, CREATED, ASC,  25, 25, 1, false, false),
+                Arguments.of(1, 30, TITLE,   DESC, 25, 25, 1, false, false),
+                Arguments.of(3, 8,  TITLE,   ASC,  25, 8,  4, true,  true),
+                Arguments.of(2, 8,  CREATED, DESC, 25, 8,  4, true,  true)
+        );
+    }
 
-        public static Object[] pageOfEntries() {
-            return new Object[] {
-                    // page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
-                    new Object[] {1, 10, CREATED, ASC,  25, 10, 3, true,  false},
-                    new Object[] {2, 10, CREATED, ASC,  25, 10, 3, true,  true},
-                    new Object[] {3, 10, CREATED, ASC,  25, 5,  3, false, true},
-                    new Object[] {1, 30, CREATED, ASC,  25, 25, 1, false, false},
-                    new Object[] {1, 30, TITLE,   DESC, 25, 25, 1, false, false},
-                    new Object[] {3, 8,  TITLE,   ASC,  25, 8,  4, true,  true},
-                    new Object[] {2, 8,  CREATED, DESC, 25, 8,  4, true,  true},
-            };
-        }
+    private static Stream<Arguments> pageOfPublicEntriesDataProvider() {
+        return Stream.of(
+                // page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
+                Arguments.of(1, 10, CREATED, ASC,  19, 10, 2, true,  false),
+                Arguments.of(2, 10, CREATED, ASC,  19, 9,  2, false, true),
+                Arguments.of(3, 10, CREATED, ASC,  19, 0,  2, false, true),
+                Arguments.of(1, 30, CREATED, ASC,  19, 19, 1, false, false),
+                Arguments.of(1, 30, TITLE,   DESC, 19, 19, 1, false, false),
+                Arguments.of(2, 8,  TITLE,   ASC,  19, 8,  3, true,  true),
+                Arguments.of(3, 8,  CREATED, DESC, 19, 3,  3, false, true)
+        );
+    }
 
-        public static Object[] pageOfPublicEntries() {
-            return new Object[] {
-                    // page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
-                    new Object[] {1, 10, CREATED, ASC,  19, 10, 2, true,  false},
-                    new Object[] {2, 10, CREATED, ASC,  19, 9,  2, false, true},
-                    new Object[] {3, 10, CREATED, ASC,  19, 0,  2, false, true},
-                    new Object[] {1, 30, CREATED, ASC,  19, 19, 1, false, false},
-                    new Object[] {1, 30, TITLE,   DESC, 19, 19, 1, false, false},
-                    new Object[] {2, 8,  TITLE,   ASC,  19, 8,  3, true,  true},
-                    new Object[] {3, 8,  CREATED, DESC, 19, 3,  3, false, true},
-            };
-        }
+    private static Stream<Arguments> pageOfPublicEntriesByCategoryDataProvider() {
+        return Stream.of(
+                // category ID, page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
+                Arguments.of(1L, 1, 5,  CREATED, ASC,  8,  5,  2, true,  false),
+                Arguments.of(1L, 2, 5,  CREATED, ASC,  8,  3,  2, false, true),
+                Arguments.of(2L, 1, 10, CREATED, ASC,  11, 10, 2, true,  false),
+                Arguments.of(2L, 2, 10, CREATED, ASC,  11, 1,  2, false, true),
+                Arguments.of(1L, 2, 10, CREATED, ASC,  8,  0,  1, false, true),
+                Arguments.of(2L, 1, 30, CREATED, ASC,  11, 11, 1, false, false),
+                Arguments.of(1L, 1, 30, TITLE,   DESC, 8,  8,  1, false, false),
+                Arguments.of(1L, 2, 3,  TITLE,   ASC,  8,  3,  3, true,  true)
+        );
+    }
 
-        public static Object[] pageOfPublicEntriesByCategory() {
-            return new Object[] {
-                    // category ID, page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
-                    new Object[] {1L, 1, 5,  CREATED, ASC,  8,  5,  2, true,  false},
-                    new Object[] {1L, 2, 5,  CREATED, ASC,  8,  3,  2, false, true},
-                    new Object[] {2L, 1, 10, CREATED, ASC,  11, 10, 2, true,  false},
-                    new Object[] {2L, 2, 10, CREATED, ASC,  11, 1,  2, false, true},
-                    new Object[] {1L, 2, 10, CREATED, ASC,  8,  0,  1, false, true},
-                    new Object[] {2L, 1, 30, CREATED, ASC,  11, 11, 1, false, false},
-                    new Object[] {1L, 1, 30, TITLE,   DESC, 8,  8,  1, false, false},
-                    new Object[] {1L, 2, 3,  TITLE,   ASC,  8,  3,  3, true,  true}
-            };
-        }
+    private static Stream<Arguments> pageOfPublicEntriesByTagDataProvider() {
+        return Stream.of(
+                Arguments.of(1L, 1, 5,  CREATED, ASC, 1, 1, 1, false, false),
+                Arguments.of(2L, 1, 2,  CREATED, ASC, 1, 1, 1, false, false),
+                Arguments.of(2L, 2, 2,  CREATED, ASC, 1, 0, 1, false, true),
+                Arguments.of(0L, 1, 10, CREATED, ASC, 0, 0, 0, false, false),
+                Arguments.of(9L, 1, 10, CREATED, ASC, 0, 0, 0, false, false)
+        );
+    }
 
-        public static Object[] pageOfPublicEntriesByTag() {
-            return new Object[] {
-                    new Object[] {1L, 1, 5,  CREATED, ASC, 1, 1, 1, false, false},
-                    new Object[] {2L, 1, 2,  CREATED, ASC, 1, 1, 1, false, false},
-                    new Object[] {2L, 2, 2,  CREATED, ASC, 1, 0, 1, false, true},
-                    new Object[] {0L, 1, 10, CREATED, ASC, 0, 0, 0, false, false},
-                    new Object[] {9L, 1, 10, CREATED, ASC, 0, 0, 0, false, false}
-            };
-        }
-
-        public static Object[] pageOfPublicEntriesByContent() {
-            return new Object[] {
-                    new Object[] {"content 7",       1, 5, CREATED, ASC, 2,  2, 1, false, false},
-                    new Object[] {"non existing",    1, 5, CREATED, ASC, 0,  0, 0, false, false},
-                    new Object[] {"Prologue #25",    1, 5, CREATED, ASC, 1,  1, 1, false, false},
-                    new Object[] {"Entry #21 title", 1, 5, CREATED, ASC, 1,  1, 1, false, false},
-                    new Object[] {"content entry",   3, 5, CREATED, ASC, 19, 5, 4, true,  true}
-            };
-        }
+    private static Stream<Arguments> pageOfPublicEntriesByContentDataProvider() {
+        return Stream.of(
+                Arguments.of("content 7",       1, 5, CREATED, ASC, 2,  2, 1, false, false),
+                Arguments.of("non existing",    1, 5, CREATED, ASC, 0,  0, 0, false, false),
+                Arguments.of("Prologue #25",    1, 5, CREATED, ASC, 1,  1, 1, false, false),
+                Arguments.of("Entry #21 title", 1, 5, CREATED, ASC, 1,  1, 1, false, false),
+                Arguments.of("content entry",   3, 5, CREATED, ASC, 19, 5, 4, true,  true)
+        );
     }
 }

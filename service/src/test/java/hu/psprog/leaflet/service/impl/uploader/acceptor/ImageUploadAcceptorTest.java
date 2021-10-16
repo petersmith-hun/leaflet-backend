@@ -1,13 +1,14 @@
 package hu.psprog.leaflet.service.impl.uploader.acceptor;
 
 import hu.psprog.leaflet.service.vo.FileInputVO;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -17,7 +18,7 @@ import static org.hamcrest.Matchers.is;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ImageUploadAcceptorTest {
 
     private static final String ACCEPTABLE_MIME_IMAGE_JPG = "image/jpg";
@@ -29,13 +30,8 @@ public class ImageUploadAcceptorTest {
     @InjectMocks
     private ImageUploadAcceptor imageUploadAcceptor;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    @Parameters(source = MIMETypeProvider.class)
+    @ParameterizedTest
+    @MethodSource("provideDataSource")
     public void testAcceptance(String mime, boolean expectedResult) {
 
         // given
@@ -54,16 +50,14 @@ public class ImageUploadAcceptorTest {
                 .build();
     }
 
-    public static class MIMETypeProvider {
-
-        public static Object[] provide() {
-            return new Object[] {
-                    new Object[] {ACCEPTABLE_MIME_IMAGE_GIF, true},
-                    new Object[] {ACCEPTABLE_MIME_IMAGE_JPEG, true},
-                    new Object[] {ACCEPTABLE_MIME_IMAGE_JPG, true},
-                    new Object[] {ACCEPTABLE_MIME_IMAGE_PNG, true},
-                    new Object[] {UNACCEPTABLE_MIME_APPLICATION_PDF, false}
-            };
-        }
+    public static Stream<Arguments> provideDataSource() {
+        
+        return Stream.of(
+                Arguments.of(ACCEPTABLE_MIME_IMAGE_GIF, true),
+                Arguments.of(ACCEPTABLE_MIME_IMAGE_JPEG, true),
+                Arguments.of(ACCEPTABLE_MIME_IMAGE_JPG, true),
+                Arguments.of(ACCEPTABLE_MIME_IMAGE_PNG, true),
+                Arguments.of(UNACCEPTABLE_MIME_APPLICATION_PDF, false)
+        );
     }
 }

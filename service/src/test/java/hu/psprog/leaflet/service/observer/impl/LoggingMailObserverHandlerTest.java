@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.service.observer.impl;
 
 import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.Appender;
 import hu.psprog.leaflet.mail.config.MailProcessorConfigurationProperties;
@@ -8,20 +9,20 @@ import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
 import hu.psprog.leaflet.mail.domain.MailDeliveryStatus;
 import io.reactivex.Observable;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -33,14 +34,14 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LoggingMailObserverHandlerTest {
 
     @Mock
     private MailProcessorConfigurationProperties configurationProperties;
 
     @Mock
-    private Appender appender;
+    private Appender<ILoggingEvent> appender;
 
     @Captor
     private ArgumentCaptor<LoggingEvent> loggingEventArgumentCaptor;
@@ -48,7 +49,7 @@ public class LoggingMailObserverHandlerTest {
     @InjectMocks
     private LoggingMailObserverHandler loggingMailObserverHandler;
 
-    @Before
+    @BeforeEach
     public void setup() {
         ((Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).addAppender(appender);
     }
@@ -93,7 +94,7 @@ public class LoggingMailObserverHandlerTest {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
-            fail("Interrupted");
+            Assertions.fail("Interrupted");
         }
     }
 

@@ -3,10 +3,10 @@ package hu.psprog.leaflet.web.processor.impl;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EntityPageResponseProcessorTest {
 
     private static final long ENTITY_COUNT = 30L;
@@ -34,7 +34,7 @@ public class EntityPageResponseProcessorTest {
     private HttpServletRequest httpServletRequest;
     private EntityPageResponseProcessor responseProcessor;
 
-    @Before
+    @BeforeEach
     public void setup() {
         httpServletRequest = new MockHttpServletRequest();
         responseProcessor = new EntityPageResponseProcessor(httpServletRequest);

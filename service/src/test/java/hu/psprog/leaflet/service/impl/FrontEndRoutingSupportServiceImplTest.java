@@ -9,13 +9,14 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.support.routing.RouteMaskProcessor;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,7 +43,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FrontEndRoutingSupportServiceImplTest {
 
     private static final Long CONTROL_ID = 1L;
@@ -55,10 +56,10 @@ public class FrontEndRoutingSupportServiceImplTest {
     private static final FrontEndRouteVO FRONT_END_ROUTE_VO_2 = prepareFrontEndRouteVO(2);
     private static final FrontEndRouteVO FRONT_END_ROUTE_VO_3 = prepareFrontEndRouteVO(3);
 
-    @Mock
+    @Mock(lenient = true)
     private FrontEndRouteDAO frontEndRouteDAO;
 
-    @Mock
+    @Mock(lenient = true)
     private ConversionService conversionService;
 
     @Mock(lenient = true)
@@ -81,7 +82,7 @@ public class FrontEndRoutingSupportServiceImplTest {
 
     private FrontEndRoutingSupportServiceImpl frontEndRoutingSupportService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         given(conversionService.convert(FRONT_END_ROUTE_1, FrontEndRouteVO.class)).willReturn(FRONT_END_ROUTE_VO_1);
         given(conversionService.convert(FRONT_END_ROUTE_2, FrontEndRouteVO.class)).willReturn(FRONT_END_ROUTE_VO_2);
@@ -157,42 +158,42 @@ public class FrontEndRoutingSupportServiceImplTest {
         assertThat(result, equalTo(1L));
     }
 
-    @Test(expected = EntityCreationException.class)
-    public void shouldCreateFailWithEntityCreationException() throws ServiceException {
+    @Test
+    public void shouldCreateFailWithEntityCreationException() {
 
         // given
         given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
 
         // when
-        frontEndRoutingSupportService.createOne(FRONT_END_ROUTE_VO_1);
+        Assertions.assertThrows(EntityCreationException.class, () -> frontEndRoutingSupportService.createOne(FRONT_END_ROUTE_VO_1));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void shouldCreateFailWithConstraintViolationException() throws ServiceException {
+    @Test
+    public void shouldCreateFailWithConstraintViolationException() {
 
         // given
         given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
         doThrow(DataIntegrityViolationException.class).when(frontEndRouteDAO).save(any());
 
         // when
-        frontEndRoutingSupportService.createOne(FRONT_END_ROUTE_VO_1);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> frontEndRoutingSupportService.createOne(FRONT_END_ROUTE_VO_1));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldCreateFailWithServiceException() throws ServiceException {
+    @Test
+    public void shouldCreateFailWithServiceException() {
 
         // given
         given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
         doThrow(RuntimeException.class).when(frontEndRouteDAO).save(any());
 
         // when
-        frontEndRoutingSupportService.createOne(FRONT_END_ROUTE_VO_1);
+        Assertions.assertThrows(ServiceException.class, () -> frontEndRoutingSupportService.createOne(FRONT_END_ROUTE_VO_1));
 
         // then
         // exception expected
@@ -212,42 +213,42 @@ public class FrontEndRoutingSupportServiceImplTest {
         assertThat(result, equalTo(FRONT_END_ROUTE_VO_1));
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldUpdateFailWithEntityNotFoundException() throws ServiceException {
+    @Test
+    public void shouldUpdateFailWithEntityNotFoundException() {
 
         // given
         given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
 
         // when
-        frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void shouldUpdateFailWithConstraintViolationException() throws ServiceException {
+    @Test
+    public void shouldUpdateFailWithConstraintViolationException() {
 
         // given
         given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
         doThrow(DataIntegrityViolationException.class).when(frontEndRouteDAO).updateOne(anyLong(), any());
 
         // when
-        frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldUpdateFailWithServiceException() throws ServiceException {
+    @Test
+    public void shouldUpdateFailWithServiceException() {
 
         // given
         given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
         doThrow(RuntimeException.class).when(frontEndRouteDAO).updateOne(anyLong(), any());
 
         // when
-        frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1);
+        Assertions.assertThrows(ServiceException.class, () -> frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1));
 
         // then
         // exception expected
@@ -266,14 +267,14 @@ public class FrontEndRoutingSupportServiceImplTest {
         verify(frontEndRouteDAO).delete(CONTROL_ID);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldDeleteFailWhenRouteDoesNotExist() throws ServiceException {
+    @Test
+    public void shouldDeleteFailWhenRouteDoesNotExist() {
 
         // given
         given(frontEndRouteDAO.exists(CONTROL_ID)).willReturn(false);
 
         // when
-        frontEndRoutingSupportService.deleteByID(CONTROL_ID);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> frontEndRoutingSupportService.deleteByID(CONTROL_ID));
 
         // then
         // expected exception
@@ -293,14 +294,14 @@ public class FrontEndRoutingSupportServiceImplTest {
         assertThat(result, equalTo(FRONT_END_ROUTE_VO_1));
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldGetOneFailWhenRouteDoesNotExist() throws ServiceException {
+    @Test
+    public void shouldGetOneFailWhenRouteDoesNotExist() {
 
         // given
         given(frontEndRouteDAO.exists(CONTROL_ID)).willReturn(false);
 
         // when
-        frontEndRoutingSupportService.getOne(CONTROL_ID);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> frontEndRoutingSupportService.getOne(CONTROL_ID));
 
         // then
         // expected exception
@@ -345,14 +346,14 @@ public class FrontEndRoutingSupportServiceImplTest {
         verify(frontEndRouteDAO).enable(CONTROL_ID);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldEnableFailWhenRouteDoesNotExist() throws EntityNotFoundException {
+    @Test
+    public void shouldEnableFailWhenRouteDoesNotExist() {
 
         // given
         given(frontEndRouteDAO.exists(CONTROL_ID)).willReturn(false);
 
         // when
-        frontEndRoutingSupportService.enable(CONTROL_ID);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> frontEndRoutingSupportService.enable(CONTROL_ID));
 
         // then
         // exception expected
@@ -371,14 +372,14 @@ public class FrontEndRoutingSupportServiceImplTest {
         verify(frontEndRouteDAO).disable(CONTROL_ID);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldDisableFailWhenRouteDoesNotExist() throws EntityNotFoundException {
+    @Test
+    public void shouldDisableFailWhenRouteDoesNotExist() {
 
         // given
         given(frontEndRouteDAO.exists(CONTROL_ID)).willReturn(false);
 
         // when
-        frontEndRoutingSupportService.disable(CONTROL_ID);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> frontEndRoutingSupportService.disable(CONTROL_ID));
 
         // then
         // exception expected

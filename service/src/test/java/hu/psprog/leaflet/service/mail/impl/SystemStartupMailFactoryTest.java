@@ -1,11 +1,11 @@
 package hu.psprog.leaflet.service.mail.impl;
 
 import hu.psprog.leaflet.mail.domain.Mail;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SystemStartupMailFactoryTest {
 
     private static final String SUBJECT = "mail.system.event.startup.subject";

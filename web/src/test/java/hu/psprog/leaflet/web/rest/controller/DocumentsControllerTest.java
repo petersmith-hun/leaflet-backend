@@ -10,12 +10,13 @@ import hu.psprog.leaflet.service.facade.DocumentFacade;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DocumentsControllerTest extends AbstractControllerBaseTest {
 
     private static final List<DocumentVO> DOCUMENT_VO_LIST = Collections.singletonList(DOCUMENT_VO_WITH_OWNER);
@@ -45,7 +46,7 @@ public class DocumentsControllerTest extends AbstractControllerBaseTest {
     @InjectMocks
     private DocumentsController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         given(conversionService.convert(DOCUMENT_VO_LIST, DocumentListDataModel.class)).willReturn(DOCUMENT_LIST_DATA_MODEL);
@@ -92,14 +93,14 @@ public class DocumentsControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, EDIT_DOCUMENT_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetDocumentByIdWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetDocumentByIdWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(documentFacade).getOne(DOCUMENT_ID);
 
         // when
-        controller.getDocumentByID(DOCUMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getDocumentByID(DOCUMENT_ID));
 
         // then
         // exception expected
@@ -118,14 +119,14 @@ public class DocumentsControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, DOCUMENT_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetDocumentByLinkWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetDocumentByLinkWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(documentFacade).getByLink(DOCUMENT_LINK);
 
         // when
-        controller.getDocumentByLink(DOCUMENT_LINK);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getDocumentByLink(DOCUMENT_LINK));
 
         // then
         // exception expected
@@ -158,29 +159,29 @@ public class DocumentsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateDocumentWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateDocumentWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(DOCUMENT_CREATE_REQUEST_MODEL, DocumentVO.class)).willReturn(DOCUMENT_VO_WITH_OWNER);
         doThrow(ConstraintViolationException.class).when(documentFacade).createOne(DOCUMENT_VO_WITH_OWNER);
 
         // when
-        controller.createDocument(DOCUMENT_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createDocument(DOCUMENT_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // expected exception
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateDocumentWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateDocumentWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(DOCUMENT_CREATE_REQUEST_MODEL, DocumentVO.class)).willReturn(DOCUMENT_VO_WITH_OWNER);
         doThrow(ServiceException.class).when(documentFacade).createOne(DOCUMENT_VO_WITH_OWNER);
 
         // when
-        controller.createDocument(DOCUMENT_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createDocument(DOCUMENT_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // expected exception
@@ -213,29 +214,29 @@ public class DocumentsControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldUpdateDocumentWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateDocumentWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(DOCUMENT_UPDATE_REQUEST_MODEL, DocumentVO.class)).willReturn(DOCUMENT_VO_WITH_OWNER);
         doThrow(ConstraintViolationException.class).when(documentFacade).updateOne(DOCUMENT_ID, DOCUMENT_VO_WITH_OWNER);
 
         // when
-        controller.updateDocument(DOCUMENT_ID, DOCUMENT_UPDATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.updateDocument(DOCUMENT_ID, DOCUMENT_UPDATE_REQUEST_MODEL, bindingResult));
 
         // then
         // expected exception
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateDocumentWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateDocumentWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(DOCUMENT_UPDATE_REQUEST_MODEL, DocumentVO.class)).willReturn(DOCUMENT_VO_WITH_OWNER);
         doThrow(ServiceException.class).when(documentFacade).updateOne(DOCUMENT_ID, DOCUMENT_VO_WITH_OWNER);
 
         // when
-        controller.updateDocument(DOCUMENT_ID, DOCUMENT_UPDATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updateDocument(DOCUMENT_ID, DOCUMENT_UPDATE_REQUEST_MODEL, bindingResult));
 
         // then
         // expected exception
@@ -254,14 +255,14 @@ public class DocumentsControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, EDIT_DOCUMENT_DATA_MODEL, LOCATION_HEADER);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldChangeStatusWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldChangeStatusWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(documentFacade).changeStatus(DOCUMENT_ID);
 
         // when
-        controller.changeStatus(DOCUMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changeStatus(DOCUMENT_ID));
 
         // then
         // exception expected
@@ -277,14 +278,14 @@ public class DocumentsControllerTest extends AbstractControllerBaseTest {
         verify(documentFacade).deletePermanently(DOCUMENT_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteDocumentWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteDocumentWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(documentFacade).deletePermanently(DOCUMENT_ID);
 
         // when
-        controller.deleteDocument(DOCUMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteDocument(DOCUMENT_ID));
 
         // then
         // exception expected

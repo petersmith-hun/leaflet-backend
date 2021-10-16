@@ -4,11 +4,12 @@ import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.AttachmentFacade;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AttachmentsControllerTest extends AbstractControllerBaseTest {
 
     @Mock
@@ -41,14 +42,14 @@ public class AttachmentsControllerTest extends AbstractControllerBaseTest {
         verify(attachmentFacade).attachFileToEntry(any());
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldAttachWithServiceFailure() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldAttachWithServiceFailure() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(attachmentFacade).attachFileToEntry(any());
 
         // when
-        controller.attach(ATTACHMENT_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.attach(ATTACHMENT_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -78,14 +79,14 @@ public class AttachmentsControllerTest extends AbstractControllerBaseTest {
         verify(attachmentFacade).detachFileFromEntry(any());
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDetachWithServiceFailure() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldDetachWithServiceFailure() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(attachmentFacade).detachFileFromEntry(any());
 
         // when
-        controller.detach(ATTACHMENT_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.detach(ATTACHMENT_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected

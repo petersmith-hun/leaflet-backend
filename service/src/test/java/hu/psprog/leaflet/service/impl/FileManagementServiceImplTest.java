@@ -9,12 +9,13 @@ import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import io.jsonwebtoken.lang.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
 
     private static final String PATH = "/images/" + FILENAME;
@@ -45,19 +46,19 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
     private static final String MIME_TYPE = "image/jpg";
     private static final String DIRECTORY_TO_CREATE = "testDirectory";
 
-    @Mock
+    @Mock(lenient = true)
     private FileUploader fileUploader;
 
-    @Mock
+    @Mock(lenient = true)
     private FileInputVO fileInputVO;
 
-    @Mock
+    @Mock(lenient = true)
     private List<UploadAcceptor> uploadAcceptors;
 
     @InjectMocks
     private FileManagementServiceImpl fileManagementService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         prepareFileInputVo();
     }
@@ -77,44 +78,44 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         verify(fileUploader).upload(fileInputVO);
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowServiceExceptionOnUploadFailure() throws ServiceException {
+    @Test
+    public void shouldThrowServiceExceptionOnUploadFailure() {
 
         // given
         given(fileInputVO.getSize()).willReturn(1L);
         doThrow(FileUploadException.class).when(fileUploader).upload(fileInputVO);
 
         // when
-        fileManagementService.upload(fileInputVO);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.upload(fileInputVO));
 
         // then
         // expected exception
         verify(fileUploader).upload(fileInputVO);
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowServiceExceptionOnNonAcceptedFile() throws ServiceException {
+    @Test
+    public void shouldThrowServiceExceptionOnNonAcceptedFile() {
 
         // given
         given(fileInputVO.getSize()).willReturn(1L);
         given(fileUploader.upload(fileInputVO)).willReturn(null);
 
         // when
-        fileManagementService.upload(fileInputVO);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.upload(fileInputVO));
 
         // then
         // expected exception
         verify(fileUploader).upload(fileInputVO);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowIllegalArgumentExceptionOnEmptyFile() throws ServiceException {
+    @Test
+    public void shouldThrowIllegalArgumentExceptionOnEmptyFile() {
 
         // given
         given(fileInputVO.getSize()).willReturn(0L);
 
         // when
-        fileManagementService.upload(fileInputVO);
+        Assertions.assertThrows(IllegalStateException.class, () -> fileManagementService.upload(fileInputVO));
 
         // then
         // expected exception
@@ -138,28 +139,28 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         assertThat(result, equalTo(expectedFile));
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowExceptionOnDownloadWhenFileIsMissing() throws IOException, ServiceException {
+    @Test
+    public void shouldThrowExceptionOnDownloadWhenFileIsMissing() throws IOException {
 
         // given
         prepareTemporaryStorage();
 
         // when
-        fileManagementService.download(PATH);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.download(PATH));
 
         // then
         // expected exception
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowServiceExceptionOnDownloadWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+    @Test
+    public void shouldThrowServiceExceptionOnDownloadWhenInvalidPathExceptionIsThrown() throws IOException {
 
         // given
         prepareTemporaryStorage();
         doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
 
         // when
-        fileManagementService.download(PATH);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.download(PATH));
 
         // then
         // exception expected
@@ -181,28 +182,28 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         assertThat(preparedFile.canRead(), is(false));
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowExceptionOnRemoveWhenFileIsMissing() throws IOException, ServiceException {
+    @Test
+    public void shouldThrowExceptionOnRemoveWhenFileIsMissing() throws IOException {
 
         // given
         prepareTemporaryStorage();
 
         // when
-        fileManagementService.remove(PATH);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.remove(PATH));
 
         // then
         // expected exception
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowServiceExceptionOnRemoveWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+    @Test
+    public void shouldThrowServiceExceptionOnRemoveWhenInvalidPathExceptionIsThrown() throws IOException {
 
         // given
         prepareTemporaryStorage();
         doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
 
         // when
-        fileManagementService.remove(PATH);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.remove(PATH));
 
         // then
         // exception expected
@@ -239,28 +240,28 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         assertThat(file.isDirectory(), is(true));
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowExceptionOnCreateDirectoryWhenInvalidParentIsGiven() throws IOException, ServiceException {
+    @Test
+    public void shouldThrowExceptionOnCreateDirectoryWhenInvalidParentIsGiven() throws IOException {
 
         // given
         prepareTemporaryStorage();
 
         // when
-        fileManagementService.createDirectory("not_existing_parent", DIRECTORY_TO_CREATE);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.createDirectory("not_existing_parent", DIRECTORY_TO_CREATE));
 
         // then
         // expected exception
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowServiceExceptionOnCreateDirectoryWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+    @Test
+    public void shouldThrowServiceExceptionOnCreateDirectoryWhenInvalidPathExceptionIsThrown() throws IOException {
 
         // given
         prepareTemporaryStorage();
         doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
 
         // when
-        fileManagementService.createDirectory(IMAGES_FOLDER, DIRECTORY_TO_CREATE);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.createDirectory(IMAGES_FOLDER, DIRECTORY_TO_CREATE));
 
         // then
         // exception expected
@@ -293,15 +294,15 @@ public class FileManagementServiceImplTest extends TemporalFileStorageBaseTest {
         assertThat(result, is(false));
     }
 
-    @Test(expected = ServiceException.class)
-    public void shouldThrowServiceExceptionOnExistsWhenInvalidPathExceptionIsThrown() throws IOException, ServiceException {
+    @Test
+    public void shouldThrowServiceExceptionOnExistsWhenInvalidPathExceptionIsThrown() throws IOException {
 
         // given
         prepareTemporaryStorage();
         doThrow(InvalidPathException.class).when(fileStorage).getAbsolutePath();
 
         // when
-        fileManagementService.exists(PATH);
+        Assertions.assertThrows(ServiceException.class, () -> fileManagementService.exists(PATH));
 
         // then
         // exception expected

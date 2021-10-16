@@ -7,12 +7,13 @@ import hu.psprog.leaflet.service.impl.uploader.acceptor.ImageUploadAcceptor;
 import hu.psprog.leaflet.service.util.FilenameGeneratorUtil;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +39,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class FileUploaderTest extends TemporalFileStorageBaseTest {
 
     private static final String ORIGINAL_FILENAME = "test.jpg";
@@ -52,16 +53,16 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
     private static final String SELF_INIT_FOLDER = "self_init_folder";
     private static final String MULTI_LEVEL_FOLDER = "multi/level/folder";
 
-    @Mock
+    @Mock(lenient = true)
     private FilenameGeneratorUtil filenameGeneratorUtil;
 
-    @Mock
+    @Mock(lenient = true)
     private ImageUploadAcceptor imageUploadAcceptor;
 
     private FileUploader fileUploader;
     private InputStream fileInputStream;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, DirectoryCreationException {
         prepareTemporaryStorage();
         given(imageUploadAcceptor.acceptedAs()).willReturn(ACCEPTED_AS_IMAGE);
@@ -71,7 +72,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         fileInputStream = new FileInputStream(prepareTempFile());
     }
 
-    @After
+    @AfterEach
     public void teardown() throws IOException {
         if (Objects.nonNull(fileInputStream)) {
             fileInputStream.close();
@@ -88,19 +89,20 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         new FileUploader(fileStorage, Collections.singletonList(imageUploadAcceptor), filenameGeneratorUtil);
 
         // then
-        File selfInitFolder = new File(temporaryFolder.getRoot(), SELF_INIT_FOLDER);
+        File selfInitFolder = new File(temporaryFolder, SELF_INIT_FOLDER);
         assertThat(selfInitFolder.exists(), is(true));
         assertThat(selfInitFolder.isDirectory(), is(true));
     }
 
-    @Test(expected = DirectoryCreationException.class)
+    @Test
     public void shouldInitializationFailIfAcceptorRootCouldNotBeCreated() {
 
         // given
         given(imageUploadAcceptor.groupRootDirectory()).willReturn(MULTI_LEVEL_FOLDER);
 
         // when
-        new FileUploader(fileStorage, Collections.singletonList(imageUploadAcceptor), filenameGeneratorUtil);
+        Assertions.assertThrows(DirectoryCreationException.class,
+                () -> new FileUploader(fileStorage, Collections.singletonList(imageUploadAcceptor), filenameGeneratorUtil));
 
         // then
         // exception expected
@@ -142,7 +144,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         assertThat(result.getPathUUID(), equalTo(PATH_UUID_SUBFOLDER));
     }
 
-    @Test(expected = FileUploadException.class)
+    @Test
     public void shouldUploadFileUnderNonExistingSubfolderThrowException() throws FileUploadException {
 
         // given
@@ -150,7 +152,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
         given(imageUploadAcceptor.accept(fileInputVO)).willReturn(true);
 
         // when
-        fileUploader.upload(fileInputVO);
+        Assertions.assertThrows(FileUploadException.class, () -> fileUploader.upload(fileInputVO));
 
         // then
         // exception expected
@@ -190,7 +192,7 @@ public class FileUploaderTest extends TemporalFileStorageBaseTest {
 
     private File prepareTempFile() throws IOException {
 
-        File tempFile = temporaryFolder.newFile();
+        File tempFile = new File(temporaryFolder, "tempFile.txt");
         List<String> lines = Arrays.asList("Line #1", "Line #2", "Line #3");
         Files.write(tempFile.toPath(), lines);
 

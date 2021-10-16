@@ -9,11 +9,12 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +32,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CategoryServiceImplTest {
     
     @Mock(lenient = true)
@@ -69,15 +70,15 @@ public class CategoryServiceImplTest {
         verify(categoryToCategoryVOConverter).convert(category);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testGetOneWithNonExistingEntry() throws ServiceException {
+    @Test
+    public void testGetOneWithNonExistingEntry() {
 
         // given
         Long id = 1L;
         given(categoryDAO.findOne(id)).willReturn(null);
 
         // when
-        categoryService.getOne(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> categoryService.getOne(id));
 
         // then
         // expected exception
@@ -149,15 +150,15 @@ public class CategoryServiceImplTest {
         verify(categoryDAO).save(category);
     }
 
-    @Test(expected = EntityCreationException.class)
-    public void testCreateOneWithFailure() throws ServiceException {
+    @Test
+    public void testCreateOneWithFailure() {
 
         // given
         given(categoryVOToCategoryConverter.convert(categoryVO)).willReturn(category);
         given(categoryDAO.save(category)).willReturn(null);
 
         // when
-        categoryService.createOne(categoryVO);
+        Assertions.assertThrows(EntityCreationException.class, () -> categoryService.createOne(categoryVO));
 
         // then
         // expected exception
@@ -184,8 +185,8 @@ public class CategoryServiceImplTest {
         verify(categoryDAO).updateOne(id, category);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testUpdateOneWithFailure() throws ServiceException {
+    @Test
+    public void testUpdateOneWithFailure() {
 
         // given
         Long id = 1L;
@@ -193,10 +194,9 @@ public class CategoryServiceImplTest {
         given(categoryDAO.updateOne(id, category)).willReturn(null);
 
         // when
-        CategoryVO result = categoryService.updateOne(id, categoryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> categoryService.updateOne(id, categoryVO));
 
         // then
-        assertThat(result, equalTo(categoryVO));
         verify(categoryVOToCategoryConverter).convert(categoryVO);
         verify(categoryToCategoryVOConverter, never()).convert(category);
         verify(categoryDAO).updateOne(id, category);
@@ -215,15 +215,15 @@ public class CategoryServiceImplTest {
         verify(categoryDAO).delete(categoryVO.getId());
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByIdWithNonExistingEntry() throws ServiceException {
+    @Test
+    public void testDeleteByIdWithNonExistingEntry() {
 
         // given
         Long id = 1L;
         given(categoryDAO.exists(categoryVO.getId())).willReturn(false);
 
         // when
-        categoryService.deleteByID(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> categoryService.deleteByID(id));
 
         // then
         // expected exception
@@ -243,15 +243,15 @@ public class CategoryServiceImplTest {
         verify(categoryDAO).enable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldEnableThrowEntityNotFoundException() throws EntityNotFoundException {
+    @Test
+    public void shouldEnableThrowEntityNotFoundException() {
 
         // given
         Long id = 1L;
         given(categoryDAO.exists(id)).willReturn(false);
 
         // when
-        categoryService.enable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> categoryService.enable(id));
 
         // then
         // exception expected;
@@ -271,15 +271,15 @@ public class CategoryServiceImplTest {
         verify(categoryDAO).disable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldDisableThrowEntityNotFoundException() throws EntityNotFoundException {
+    @Test
+    public void shouldDisableThrowEntityNotFoundException() {
 
         // given
         Long id = 1L;
         given(categoryDAO.exists(id)).willReturn(false);
 
         // when
-        categoryService.disable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> categoryService.disable(id));
 
         // then
         // exception expected;

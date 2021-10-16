@@ -17,15 +17,17 @@ import hu.psprog.leaflet.bridge.client.exception.RequestProcessingFailureExcepti
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.CommentBridgeService;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static hu.psprog.leaflet.bridge.client.domain.OrderBy.Comment.CREATED;
 import static hu.psprog.leaflet.bridge.client.domain.OrderDirection.ASC;
@@ -35,14 +37,13 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Acceptance tests for {@code /comments} endpoints.
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
 @LeafletAcceptanceSuite
 public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
@@ -80,8 +81,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(result, equalTo(control));
     }
 
-    @Test
-    @Parameters(source = CommentAcceptanceTestDataProvider.class, method = "pageOfComments")
+    @ParameterizedTest
+    @MethodSource("pageOfCommentsDataProvider")
     public void shouldReturnCommentsForEntry(long entryID, int page, int limit, OrderBy.Comment orderBy, OrderDirection orderDirection,
                                              long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious,
                                              int expectedLogicallyDeletedCount)
@@ -96,8 +97,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(result.getMenu(), nullValue());
     }
 
-    @Test
-    @Parameters(source = CommentAcceptanceTestDataProvider.class, method = "pageOfPublicComments")
+    @ParameterizedTest
+    @MethodSource("pageOfPublicCommentsDataProvider")
     public void shouldReturnPublicCommentsForEntry(String entryLink, int page, int limit, OrderBy.Comment orderBy, OrderDirection orderDirection,
                                                    long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious,
                                                    int expectedLogicallyDeletedCount)
@@ -112,8 +113,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(result.getMenu(), nullValue());
     }
 
-    @Test
-    @Parameters(source = CommentAcceptanceTestDataProvider.class, method = "pageOfCommentsForUser")
+    @ParameterizedTest
+    @MethodSource("pageOfCommentsForUserDataProvider")
     public void shouldReturnCommentsForUser(long userID, int page, int limit, OrderBy.Comment orderBy, OrderDirection orderDirection,
                                             long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious,
                                             int expectedLogicallyDeletedCount, int expectedEnabledCount)
@@ -192,16 +193,16 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         }
     }
 
-    @Test(expected = RequestProcessingFailureException.class)
+    @Test
     @ResetDatabase
-    public void shouldCommentCreationFailForAuthenticatedUserWithDifferentAuthenticatedUserID() throws CommunicationFailureException {
+    public void shouldCommentCreationFailForAuthenticatedUserWithDifferentAuthenticatedUserID() {
 
         // given
         CommentCreateRequestModel control = getControl(CONTROL_COMMENT_AUTH, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
         control.setAuthenticatedUserId(2L);
 
         // when
-        commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
+        Assertions.assertThrows(RequestProcessingFailureException.class, () -> commentBridgeService.createComment(control, RECAPTCHA_TOKEN));
 
         // then
         // exception expected
@@ -253,7 +254,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(current.getLastModified().getYear() >= 2019, is(true));
     }
 
-    @Test(expected = ResourceNotFoundException.class)
+    @Test
     @ResetDatabase
     public void shouldDeleteCommentPermanently() throws CommunicationFailureException {
 
@@ -262,7 +263,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
         // then
         // this call should cause exception
-        commentBridgeService.getComment(CONTROL_COMMENT_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> commentBridgeService.getComment(CONTROL_COMMENT_ID));
     }
 
     private void assertLogicallyDeletedComments(List<? extends CommentDataModel> result, int expectedLogicallyDeletedCount) {
@@ -322,39 +323,39 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(result.getPagination().getEntityCount(), equalTo(expectedEntityCount));
     }
 
-    public static class CommentAcceptanceTestDataProvider {
+    private static Stream<Arguments> pageOfCommentsDataProvider() {
 
-        public static Object[] pageOfComments() {
-            return new Object[] {
-                    // entry ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted
-                    new Object[] {1, 1, 4, CREATED, ASC, 10, 4, 3, true, false, 1},
-                    new Object[] {1, 2, 4, CREATED, ASC, 10, 4, 3, true, true, 2},
-                    new Object[] {1, 3, 4, CREATED, ASC, 10, 2, 3, false, true, 1},
-                    new Object[] {2, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
-                    new Object[] {1, 1, 20, CREATED, DESC, 10, 10, 1, false, false, 4}
-            };
-        }
+        return Stream.of(
+                // entry ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted
+                Arguments.of(1, 1, 4, CREATED, ASC, 10, 4, 3, true, false, 1),
+                Arguments.of(1, 2, 4, CREATED, ASC, 10, 4, 3, true, true, 2),
+                Arguments.of(1, 3, 4, CREATED, ASC, 10, 2, 3, false, true, 1),
+                Arguments.of(2, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0),
+                Arguments.of(1, 1, 20, CREATED, DESC, 10, 10, 1, false, false, 4)
+        );
+    }
 
-        public static Object[] pageOfPublicComments() {
-            return new Object[] {
-                    // entry ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted
-                    new Object[] {CONTROL_ENTRY_LINK, 1, 4, CREATED, ASC, 7, 4, 2, true, false, 1},
-                    new Object[] {CONTROL_ENTRY_LINK, 2, 4, CREATED, ASC, 7, 3, 2, false, true, 3},
-                    new Object[] {CONTROL_ENTRY_LINK, 3, 4, CREATED, ASC, 7, 0, 2, false, true, 0},
-                    new Object[] {ENTRY_WITHOUT_COMMENTS_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
-                    new Object[] {ENTRY_NON_EXISTING_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0},
-                    new Object[] {CONTROL_ENTRY_LINK, 1, 20, CREATED, DESC, 7, 7, 1, false, false, 4}
-            };
-        }
+    private static Stream<Arguments> pageOfPublicCommentsDataProvider() {
 
-        public static Object[] pageOfCommentsForUser() {
-            return new Object[] {
-                    // user ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted, enabled
-                    new Object[] {1, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0, 0},
-                    new Object[] {2, 1, 4, CREATED, ASC, 6, 4, 2, true, false, 1, 4},
-                    new Object[] {2, 2, 4, CREATED, ASC, 6, 2, 2, false, true, 2, 2},
-                    new Object[] {4, 1, 10, CREATED, ASC, 4, 4, 1, false, false, 1, 1}
-            };
-        }
+        return Stream.of(
+                // entry ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted
+                Arguments.of(CONTROL_ENTRY_LINK, 1, 4, CREATED, ASC, 7, 4, 2, true, false, 1),
+                Arguments.of(CONTROL_ENTRY_LINK, 2, 4, CREATED, ASC, 7, 3, 2, false, true, 3),
+                Arguments.of(CONTROL_ENTRY_LINK, 3, 4, CREATED, ASC, 7, 0, 2, false, true, 0),
+                Arguments.of(ENTRY_WITHOUT_COMMENTS_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0),
+                Arguments.of(ENTRY_NON_EXISTING_LINK, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0),
+                Arguments.of(CONTROL_ENTRY_LINK, 1, 20, CREATED, DESC, 7, 7, 1, false, false, 4)
+        );
+    }
+
+    private static Stream<Arguments> pageOfCommentsForUserDataProvider() {
+
+        return Stream.of(
+                // user ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted, enabled
+                Arguments.of(1, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0, 0),
+                Arguments.of(2, 1, 4, CREATED, ASC, 6, 4, 2, true, false, 1, 4),
+                Arguments.of(2, 2, 4, CREATED, ASC, 6, 2, 2, false, true, 2, 2),
+                Arguments.of(4, 1, 10, CREATED, ASC, 4, 4, 1, false, false, 1, 1)
+        );
     }
 }

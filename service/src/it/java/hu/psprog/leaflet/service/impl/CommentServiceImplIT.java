@@ -10,28 +10,24 @@ import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -44,17 +40,13 @@ import static org.hamcrest.Matchers.notNullValue;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
-@ContextConfiguration(classes = LeafletITContextConfig.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        classes = LeafletITContextConfig.class)
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class CommentServiceImplIT {
 
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
     static final String DELETED_COMMENT = "DELETED_COMMENT";
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     private static final String COMMENT_1 = "comment_1";
     private static final String COMMENT_NEW = "comment_new";
@@ -70,7 +62,7 @@ public class CommentServiceImplIT {
     private CommentVO controlCommentVO;
     private EntryVO controlEntryVO;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         controlCommentVO = testObjectReader.read(COMMENT_1, TestObjectReader.ObjectDirectory.VO, CommentVO.class);
         controlEntryVO = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
@@ -91,7 +83,7 @@ public class CommentServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
-    public void testGetAll() throws ServiceException {
+    public void testGetAll() {
 
         // when
         List<CommentVO> result = commentService.getAll();
@@ -102,10 +94,10 @@ public class CommentServiceImplIT {
         assertThat(result.get(0).getContent(), equalTo(controlCommentVO.getContent()));
     }
 
-    @Test
+    @ParameterizedTest
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
-    @Parameters(method = "pageOfCommentsForEntry", source = PagingParameterProvider.class)
+    @MethodSource("pageOfCommentsForEntryDataProvider")
     public void testGetPageOfCommentsForEntry(int page, int itemNumber) {
 
         // given
@@ -126,10 +118,10 @@ public class CommentServiceImplIT {
         assertThat(result.getEntitiesOnPage().size(), equalTo(itemNumber));
     }
 
-    @Test
+    @ParameterizedTest
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
-    @Parameters(method = "pageOfPublicCommentsForEntry", source = PagingParameterProvider.class)
+    @MethodSource("pageOfPublicCommentsForEntryDataProvider")
     public void testGetPageOfPublicCommentsForEntry(int page, int itemNumber, long numberOfDeletedComments) {
 
         // given
@@ -156,11 +148,11 @@ public class CommentServiceImplIT {
                 .allMatch(commentVO -> commentVO.getContent().equals(DELETED_COMMENT)), is(true));
     }
 
-    @Test
+    @ParameterizedTest
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
-    @Parameters(method = "pageOfCommentsForUser", source = PagingParameterProvider.class)
-    public void testGetPageOfCommentsForUser(int page, int itemNumber) throws ServiceException, IOException {
+    @MethodSource("pageOfCommentsForUserDataProvider")
+    public void testGetPageOfCommentsForUser(int page, int itemNumber) {
 
         // given
         int limit = 5;
@@ -171,7 +163,7 @@ public class CommentServiceImplIT {
                 .withUsername("IT Editor")
                 .withEmail("lflt-it-5101@leaflet.dev")
                 .withPassword("lflt1234")
-                .withAuthorities(Arrays.asList(new SimpleGrantedAuthority("EDITOR")))
+                .withAuthorities(List.of(new SimpleGrantedAuthority("EDITOR")))
                 .withEnabled(true)
                 .withLocale(Locale.EN)
                 .withCreated(new Date(1471514400000L))
@@ -322,27 +314,27 @@ public class CommentServiceImplIT {
         assertThat(commentService.getOne(id).isDeleted(), equalTo(false));
     }
 
-    public static class PagingParameterProvider {
+    public static Stream<Arguments> pageOfCommentsForEntryDataProvider() {
 
-        public static Object[] pageOfCommentsForEntry() {
-            return new Object[] {
-                    new Object[] {1, 6},
-                    new Object[] {2, 4}
-            };
-        }
+        return Stream.of(
+                Arguments.of(1, 6),
+                Arguments.of(2, 4)
+        );
+    }
 
-        public static Object[] pageOfPublicCommentsForEntry() {
-            return new Object[] {
-                    new Object[] {1, 4, 1L},
-                    new Object[] {2, 3, 0L}
-            };
-        }
+    public static Stream<Arguments> pageOfPublicCommentsForEntryDataProvider() {
 
-        public static Object[] pageOfCommentsForUser() {
-            return new Object[] {
-                    new Object[] {1, 5},
-                    new Object[] {2, 1}
-            };
-        }
+        return Stream.of(
+                Arguments.of(1, 4, 1L),
+                Arguments.of(2, 3, 0L)
+        );
+    }
+
+    public static Stream<Arguments> pageOfCommentsForUserDataProvider() {
+
+        return Stream.of(
+                Arguments.of(1, 5),
+                Arguments.of(2, 1)
+        );
     }
 }

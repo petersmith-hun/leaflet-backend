@@ -3,11 +3,12 @@ package hu.psprog.leaflet.web.filter.restrictions.strategy.impl;
 import hu.psprog.leaflet.web.filter.restrictions.domain.RestrictionType;
 import hu.psprog.leaflet.web.filter.restrictions.exception.ClientSecurityViolationException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
@@ -22,7 +23,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DeviceIDRestrictionValidatorStrategyTest {
 
     @Mock
@@ -44,14 +45,14 @@ public class DeviceIDRestrictionValidatorStrategyTest {
         // silent success expected
     }
 
-    @Test(expected = ClientSecurityViolationException.class)
+    @Test
     public void shouldFailToValidate() {
 
         // given
         given(request.getHeader(DEVICE_ID_HEADER)).willReturn(StringUtils.EMPTY);
 
         // when
-        deviceIDRestrictionValidatorStrategy.validate(request);
+        Assertions.assertThrows(ClientSecurityViolationException.class, () -> deviceIDRestrictionValidatorStrategy.validate(request));
 
         // then
         // exception expected

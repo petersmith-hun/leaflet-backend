@@ -5,19 +5,21 @@ import hu.psprog.leaflet.web.filter.restrictions.domain.RestrictionRoute;
 import hu.psprog.leaflet.web.filter.restrictions.domain.RestrictionType;
 import hu.psprog.leaflet.web.filter.restrictions.exception.ClientSecurityViolationException;
 import hu.psprog.leaflet.web.filter.restrictions.strategy.impl.recaptcha.service.ReCaptchaValidationService;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static hu.psprog.leaflet.web.filter.ClientAcceptorFilter.HEADER_CLIENT_ID;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -27,14 +29,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * Unit tests for {@link ReCaptchaRestrictionValidatorStrategy}.
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ReCaptchaRestrictionValidatorStrategyTest {
 
     private static final RestrictionRoute RESTRICTION_ROUTE_1 = prepareRestrictionRoute(HttpMethod.POST, "/**/users/register");
@@ -49,15 +51,14 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
     @Mock
     private ReCaptchaValidationService reCaptchaValidationService;
 
-    @Mock
+    @Mock(lenient = true)
     private HttpServletRequest request;
 
     @InjectMocks
     private ReCaptchaRestrictionValidatorStrategy reCaptchaRestrictionValidatorStrategy;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
         initStrategy();
         given(request.getHeader(HEADER_CLIENT_ID)).willReturn("test-client");
     }
@@ -75,8 +76,8 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
         assertThat(strategyToInit.getRoutes(), notNullValue());
     }
 
-    @Test
-    @Parameters(source = ReCaptchaRestrictionValidatorStrategyParameterProvider.class, method = "skipValidation")
+    @ParameterizedTest
+    @MethodSource("skipValidationDataProvider")
     public void shouldNotValidateRequest(HttpMethod currentMethod, String currentPath) {
 
         // given
@@ -88,7 +89,7 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
 
         // then
         verify(request, never()).getHeader(CAPTCHA_RESPONSE_HEADER);
-        verifyZeroInteractions(reCaptchaValidationService);
+        verifyNoInteractions(reCaptchaValidationService);
     }
 
     @Test
@@ -112,7 +113,7 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
                 .build());
     }
 
-    @Test(expected = ClientSecurityViolationException.class)
+    @Test
     public void shouldValidationFailForMissingCaptchaHeader() {
 
         // given
@@ -121,13 +122,13 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
         given(request.getHeader(CAPTCHA_RESPONSE_HEADER)).willReturn(null);
 
         // when
-        reCaptchaRestrictionValidatorStrategy.validate(request);
+        Assertions.assertThrows(ClientSecurityViolationException.class, () -> reCaptchaRestrictionValidatorStrategy.validate(request));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ClientSecurityViolationException.class)
+    @Test
     public void shouldValidationFailForInvalidResponseToken() {
 
         // given
@@ -138,7 +139,7 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
         given(reCaptchaValidationService.isValid(any(ReCaptchaRequest.class))).willReturn(false);
 
         // when
-        reCaptchaRestrictionValidatorStrategy.validate(request);
+        Assertions.assertThrows(ClientSecurityViolationException.class, () -> reCaptchaRestrictionValidatorStrategy.validate(request));
 
         // then
         // exception expected
@@ -168,17 +169,14 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
         return restrictionRoute;
     }
 
-    public static class ReCaptchaRestrictionValidatorStrategyParameterProvider {
+    private static Stream<Arguments> skipValidationDataProvider() {
 
-        public static Object[] skipValidation() {
-            return new Object[] {
-                                  // method         // current path
-                    new Object[] {HttpMethod.GET,   PATH_ANY_ROUTE},
-                    new Object[] {HttpMethod.POST,  PATH_ANY_ROUTE},
-                    new Object[] {HttpMethod.PUT,   PATH_ANY_ROUTE},
-                    new Object[] {HttpMethod.GET,   PATH_USERS_REGISTER},
-                    new Object[] {HttpMethod.PUT,   PATH_USERS_REGISTER}
-            };
-        }
+        return Stream.of(
+                Arguments.of(HttpMethod.GET,   PATH_ANY_ROUTE),
+                Arguments.of(HttpMethod.POST,  PATH_ANY_ROUTE),
+                Arguments.of(HttpMethod.PUT,   PATH_ANY_ROUTE),
+                Arguments.of(HttpMethod.GET,   PATH_USERS_REGISTER),
+                Arguments.of(HttpMethod.PUT,   PATH_USERS_REGISTER)
+        );
     }
 }

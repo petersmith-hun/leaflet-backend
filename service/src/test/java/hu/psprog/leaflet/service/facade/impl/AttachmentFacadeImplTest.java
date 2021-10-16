@@ -8,12 +8,13 @@ import hu.psprog.leaflet.service.facade.FileManagementFacade;
 import hu.psprog.leaflet.service.vo.AttachmentRequestVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class AttachmentFacadeImplTest {
 
     @Mock
@@ -52,7 +53,7 @@ public class AttachmentFacadeImplTest {
 
     private AttachmentRequestVO attachmentRequestVO;
 
-    @Before
+    @BeforeEach
     public void setup() {
         attachmentRequestVO = AttachmentRequestVO.getBuilder()
                 .withEntryID(1L)
@@ -76,7 +77,7 @@ public class AttachmentFacadeImplTest {
         verify(attachmentService).attachFileToEntry(uploadedFileVO, entryVO);
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldThrowExceptionOnAttachWhenEntryDoesNotExist() throws ServiceException {
 
         // given
@@ -84,7 +85,7 @@ public class AttachmentFacadeImplTest {
         given(fileManagementFacade.getCheckedMetaInfo(attachmentRequestVO.getPathUUID())).willReturn(Optional.of(uploadedFileVO));
 
         // when
-        attachmentFacade.attachFileToEntry(attachmentRequestVO);
+        Assertions.assertThrows(ServiceException.class, () -> attachmentFacade.attachFileToEntry(attachmentRequestVO));
 
         // then
         verify(entryService).getOne(attachmentRequestVO.getEntryID());
@@ -92,14 +93,14 @@ public class AttachmentFacadeImplTest {
         verify(attachmentService, never()).attachFileToEntry(any(UploadedFileVO.class), any(EntryVO.class));
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldThrowExceptionOnAttachWhenFileDoesNotExist() throws ServiceException {
 
         // given
         given(fileManagementFacade.getCheckedMetaInfo(attachmentRequestVO.getPathUUID())).willReturn(Optional.empty());
 
         // when
-        attachmentFacade.attachFileToEntry(attachmentRequestVO);
+        Assertions.assertThrows(ServiceException.class, () -> attachmentFacade.attachFileToEntry(attachmentRequestVO));
 
         // then
         verify(entryService, never()).getOne(attachmentRequestVO.getEntryID());
@@ -123,7 +124,7 @@ public class AttachmentFacadeImplTest {
         verify(attachmentService).detachFileFromEntry(uploadedFileVO, entryVO);
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldThrowExceptionOnDetachWhenEntryDoesNotExist() throws ServiceException {
 
         // given
@@ -131,7 +132,7 @@ public class AttachmentFacadeImplTest {
         given(fileManagementFacade.getCheckedMetaInfo(attachmentRequestVO.getPathUUID())).willReturn(Optional.of(uploadedFileVO));
 
         // when
-        attachmentFacade.detachFileFromEntry(attachmentRequestVO);
+        Assertions.assertThrows(ServiceException.class, () -> attachmentFacade.detachFileFromEntry(attachmentRequestVO));
 
         // then
         verify(entryService).getOne(attachmentRequestVO.getEntryID());
@@ -139,14 +140,14 @@ public class AttachmentFacadeImplTest {
         verify(attachmentService, never()).detachFileFromEntry(any(UploadedFileVO.class), any(EntryVO.class));
     }
 
-    @Test(expected = ServiceException.class)
+    @Test
     public void shouldThrowExceptionOnDetachWhenFileDoesNotExist() throws ServiceException {
 
         // given
         given(fileManagementFacade.getCheckedMetaInfo(attachmentRequestVO.getPathUUID())).willReturn(Optional.empty());
 
         // when
-        attachmentFacade.detachFileFromEntry(attachmentRequestVO);
+        Assertions.assertThrows(ServiceException.class, () -> attachmentFacade.detachFileFromEntry(attachmentRequestVO));
 
         // then
         verify(entryService, never()).getOne(attachmentRequestVO.getEntryID());

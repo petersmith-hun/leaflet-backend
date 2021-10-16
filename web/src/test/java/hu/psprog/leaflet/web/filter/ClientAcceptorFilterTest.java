@@ -3,12 +3,12 @@ package hu.psprog.leaflet.web.filter;
 import hu.psprog.leaflet.web.filter.restrictions.domain.ClientAcceptorConfiguration;
 import hu.psprog.leaflet.web.filter.restrictions.domain.RestrictionType;
 import hu.psprog.leaflet.web.filter.restrictions.strategy.RestrictionValidatorStrategy;
-import junitparams.JUnitParamsRunner;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.ReflectionUtils;
 
 import javax.servlet.FilterChain;
@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import static hu.psprog.leaflet.web.filter.ClientAcceptorFilter.HEADER_CLIENT_ID;
-import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,14 +33,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * Unit tests for {@link ClientAcceptorFilter}.
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ClientAcceptorFilterTest {
 
     private static final Map<UUID, ClientAcceptorConfiguration> CLIENTS = new HashMap<>();
@@ -49,7 +48,6 @@ public class ClientAcceptorFilterTest {
     private static final UUID CLIENT_ID_2 = UUID.randomUUID();
     private static final ClientAcceptorConfiguration CLIENT_ACCEPTOR_CONFIGURATION_1 = new ClientAcceptorConfiguration();
     private static final ClientAcceptorConfiguration CLIENT_ACCEPTOR_CONFIGURATION_2 = new ClientAcceptorConfiguration();
-    private static final String SECURITY_CHECKS_ENABLED_PROPERTY = "leaflet-link.security-checks-enabled";
     private static final String EXCLUDED_ROUTE = "/excluded-route";
 
     static {
@@ -80,9 +78,8 @@ public class ClientAcceptorFilterTest {
 
     private ClientAcceptorFilter clientAcceptorFilter;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
         given(restrictionValidatorStrategy1.forRestrictionType()).willReturn(RestrictionType.DEVICE_ID);
         given(restrictionValidatorStrategy2.forRestrictionType()).willReturn(RestrictionType.CAPTCHA_TOKEN);
         clientAcceptorFilter = new ClientAcceptorFilter(Arrays.asList(restrictionValidatorStrategy1, restrictionValidatorStrategy2));
@@ -128,7 +125,6 @@ public class ClientAcceptorFilterTest {
         // given
         clientAcceptorFilter.setExcludedRoutes(Collections.singletonList(EXCLUDED_ROUTE));
         clientAcceptorFilter.init();
-        given(request.getHeader(HEADER_CLIENT_ID)).willReturn(CLIENT_ID_1.toString());
         given(request.getRequestURI()).willReturn(EXCLUDED_ROUTE);
 
         // when
@@ -180,7 +176,7 @@ public class ClientAcceptorFilterTest {
 
         // then
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
-        verifyZeroInteractions(filterChain);
+        verifyNoInteractions(filterChain);
         verify(restrictionValidatorStrategy1, never()).validate(request);
         verify(restrictionValidatorStrategy2, never()).validate(request);
     }
@@ -194,7 +190,7 @@ public class ClientAcceptorFilterTest {
         try {
             mapping = (Map<UUID, List<RestrictionValidatorStrategy>>) mappingField.get(clientAcceptorFilter);
         } catch (IllegalAccessException e) {
-            fail("Could not extract mapping");
+            Assertions.fail("Could not extract mapping");
         }
 
         return mapping;

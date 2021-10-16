@@ -5,7 +5,7 @@ import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,12 +18,14 @@ import java.util.Optional;
  * @author Peter Smith
  */
 @Component
-public class ResponseFillerInterceptor extends HandlerInterceptorAdapter {
+public class ResponseFillerInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+
         setAJAXFlag(request, getFillResponseAnnotation(handler));
-        return super.preHandle(request, response, handler);
+
+        return true;
     }
 
     private FillResponse getFillResponseAnnotation(Object handler) {

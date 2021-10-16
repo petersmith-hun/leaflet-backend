@@ -6,19 +6,19 @@ import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
 import hu.psprog.leaflet.service.vo.EntryVO;
+import hu.psprog.leaflet.service.vo.SelfStatusAwareIdentifiableVO;
 import hu.psprog.leaflet.service.vo.TagVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -31,8 +31,9 @@ import static org.hamcrest.Matchers.notNullValue;
  *
  * @author Peter Smith
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = LeafletITContextConfig.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        classes = LeafletITContextConfig.class)
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class TagServiceImplIT {
 
@@ -56,7 +57,7 @@ public class TagServiceImplIT {
     private TagVO tagToAttach;
     private EntryVO controlEntryVO;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         controlTagVO = testObjectReader.read(TAG_1, TestObjectReader.ObjectDirectory.VO, TagVO.class);
         controlEntryVO = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
@@ -79,13 +80,13 @@ public class TagServiceImplIT {
     @Test
     @Transactional
     @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
-    public void testGetAll() throws ServiceException {
+    public void testGetAll() {
 
         // when
         List<TagVO> result = tagService.getAll();
 
         // then
-        assertThat(result.stream().allMatch(e -> e != null), equalTo(true));
+        assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.size(), equalTo(20));
         assertThat(result.get(0).getTitle(), equalTo(controlTagVO.getTitle()));
     }
@@ -99,8 +100,8 @@ public class TagServiceImplIT {
         List<TagVO> result = tagService.getPublicTags();
 
         // then
-        assertThat(result.stream().allMatch(e -> e != null), equalTo(true));
-        assertThat(result.stream().allMatch(e -> e.isEnabled()), equalTo(true));
+        assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
+        assertThat(result.stream().allMatch(SelfStatusAwareIdentifiableVO::isEnabled), equalTo(true));
         assertThat(result.size(), equalTo(14));
     }
 

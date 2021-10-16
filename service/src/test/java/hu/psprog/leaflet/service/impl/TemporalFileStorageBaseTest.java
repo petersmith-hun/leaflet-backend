@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.service.impl;
 
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 
 import java.io.File;
@@ -25,25 +24,23 @@ public class TemporalFileStorageBaseTest {
     private File imagesRootFolder;
     private File imagesSubFolder;
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     @Mock(lenient = true)
     protected File fileStorage;
 
     protected void prepareTemporaryStorage() throws IOException {
-        prepareTemporaryStorage(true);
-    }
-
-    protected void prepareTemporaryStorage(boolean prepareFolders) throws IOException {
-        if (prepareFolders) {
-            imagesRootFolder = temporaryFolder.newFolder(IMAGES_FOLDER);
-            imagesSubFolder = new File(imagesRootFolder, SUBFOLDER);
-            if (!imagesSubFolder.mkdir()) {
-                throw new IOException("Failed to prepare temporary storage");
-            }
+        imagesRootFolder = new File(temporaryFolder.getAbsolutePath(), IMAGES_FOLDER);
+        if (!imagesRootFolder.mkdir()) {
+            throw new IOException("Failed to prepare temporary storage (root folder creation failed)");
         }
-        given(fileStorage.getAbsolutePath()).willReturn(temporaryFolder.getRoot().getAbsolutePath());
+
+        imagesSubFolder = new File(imagesRootFolder, SUBFOLDER);
+        if (!imagesSubFolder.mkdir()) {
+            throw new IOException("Failed to prepare temporary storage (images folder creation failed)");
+        }
+        given(fileStorage.getAbsolutePath()).willReturn(temporaryFolder.getAbsolutePath());
     }
 
     protected File prepareFileForDownload() throws IOException {

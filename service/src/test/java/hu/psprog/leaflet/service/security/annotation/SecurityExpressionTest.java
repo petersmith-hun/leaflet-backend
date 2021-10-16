@@ -3,8 +3,9 @@ package hu.psprog.leaflet.service.security.annotation;
 import hu.psprog.leaflet.security.jwt.model.Role;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -13,7 +14,7 @@ import org.springframework.security.test.context.support.WithSecurityContextTest
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
@@ -29,7 +30,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  *
  * @author Peter Smith
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = SecurityTestContextConfiguration.class)
 @ActiveProfiles(SECURITY_TEST_PROFILE)
 @TestExecutionListeners(listeners = {ServletTestExecutionListener.class,
@@ -69,23 +70,23 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = USERNAME, authorities = AUTHORITY_USER)
     public void shouldPermitAdminWithFailureOnUserAuthority() {
 
         // when
-        securityExpressionStub.testPermitAdmin();
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitAdmin());
 
         // then
         // expected exception
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = USERNAME, authorities = AUTHORITY_EDITOR)
     public void shouldPermitAdminWithFailureOnEditorAuthority() {
 
         // when
-        securityExpressionStub.testPermitAdmin();
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitAdmin());
 
         // then
         // expected exception
@@ -113,12 +114,12 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = USERNAME, authorities = AUTHORITY_USER)
     public void shouldPermitEditorOrAdminWithFailureOnUserAuthority() {
 
         // when
-        securityExpressionStub.testPermitEditorOrAdmin();
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitEditorOrAdmin());
 
         // then
         // expected exception
@@ -135,12 +136,12 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = USERNAME, authorities = AUTHORITY_EDITOR)
     public void shouldPermitServiceOrAdminWithFailureOnEditorAuthority() {
 
         // when
-        securityExpressionStub.testPermitServiceOrAdmin();
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitServiceOrAdmin());
 
         // then
         // expected exception
@@ -157,12 +158,12 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = USERNAME, authorities = AUTHORITY_USER)
     public void shouldPermitServiceOrAdminWithFailureOnUserAuthority() {
 
         // when
-        securityExpressionStub.testPermitServiceOrAdmin();
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitServiceOrAdmin());
 
         // then
         // expected exception
@@ -201,11 +202,11 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test
     public void shouldPermitAuthenticatedWithUnauthenticatedUser() {
 
         // when
-        securityExpressionStub.testPermitAuthenticated();
+        Assertions.assertThrows(AuthenticationCredentialsNotFoundException.class, () -> securityExpressionStub.testPermitAuthenticated());
 
         // then
         // expected exception
@@ -222,12 +223,12 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockedJWTUser(userID = CURRENT_USER_ID, role = Role.USER)
     public void shouldPermitSelfWithFailure() {
 
         // when
-        securityExpressionStub.testPermitSelfUser(3L);
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitSelfUser(3L));
 
         // then
         // expected exception
@@ -255,12 +256,12 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockedJWTUser(userID = OTHER_USER_ID, role = Role.EDITOR)
     public void shouldPermitSelfEntryWithFailureForOtherEditor() {
 
         // when
-        securityExpressionStub.testPermitSelfEntry(1L);
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitSelfEntry(1L));
 
         // then
         // expected exception
@@ -299,12 +300,12 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockedJWTUser(userID = OTHER_USER_ID, role = Role.USER)
     public void shouldPermitSelfCommentWithFailureForDifferentUser() {
 
         // when
-        securityExpressionStub.testPermitSelfComment(1L);
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitSelfComment(1L));
 
         // then
         // expected exception
@@ -343,12 +344,12 @@ public class SecurityExpressionTest {
         assertThat(result, is(true));
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockedJWTUser(userID = OTHER_USER_ID, role = Role.USER)
     public void shouldPermitSelfCommentByEntityWithFailureForDifferentUser() {
 
         // when
-        securityExpressionStub.testPermitSelfCommentByEntity(COMMENT);
+        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitSelfCommentByEntity(COMMENT));
 
         // then
         // expected exception

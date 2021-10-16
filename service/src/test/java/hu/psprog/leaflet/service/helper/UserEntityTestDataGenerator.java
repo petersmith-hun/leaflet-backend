@@ -4,9 +4,6 @@ import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Random test {@link User} entity generator.
  *
@@ -16,6 +13,7 @@ public class UserEntityTestDataGenerator implements TestDataGenerator<User> {
 
     @Override
     public User generate() {
+
         return User.getBuilder()
                 .withRole(Role.USER)
                 .withEmail(RandomDataGenerator.email())
@@ -29,14 +27,4 @@ public class UserEntityTestDataGenerator implements TestDataGenerator<User> {
                 .build();
     }
 
-    @Override
-    public List<User> generate(int count) {
-
-        List<User> users = new LinkedList<>();
-        for (int index = 0; index < count; index++) {
-            users.add(generate());
-        }
-
-        return null;
-    }
 }

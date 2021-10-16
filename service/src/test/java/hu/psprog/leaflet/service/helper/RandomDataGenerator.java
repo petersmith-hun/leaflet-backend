@@ -13,7 +13,7 @@ public class RandomDataGenerator {
     /**
      * Date types.
      */
-    public static enum DateType {
+    public enum DateType {
 
         /**
          * Generated date is in the past.
@@ -23,12 +23,12 @@ public class RandomDataGenerator {
         /**
          * Generated date is in the future.
          */
-        FUTURE;
+        FUTURE
     }
 
     private static final String BASE_STRING = "ut-lflt";
     private static final String EMAIL_SUFFIX = "@leaflet.dev";
-    private static Random random;
+    private static final Random random;
     private static int sequence = 0;
 
     static {
@@ -44,7 +44,7 @@ public class RandomDataGenerator {
      */
     public static String sequentialString() {
 
-        return BASE_STRING + String.valueOf(++sequence);
+        return BASE_STRING + ++sequence;
     }
 
     /**
@@ -57,7 +57,9 @@ public class RandomDataGenerator {
 
         char[] chars = new char[length];
         for (int cnt = 0; cnt < length; cnt++) {
-            chars[cnt] = (char)(random.nextInt(1) == 1 ? random.nextInt(65) + 25 : random.nextInt(97) + 25);
+            chars[cnt] = (char)(random.nextInt(2) == 1
+                    ? random.nextInt(65) + 25
+                    : random.nextInt(97) + 25);
         }
 
         return String.valueOf(chars);
@@ -70,18 +72,7 @@ public class RandomDataGenerator {
      */
     public static String email() {
 
-        return BASE_STRING + String.valueOf(random.nextInt(8999) + 1000) + EMAIL_SUFFIX;
-    }
-
-    /**
-     * Random integer number under {@code top}.
-     *
-     * @param top exclusive top of number
-     * @return random integer
-     */
-    public static int randomInteger(int top) {
-
-        return random.nextInt(top);
+        return BASE_STRING + (random.nextInt(8999) + 1000) + EMAIL_SUFFIX;
     }
 
     /**
@@ -109,8 +100,7 @@ public class RandomDataGenerator {
         } else {
             timestamp -= offset;
         }
-        Date date = new Date(timestamp);
 
-        return date;
+        return new Date(timestamp);
     }
 }

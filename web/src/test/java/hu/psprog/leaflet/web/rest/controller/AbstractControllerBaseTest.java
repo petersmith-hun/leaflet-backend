@@ -4,7 +4,7 @@ import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import hu.psprog.leaflet.web.test.ConversionTestObjects;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
@@ -39,7 +39,7 @@ abstract class AbstractControllerBaseTest extends ConversionTestObjects {
     @Mock
     ExceptionHandlerCounters exceptionHandlerCounters;
 
-    @Before
+    @BeforeEach
     public void setup() {
         given(bindingResult.getAllErrors()).willReturn(OBJECT_ERROR_LIST);
         given(conversionService.convert(OBJECT_ERROR_LIST, ValidationErrorMessageListDataModel.class))

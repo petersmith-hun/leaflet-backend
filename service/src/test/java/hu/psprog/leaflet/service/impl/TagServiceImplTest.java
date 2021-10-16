@@ -12,11 +12,12 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,23 +42,23 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TagServiceImplTest {
 
     private static final long TAG_ID = 15L;
     private static final long ENTRY_ID = 1L;
     private static final String CONTROL_TAG_TITLE = "Tag #15";
 
-    @Mock
+    @Mock(lenient = true)
     private TagDAO tagDAO;
 
-    @Mock
+    @Mock(lenient = true)
     private EntryDAO entryDAO;
 
     @Mock
     private TagToTagVOConverter tagToTagVOConverter;
 
-    @Mock
+    @Mock(lenient = true)
     private TagVOToTagConverter tagVOToTagConverter;
 
     @Mock
@@ -66,7 +67,7 @@ public class TagServiceImplTest {
     @Mock
     private TagVO tagVO;
 
-    @Mock
+    @Mock(lenient = true)
     private Entry entry;
 
     @InjectMocks
@@ -94,20 +95,20 @@ public class TagServiceImplTest {
         verify(tagToTagVOConverter).convert(tag);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testGetOneWithNonExistingTag() throws ServiceException {
+    @Test
+    public void testGetOneWithNonExistingTag() {
 
         // given
         Long id = 1L;
         given(tagDAO.findOne(id)).willReturn(null);
 
         // when
-        tagService.getOne(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.getOne(id));
 
         // then
         // expected exception
         verify(tagDAO).findOne(id);
-        verify(tagToTagVOConverter).convert(tag);
+        verify(tagToTagVOConverter, never()).convert(tag);
     }
 
     @Test
@@ -191,15 +192,15 @@ public class TagServiceImplTest {
         verify(tag, atLeastOnce()).getId();
     }
 
-    @Test(expected = EntityCreationException.class)
-    public void testCreateOneWithFailure() throws ServiceException {
+    @Test
+    public void testCreateOneWithFailure() {
 
         // given
         given(tagVOToTagConverter.convert(tagVO)).willReturn(tag);
         given(tagDAO.save(tag)).willReturn(null);
 
         // when
-        tagService.createOne(tagVO);
+        Assertions.assertThrows(EntityCreationException.class, () -> tagService.createOne(tagVO));
 
         // then
         // expected exception
@@ -227,8 +228,8 @@ public class TagServiceImplTest {
         verify(tagDAO).updateOne(id, tag);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testUpdateOneWithFailure() throws ServiceException {
+    @Test
+    public void testUpdateOneWithFailure() {
 
         // given
         Long id = 1L;
@@ -236,7 +237,7 @@ public class TagServiceImplTest {
         given(tagDAO.updateOne(id, tag)).willReturn(null);
 
         // when
-        tagService.updateOne(id, tagVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.updateOne(id, tagVO));
 
         // then
         // expected exception
@@ -260,15 +261,15 @@ public class TagServiceImplTest {
     }
 
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByIDWithNonExistingDocument() throws ServiceException {
+    @Test
+    public void testDeleteByIDWithNonExistingDocument() {
 
         // given
         Long id = 1L;
         given(tagDAO.exists(id)).willReturn(false);
 
         // when
-        tagService.deleteByID(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.deleteByID(id));
 
         // then
         // expected exception
@@ -289,15 +290,15 @@ public class TagServiceImplTest {
         verify(tagDAO).enable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testEnableWithFailure() throws EntityNotFoundException {
+    @Test
+    public void testEnableWithFailure() {
 
         // given
         Long id = 1L;
         given(tagDAO.exists(id)).willReturn(false);
 
         // when
-        tagService.enable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.enable(id));
 
         // then
         verify(tagDAO).exists(id);
@@ -319,15 +320,15 @@ public class TagServiceImplTest {
         verify(tagDAO).disable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testDisableWithFailure() throws EntityNotFoundException {
+    @Test
+    public void testDisableWithFailure() {
 
         // given
         Long id = 1L;
         given(tagDAO.exists(id)).willReturn(false);
 
         // when
-        tagService.disable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.disable(id));
 
         // then
         verify(tagDAO).exists(id);
@@ -386,57 +387,57 @@ public class TagServiceImplTest {
         assertResults(5, false, true);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnAttachIfTagDoesNotExist() throws ServiceException {
+    @Test
+    public void shouldThrowExceptionOnAttachIfTagDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(tagDAO.exists(TAG_ID)).willReturn(false);
 
         // when
-        tagService.attachTagToEntry(inputTagVO, inputEntryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.attachTagToEntry(inputTagVO, inputEntryVO));
 
         // then
         // expected exception
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnAttachIfEntryDoesNotExist() throws ServiceException {
+    @Test
+    public void shouldThrowExceptionOnAttachIfEntryDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        tagService.attachTagToEntry(inputTagVO, inputEntryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.attachTagToEntry(inputTagVO, inputEntryVO));
 
         // then
         // expected exception
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnDetachIfTagDoesNotExist() throws ServiceException {
+    @Test
+    public void shouldThrowExceptionOnDetachIfTagDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(tagDAO.exists(TAG_ID)).willReturn(false);
 
         // when
-        tagService.detachTagFromEntry(inputTagVO, inputEntryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.detachTagFromEntry(inputTagVO, inputEntryVO));
 
         // then
         // expected exception
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldThrowExceptionOnDetachIfEntryDoesNotExist() throws ServiceException {
+    @Test
+    public void shouldThrowExceptionOnDetachIfEntryDoesNotExist() {
 
         // given
         prepareMocks(false);
         given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        tagService.detachTagFromEntry(inputTagVO, inputEntryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.detachTagFromEntry(inputTagVO, inputEntryVO));
 
         // then
         // expected exception

@@ -7,11 +7,12 @@ import hu.psprog.leaflet.api.rest.response.dcp.DCPListDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DCPStoreControllerTest extends AbstractControllerBaseTest {
 
     private static final String KEY_1 = "key-1";
@@ -65,14 +66,14 @@ public class DCPStoreControllerTest extends AbstractControllerBaseTest {
         verify(dynamicConfigurationPropertyService).add(KEY_1, VALUE_1);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(dynamicConfigurationPropertyService).add(KEY_1, VALUE_1);
 
         // when
-        controller.create(prepareDcpRequestModel(), bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.create(prepareDcpRequestModel(), bindingResult));
 
         // then
         // exception expected
@@ -102,14 +103,14 @@ public class DCPStoreControllerTest extends AbstractControllerBaseTest {
         verify(dynamicConfigurationPropertyService).update(KEY_1, VALUE_1);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldUpdateWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldUpdateWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(dynamicConfigurationPropertyService).update(KEY_1, VALUE_1);
 
         // when
-        controller.update(prepareDcpRequestModel(), bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.update(prepareDcpRequestModel(), bindingResult));
 
         // then
         // exception expected
@@ -139,14 +140,14 @@ public class DCPStoreControllerTest extends AbstractControllerBaseTest {
         verify(dynamicConfigurationPropertyService).delete(KEY_1);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldRemoveWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldRemoveWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(dynamicConfigurationPropertyService).delete(KEY_1);
 
         // when
-        controller.remove(KEY_1);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.remove(KEY_1));
 
         // then
         // exception expected

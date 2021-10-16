@@ -6,18 +6,20 @@ import hu.psprog.leaflet.service.facade.TagFacade;
 import hu.psprog.leaflet.service.util.FilenameGeneratorUtil;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.service.vo.TagVO;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,7 +30,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TagRouteMaskProcessorTest {
 
     private static final String TAG_1 = "Tag 1";
@@ -69,21 +71,20 @@ public class TagRouteMaskProcessorTest {
     @Mock
     private TagFacade tagFacade;
 
-    @Mock
+    @Mock(lenient = true)
     private FilenameGeneratorUtil filenameGeneratorUtil;
 
     @InjectMocks
     private TagRouteMaskProcessor tagRouteMaskProcessor;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
         given(filenameGeneratorUtil.doCleanFilename(TAG_1)).willReturn("tag_1");
         given(filenameGeneratorUtil.doCleanFilename(TAG_2)).willReturn("tag_2");
     }
 
-    @Test
-    @Parameters(source = SupportParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("supportDataProvider")
     public void shouldSupport(FrontEndRouteType type, boolean expectedResult) {
 
         // given
@@ -130,18 +131,16 @@ public class TagRouteMaskProcessorTest {
         assertThat(result.containsAll(FRONT_END_ROUTE_VO_LIST_WITHOUT_URL), is(true));
     }
 
-    public static class SupportParameterProvider {
+    public static Stream<Arguments> supportDataProvider() {
 
-        public static Object[] provide() {
-            return new Object[] {
-                    new Object[] {FrontEndRouteType.ENTRY_ROUTE_MASK,    false},
-                    new Object[] {FrontEndRouteType.CATEGORY_ROUTE_MASK, false},
-                    new Object[] {FrontEndRouteType.TAG_ROUTE_MASK,      true},
-                    new Object[] {FrontEndRouteType.HEADER_MENU,         false},
-                    new Object[] {FrontEndRouteType.FOOTER_MENU,         false},
-                    new Object[] {FrontEndRouteType.STANDALONE,          false},
-                    new Object[] {null,                                  false}
-            };
-        }
+        return Stream.of(
+                Arguments.of(FrontEndRouteType.ENTRY_ROUTE_MASK,    false),
+                Arguments.of(FrontEndRouteType.CATEGORY_ROUTE_MASK, false),
+                Arguments.of(FrontEndRouteType.TAG_ROUTE_MASK,      true),
+                Arguments.of(FrontEndRouteType.HEADER_MENU,         false),
+                Arguments.of(FrontEndRouteType.FOOTER_MENU,         false),
+                Arguments.of(FrontEndRouteType.STANDALONE,          false),
+                Arguments.of(null,                                  false)
+        );
     }
 }

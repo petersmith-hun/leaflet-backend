@@ -12,12 +12,13 @@ import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EntriesControllerTest extends AbstractControllerBaseTest {
 
     private static final List<EntryVO> ENTRY_VO_LIST = Collections.singletonList(ENTRY_VO);
@@ -50,7 +51,7 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     @InjectMocks
     private EntriesController controller;
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         given(conversionService.convert(ENTRY_VO_LIST, EntryListDataModel.class)).willReturn(ENTRY_LIST_DATA_MODEL);
@@ -159,14 +160,14 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, EXTENDED_ENTRY_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetEntryByLinkWithEntityNotFoundException() throws EntityNotFoundException, ResourceNotFoundException {
+    @Test
+    public void shouldGetEntryByLinkWithEntityNotFoundException() throws EntityNotFoundException {
 
         // given
         doThrow(EntityNotFoundException.class).when(entryFacade).findByLink(ENTRY_LINK);
 
         // when
-        controller.getEntryByLink(ENTRY_LINK);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getEntryByLink(ENTRY_LINK));
 
         // then
         // exception expected
@@ -185,14 +186,14 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.OK, EDIT_ENTRY_DATA_MODEL);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldGetEntryByLinkWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldGetEntryByLinkWithServiceException() throws ServiceException {
 
         // given
         doThrow(EntityNotFoundException.class).when(entryFacade).getOne(ENTRY_ID);
 
         // when
-        controller.getEntryByID(ENTRY_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.getEntryByID(ENTRY_ID));
 
         // then
         // exception expected
@@ -225,29 +226,29 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateEntryWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateEntryWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(ENTRY_CREATE_REQUEST_MODEL, EntryVO.class)).willReturn(ENTRY_VO);
         doThrow(ConstraintViolationException.class).when(entryFacade).createOne(ENTRY_VO);
 
         // when
-        controller.createEntry(ENTRY_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createEntry(ENTRY_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldCreateEntryWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException {
+    @Test
+    public void shouldCreateEntryWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(ENTRY_CREATE_REQUEST_MODEL, EntryVO.class)).willReturn(ENTRY_VO);
         doThrow(ServiceException.class).when(entryFacade).createOne(ENTRY_VO);
 
         // when
-        controller.createEntry(ENTRY_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.createEntry(ENTRY_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -280,29 +281,29 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
         assertValidationError(result);
     }
 
-    @Test(expected = RequestCouldNotBeFulfilledException.class)
-    public void shouldUpdateEntryWithConstraintViolation() throws ServiceException, RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateEntryWithConstraintViolation() throws ServiceException {
 
         // given
         given(conversionService.convert(ENTRY_CREATE_REQUEST_MODEL, EntryVO.class)).willReturn(ENTRY_VO);
         doThrow(ConstraintViolationException.class).when(entryFacade).updateOne(ENTRY_ID, ENTRY_VO);
 
         // when
-        controller.updateEntry(ENTRY_ID, ENTRY_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.updateEntry(ENTRY_ID, ENTRY_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldUpdateEntryWithServiceException() throws ServiceException, RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+    @Test
+    public void shouldUpdateEntryWithServiceException() throws ServiceException {
 
         // given
         given(conversionService.convert(ENTRY_CREATE_REQUEST_MODEL, EntryVO.class)).willReturn(ENTRY_VO);
         doThrow(ServiceException.class).when(entryFacade).updateOne(ENTRY_ID, ENTRY_VO);
 
         // when
-        controller.updateEntry(ENTRY_ID, ENTRY_CREATE_REQUEST_MODEL, bindingResult);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.updateEntry(ENTRY_ID, ENTRY_CREATE_REQUEST_MODEL, bindingResult));
 
         // then
         // exception expected
@@ -321,14 +322,14 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
         assertResponse(result, HttpStatus.CREATED, EDIT_ENTRY_DATA_MODEL, LOCATION_HEADER);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldChangeStatusWithServiceException() throws ServiceException, ResourceNotFoundException {
+    @Test
+    public void shouldChangeStatusWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(entryFacade).changeStatus(ENTRY_ID);
 
         // when
-        controller.changeStatus(ENTRY_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changeStatus(ENTRY_ID));
 
         // then
         // exception expected
@@ -344,14 +345,14 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
         verify(entryFacade).deletePermanently(ENTRY_ID);
     }
 
-    @Test(expected = ResourceNotFoundException.class)
-    public void shouldDeleteEntryWithServiceException() throws ResourceNotFoundException, ServiceException {
+    @Test
+    public void shouldDeleteEntryWithServiceException() throws ServiceException {
 
         // given
         doThrow(ServiceException.class).when(entryFacade).deletePermanently(ENTRY_ID);
 
         // when
-        controller.deleteEntry(ENTRY_ID);
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.deleteEntry(ENTRY_ID));
 
         // then
         // exception expected

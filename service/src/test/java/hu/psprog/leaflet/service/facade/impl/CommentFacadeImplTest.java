@@ -11,11 +11,12 @@ import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,14 +27,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * Unit tests for {@link CommentFacadeImpl}.
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommentFacadeImplTest {
 
     private static final long REGISTERED_USER_ID = 1L;
@@ -62,7 +63,7 @@ public class CommentFacadeImplTest {
 
     private CommentFacade commentFacade;
 
-    @Before
+    @BeforeEach
     public void setup() {
         commentFacade = new CommentFacadeImpl(commentService, userService, entryService, true);
     }
@@ -78,7 +79,7 @@ public class CommentFacadeImplTest {
         commentFacade.createOne(commentVO);
 
         // then
-        verifyZeroInteractions(userService);
+        verifyNoInteractions(userService);
         verify(commentService).createOne(commentVO);
         verify(commentService).notifyEntryAuthor(COMMENT_ID);
     }
@@ -94,7 +95,7 @@ public class CommentFacadeImplTest {
         commentFacade.createOne(commentVO);
 
         // then
-        verifyZeroInteractions(userService);
+        verifyNoInteractions(userService);
         verify(commentService).createOne(commentVO);
         verify(commentService, never()).notifyEntryAuthor(anyLong());
     }
@@ -139,7 +140,7 @@ public class CommentFacadeImplTest {
         verify(commentService).notifyEntryAuthor(COMMENT_ID);
     }
 
-    @Test(expected = EntityCreationException.class)
+    @Test
     public void testCreateOneByAnExistingNormalUserWithoutLogin() throws ServiceException {
 
         // given
@@ -148,16 +149,13 @@ public class CommentFacadeImplTest {
         given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(userVO);
 
         // when
-        try {
-            commentFacade.createOne(commentVO);
-        } finally {
+        Assertions.assertThrows(EntityCreationException.class, () -> commentFacade.createOne(commentVO));
 
-            // then
-            // expected exception
-            verify(userService).silentGetUserByEmail(USER_EMAIL);
-            verify(userService, never()).createOne(any(UserVO.class));
-            verify(commentService, never()).createOne(any(CommentVO.class));
-        }
+        // then
+        // expected exception
+        verify(userService).silentGetUserByEmail(USER_EMAIL);
+        verify(userService, never()).createOne(any(UserVO.class));
+        verify(commentService, never()).createOne(any(CommentVO.class));
     }
 
     @Test

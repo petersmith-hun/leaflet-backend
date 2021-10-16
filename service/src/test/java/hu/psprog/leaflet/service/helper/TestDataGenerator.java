@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.service.helper;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Generic test data generator.
@@ -16,12 +15,5 @@ public interface TestDataGenerator<T extends Serializable> {
      *
      * @return a new instance of given type
      */
-    public T generate();
-
-    /**
-     * Generates N instances of specified type.
-     * @param count number of instances to generate
-     * @return List of generated instances of given type
-     */
-    public List<T> generate(int count);
+    T generate();
 }

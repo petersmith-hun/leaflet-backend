@@ -6,7 +6,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -35,14 +34,4 @@ public class UserVOTestDataGenerator implements TestDataGenerator<UserVO> {
                 .build();
     }
 
-    @Override
-    public List<UserVO> generate(int count) {
-
-        List<UserVO> userVOs = new LinkedList<>();
-        for (int index = 0; index < count; index++) {
-            userVOs.add(generate());
-        }
-
-        return userVOs;
-    }
 }

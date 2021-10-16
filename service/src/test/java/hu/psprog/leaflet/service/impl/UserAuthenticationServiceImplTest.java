@@ -13,12 +13,13 @@ import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.security.annotation.WithMockedJWTUser;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.Extensions;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -27,7 +28,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
 import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import java.util.Collections;
@@ -36,8 +37,8 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -46,7 +47,10 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@Extensions({
+        @ExtendWith(SpringExtension.class),
+        @ExtendWith(MockitoExtension.class)
+})
 @TestExecutionListeners(listeners = {
         DirtiesContextTestExecutionListener.class,
         WithSecurityContextTestExecutionListener.class})
@@ -81,6 +85,9 @@ public class UserAuthenticationServiceImplTest {
             .build();
     private static final UsernamePasswordAuthenticationToken USERNAME_PASSWORD_AUTHENTICATION_TOKEN
             = new UsernamePasswordAuthenticationToken(EXTENDED_USER_DETAILS.getUsername(), PASSWORD);
+    private static final JWTAuthenticationAnswerModel JWT_AUTHENTICATION_ANSWER_MODEL = JWTAuthenticationAnswerModel.getBuilder()
+            .withToken(TOKEN)
+            .build();
 
     @Mock
     private AuthenticationManager authenticationManager;
@@ -100,20 +107,12 @@ public class UserAuthenticationServiceImplTest {
     @InjectMocks
     private UserAuthenticationServiceImpl userAuthenticationService;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        JWTAuthenticationAnswerModel jwtAuthenticationAnswerModel = JWTAuthenticationAnswerModel.getBuilder()
-                .withToken(TOKEN)
-                .build();
-        given(userDetailsService.loadUserByUsername(anyString())).willReturn(EXTENDED_USER_DETAILS);
-        given(jwtComponent.generateToken(any(UserDetails.class))).willReturn(jwtAuthenticationAnswerModel);
-        given(jwtComponent.generateToken(any(UserDetails.class), anyInt())).willReturn(jwtAuthenticationAnswerModel);
-    }
-
     @Test
     @WithMockedJWTUser(userID = USER_ID, role = Role.ADMIN)
     public void shouldReAuthenticate() {
+
+        // given
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(EXTENDED_USER_DETAILS);
 
         // when
         userAuthenticationService.reAuthenticate(PASSWORD);
@@ -122,22 +121,22 @@ public class UserAuthenticationServiceImplTest {
         verify(authenticationManager).authenticate(USERNAME_PASSWORD_AUTHENTICATION_TOKEN);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     @WithMockUser
     public void shouldReAuthenticateThrowExceptionIfNonJWTAuthenticated() {
 
         // when
-        userAuthenticationService.reAuthenticate(PASSWORD);
+        Assertions.assertThrows(IllegalStateException.class, () -> userAuthenticationService.reAuthenticate(PASSWORD));
 
         // then
         // exception expected
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void shouldReAuthenticateThrowExceptionIfNonAuthenticated() {
 
         // when
-        userAuthenticationService.reAuthenticate(PASSWORD);
+        Assertions.assertThrows(IllegalStateException.class, () -> userAuthenticationService.reAuthenticate(PASSWORD));
 
         // then
         // exception expected
@@ -145,6 +144,10 @@ public class UserAuthenticationServiceImplTest {
 
     @Test
     public void shouldClaimToken() {
+
+        // given
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(EXTENDED_USER_DETAILS);
+        given(jwtComponent.generateToken(any(UserDetails.class))).willReturn(JWT_AUTHENTICATION_ANSWER_MODEL);
 
         // when
         userAuthenticationService.claimToken(LOGIN_CONTEXT_VO);
@@ -170,6 +173,10 @@ public class UserAuthenticationServiceImplTest {
     @Test
     public void shouldDemandPasswordReset() {
 
+        // given
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(EXTENDED_USER_DETAILS);
+        given(jwtComponent.generateToken(any(UserDetails.class), eq(1))).willReturn(JWT_AUTHENTICATION_ANSWER_MODEL);
+
         // when
         userAuthenticationService.demandPasswordReset(LOGIN_CONTEXT_VO);
 
@@ -184,6 +191,9 @@ public class UserAuthenticationServiceImplTest {
     @WithMockedJWTUser(userID = 1L, role = Role.ADMIN)
     public void shouldConfirmPasswordReset() {
 
+        // given
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(EXTENDED_USER_DETAILS);
+
         // when
         Long result = userAuthenticationService.confirmPasswordReset();
 
@@ -196,6 +206,10 @@ public class UserAuthenticationServiceImplTest {
     @Test
     @WithMockedJWTUser(userID = 1L, role = Role.ADMIN)
     public void shouldExtendSession() {
+
+        // given
+        given(userDetailsService.loadUserByUsername(anyString())).willReturn(EXTENDED_USER_DETAILS);
+        given(jwtComponent.generateToken(any(UserDetails.class))).willReturn(JWT_AUTHENTICATION_ANSWER_MODEL);
 
         // when
         String result = userAuthenticationService.extendSession(LOGIN_CONTEXT_VO);

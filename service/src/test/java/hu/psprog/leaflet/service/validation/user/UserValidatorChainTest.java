@@ -3,11 +3,11 @@ package hu.psprog.leaflet.service.validation.user;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.validation.Validator;
 import hu.psprog.leaflet.service.validation.user.impl.UserNullValidator;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,20 +19,20 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UserValidatorChainTest {
 
     private static final User USER = new User();
 
-    @Mock
+    @Mock(lenient = true)
     private UserNullValidator mockedTrueValidator;
 
-    @Mock
+    @Mock(lenient = true)
     private Validator<User> mockedFalseValidator;
 
     private UserValidatorChain userValidatorChain;
 
-    @Before
+    @BeforeEach
     public void setup() {
         given(mockedTrueValidator.isValid(any(User.class))).willReturn(true);
         given(mockedFalseValidator.isValid(any(User.class))).willReturn(false);

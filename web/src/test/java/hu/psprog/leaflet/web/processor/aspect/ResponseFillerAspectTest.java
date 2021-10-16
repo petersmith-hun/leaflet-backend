@@ -11,10 +11,10 @@ import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.web.rest.controller.EntriesController;
 import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
@@ -29,14 +29,14 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * Unit tests for {@link ResponseFillerAspect}.
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ResponseFillerAspectTest {
 
     private static final EntryDataModel ENTRY_DATA_MODEL = EntryDataModel.getBuilder()
@@ -161,7 +161,7 @@ public class ResponseFillerAspectTest {
         ResponseEntity<?> result = preparePointcut().getAllEntries();
 
         // then
-        verifyZeroInteractions(proceedingJoinPoint);
+        verifyNoInteractions(proceedingJoinPoint);
         assertThat(result, equalTo(ResponseEntity.ok(ENTRY_LIST_DATA_MODEL)));
     }
 

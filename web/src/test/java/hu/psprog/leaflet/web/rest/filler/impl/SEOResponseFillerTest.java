@@ -5,10 +5,10 @@ import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +23,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SEOResponseFillerTest {
 
     private static final String DCP_PAGE_TITLE = "DCP Page title";
@@ -35,7 +35,7 @@ public class SEOResponseFillerTest {
     private static final String SEO_DESCRIPTION = "SEO Description";
     private static final String SEO_KEYWORDS = "SEO Keywords";
 
-    @Mock
+    @Mock(lenient = true)
     private DynamicConfigurationPropertyService dcpService;
 
     private SEOResponseFiller responseFiller;

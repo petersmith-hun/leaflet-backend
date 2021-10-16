@@ -2,11 +2,12 @@ package hu.psprog.leaflet.service.mail.impl;
 
 import hu.psprog.leaflet.mail.domain.Mail;
 import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
@@ -21,7 +22,7 @@ import static org.mockito.BDDMockito.given;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SignUpConfirmationMailFactoryTest {
 
     private static final String SUBJECT = "mail.user.signup.confirm.subject";
@@ -59,21 +60,22 @@ public class SignUpConfirmationMailFactoryTest {
         assertThat(result.getContentMap().get(GENERATED_AT), notNullValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionOnNullRecipient() {
 
         // given
-        signUpConfirmationMailFactory.buildMail(SIGN_UP_CONFIRMATION);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> signUpConfirmationMailFactory.buildMail(SIGN_UP_CONFIRMATION));
 
         // then
         // exception expected
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionOnMultipleRecipients() {
 
         // given
-        signUpConfirmationMailFactory.buildMail(SIGN_UP_CONFIRMATION, RECIPIENT, RECIPIENT);
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> signUpConfirmationMailFactory.buildMail(SIGN_UP_CONFIRMATION, RECIPIENT, RECIPIENT));
 
         // then
         // exception expected

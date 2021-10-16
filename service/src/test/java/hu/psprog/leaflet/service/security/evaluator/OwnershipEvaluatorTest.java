@@ -9,15 +9,17 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
+
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,15 +32,15 @@ import static org.mockito.Mockito.doThrow;
  *
  * @author Peter Smith
  */
-@RunWith(JUnitParamsRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class OwnershipEvaluatorTest {
 
     private static final Long CURRENT_USER_ID = 10L;
 
-    @Mock
+    @Mock(lenient = true)
     private CommentService commentService;
 
-    @Mock
+    @Mock(lenient = true)
     private EntryService entryService;
 
     @InjectMocks
@@ -46,13 +48,8 @@ public class OwnershipEvaluatorTest {
 
     private Authentication authentication;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    @Parameters(method = "isSelf", source = OwnershipEvaluatorParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("isSelf")
     public void shouldValidateSelf(Long userID, boolean expectedResult) {
 
         // given
@@ -65,8 +62,8 @@ public class OwnershipEvaluatorTest {
         assertThat(result, is(expectedResult));
     }
 
-    @Test
-    @Parameters(method = "isSelfOrAdmin", source = OwnershipEvaluatorParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("isSelfOrAdmin")
     public void shouldValidateSelfOrAdmin(Long userID, Role role, boolean expectedResult) {
 
         // given
@@ -79,8 +76,8 @@ public class OwnershipEvaluatorTest {
         assertThat(result, is(expectedResult));
     }
 
-    @Test
-    @Parameters(method = "isSelfOrModerator", source = OwnershipEvaluatorParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("isSelfOrModerator")
     public void shouldValidateSelfOrModerator(Long userID, Role role, boolean expectedResult) {
 
         // given
@@ -93,8 +90,8 @@ public class OwnershipEvaluatorTest {
         assertThat(result, is(expectedResult));
     }
 
-    @Test
-    @Parameters(method = "isOwnEntryOrAdmin", source = OwnershipEvaluatorParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("isOwnEntryOrAdmin")
     public void shouldValidateEntry(Role role, Long ownerID, boolean expectedResult) throws ServiceException {
 
         // given
@@ -127,8 +124,8 @@ public class OwnershipEvaluatorTest {
         assertThat(result, is(false));
     }
 
-    @Test
-    @Parameters(method = "isOwnCommentOrModerator", source = OwnershipEvaluatorParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("isOwnCommentOrModerator")
     public void shouldValidateComment(Role role, Long ownerID, boolean expectedResult) throws ServiceException {
 
         // given
@@ -147,8 +144,8 @@ public class OwnershipEvaluatorTest {
         assertThat(result, is(expectedResult));
     }
 
-    @Test
-    @Parameters(method = "isOwnCommentOrModerator", source = OwnershipEvaluatorParameterProvider.class)
+    @ParameterizedTest
+    @MethodSource("isOwnCommentOrModerator")
     public void shouldValidateCommentByEntity(Role role, Long ownerID, boolean expectedResult) throws ServiceException {
 
         // given
@@ -191,50 +188,52 @@ public class OwnershipEvaluatorTest {
                 .build();
     }
 
-    public static class OwnershipEvaluatorParameterProvider {
+    private static Stream<Arguments> isSelf() {
 
-        public static Object[] isSelf() {
-            return new Object[] {
-                    new Object[] {CURRENT_USER_ID, true},
-                    new Object[] {2L, false}
-            };
-        }
+        return Stream.of(
+                Arguments.of(CURRENT_USER_ID, true),
+                Arguments.of(2L, false)
+        );
+    }
 
-        public static Object[] isSelfOrAdmin() {
-            return new Object[] {
-                    new Object[] {CURRENT_USER_ID, Role.USER, true},
-                    new Object[] {2L, Role.ADMIN, true},
-                    new Object[] {2L, Role.USER, false}
-            };
-        }
+    private static Stream<Arguments> isSelfOrAdmin() {
 
-        public static Object[] isSelfOrModerator() {
-            return new Object[] {
-                    new Object[] {CURRENT_USER_ID, Role.USER, true},
-                    new Object[] {2L, Role.ADMIN, true},
-                    new Object[] {2L, Role.EDITOR, true},
-                    new Object[] {2L, Role.USER, false}
-            };
-        }
+        return Stream.of(
+                Arguments.of(CURRENT_USER_ID, Role.USER, true),
+                Arguments.of(2L, Role.ADMIN, true),
+                Arguments.of(2L, Role.USER, false)
+        );
+    }
 
-        public static Object[] isOwnEntryOrAdmin() {
-            return new Object[] {
-                    new Object[] {Role.ADMIN, 2L, true},
-                    new Object[] {Role.ADMIN, CURRENT_USER_ID, true},
-                    new Object[] {Role.EDITOR, CURRENT_USER_ID, true},
-                    new Object[] {Role.EDITOR, 2L, false}
-            };
-        }
+    private static Stream<Arguments> isSelfOrModerator() {
 
-        public static Object[] isOwnCommentOrModerator() {
-            return new Object[] {
-                    new Object[] {Role.ADMIN, 2L, true},
-                    new Object[] {Role.ADMIN, CURRENT_USER_ID, true},
-                    new Object[] {Role.EDITOR, 2L, true},
-                    new Object[] {Role.EDITOR, CURRENT_USER_ID, true},
-                    new Object[] {Role.USER, 2L, false},
-                    new Object[] {Role.USER, CURRENT_USER_ID, true},
-            };
-        }
+        return Stream.of(
+                Arguments.of(CURRENT_USER_ID, Role.USER, true),
+                Arguments.of(2L, Role.ADMIN, true),
+                Arguments.of(2L, Role.EDITOR, true),
+                Arguments.of(2L, Role.USER, false)
+        );
+    }
+
+    private static Stream<Arguments> isOwnEntryOrAdmin() {
+
+        return Stream.of(
+                Arguments.of(Role.ADMIN, 2L, true),
+                Arguments.of(Role.ADMIN, CURRENT_USER_ID, true),
+                Arguments.of(Role.EDITOR, CURRENT_USER_ID, true),
+                Arguments.of(Role.EDITOR, 2L, false)
+        );
+    }
+
+    private static Stream<Arguments> isOwnCommentOrModerator() {
+
+        return Stream.of(
+                Arguments.of(Role.ADMIN, 2L, true),
+                Arguments.of(Role.ADMIN, CURRENT_USER_ID, true),
+                Arguments.of(Role.EDITOR, 2L, true),
+                Arguments.of(Role.EDITOR, CURRENT_USER_ID, true),
+                Arguments.of(Role.USER, 2L, false),
+                Arguments.of(Role.USER, CURRENT_USER_ID, true)
+        );
     }
 }

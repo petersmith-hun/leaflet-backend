@@ -18,11 +18,12 @@ import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -52,7 +53,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Peter Smith
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class EntryServiceImplTest {
 
     @Mock(lenient = true)
@@ -99,15 +100,15 @@ public class EntryServiceImplTest {
         verify(entryToEntryVOConverter).convert(entry);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testGetOneWithNonExistingEntry() throws ServiceException {
+    @Test
+    public void testGetOneWithNonExistingEntry() {
 
         // given
         Long id = 1L;
         given(entryDAO.findOne(id)).willReturn(null);
 
         // when
-        EntryVO result = entryService.getOne(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.getOne(id));
 
         // then
         // expected exception
@@ -263,15 +264,15 @@ public class EntryServiceImplTest {
         verify(publishHandler).updatePublishDate(entry);
     }
 
-    @Test(expected = EntityCreationException.class)
-    public void testCreateOneWithFailure() throws ServiceException {
+    @Test
+    public void testCreateOneWithFailure() {
 
         // given
         given(entryVOToEntryConverter.convert(entryVO)).willReturn(entry);
         given(entryDAO.save(entry)).willReturn(null);
 
         // when
-        entryService.createOne(entryVO);
+        Assertions.assertThrows(EntityCreationException.class, () -> entryService.createOne(entryVO));
 
         // then
         // expected exception
@@ -279,29 +280,29 @@ public class EntryServiceImplTest {
         verify(entryDAO).save(entry);
     }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testCreateShouldThrowConstraintViolationException() throws ServiceException {
+    @Test
+    public void testCreateShouldThrowConstraintViolationException() {
 
         // given
         given(entryVOToEntryConverter.convert(entryVO)).willReturn(entry);
         doThrow(DataIntegrityViolationException.class).when(entryDAO).save(entry);
 
         // when
-        entryService.createOne(entryVO);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> entryService.createOne(entryVO));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ServiceException.class)
-    public void testCreateShouldThrowServiceException() throws ServiceException {
+    @Test
+    public void testCreateShouldThrowServiceException() {
 
         // given
         given(entryVOToEntryConverter.convert(entryVO)).willReturn(entry);
         doThrow(IllegalArgumentException.class).when(entryDAO).save(entry);
 
         // when
-        entryService.createOne(entryVO);
+        Assertions.assertThrows(ServiceException.class, () -> entryService.createOne(entryVO));
 
         // then
         // exception expected
@@ -327,8 +328,8 @@ public class EntryServiceImplTest {
         verify(publishHandler).updatePublishDate(id, entry);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testUpdateOneWithFailure() throws ServiceException {
+    @Test
+    public void testUpdateOneWithFailure() {
 
         // given
         Long id = 1L;
@@ -336,17 +337,16 @@ public class EntryServiceImplTest {
         given(entryDAO.updateOne(id, entry)).willReturn(null);
 
         // when
-        EntryVO result = entryService.updateOne(id, entryVO);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.updateOne(id, entryVO));
 
         // then
-        assertThat(result, equalTo(entryVO));
         verify(entryVOToEntryConverter).convert(entryVO);
         verify(entryToEntryVOConverter, never()).convert(entry);
         verify(entryDAO).updateOne(id, entry);
     }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateShouldThrowConstraintViolationException() throws ServiceException {
+    @Test
+    public void testUpdateShouldThrowConstraintViolationException() {
 
         // given
         Long id = 1L;
@@ -354,14 +354,14 @@ public class EntryServiceImplTest {
         doThrow(DataIntegrityViolationException.class).when(entryDAO).updateOne(id, entry);
 
         // when
-        entryService.updateOne(id, entryVO);
+        Assertions.assertThrows(ConstraintViolationException.class, () -> entryService.updateOne(id, entryVO));
 
         // then
         // exception expected
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateShouldThrowServiceException() throws ServiceException {
+    @Test
+    public void testUpdateShouldThrowServiceException() {
 
         // given
         Long id = 1L;
@@ -369,7 +369,7 @@ public class EntryServiceImplTest {
         doThrow(IllegalArgumentException.class).when(entryDAO).updateOne(id, entry);
 
         // when
-        entryService.updateOne(id, entryVO);
+        Assertions.assertThrows(ServiceException.class, () -> entryService.updateOne(id, entryVO));
 
         // then
         // exception expected
@@ -392,18 +392,17 @@ public class EntryServiceImplTest {
         verify(entryToEntryVOConverter).convert(entry);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testFindByLinkWithNonExistingEntry() throws EntityNotFoundException {
+    @Test
+    public void testFindByLinkWithNonExistingEntry() {
 
         // given
         String link = "link-lflt-49-ut";
         given(entryDAO.findByLink(link)).willReturn(null);
 
         // when
-        EntryVO result = entryService.findByLink(link);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.findByLink(link));
 
         // then
-        assertThat(result, equalTo(entryVO));
         verify(entryDAO).findByLink(link);
         verify(entryToEntryVOConverter, never()).convert(entry);
     }
@@ -421,15 +420,15 @@ public class EntryServiceImplTest {
         verify(entryDAO).delete(entryVO.getId());
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void testDeleteByIdWithNonExistingEntry() throws ServiceException {
+    @Test
+    public void testDeleteByIdWithNonExistingEntry() {
 
         // given
         Long id = 1L;
         given(entryDAO.exists(entryVO.getId())).willReturn(false);
 
         // when
-        entryService.deleteByID(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.deleteByID(id));
 
         // then
         // expected exception
@@ -449,15 +448,15 @@ public class EntryServiceImplTest {
         verify(entryDAO).enable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldEnableThrowEntityNotFoundException() throws EntityNotFoundException {
+    @Test
+    public void shouldEnableThrowEntityNotFoundException() {
 
         // given
         Long id = 1L;
         given(entryDAO.exists(id)).willReturn(false);
 
         // when
-        entryService.enable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.enable(id));
 
         // then
         // exception expected;
@@ -477,15 +476,15 @@ public class EntryServiceImplTest {
         verify(entryDAO).disable(id);
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void shouldDisableThrowEntityNotFoundException() throws EntityNotFoundException {
+    @Test
+    public void shouldDisableThrowEntityNotFoundException() {
 
         // given
         Long id = 1L;
         given(entryDAO.exists(id)).willReturn(false);
 
         // when
-        entryService.disable(id);
+        Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.disable(id));
 
         // then
         // exception expected;
