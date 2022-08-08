@@ -22,18 +22,13 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -41,11 +36,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.FileSystemUtils;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 import java.io.File;
 import java.util.Collections;
 import java.util.Date;
@@ -59,8 +51,8 @@ import java.util.Properties;
  */
 @Profile(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 @Configuration
+@Import(LeafletITDatasourceConfig.class)
 @ComponentScan(basePackages = LeafletITContextConfig.COMPONENT_SCAN_PACKAGE)
-@EnableJpaRepositories(basePackages = LeafletITContextConfig.REPOSITORY_PACKAGE)
 public class LeafletITContextConfig implements ApplicationListener<ContextClosedEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LeafletITContextConfig.class);
@@ -75,8 +67,6 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     public static final String INTEGRATION_TEST_DB_SCRIPT_DCP = "classpath:/service_it_db_script_dcp.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_FRONT_END_ROUTES = "classpath:/service_it_db_script_front_end_routes.sql";
 
-    public static final String REPOSITORY_PACKAGE = "hu.psprog.leaflet.persistence.repository";
-    public static final String ENTITY_PACKAGE = "hu.psprog.leaflet.persistence.entity";
     public static final String COMPONENT_SCAN_PACKAGE = "hu.psprog.leaflet.service";
     public static final String INTEGRATION_TEST_CONFIG_PROFILE = "it";
 
@@ -134,43 +124,6 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
 
             }
         };
-    }
-
-    @Bean
-    public DataSource dataSource() {
-
-        EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
-
-        return builder.setType(EmbeddedDatabaseType.H2).build();
-    }
-
-    @Bean
-    public EntityManagerFactory entityManagerFactory() {
-
-        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
-
-        Properties jpaProperties = new Properties();
-        jpaProperties.setProperty("generate-ddl", "true");
-        jpaProperties.setProperty("defer-datasource-initialization", "true");
-
-        vendorAdapter.setGenerateDdl(true);
-        factoryBean.setJpaProperties(jpaProperties);
-        factoryBean.setJpaVendorAdapter(vendorAdapter);
-        factoryBean.setPackagesToScan(ENTITY_PACKAGE);
-        factoryBean.setDataSource(dataSource());
-        factoryBean.afterPropertiesSet();
-
-        return factoryBean.getObject();
-    }
-
-    @Bean
-    public PlatformTransactionManager transactionManager() {
-
-        JpaTransactionManager txManager = new JpaTransactionManager();
-        txManager.setEntityManagerFactory(entityManagerFactory());
-
-        return txManager;
     }
 
     @Bean

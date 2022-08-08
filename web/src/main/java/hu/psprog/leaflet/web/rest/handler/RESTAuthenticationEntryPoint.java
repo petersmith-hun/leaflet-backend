@@ -8,7 +8,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -32,15 +31,15 @@ public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint, A
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        handleFailure(request, response, authException);
+        handleFailure(response);
     }
 
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        handleFailure(request, response, exception);
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
+        handleFailure(response);
     }
 
-    private void handleFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+    private void handleFailure(HttpServletResponse response) throws IOException {
 
         exceptionHandlerCounters.authenticationFailure();
         PrintWriter responseWriter = response.getWriter();
