@@ -14,9 +14,9 @@ import org.springframework.data.jpa.domain.Specification;
  */
 public interface CommentDAO extends BaseDAO<Comment, Long>, SelfStatusAwareDAO<Long>, LogicallyDeletableDAO<Long> {
 
-    public Page<Comment> findByEntry(Pageable pageable, Entry entry);
+    Page<Comment> findByEntry(Pageable pageable, Entry entry);
 
-    public Page<Comment> findByEntry(Specification<Comment> specification, Pageable pageable, Entry entry);
+    Page<Comment> findByEntry(Specification<Comment> specification, Pageable pageable, Entry entry);
 
-    public Page<Comment> findByUser(Pageable pageable,  User user);
+    Page<Comment> findByUser(Pageable pageable,  User user);
 }

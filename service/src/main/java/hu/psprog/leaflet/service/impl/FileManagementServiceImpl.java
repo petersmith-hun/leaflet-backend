@@ -5,7 +5,7 @@ import hu.psprog.leaflet.service.exception.FileUploadException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.uploader.FileUploader;
 import hu.psprog.leaflet.service.impl.uploader.acceptor.UploadAcceptor;
-import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
@@ -40,9 +40,9 @@ public class FileManagementServiceImpl implements FileManagementService {
     private static final String GIVEN_PATH_IS_INVALID_MESSAGE_WITH_PATH = "Given path [{}] is invalid";
     private static final String GIVEN_PATH_IS_INVALID = "Given path is invalid";
 
-    private File fileStorage;
-    private FileUploader fileUploader;
-    private List<UploadAcceptor> uploadAcceptors;
+    private final File fileStorage;
+    private final FileUploader fileUploader;
+    private final List<UploadAcceptor> uploadAcceptors;
 
     @Autowired
     public FileManagementServiceImpl(File fileStorage, FileUploader fileUploader, List<UploadAcceptor> uploadAcceptors) {
@@ -52,7 +52,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Entries
     public UploadedFileVO upload(FileInputVO fileInputVO) throws ServiceException {
 
         Assert.state(fileInputVO.getSize() > 0, "File size must be greater than 0!");
@@ -90,7 +90,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Entries
     public void remove(String path) throws ServiceException {
         try {
             File file = buildAbsolutePath(path).toFile();
@@ -110,7 +110,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Entries
     public void createDirectory(String parent, String directoryName) throws ServiceException {
         try {
             Path path = Paths.get(parent, directoryName);
@@ -138,7 +138,7 @@ public class FileManagementServiceImpl implements FileManagementService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Entries
     public List<AcceptorInfoVO> getAcceptorInfo() {
 
         return uploadAcceptors.stream()

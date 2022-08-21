@@ -1,11 +1,10 @@
 package hu.psprog.leaflet.service.security.annotation;
 
-import hu.psprog.leaflet.service.CommentService;
-import hu.psprog.leaflet.service.EntryService;
-import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.vo.CommentVO;
-import hu.psprog.leaflet.service.vo.EntryVO;
-import hu.psprog.leaflet.service.vo.UserVO;
+import hu.psprog.leaflet.persistence.dao.CommentDAO;
+import hu.psprog.leaflet.persistence.dao.EntryDAO;
+import hu.psprog.leaflet.persistence.entity.Comment;
+import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.User;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,6 +14,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import java.util.Optional;
 
 import static hu.psprog.leaflet.service.security.annotation.SecurityTestContextConfiguration.SECURITY_TEST_PROFILE;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -33,32 +34,30 @@ import static org.mockito.BDDMockito.given;
 public class SecurityTestContextConfiguration extends WebSecurityConfigurerAdapter {
 
     static final String SECURITY_TEST_PROFILE = "securityTest";
-    static final long CURRENT_USER_ID = 2L;
+    static final long USER_UID = 1L;
+    static final long EDITOR_UID = 2L;
+    static final long ADMIN_UID = 3L;
+    static final long OTHER_USER_UID = 4L;
+    static final long OTHER_EDITOR_UID = 5L;
+    private static final Entry ENTRY = prepareEntry();
+    private static final Comment COMMENT = prepareComment();
 
     @Bean
-    public EntryService entryService() throws ServiceException {
+    public EntryDAO entryDAO() {
 
-        EntryService mockedEntryService = Mockito.mock(EntryService.class);
-        given(mockedEntryService.getOne(anyLong())).willReturn(EntryVO.getBuilder()
-                .withOwner(UserVO.getBuilder()
-                        .withId(CURRENT_USER_ID)
-                        .build())
-                .build());
+        EntryDAO mockedEntryDAO = Mockito.mock(EntryDAO.class);
+        given(mockedEntryDAO.findById(anyLong())).willReturn(Optional.of(ENTRY));
 
-        return mockedEntryService;
+        return mockedEntryDAO;
     }
 
     @Bean
-    public CommentService commentServiceImpl() throws ServiceException {
+    public CommentDAO commentDAO() {
 
-        CommentService mockedCommentService = Mockito.mock(CommentService.class);
-        given(mockedCommentService.getOne(anyLong())).willReturn(CommentVO.getBuilder()
-                .withOwner(UserVO.getBuilder()
-                        .withId(CURRENT_USER_ID)
-                        .build())
-                .build());
+        CommentDAO mockedCommentDAO = Mockito.mock(CommentDAO.class);
+        given(mockedCommentDAO.findById(anyLong())).willReturn(Optional.of(COMMENT));
 
-        return mockedCommentService;
+        return mockedCommentDAO;
     }
 
     @Bean
@@ -69,5 +68,23 @@ public class SecurityTestContextConfiguration extends WebSecurityConfigurerAdapt
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationManagerBean();
+    }
+
+    private static Entry prepareEntry() {
+
+        return Entry.getBuilder()
+                .withUser(User.getBuilder()
+                        .withId(EDITOR_UID)
+                        .build())
+                .build();
+    }
+
+    private static Comment prepareComment() {
+
+        return Comment.getBuilder()
+                .withUser(User.getBuilder()
+                        .withId(USER_UID)
+                        .build())
+                .build();
     }
 }

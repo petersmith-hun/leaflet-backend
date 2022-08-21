@@ -12,9 +12,7 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
-import hu.psprog.leaflet.service.security.annotation.PermitReclaim;
-import hu.psprog.leaflet.service.security.annotation.PermitSelf;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.UserVO;
@@ -45,10 +43,10 @@ public class UserServiceImpl implements UserService {
     private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
     private static final String EMAIL_ADDRESS_IS_ALREADY_IN_USE = "Email address is already in use";
 
-    private UserDAO userDAO;
-    private UserToUserVOConverter userToUserVOConverter;
-    private UserVOToUserConverter userVOToUserConverter;
-    private AuthorityToRoleConverter authorityToRoleConverter;
+    private final UserDAO userDAO;
+    private final UserToUserVOConverter userToUserVOConverter;
+    private final UserVOToUserConverter userVOToUserConverter;
+    private final AuthorityToRoleConverter authorityToRoleConverter;
 
     @Autowired
     public UserServiceImpl(UserDAO userDAO, UserToUserVOConverter userToUserVOConverter, UserVOToUserConverter userVOToUserConverter,
@@ -60,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitSelf.UserOrAdmin
+    @PermitScope.Read.OwnUserOrElevated
     public UserVO getOne(@P("id") Long userID) throws ServiceException {
 
         User user = userDAO.findOne(userID);
@@ -73,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Read.Users
     public List<UserVO> getAll() {
 
         return userDAO.findAll().stream()
@@ -82,14 +80,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Read.Users
     public Long count() {
 
         return userDAO.count();
     }
 
     @Override
-    @PermitSelf.User
+    @PermitScope.Write.OwnUser
     public void deleteByID(@P("id") Long userID) throws ServiceException {
 
         if (!userDAO.exists(userID)) {
@@ -101,7 +99,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Users
     public Long createOne(UserVO entity) throws ServiceException {
 
         User user = userVOToUserConverter.convert(entity);
@@ -124,7 +122,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitSelf.User
+    @PermitScope.Write.OwnUser
     public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
 
         User updatedUser;
@@ -146,6 +144,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PermitScope.DenyAlways
     public Long register(UserVO entity) throws ServiceException {
 
         if (!isUserRole(entity)) {
@@ -166,7 +165,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitSelf.User
+    @PermitScope.Write.OwnUser
     public void changePassword(Long id, String password) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {
@@ -178,13 +177,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitReclaim
+    @PermitScope.DenyAlways
     public void reclaimPassword(Long id, String password) throws EntityNotFoundException {
         changePassword(id, password);
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Users
     public void changeAuthority(Long id, GrantedAuthority grantedAuthority) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {
@@ -196,7 +195,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Read.Users
     public EntityPageVO<UserVO> getEntityPage(int page, int limit, OrderDirection direction, UserVO.OrderBy orderBy) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
@@ -206,7 +205,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Users
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {
@@ -219,7 +218,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Users
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!userDAO.exists(id)) {

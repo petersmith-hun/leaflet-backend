@@ -12,5 +12,5 @@ import java.util.List;
  */
 public interface TagDAO extends BaseDAO<Tag, Long>, SelfStatusAwareDAO<Long> {
 
-    public List<Tag> findAll(Specification<Tag> specification);
+    List<Tag> findAll(Specification<Tag> specification);
 }

@@ -9,7 +9,7 @@ import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +29,9 @@ public class CategoryServiceImpl implements CategoryService {
 
      private static final Logger LOGGER = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
-    private CategoryDAO categoryDAO;
-    private CategoryToCategoryVOConverter categoryToCategoryVOConverter;
-    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
+    private final CategoryDAO categoryDAO;
+    private final CategoryToCategoryVOConverter categoryToCategoryVOConverter;
+    private final CategoryVOToCategoryConverter categoryVOToCategoryConverter;
 
     @Autowired
     public CategoryServiceImpl(CategoryDAO categoryDAO, CategoryToCategoryVOConverter categoryToCategoryVOConverter,
@@ -42,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Categories
     public CategoryVO getOne(Long id) throws ServiceException {
 
         Category category = categoryDAO.findOne(id);
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Categories
     public List<CategoryVO> getAll() {
 
         return categoryDAO.findAll().stream()
@@ -72,14 +72,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Categories
     public Long count() {
 
         return categoryDAO.count();
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Categories
     public Long createOne(CategoryVO entity) throws ServiceException {
 
         Category category = categoryVOToCategoryConverter.convert(entity);
@@ -95,7 +95,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Categories
     public CategoryVO updateOne(Long id, CategoryVO updatedEntity) throws ServiceException {
 
         Category updatedCategory = categoryDAO.updateOne(id, categoryVOToCategoryConverter.convert(updatedEntity));
@@ -110,7 +110,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Categories
     public void deleteByID(Long id) throws ServiceException {
 
         if (!categoryDAO.exists(id)) {
@@ -122,7 +122,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Categories
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!categoryDAO.exists(id)) {
@@ -134,7 +134,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Categories
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!categoryDAO.exists(id)) {

@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 public interface SelfStatusAwareDAO<ID extends Serializable>  {
 
-    public void enable(ID id);
+    void enable(ID id);
 
-    public void disable(ID id);
+    void disable(ID id);
 }

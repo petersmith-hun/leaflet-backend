@@ -12,5 +12,5 @@ import java.util.List;
  */
 public interface CategoryDAO extends BaseDAO<Category, Long>, SelfStatusAwareDAO<Long> {
 
-    public List<Category> findAll(Specification<Category> specification);
+    List<Category> findAll(Specification<Category> specification);
 }

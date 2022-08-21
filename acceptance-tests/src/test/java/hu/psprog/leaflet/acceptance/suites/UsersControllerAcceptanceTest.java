@@ -19,10 +19,9 @@ import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.ForbiddenOperationException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.client.exception.UnauthorizedAccessException;
+import hu.psprog.leaflet.bridge.client.impl.AccessTokenTestUtility;
 import hu.psprog.leaflet.bridge.service.UserBridgeService;
 import hu.psprog.leaflet.persistence.entity.Role;
-import hu.psprog.leaflet.security.jwt.JWTComponent;
-import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import static hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel.AuthenticationResult.AUTH_SUCCESS;
-import static hu.psprog.leaflet.security.jwt.model.Role.RECLAIM;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -79,7 +77,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     private UserBridgeService userBridgeService;
 
     @Autowired
-    private JWTComponent jwtComponent;
+    private AccessTokenTestUtility accessTokenTestUtility;
 
     @AfterEach
     public void tearDown() {
@@ -124,10 +122,10 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     }
 
     @Test
-    public void shouldNotUpdateSelfRole() throws CommunicationFailureException {
+    public void shouldNotUpdateSelfRole() {
 
         // given
-        login(TEST_USER_1_EMAIL, TEST_PASSWORD);
+        oauthLogin(TEST_USER_1_EMAIL);
         UpdateRoleRequestModel updateRoleRequestModel = prepareUpdateRoleRequestModel();
 
         // when
@@ -238,43 +236,41 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     }
 
     @Test
-    public void shouldStartPasswordResetProcess() throws CommunicationFailureException {
+    public void shouldStartPasswordResetProcess() {
 
         // given
         PasswordResetDemandRequestModel passwordResetDemandRequestModel = new PasswordResetDemandRequestModel();
         passwordResetDemandRequestModel.setEmail(TEST_USER_3_EMAIL);
 
         // when
-        userBridgeService.demandPasswordReset(passwordResetDemandRequestModel, RECAPTCHA_TOKEN);
+        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.demandPasswordReset(passwordResetDemandRequestModel, RECAPTCHA_TOKEN));
 
         // then
-        assertThat(notificationService.getPasswordResetRequest(), notNullValue());
-        assertThat(notificationService.getPasswordResetRequest().getToken(), notNullValue());
-        assertThat(jwtComponent.decode(notificationService.getPasswordResetRequest().getToken()).getRole(), equalTo(RECLAIM));
+        // exception expected
     }
 
     @Test
     @ResetDatabase
-    public void shouldConfirmPasswordReset() throws CommunicationFailureException {
+    public void shouldConfirmPasswordReset() {
 
         // given
-        prepareMockedRequestAuthentication(preparePasswordResetConfirmation(TEST_EDITOR_4_EMAIL));
         UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(true);
 
         // when
-        userBridgeService.confirmPasswordReset(userPasswordRequestModel, RECAPTCHA_TOKEN);
+        Assertions.assertThrows(ConflictingRequestException.class, () -> {
+            prepareMockedRequestAuthentication(preparePasswordResetConfirmation(TEST_EDITOR_4_EMAIL));
+            userBridgeService.confirmPasswordReset(userPasswordRequestModel, RECAPTCHA_TOKEN);
+        });
 
         // then
-        LoginResponseDataModel loginResponse = userBridgeService.claimToken(prepareLoginRequestModel(TEST_EDITOR_4_EMAIL, UPDATED_PASSWORD));
-        assertThat(loginResponse.getStatus(), equalTo(AUTH_SUCCESS));
-        assertThat(notificationService.getPasswordResetSuccess().getParticipant(), equalTo(TEST_EDITOR_4_EMAIL));
+        // exception expected
     }
 
     @Test
-    public void shouldRevokeToken() throws CommunicationFailureException {
+    public void shouldRevokeToken() {
 
         // given
-        login(TEST_EDITOR_5_EMAIL, TEST_PASSWORD);
+        oauthLogin(TEST_EDITOR_5_EMAIL);
         try {
             UserDataModel userData = userBridgeService.getUserByID(TEST_EDITOR_5_ID);
             assertThat(userData.getId(), equalTo(TEST_EDITOR_5_ID));
@@ -284,26 +280,24 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         }
 
         // when
-        userBridgeService.revokeToken();
+        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.revokeToken());
 
         // then
-        // this call should fail and cause exception
-        Assertions.assertThrows(UnauthorizedAccessException.class, () -> userBridgeService.getUserByID(TEST_EDITOR_5_ID));
+        // exception expected
     }
 
     @Test
-    public void shouldRenewSession() throws CommunicationFailureException, InterruptedException {
+    public void shouldRenewSession() throws InterruptedException {
 
         // given
-        login(TEST_USER_6_EMAIL, TEST_PASSWORD);
+        oauthLogin(TEST_USER_6_EMAIL);
         Thread.sleep(1200); // without this, test is so fast, it fails
 
         // when
-        LoginResponseDataModel result = userBridgeService.renewToken();
+        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.renewToken());
 
         // then
-        assertThat(result, notNullValue());
-        assertThat(result.getStatus(), equalTo(AUTH_SUCCESS));
+        // exception expected
     }
 
     @Test
@@ -311,7 +305,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     public void shouldDeleteSelfUser() throws CommunicationFailureException {
 
         // given
-        login(TEST_USER_7_EMAIL, TEST_PASSWORD);
+        oauthLogin(TEST_USER_7_EMAIL);
 
         // when
         userBridgeService.deleteUser(TEST_USER_7_ID);
@@ -346,10 +340,10 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     }
 
     @Test
-    public void shouldFailCreatingUserIfNonAdminUserCalls() throws CommunicationFailureException {
+    public void shouldFailCreatingUserIfNonAdminUserCalls() {
 
         // given
-        login(TEST_EDITOR_8_EMAIL, TEST_PASSWORD);
+        oauthLogin(TEST_EDITOR_8_EMAIL);
         UserCreateRequestModel userCreateRequestModel = getControl(CONTROL_USER_CREATE, UserCreateRequestModel.class);
 
         // when
@@ -361,18 +355,16 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
     @Test
     @ResetDatabase
-    public void shouldRegister() throws CommunicationFailureException {
+    public void shouldRegister() {
 
         // given
         UserInitializeRequestModel userInitializeRequestModel = getControl(CONTROL_USER_REGISTER, UserInitializeRequestModel.class);
-        SignUpConfirmation signUpConfirmation = new SignUpConfirmation(userInitializeRequestModel.getUsername(), userInitializeRequestModel.getEmail());
 
         // when
-        ExtendedUserDataModel result = userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN);
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN));
 
         // then
-        assertCreatedUser(userInitializeRequestModel, result.getId());
-        assertThat(notificationService.getSignUpConfirmation(), equalTo(signUpConfirmation));
+        // exception expected
     }
 
     @Test
@@ -384,7 +376,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         userInitializeRequestModel.setEmail(TEST_USER_1_EMAIL);
 
         // when
-        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN));
+        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN));
 
         // then
         // exception expected
@@ -422,9 +414,9 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         return updateRoleRequestModel;
     }
 
-    private void login(String email, String password) throws CommunicationFailureException {
-        LoginResponseDataModel loginResponse = userBridgeService.claimToken(prepareLoginRequestModel(email, password));
-        prepareMockedRequestAuthentication(loginResponse.getToken());
+    private void oauthLogin(String email) {
+        String token = accessTokenTestUtility.generateToken(email);
+        prepareMockedRequestAuthentication(token);
     }
 
     private UserPasswordRequestModel prepareUserPasswordRequestModel(boolean forPasswordReset) {

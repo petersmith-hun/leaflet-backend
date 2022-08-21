@@ -21,7 +21,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Web Security configuration.
@@ -90,7 +89,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
 
         auth
             .authenticationProvider(claimAuthenticationProvider())
@@ -101,8 +100,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-            .addFilterBefore(getJwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-
             .authorizeRequests()
                 .antMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
                     .permitAll()
@@ -124,13 +121,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
 
             .anonymous()
-                .key(JWTAuthenticationFilter.ANONYMOUS_ID);
-    }
+                .key(JWTAuthenticationFilter.ANONYMOUS_ID)
+                .and()
 
-    private JWTAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
-        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtComponent);
-        jwtAuthenticationFilter.setAuthenticationManager(authenticationManagerBean());
-        jwtAuthenticationFilter.setAuthenticationFailureHandler(restAuthenticationEntryPoint());
-        return jwtAuthenticationFilter;
+            .oauth2ResourceServer()
+                .jwt();
     }
 }

@@ -4,7 +4,7 @@ import hu.psprog.leaflet.persistence.dao.DynamicConfigurationPropertyDAO;
 import hu.psprog.leaflet.persistence.entity.DynamicConfigurationProperty;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DynamicConfigurationPropertyServiceImpl.class);
 
-    private DynamicConfigurationPropertyDAO dynamicConfigurationPropertyDAO;
+    private final DynamicConfigurationPropertyDAO dynamicConfigurationPropertyDAO;
     private Map<String, String> dcpStore;
 
     @Autowired
@@ -43,7 +43,7 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Read.Admin
     public Map<String, String> getAll() {
         return dcpStore;
     }
@@ -59,7 +59,7 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public void add(String key, String value) throws ServiceException {
 
         try {
@@ -73,7 +73,7 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public void update(String key, String value) throws ServiceException {
 
         try {
@@ -87,7 +87,7 @@ public class DynamicConfigurationPropertyServiceImpl implements DynamicConfigura
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public void delete(String key) throws ServiceException {
 
         try {

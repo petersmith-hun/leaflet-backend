@@ -1,7 +1,6 @@
 package hu.psprog.leaflet.web.validation;
 
 import hu.psprog.leaflet.api.rest.request.common.AuthenticatedRequestModel;
-import hu.psprog.leaflet.security.jwt.model.Role;
 import hu.psprog.leaflet.web.test.WithMockedJWTUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +44,7 @@ public class AuthenticatedRequestValidatorTest {
     private AuthenticatedRequestValidator authenticatedRequestValidator;
 
     @ParameterizedTest
-    @WithMockedJWTUser(userID = 1L, role = Role.ADMIN)
+    @WithMockedJWTUser(userID = 1L)
     @MethodSource("authenticationRequestValidatorDataProvider")
     public void shouldValidate(Long userID, boolean expectedValidationResult) {
 
