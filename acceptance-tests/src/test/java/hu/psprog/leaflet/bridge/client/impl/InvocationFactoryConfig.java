@@ -4,6 +4,9 @@ import hu.psprog.leaflet.bridge.client.handler.InvocationFactory;
 import hu.psprog.leaflet.bridge.client.request.RequestAdapter;
 import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
 import hu.psprog.leaflet.bridge.integration.request.adapter.HttpServletBasedRequestAdapter;
+import hu.psprog.leaflet.security.jwt.JWTComponent;
+import hu.psprog.leaflet.security.sessionstore.service.SessionStoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +36,12 @@ public class InvocationFactoryConfig {
 
     private String remoteAddress;
     private UUID deviceId;
+
+    @Autowired
+    private JWTComponent jwtComponent;
+
+    @Autowired
+    private SessionStoreService sessionStoreService;
 
     @Bean
     @Primary
