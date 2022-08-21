@@ -27,7 +27,7 @@ public interface SelfStatusAwareJpaRepository<T extends SelfStatusAwareIdentifia
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE #{#entityName} e SET e.enabled = true WHERE e.id = :id")
-    public void enable(@Param("id") ID id);
+    void enable(@Param("id") ID id);
 
     /**
      * Disables given entity.
@@ -37,5 +37,5 @@ public interface SelfStatusAwareJpaRepository<T extends SelfStatusAwareIdentifia
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE #{#entityName} e SET e.enabled = false WHERE e.id = :id")
-    public void disable(@Param("id") ID id);
+    void disable(@Param("id") ID id);
 }

@@ -10,7 +10,7 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +34,9 @@ public class DocumentServiceImpl implements DocumentService {
     private static final String A_DOCUMENT_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS = "A document with the specified link already exists.";
     private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
 
-    private DocumentDAO documentDAO;
-    private DocumentToDocumentVOConverter documentToDocumentVOConverter;
-    private DocumentVOToDocumentConverter documentVOToDocumentConverter;
+    private final DocumentDAO documentDAO;
+    private final DocumentToDocumentVOConverter documentToDocumentVOConverter;
+    private final DocumentVOToDocumentConverter documentVOToDocumentConverter;
 
     @Autowired
     public DocumentServiceImpl(DocumentDAO documentDAO, DocumentToDocumentVOConverter documentToDocumentVOConverter,
@@ -47,7 +47,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Documents
     public DocumentVO getOne(Long id) throws ServiceException {
 
         Document document = documentDAO.findOne(id);
@@ -60,7 +60,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Documents
     public List<DocumentVO> getAll() {
 
         return documentDAO.findAll().stream()
@@ -89,14 +89,14 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Documents
     public Long count() {
 
         return documentDAO.count();
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Documents
     public Long createOne(DocumentVO entity) throws ServiceException {
 
         Document document = documentVOToDocumentConverter.convert(entity);
@@ -119,7 +119,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Documents
     public DocumentVO updateOne(Long id, DocumentVO updatedEntity) throws ServiceException {
 
         Document updatedDocument;
@@ -141,7 +141,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Documents
     public void deleteByID(Long id) throws ServiceException {
 
         if (!documentDAO.exists(id)) {
@@ -153,7 +153,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Documents
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!documentDAO.exists(id)) {
@@ -165,7 +165,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Documents
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!documentDAO.exists(id)) {

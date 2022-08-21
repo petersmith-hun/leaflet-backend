@@ -23,7 +23,7 @@ public interface EntryRepository extends SelfStatusAwareJpaRepository<Entry, Lon
      * @param link entry link
      * @return Entry object identified by given link or {@code null} if no Entry found
      */
-    public Entry findByLink(String link);
+    Entry findByLink(String link);
 
     /**
      * Returns {@link List} of {@link Entry} objects associated with given {@link User}.
@@ -31,7 +31,7 @@ public interface EntryRepository extends SelfStatusAwareJpaRepository<Entry, Lon
      * @param user {@link User} object to retrieve entries associated with
      * @return List of Entry objects or {@code null} if no Entry found
      */
-    public List<Entry> findByUser(User user);
+    List<Entry> findByUser(User user);
 
     /**
      * Returns {@link List} of {@link Entry} objects associated with given {@link Category}.
@@ -39,7 +39,7 @@ public interface EntryRepository extends SelfStatusAwareJpaRepository<Entry, Lon
      * @param category {@link Category} object to retrieve entries associated with
      * @return List of Entry objects or {@code null} if no Entry found
      */
-    public List<Entry> findByCategory(Category category);
+    List<Entry> findByCategory(Category category);
 
     /**
      * Returns {@link List} of {@link Entry} objects associated with given {@link Tag}.
@@ -47,5 +47,5 @@ public interface EntryRepository extends SelfStatusAwareJpaRepository<Entry, Lon
      * @param tag {@link Tag} object to retrieve entries associated with
      * @return List of Entry objects or {@code null} if no Entry found
      */
-    public List<Entry> findByTags(Tag tag);
+    List<Entry> findByTags(Tag tag);
 }

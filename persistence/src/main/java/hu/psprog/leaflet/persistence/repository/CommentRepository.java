@@ -24,7 +24,7 @@ public interface CommentRepository extends SelfStatusAwareJpaRepository<Comment,
      * @param entry {@link Entry} object to retrieve comments associated with
      * @return List of Comment objects or {@code null} if no Comment found
      */
-    public Page<Comment> findByEntry(Pageable pageable,  Entry entry);
+    Page<Comment> findByEntry(Pageable pageable,  Entry entry);
 
     /**
      * Returns {@link List} of {@link Comment} objects associated with given {@link User}.
@@ -32,5 +32,5 @@ public interface CommentRepository extends SelfStatusAwareJpaRepository<Comment,
      * @param user {@link User} object to retrieve comments associated with
      * @return List of Comment objects or {@code null} if no Comment found
      */
-    public Page<Comment> findByUser(Pageable pageable, User user);
+    Page<Comment> findByUser(Pageable pageable, User user);
 }

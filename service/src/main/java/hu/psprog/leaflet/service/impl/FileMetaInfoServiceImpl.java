@@ -9,7 +9,7 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.slf4j.Logger;
@@ -36,9 +36,9 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
     private static final String A_FILE_WITH_GIVEN_FILENAME_ALREADY_EXISTS = "A file with given filename already exists";
 
-    private UploadedFileDAO uploadedFileDAO;
-    private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
-    private UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
+    private final UploadedFileDAO uploadedFileDAO;
+    private final UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
+    private final UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
 
     @Autowired
     public FileMetaInfoServiceImpl(UploadedFileDAO uploadedFileDAO, UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter,
@@ -60,7 +60,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Entries
     public Long storeMetaInfo(UploadedFileVO uploadedFileVO) throws ServiceException {
 
         UploadedFile uploadedFileToStore = uploadedFileVOToUploadedFileConverter.convert(uploadedFileVO);
@@ -83,7 +83,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Entries
     public void removeMetaInfo(UUID pathUUID) throws ServiceException  {
 
         UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
@@ -96,7 +96,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Entries
     public void updateMetaInfo(UUID pathUUID, UpdateFileMetaInfoVO updateFileMetaInfoVO) throws ServiceException  {
 
         UploadedFile uploadedFile = uploadedFileDAO.findByPathUUID(pathUUID);
@@ -111,7 +111,7 @@ public class FileMetaInfoServiceImpl implements FileMetaInfoService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Entries
     public List<UploadedFileVO> getUploadedFiles() {
         return uploadedFileDAO.findAll().stream()
                 .map(uploadedFileToUploadedFileVOConverter::convert)

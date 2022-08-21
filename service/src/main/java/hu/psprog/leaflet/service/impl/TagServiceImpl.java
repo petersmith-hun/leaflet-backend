@@ -11,7 +11,7 @@ import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.security.annotation.PermitEditorOrAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import org.slf4j.Logger;
@@ -32,10 +32,10 @@ public class TagServiceImpl implements TagService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TagServiceImpl.class);
 
-    private TagDAO tagDAO;
-    private EntryDAO entryDAO;
-    private TagToTagVOConverter tagToTagVOConverter;
-    private TagVOToTagConverter tagVOToTagConverter;
+    private final TagDAO tagDAO;
+    private final EntryDAO entryDAO;
+    private final TagToTagVOConverter tagToTagVOConverter;
+    private final TagVOToTagConverter tagVOToTagConverter;
 
     @Autowired
     public TagServiceImpl(TagDAO tagDAO, EntryDAO entryDAO, TagToTagVOConverter tagToTagVOConverter, TagVOToTagConverter tagVOToTagConverter) {
@@ -46,7 +46,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Tags
     public TagVO getOne(Long id) throws ServiceException {
 
         Tag tag = tagDAO.findOne(id);
@@ -59,7 +59,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Tags
     public List<TagVO> getAll() {
 
         return tagDAO.findAll().stream()
@@ -76,14 +76,14 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Read.Tags
     public Long count() {
 
         return tagDAO.count();
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Tags
     public Long createOne(TagVO entity) throws ServiceException {
 
         Tag tag = tagVOToTagConverter.convert(entity);
@@ -99,7 +99,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Tags
     public void attachTagToEntry(TagVO tagVO, EntryVO entryVO) throws ServiceException {
 
         assertState(tagVO, entryVO);
@@ -116,7 +116,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Tags
     public void detachTagFromEntry(TagVO tagVO, EntryVO entryVO) throws ServiceException {
 
         assertState(tagVO, entryVO);
@@ -133,7 +133,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Tags
     public TagVO updateOne(Long id, TagVO updatedEntity) throws ServiceException {
 
         Tag updatedTag = tagDAO.updateOne(id, tagVOToTagConverter.convert(updatedEntity));
@@ -148,7 +148,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Tags
     public void deleteByID(Long id) throws ServiceException {
 
         if (!tagDAO.exists(id)) {
@@ -160,7 +160,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Tags
     public void enable(Long id) throws EntityNotFoundException {
 
         if (!tagDAO.exists(id)) {
@@ -172,7 +172,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitEditorOrAdmin
+    @PermitScope.Write.Tags
     public void disable(Long id) throws EntityNotFoundException {
 
         if (!tagDAO.exists(id)) {

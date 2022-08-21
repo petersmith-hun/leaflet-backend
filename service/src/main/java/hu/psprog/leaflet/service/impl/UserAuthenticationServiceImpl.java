@@ -10,8 +10,7 @@ import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
-import hu.psprog.leaflet.service.security.annotation.PermitAuthenticated;
-import hu.psprog.leaflet.service.security.annotation.PermitReclaim;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -43,6 +43,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     private static final int RECLAIM_TOKEN_EXPIRATION_IN_HOURS = 1;
     private static final String RECLAIM_ROLE = "RECLAIM";
     private static final List<String> ELEVATED_ROLES = Arrays.asList("ADMIN", "EDITOR");
+    private static final String USERNAME_JWT_ATTRIBUTE = "usr";
 
     private AuthenticationManager authenticationManager;
     private UserDetailsService userDetailsService;
@@ -78,7 +79,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     }
 
     @Override
-    @PermitAuthenticated
+    @PermitScope.DenyAlways
     public void revokeToken() {
 
         Authentication authentication = retrieveAuthentication();
@@ -86,6 +87,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     }
 
     @Override
+    @PermitScope.DenyAlways
     public void demandPasswordReset(LoginContextVO loginContextVO) {
 
         LOGGER.info("Password reset process started for user [{}]", loginContextVO.getUsername());
@@ -105,7 +107,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     }
 
     @Override
-    @PermitReclaim
+    @PermitScope.DenyAlways
     public Long confirmPasswordReset() {
 
         ExtendedUserDetails userDetails = retrieveAuthenticatedUserDetails();
@@ -121,7 +123,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     }
 
     @Override
-    @PermitAuthenticated
+    @PermitScope.DenyAlways
     public String extendSession(LoginContextVO loginContextVO) {
 
         ExtendedUserDetails userDetails = retrieveAuthenticatedUserDetails();
@@ -140,7 +142,12 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     }
 
     private ExtendedUserDetails retrieveAuthenticatedUserDetails() {
-        return (ExtendedUserDetails) userDetailsService.loadUserByUsername(retrieveAuthentication().getPrincipal().toString());
+
+        String username = (String) ((JwtAuthenticationToken) retrieveAuthentication())
+                .getTokenAttributes()
+                .get(USERNAME_JWT_ATTRIBUTE);
+
+        return (ExtendedUserDetails) userDetailsService.loadUserByUsername(username);
     }
 
     private Authentication createUsernamePasswordAuthentication(String username, String password) {
@@ -150,7 +157,7 @@ public class UserAuthenticationServiceImpl implements UserAuthenticationService 
     private Authentication retrieveAuthentication() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (Objects.isNull(authentication) || !(authentication instanceof JWTAuthenticationToken)) {
+        if (Objects.isNull(authentication) || !(authentication instanceof JwtAuthenticationToken)) {
             throw new IllegalStateException("No JWT authentication token found in security context - retrieving authentication object failed.");
         }
 

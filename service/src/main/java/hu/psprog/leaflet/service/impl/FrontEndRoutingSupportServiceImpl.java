@@ -9,7 +9,7 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.support.routing.RouteMaskProcessor;
-import hu.psprog.leaflet.service.security.annotation.PermitAdmin;
+import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +37,9 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     private static final String COULD_NOT_PERSIST_FRONT_END_ROUTE = "Could not persist FrontEndRoute";
     private static final String A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS = "A route with the specified ID already exists";
 
-    private FrontEndRouteDAO frontEndRouteDAO;
-    private ConversionService conversionService;
-    private List<RouteMaskProcessor> routeMaskProcessors;
+    private final FrontEndRouteDAO frontEndRouteDAO;
+    private final ConversionService conversionService;
+    private final List<RouteMaskProcessor> routeMaskProcessors;
 
     @Autowired
     public FrontEndRoutingSupportServiceImpl(FrontEndRouteDAO frontEndRouteDAO, ConversionService conversionService, List<RouteMaskProcessor> routeMaskProcessors) {
@@ -75,7 +75,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public Long createOne(FrontEndRouteVO entity) throws ServiceException {
 
         FrontEndRoute createdRoute;
@@ -97,7 +97,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public void deleteByID(Long id) throws ServiceException {
 
         assertExisting(id);
@@ -106,7 +106,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Read.Admin
     public FrontEndRouteVO getOne(Long id) throws ServiceException {
 
         assertExisting(id);
@@ -115,7 +115,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Read.Admin
     public List<FrontEndRouteVO> getAll() {
 
         return frontEndRouteDAO.findAll().stream()
@@ -129,7 +129,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public void enable(Long id) throws EntityNotFoundException {
 
         assertExisting(id);
@@ -138,7 +138,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public void disable(Long id) throws EntityNotFoundException {
 
         assertExisting(id);
@@ -147,7 +147,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     }
 
     @Override
-    @PermitAdmin
+    @PermitScope.Write.Admin
     public FrontEndRouteVO updateOne(Long id, FrontEndRouteVO updatedEntity) throws ServiceException {
 
         FrontEndRoute updatedRoute;

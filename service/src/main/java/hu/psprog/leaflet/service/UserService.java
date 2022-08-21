@@ -11,6 +11,8 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
 
+import static hu.psprog.leaflet.service.config.ServiceConfiguration.AUTH_OPERATION_DEPRECATED_SINCE;
+
 /**
  * User service operations interface.
  *
@@ -29,7 +31,9 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
      * @param entity user data
      * @return created user's ID
      * @throws ServiceException if user could not be created
+     * @deprecated Functionality has been moved to LAGS
      */
+    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
     Long register(UserVO entity) throws ServiceException;
     /**
      * Creates a no-login user via anonymous commenting.
@@ -53,7 +57,9 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
      *
      * @param id ID of user to update password for
      * @param password new password
+     * @deprecated Functionality has been moved to LAGS
      */
+    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
     void reclaimPassword(Long id, String password) throws EntityNotFoundException;
 
     /**

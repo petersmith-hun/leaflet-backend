@@ -1,22 +1,21 @@
 package hu.psprog.leaflet.service.security.evaluator;
 
-import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationToken;
-import hu.psprog.leaflet.security.jwt.model.JWTPayload;
-import hu.psprog.leaflet.security.jwt.model.Role;
-import hu.psprog.leaflet.service.CommentService;
-import hu.psprog.leaflet.service.EntryService;
-import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.persistence.dao.BaseDAO;
+import hu.psprog.leaflet.persistence.dao.CommentDAO;
+import hu.psprog.leaflet.persistence.dao.EntryDAO;
+import hu.psprog.leaflet.persistence.entity.Comment;
+import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.IdentifiableEntity;
+import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.CommentVO;
-import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Evaluates ownership of resources for PermitSelf permission types.
@@ -26,19 +25,19 @@ import java.util.Optional;
 @Component
 public class OwnershipEvaluator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OwnershipEvaluator.class);
+    private static final String USER_ID_TOKEN_ATTRIBUTE = "uid";
 
-    private EntryService entryService;
-    private CommentService commentService;
+    private final CommentDAO commentDAO;
+    private final EntryDAO entryDAO;
 
     @Autowired
-    public OwnershipEvaluator(EntryService entryService, @Qualifier("commentServiceImpl") CommentService commentService) {
-        this.entryService = entryService;
-        this.commentService = commentService;
+    public OwnershipEvaluator(CommentDAO commentDAO, EntryDAO entryDAO) {
+        this.commentDAO = commentDAO;
+        this.entryDAO = entryDAO;
     }
 
     /**
-     * Validates that a user is accessing their own user entry.
+     * Validates that a user is accessing their own account data.
      *
      * @param authentication current {@link Authentication} object
      * @param id user ID
@@ -46,124 +45,92 @@ public class OwnershipEvaluator {
      */
     public boolean isSelf(Authentication authentication, Long id) {
 
-        return extractPayload(authentication)
-                .map(jwtPayload -> jwtPayload.getId().equals(id.intValue()))
+        return extractUserID(authentication)
+                .map(id::equals)
                 .orElse(false);
     }
 
     /**
-     * Validates that a user is accessing their own user entry or an admin is accessing user information.
+     * Validates that a user is accessing their own account data.
      *
      * @param authentication current {@link Authentication} object
-     * @param id user ID
-     * @return {@code true} if the given user ID is the same as in the one in the {@link Authentication} object,
-     * or the authenticated user is an admin, {@code false} otherwise
+     * @param userVO user object containing their ID
+     * @return {@code true} if the given user ID is the same as in the one in the {@link Authentication} object, {@code false} otherwise
      */
-    public boolean isSelfOrAdmin(Authentication authentication, Long id) {
+    public boolean isSelf(Authentication authentication, UserVO userVO) {
 
-        return extractPayload(authentication)
-                .map(jwtPayload -> jwtPayload.getId().equals(id.intValue()) || isAdmin(jwtPayload))
+        return extractUserID(authentication)
+                .map(userVO.getId()::equals)
                 .orElse(false);
     }
 
     /**
-     * Validates that a user is accessing their own user entry or an admin/editor is accessing user information.
-     *
-     * @param authentication current {@link Authentication} object
-     * @param userVO user VO
-     * @return {@code true} if the given user ID is the same as in the one in the {@link Authentication} object,
-     * or the authenticated user is either an admin or an editor, {@code false} otherwise
-     */
-    public boolean isSelfOrModerator(Authentication authentication, UserVO userVO) {
-
-        return extractPayload(authentication)
-                .map(jwtPayload -> jwtPayload.getId().equals(userVO.getId().intValue()) || isModerator(jwtPayload))
-                .orElse(false);
-    }
-
-    /**
-     * Validates that an editor is accessing their own entry.
-     * Admin users can also access.
+     * Validates that a user is accessing their own entry.
      *
      * @param authentication current {@link Authentication} object
      * @param id entry ID
-     * @return {@code true} if the entry belongs to the current user or the current user is an admin, {@code false} otherwise
+     * @return {@code true} if the given entry has an owner with the same user ID as the one in the {@link Authentication} object, {@code false} otherwise
      */
-    public boolean isOwnEntryOrAdmin(Authentication authentication, Long id) {
+    public boolean isOwnEntry(Authentication authentication, Long id) {
 
-        return extractPayload(authentication)
-                .map(jwtPayload -> isAdmin(jwtPayload) || isOwnEntry(jwtPayload, id))
+        return extractUserID(authentication)
+                .map(userID -> isOwnEntry(userID, id))
                 .orElse(false);
     }
 
     /**
      * Validates that a user is accessing their own comment.
-     * Comments are also accessible for "moderators" (admin and editor users).
      *
      * @param authentication current {@link Authentication} object
      * @param id comment ID
-     * @return {@code true} if the comment belongs to the current user or the current user is a moderator, {@code false} otherwise
+     * @return {@code true} if the given comment has an owner with the same user ID as the one in the {@link Authentication} object, {@code false} otherwise
      */
-    public boolean isOwnCommentOrModerator(Authentication authentication, Long id) {
+    public boolean isOwnComment(Authentication authentication, Long id) {
 
-        return extractPayload(authentication)
-                .map(jwtPayload -> isModerator(jwtPayload) || isOwnComment(jwtPayload, id))
+        return extractUserID(authentication)
+                .map(userID -> isOwnComment(userID, id))
                 .orElse(false);
     }
 
     /**
-     * Validates that a user is accessing their own comment.
-     * Comments are also accessible for "moderators" (admin and editor users).
+     * Validates that a user is accessing their own entry.
      *
      * @param authentication current {@link Authentication} object
-     * @param commentVO comment entity
-     * @return {@code true} if the comment belongs to the current user or the current user is a moderator, {@code false} otherwise
+     * @param commentVO comment object
+     * @return {@code true} if the given comment has an owner with the same user ID as the one in the {@link Authentication} object, {@code false} otherwise
      */
-    public boolean isOwnCommentOrModerator(Authentication authentication, CommentVO commentVO) {
-        return isOwnCommentOrModerator(authentication, commentVO.getId());
+    public boolean isOwnComment(Authentication authentication, CommentVO commentVO) {
+
+        return extractUserID(authentication)
+                .map(userID -> isOwnComment(userID, commentVO.getId()))
+                .orElse(false);
     }
 
-    private Optional<JWTPayload> extractPayload(Authentication authentication) {
+    private Optional<Long> extractUserID(Authentication authentication) {
 
-        JWTPayload payload = null;
-        if (authentication instanceof JWTAuthenticationToken) {
-            payload = (JWTPayload) authentication.getDetails();
+        Long userID = null;
+        if (authentication instanceof JwtAuthenticationToken) {
+            userID = (Long) ((JwtAuthenticationToken) authentication).getTokenAttributes().get(USER_ID_TOKEN_ATTRIBUTE);
         }
 
-        return Optional.ofNullable(payload);
+        return Optional.ofNullable(userID);
     }
 
-    private boolean isOwnEntry(JWTPayload jwtPayload, Long entryID) {
-
-        boolean isOwnEntry = false;
-        try {
-            EntryVO entryVO = entryService.getOne(entryID);
-            isOwnEntry = entryVO.getOwner().getId() == jwtPayload.getId().longValue();
-        } catch (ServiceException e) {
-            LOGGER.error("Error occurred while retrieving entry data.", e);
-        }
-
-        return isOwnEntry;
+    private boolean isOwnEntry(Long userID, Long entryID) {
+        return isOwnItem(entryDAO, Entry::getUser, userID, entryID);
     }
 
-    private boolean isOwnComment(JWTPayload jwtPayload, Long commentID) {
-
-        boolean isOwnComment = false;
-        try {
-            CommentVO commentVO = commentService.getOne(commentID);
-            isOwnComment = commentVO.getOwner().getId() == jwtPayload.getId().longValue();
-        } catch (ServiceException e) {
-            LOGGER.error("Error occurred while retrieving comment data.", e);
-        }
-
-        return isOwnComment;
+    private boolean isOwnComment(Long userID, Long commentID) {
+        return isOwnItem(commentDAO, Comment::getUser, userID, commentID);
     }
 
-    private boolean isAdmin(JWTPayload jwtPayload) {
-        return jwtPayload.getRole() == Role.ADMIN;
-    }
+    private <T extends IdentifiableEntity<Long>> boolean isOwnItem(BaseDAO<T, Long> sourceDAO, Function<T, User> ownerMapper,
+                                                                   Long targetUserID, Long itemID) {
 
-    private boolean isModerator(JWTPayload jwtPayload) {
-        return isAdmin(jwtPayload) || jwtPayload.getRole() == Role.EDITOR;
+        return sourceDAO.findById(itemID)
+                .map(ownerMapper)
+                .map(User::getId)
+                .map(targetUserID::equals)
+                .orElse(false);
     }
 }

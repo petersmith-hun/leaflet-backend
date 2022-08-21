@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.nimbusds.jose.JWSAlgorithm;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.bridge.client.impl.InvocationFactoryConfig;
 import hu.psprog.leaflet.service.NotificationService;
@@ -21,7 +22,10 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.ws.rs.client.Client;
@@ -87,6 +91,14 @@ public class AcceptanceTestConfig {
     @Bean
     public NotificationService notificationService() {
         return new MockNotificationService();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(String jwtSecret) {
+
+        return NimbusJwtDecoder
+                .withSecretKey(new SecretKeySpec(jwtSecret.getBytes(), JWSAlgorithm.HS256.getName()))
+                .build();
     }
 
     private DataSource sessionStoreDataSource() {

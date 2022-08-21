@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Base DAO for repositories.
@@ -16,19 +17,21 @@ import java.util.List;
  */
 public interface BaseDAO<T extends SerializableEntity, ID extends Serializable> {
 
-    public boolean exists(ID id);
+    boolean exists(ID id);
 
-    public T findOne(ID id);
+    T findOne(ID id);
+    
+    Optional<T> findById(ID id);
 
-    public List<T> findAll();
+    List<T> findAll();
 
-    public Page<T> findAll(Pageable pageable);
+    Page<T> findAll(Pageable pageable);
 
-    public T updateOne(ID id, T updatedEntity);
+    T updateOne(ID id, T updatedEntity);
 
-    public void delete(ID id);
+    void delete(ID id);
 
-    public <S extends T> S save(S entity);
+    <S extends T> S save(S entity);
 
-    public long count();
+    long count();
 }

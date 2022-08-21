@@ -24,6 +24,8 @@ public class ServiceConfiguration {
 
     static final String PERSISTENCE_DAO_PACKAGE = "hu.psprog.leaflet.persistence.dao";
 
+    public static final String AUTH_OPERATION_DEPRECATED_SINCE = "v1.13.0";
+
     @Value("${files.upload.storage-path}")
     @NotNull
     private String storageRootDirectoryPath;

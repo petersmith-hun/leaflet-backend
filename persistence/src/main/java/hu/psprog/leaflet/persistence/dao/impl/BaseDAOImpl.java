@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Default implementation of {@link BaseDAO}.
@@ -38,6 +39,11 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
     public T findOne(ID id) {
         return jpaRepository.findById(id)
                 .orElse(null);
+    }
+
+    @Override
+    public Optional<T> findById(ID id) {
+        return jpaRepository.findById(id);
     }
 
     @Override

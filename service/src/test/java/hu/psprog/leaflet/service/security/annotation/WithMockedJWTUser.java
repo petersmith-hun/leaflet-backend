@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.service.security.annotation;
 
-import hu.psprog.leaflet.security.jwt.model.Role;
+import hu.psprog.leaflet.persistence.entity.Role;
 import org.springframework.security.test.context.support.WithSecurityContext;
 
 import java.lang.annotation.Retention;

@@ -1,10 +1,10 @@
 package hu.psprog.leaflet.service.impl;
 
+import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationToken;
 import hu.psprog.leaflet.security.jwt.model.ExtendedUserDetails;
 import hu.psprog.leaflet.security.jwt.model.JWTAuthenticationAnswerModel;
-import hu.psprog.leaflet.security.jwt.model.Role;
 import hu.psprog.leaflet.security.sessionstore.domain.ClaimedTokenContext;
 import hu.psprog.leaflet.security.sessionstore.service.SessionStoreService;
 import hu.psprog.leaflet.service.NotificationService;
@@ -14,6 +14,7 @@ import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.security.annotation.WithMockedJWTUser;
 import hu.psprog.leaflet.service.vo.LoginContextVO;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.Extensions;
@@ -160,6 +161,7 @@ public class UserAuthenticationServiceImplTest {
     }
 
     @Test
+    @Disabled("Deprecated use case, will be removed later")
     @WithMockedJWTUser(userID = USER_ID, role = Role.ADMIN)
     public void shouldRevokeToken() {
 
@@ -188,6 +190,7 @@ public class UserAuthenticationServiceImplTest {
     }
 
     @Test
+    @Disabled("Deprecated use case, will be removed later")
     @WithMockedJWTUser(userID = 1L, role = Role.ADMIN)
     public void shouldConfirmPasswordReset() {
 
@@ -204,6 +207,7 @@ public class UserAuthenticationServiceImplTest {
     }
 
     @Test
+    @Disabled("Deprecated use case, will be removed later")
     @WithMockedJWTUser(userID = 1L, role = Role.ADMIN)
     public void shouldExtendSession() {
 

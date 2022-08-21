@@ -18,5 +18,5 @@ public interface DocumentRepository extends SelfStatusAwareJpaRepository<Documen
      * @param link link of document
      * @return document identified by given link
      */
-    public Document findByLink(String link);
+    Document findByLink(String link);
 }
