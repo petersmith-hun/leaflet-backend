@@ -13,6 +13,11 @@ public enum Role {
     USER,
 
     /**
+     * Role for users signed up via external identity providers.
+     */
+    EXTERNAL_USER,
+
+    /**
      * Blog editors.
      */
     EDITOR,
@@ -29,7 +34,7 @@ public enum Role {
 
     /**
      * Non-registered user type, which is created when a user comments without registration.
-     * These users are not allowed to login, though their role can be elevated to USER.
+     * These users are not allowed to log in, though their role can be elevated to USER.
      */
     NO_LOGIN
 }
