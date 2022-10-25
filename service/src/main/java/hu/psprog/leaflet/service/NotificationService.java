@@ -24,14 +24,18 @@ public interface NotificationService {
      * Sends response mail for password reset request.
      *
      * @param passwordResetRequest domain object holding required parameters
+     * @deprecated Functionality is not part of Leaflet any longer, use LAGS instead
      */
+    @Deprecated
     void passwordResetRequested(PasswordResetRequest passwordResetRequest);
 
     /**
      * Sends notification of successful password reset.
      *
      * @param passwordResetSuccess domain object holding required parameters
+     * @deprecated Functionality is not part of Leaflet any longer, use LAGS instead
      */
+    @Deprecated
     void successfulPasswordReset(PasswordResetSuccess passwordResetSuccess);
 
     /**
@@ -52,6 +56,8 @@ public interface NotificationService {
      * Sends notification about successful sign-up.
      *
      * @param signUpConfirmation {@link SignUpConfirmation} domain object holding required parameters
+     * @deprecated Functionality is not part of Leaflet any longer, use LAGS instead
      */
+    @Deprecated
     void signUpConfirmation(SignUpConfirmation signUpConfirmation);
 }

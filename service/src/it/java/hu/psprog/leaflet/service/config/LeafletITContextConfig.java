@@ -3,18 +3,14 @@ package hu.psprog.leaflet.service.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import hu.psprog.leaflet.mail.client.MailClient;
-import hu.psprog.leaflet.mail.config.MailProcessorConfigurationProperties;
-import hu.psprog.leaflet.mail.domain.Mail;
-import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
-import hu.psprog.leaflet.mail.domain.MailDeliveryStatus;
+import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
 import hu.psprog.leaflet.security.jwt.JWTComponent;
 import hu.psprog.leaflet.security.jwt.auth.JWTAuthenticationToken;
 import hu.psprog.leaflet.security.sessionstore.domain.ClaimedTokenContext;
 import hu.psprog.leaflet.security.sessionstore.domain.SessionStoreValidationStatus;
 import hu.psprog.leaflet.security.sessionstore.service.SessionStoreService;
 import hu.psprog.leaflet.service.helper.TestObjectReader;
-import io.reactivex.Observable;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,17 +84,8 @@ public class LeafletITContextConfig implements ApplicationListener<ContextClosed
     }
 
     @Bean
-    public MailClient mailClient() {
-        return mail -> Observable.just(MailDeliveryInfo.getBuilder()
-                .withMail(Mail.getBuilder().build())
-                .withConstraintViolations(Collections.emptyMap())
-                .withMailDeliveryStatus(MailDeliveryStatus.DELIVERED)
-                .build());
-    }
-
-    @Bean
-    public MailProcessorConfigurationProperties mailProcessorConfigurationProperties() {
-        return new MailProcessorConfigurationProperties(null, null, null, null);
+    public EventNotificationServiceClient eventNotificationServiceClient() {
+        return Mockito.mock(EventNotificationServiceClient.class);
     }
 
     @Bean
