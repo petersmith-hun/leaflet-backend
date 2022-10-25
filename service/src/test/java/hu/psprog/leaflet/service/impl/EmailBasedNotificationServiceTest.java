@@ -1,30 +1,26 @@
 package hu.psprog.leaflet.service.impl;
 
-import hu.psprog.leaflet.mail.client.MailClient;
-import hu.psprog.leaflet.mail.domain.Mail;
-import hu.psprog.leaflet.mail.domain.MailDeliveryInfo;
+import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
+import hu.psprog.leaflet.lens.api.domain.ContactRequest;
+import hu.psprog.leaflet.lens.api.domain.MailRequestWrapper;
+import hu.psprog.leaflet.lens.api.domain.SystemStartup;
+import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
-import hu.psprog.leaflet.service.mail.impl.CommentNotificationMailFactory;
-import hu.psprog.leaflet.service.mail.impl.ContactRequestMailFactory;
-import hu.psprog.leaflet.service.mail.impl.MailFactoryRegistry;
-import hu.psprog.leaflet.service.mail.impl.PasswordResetRequestMailFactory;
-import hu.psprog.leaflet.service.mail.impl.PasswordResetSuccessMailFactory;
-import hu.psprog.leaflet.service.mail.impl.SignUpConfirmationMailFactory;
-import hu.psprog.leaflet.service.mail.impl.SystemStartupMailFactory;
-import hu.psprog.leaflet.service.observer.impl.LoggingMailObserverHandler;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
-import io.reactivex.Observable;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.BDDMockito.given;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -35,147 +31,147 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class EmailBasedNotificationServiceTest {
 
-    private static final Observable<MailDeliveryInfo> DELIVERY_INFO_OBSERVABLE = Observable.empty();
     private static final String DESTINATION_EMAIL_ADDRESS = "destination-email-address";
     private static final String USER_1 = "user1";
     private static final String VERSION = "v1";
+    private static final String USERNAME = "User 1";
+    private static final String EMAIL = "user1@dev.local";
+    private static final String CONTENT = "This is the content";
+    private static final String AUTHOR_NAME = "Editor 1";
+    private static final String ENTRY_TITLE = "Article title";
 
     @Mock
-    private MailClient mailClient;
-
-    @Mock
-    private LoggingMailObserverHandler loggingMailObserverHandler;
-
-    @Mock
-    private MailFactoryRegistry mailFactoryRegistry;
-
-    @Mock
-    private SystemStartupMailFactory systemStartupMailFactory;
-
-    @Mock
-    private PasswordResetSuccessMailFactory passwordResetSuccessMailFactory;
-
-    @Mock
-    private PasswordResetRequestMailFactory passwordResetRequestMailFactory;
-
-    @Mock
-    private CommentNotificationMailFactory commentNotificationMailFactory;
-
-    @Mock
-    private ContactRequestMailFactory contactRequestMailFactory;
-
-    @Mock
-    private SignUpConfirmationMailFactory signUpConfirmationMailFactory;
-
-    @Mock
-    private Mail mockMail;
+    private EventNotificationServiceClient eventNotificationServiceClient;
 
     @InjectMocks
     private EmailBasedNotificationService emailBasedNotificationService;
 
-    @BeforeEach
-    public void setup() {
-        given(mailClient.sendMail(mockMail)).willReturn(DELIVERY_INFO_OBSERVABLE);
-    }
-
     @Test
-    public void shouldSendStartupFinishedNotification() {
+    public void shouldSendStartupFinishedNotification() throws CommunicationFailureException {
 
         // given
-        given(mailFactoryRegistry.getFactory(SystemStartupMailFactory.class)).willReturn(systemStartupMailFactory);
-        given(systemStartupMailFactory.buildMail(VERSION)).willReturn(mockMail);
+        MailRequestWrapper<SystemStartup> systemStartupMail = new MailRequestWrapper<>();
+        systemStartupMail.setOverrideSubjectKey("mail.system.event.startup.subject.leaflet");
+        systemStartupMail.setContent(SystemStartup.builder()
+                .applicationName("Leaflet Backend")
+                .version(VERSION)
+                .build());
 
         // when
         emailBasedNotificationService.startupFinished(VERSION);
 
         // then
-        assertMailSentAndObserverAttached();
+        verify(eventNotificationServiceClient).requestMailNotification(systemStartupMail);
     }
 
     @Test
-    public void shouldSendPasswordResetRequestedNotification() {
+    public void shouldAnyOperationFailSilentlyIfCommunicationFailureExceptionIsThrown() throws CommunicationFailureException {
+
+        // given
+        doThrow(CommunicationFailureException.class).when(eventNotificationServiceClient).requestMailNotification(any(MailRequestWrapper.class));
+
+        // when
+        emailBasedNotificationService.startupFinished(VERSION);
+
+        // then
+        // silent failure expected
+    }
+
+    @Test
+    public void shouldSendPasswordResetRequestedNotificationThrowUnsupportedOperationException() {
 
         // given
         PasswordResetRequest passwordResetRequest = PasswordResetRequest.getBuilder()
                 .withParticipant(DESTINATION_EMAIL_ADDRESS)
                 .build();
-        given(mailFactoryRegistry.getFactory(PasswordResetRequestMailFactory.class)).willReturn(passwordResetRequestMailFactory);
-        given(passwordResetRequestMailFactory.buildMail(passwordResetRequest, passwordResetRequest.getParticipant())).willReturn(mockMail);
 
         // when
-        emailBasedNotificationService.passwordResetRequested(passwordResetRequest);
+        assertThrows(UnsupportedOperationException.class, () -> emailBasedNotificationService.passwordResetRequested(passwordResetRequest));
 
         // then
-        assertMailSentAndObserverAttached();
+        // exception expected
     }
 
     @Test
-    public void shouldSendPasswordResetConfirmationNotification() {
+    public void shouldSendPasswordResetConfirmationNotificationUnsupportedOperationException() {
 
         // given
         PasswordResetSuccess passwordResetSuccess = PasswordResetSuccess.getBuilder()
                 .withUsername(USER_1)
                 .withParticipant(DESTINATION_EMAIL_ADDRESS)
                 .build();
-        given(mailFactoryRegistry.getFactory(PasswordResetSuccessMailFactory.class)).willReturn(passwordResetSuccessMailFactory);
-        given(passwordResetSuccessMailFactory.buildMail(passwordResetSuccess.getUsername(), passwordResetSuccess.getParticipant())).willReturn(mockMail);
 
         // when
-        emailBasedNotificationService.successfulPasswordReset(passwordResetSuccess);
+        assertThrows(UnsupportedOperationException.class, () -> emailBasedNotificationService.successfulPasswordReset(passwordResetSuccess));
 
         // then
-        assertMailSentAndObserverAttached();
+        // exception expected
     }
 
     @Test
-    public void shouldSendCommentNotification() {
+    public void shouldSendCommentNotification() throws CommunicationFailureException {
 
         // given
         CommentNotification commentNotification = CommentNotification.getBuilder()
+                .withUsername(USERNAME)
+                .withEmail(EMAIL)
+                .withContent(CONTENT)
+                .withAuthorName(AUTHOR_NAME)
                 .withAuthorEmail(DESTINATION_EMAIL_ADDRESS)
+                .withEntryTitle(ENTRY_TITLE)
                 .build();
-        given(mailFactoryRegistry.getFactory(CommentNotificationMailFactory.class)).willReturn(commentNotificationMailFactory);
-        given(commentNotificationMailFactory.buildMail(commentNotification, commentNotification.getAuthorEmail())).willReturn(mockMail);
+        MailRequestWrapper<hu.psprog.leaflet.lens.api.domain.CommentNotification> commentNotificationMail = new MailRequestWrapper<>();
+        commentNotificationMail.setRecipients(List.of(DESTINATION_EMAIL_ADDRESS));
+        commentNotificationMail.setContent(hu.psprog.leaflet.lens.api.domain.CommentNotification.builder()
+                .username(USERNAME)
+                .email(EMAIL)
+                .content(CONTENT)
+                .authorName(AUTHOR_NAME)
+                .authorEmail(DESTINATION_EMAIL_ADDRESS)
+                .entryTitle(ENTRY_TITLE)
+                .build());
 
         // when
         emailBasedNotificationService.commentNotification(commentNotification);
 
         // then
-        assertMailSentAndObserverAttached();
+        verify(eventNotificationServiceClient).requestMailNotification(commentNotificationMail);
     }
 
     @Test
-    public void shouldSendContactRequestNotification() {
+    public void shouldSendContactRequestNotification() throws CommunicationFailureException {
 
         // given
-        ContactRequestVO contactRequestVO = ContactRequestVO.getBuilder().build();
-        given(mailFactoryRegistry.getFactory(ContactRequestMailFactory.class)).willReturn(contactRequestMailFactory);
-        given(contactRequestMailFactory.buildMail(contactRequestVO)).willReturn(mockMail);
+        ContactRequestVO contactRequestVO = ContactRequestVO.getBuilder()
+                .withName(USERNAME)
+                .withMessage(CONTENT)
+                .withEmail(EMAIL)
+                .build();
+        MailRequestWrapper<ContactRequest> contactRequestMail = new MailRequestWrapper<>();
+        contactRequestMail.setReplyTo(EMAIL);
+        contactRequestMail.setContent(ContactRequest.builder()
+                .name(USERNAME)
+                .email(EMAIL)
+                .message(CONTENT)
+                .build());
 
         // when
         emailBasedNotificationService.contactRequestReceived(contactRequestVO);
 
         // then
-        assertMailSentAndObserverAttached();
+        verify(eventNotificationServiceClient).requestMailNotification(contactRequestMail);
     }
 
     @Test
-    public void shouldSendSignUpConfirmation() {
+    public void shouldSendSignUpConfirmationUnsupportedOperationException() {
 
         // given
         SignUpConfirmation signUpConfirmation = new SignUpConfirmation("username", "email");
-        given(mailFactoryRegistry.getFactory(SignUpConfirmationMailFactory.class)).willReturn(signUpConfirmationMailFactory);
-        given(signUpConfirmationMailFactory.buildMail(signUpConfirmation, signUpConfirmation.getEmail())).willReturn(mockMail);
 
         // when
-        emailBasedNotificationService.signUpConfirmation(signUpConfirmation);
+        assertThrows(UnsupportedOperationException.class, () -> emailBasedNotificationService.signUpConfirmation(signUpConfirmation));
 
         // then
-        assertMailSentAndObserverAttached();
-    }
-
-    private void assertMailSentAndObserverAttached() {
-        verify(mailClient).sendMail(mockMail);
-        verify(loggingMailObserverHandler).attachObserver(DELIVERY_INFO_OBSERVABLE);
+        // exception expected
     }
 }

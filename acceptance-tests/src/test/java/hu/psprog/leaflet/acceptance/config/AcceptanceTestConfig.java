@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.nimbusds.jose.JWSAlgorithm;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
+import hu.psprog.leaflet.bridge.client.BridgeClient;
+import hu.psprog.leaflet.bridge.client.impl.BridgeClientImpl;
 import hu.psprog.leaflet.bridge.client.impl.InvocationFactoryConfig;
 import hu.psprog.leaflet.service.NotificationService;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -22,6 +24,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
@@ -99,6 +102,16 @@ public class AcceptanceTestConfig {
         return NimbusJwtDecoder
                 .withSecretKey(new SecretKeySpec(jwtSecret.getBytes(), JWSAlgorithm.HS256.getName()))
                 .build();
+    }
+
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        return Mockito.mock(ClientRegistrationRepository.class);
+    }
+
+    @Bean
+    public BridgeClient lens() {
+        return Mockito.mock(BridgeClientImpl.class);
     }
 
     private DataSource sessionStoreDataSource() {

@@ -6,7 +6,7 @@
 
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>1.13.1-dev</version>
+    <version>1.14.0-dev</version>
 
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
@@ -37,6 +37,10 @@
         
         <!-- Java environment version -->        
         <java.version>11</java.version>
+
+        <!-- overrides for leaflet internal libs -->
+        <leaflet.bridge.version>3.4.0</leaflet.bridge.version>
+        <leaflet.rcp.version>1.9.0</leaflet.rcp.version>
 
         <!-- Docker build configuration -->
         <!--suppress UnresolvedMavenProperty -->
@@ -69,6 +73,16 @@
                 <groupId>hu.psprog.leaflet</groupId>
                 <artifactId>leaflet-service</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>hu.psprog.leaflet</groupId>
+                <artifactId>lens-rest-client</artifactId>
+                <version>${leaflet.rcp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>hu.psprog.leaflet</groupId>
+                <artifactId>bridge-oauth-support</artifactId>
+                <version>${leaflet.bridge.version}</version>
             </dependency>
 
         </dependencies>

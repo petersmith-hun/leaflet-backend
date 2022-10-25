@@ -5,7 +5,7 @@
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet</artifactId>
-        <version>1.13.1-dev</version>
+        <version>1.14.0-dev</version>
     </parent>
     
     <artifactId>leaflet-service</artifactId>
@@ -21,7 +21,11 @@
         </dependency>
         <dependency>
             <groupId>hu.psprog.leaflet</groupId>
-            <artifactId>leaflet-mailer-component</artifactId>
+            <artifactId>lens-rest-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.psprog.leaflet</groupId>
+            <artifactId>bridge-oauth-support</artifactId>
         </dependency>
 
         <dependency>
