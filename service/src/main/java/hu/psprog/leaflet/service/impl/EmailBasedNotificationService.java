@@ -1,13 +1,13 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
+import hu.psprog.leaflet.lens.api.domain.CommentNotification;
 import hu.psprog.leaflet.lens.api.domain.ContactRequest;
 import hu.psprog.leaflet.lens.api.domain.MailContent;
 import hu.psprog.leaflet.lens.api.domain.MailRequestWrapper;
 import hu.psprog.leaflet.lens.api.domain.SystemStartup;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
 import hu.psprog.leaflet.service.NotificationService;
-import hu.psprog.leaflet.service.mail.domain.CommentNotification;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
 import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
 import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
@@ -16,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Email-based implementation of {@link NotificationService}.
@@ -42,12 +40,13 @@ public class EmailBasedNotificationService implements NotificationService {
     @Override
     public void startupFinished(String version) {
 
-        MailRequestWrapper<SystemStartup> systemStartupMail = new MailRequestWrapper<>();
-        systemStartupMail.setOverrideSubjectKey(SYSTEM_STARTUP_SUBJECT_KEY);
-        systemStartupMail.setContent(SystemStartup.builder()
-                .applicationName(APPLICATION_NAME)
-                .version(version)
-                .build());
+        var systemStartupMail = MailRequestWrapper.<SystemStartup>builder()
+                .overrideSubjectKey(SYSTEM_STARTUP_SUBJECT_KEY)
+                .content(SystemStartup.builder()
+                        .applicationName(APPLICATION_NAME)
+                        .version(version)
+                        .build())
+                .build();
 
         submit(systemStartupMail);
     }
@@ -63,18 +62,19 @@ public class EmailBasedNotificationService implements NotificationService {
     }
 
     @Override
-    public void commentNotification(CommentNotification commentNotification) {
+    public void commentNotification(hu.psprog.leaflet.service.mail.domain.CommentNotification commentNotification) {
 
-        MailRequestWrapper<hu.psprog.leaflet.lens.api.domain.CommentNotification> commentNotificationMail = new MailRequestWrapper<>();
-        commentNotificationMail.setRecipients(List.of(commentNotification.getAuthorEmail()));
-        commentNotificationMail.setContent(hu.psprog.leaflet.lens.api.domain.CommentNotification.builder()
-                .username(commentNotification.getUsername())
-                .email(commentNotification.getEmail())
-                .content(commentNotification.getContent())
-                .authorName(commentNotification.getAuthorName())
-                .authorEmail(commentNotification.getAuthorEmail())
-                .entryTitle(commentNotification.getEntryTitle())
-                .build());
+        var commentNotificationMail = MailRequestWrapper.<CommentNotification>builder()
+                .recipients(commentNotification.getAuthorEmail())
+                .content(CommentNotification.builder()
+                        .username(commentNotification.getUsername())
+                        .email(commentNotification.getEmail())
+                        .content(commentNotification.getContent())
+                        .authorName(commentNotification.getAuthorName())
+                        .authorEmail(commentNotification.getAuthorEmail())
+                        .entryTitle(commentNotification.getEntryTitle())
+                        .build())
+                .build();
 
         submit(commentNotificationMail);
     }
@@ -82,13 +82,14 @@ public class EmailBasedNotificationService implements NotificationService {
     @Override
     public void contactRequestReceived(ContactRequestVO contactRequestVO) {
 
-        MailRequestWrapper<ContactRequest> contactRequestMail = new MailRequestWrapper<>();
-        contactRequestMail.setReplyTo(contactRequestVO.getEmail());
-        contactRequestMail.setContent(ContactRequest.builder()
-                .name(contactRequestVO.getName())
-                .email(contactRequestVO.getEmail())
-                .message(contactRequestVO.getMessage())
-                .build());
+        var contactRequestMail = MailRequestWrapper.<ContactRequest>builder()
+                .replyTo(contactRequestVO.getEmail())
+                .content(ContactRequest.builder()
+                        .name(contactRequestVO.getName())
+                        .email(contactRequestVO.getEmail())
+                        .message(contactRequestVO.getMessage())
+                        .build())
+                .build();
 
         submit(contactRequestMail);
     }

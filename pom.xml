@@ -6,7 +6,7 @@
 
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>1.14.0-dev</version>
+    <version>1.14.1-dev</version>
 
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
@@ -40,7 +40,7 @@
 
         <!-- overrides for leaflet internal libs -->
         <leaflet.bridge.version>3.4.0</leaflet.bridge.version>
-        <leaflet.rcp.version>1.9.0</leaflet.rcp.version>
+        <leaflet.rcp.version>1.9.1</leaflet.rcp.version>
 
         <!-- Docker build configuration -->
         <!--suppress UnresolvedMavenProperty -->
