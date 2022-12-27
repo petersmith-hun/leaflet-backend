@@ -88,6 +88,10 @@ mail:
     name: "Leaflet Acceptance"
   renderer: hu.psprog.leaflet.mail.client.renderer.impl.ThymeleafMailRenderer
   event:
+    contact-request:
+      blacklist:
+        - name equals 'Blocked User'
+        - message contains 'something bad'
     comment-notification:
       enabled: true
     startup:
