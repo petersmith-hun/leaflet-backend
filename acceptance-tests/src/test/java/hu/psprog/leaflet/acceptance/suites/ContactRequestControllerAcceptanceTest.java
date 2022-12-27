@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -46,5 +47,37 @@ public class ContactRequestControllerAcceptanceTest extends AbstractParameterize
 
         // then
         assertThat(notificationService.getContactRequestVO(), equalTo(CONTACT_REQUEST_VO));
+    }
+
+    @Test
+    public void shouldProcessContactRequestBlockBlacklistedRequestScenario1() throws CommunicationFailureException {
+
+        // given
+        ContactRequestModel blockedContactRequest = new ContactRequestModel();
+        blockedContactRequest.setName("Blocked User");
+        blockedContactRequest.setMessage("This request is going to be blocked");
+        blockedContactRequest.setEmail("blocked@dev.local");
+
+        // when
+        contactBridgeService.sendContactRequest(blockedContactRequest, RECAPTCHA_TOKEN);
+
+        // then
+        assertThat(notificationService.getContactRequestVO(), nullValue());
+    }
+
+    @Test
+    public void shouldProcessContactRequestBlockBlacklistedRequestScenario2() throws CommunicationFailureException {
+
+        // given
+        ContactRequestModel blockedContactRequest = new ContactRequestModel();
+        blockedContactRequest.setName("Test User");
+        blockedContactRequest.setMessage("This message contains something bad, so it will be blocked");
+        blockedContactRequest.setEmail("blocked@dev.local");
+
+        // when
+        contactBridgeService.sendContactRequest(blockedContactRequest, RECAPTCHA_TOKEN);
+
+        // then
+        assertThat(notificationService.getContactRequestVO(), nullValue());
     }
 }
