@@ -14,7 +14,9 @@ import java.util.List;
  * Also handles storage status information management in database.
  *
  * @author Peter Smith
+ * @deprecated LSRS service is taking over the respective functionality
  */
+@Deprecated(forRemoval = true)
 public interface FileManagementService {
 
     /**
@@ -24,6 +26,7 @@ public interface FileManagementService {
      * @return uploaded file information
      * @throws ServiceException on file upload failure
      */
+    @Deprecated(forRemoval = true)
     UploadedFileVO upload(FileInputVO fileInputVO) throws ServiceException;
 
     /**
@@ -34,6 +37,7 @@ public interface FileManagementService {
      * @return uploaded file as {@link File}
      * @throws ServiceException if there's no existing file by the given filename
      */
+    @Deprecated(forRemoval = true)
     File download(String path) throws ServiceException;
 
     /**
@@ -42,6 +46,7 @@ public interface FileManagementService {
      * @param path filename of the file to remove
      * @throws ServiceException if there's no existing file by the given filename
      */
+    @Deprecated(forRemoval = true)
     void remove(String path) throws ServiceException;
 
     /**
@@ -50,6 +55,7 @@ public interface FileManagementService {
      * @param parent parent directory name (must be already existing)
      * @param directoryName name of the directory to create
      */
+    @Deprecated(forRemoval = true)
     void createDirectory(String parent, String directoryName) throws ServiceException;
 
     /**
@@ -59,6 +65,7 @@ public interface FileManagementService {
      * @return {@true} if file exists, {@false} otherwise
      * @throws ServiceException if there's no existing file by the given filename
      */
+    @Deprecated(forRemoval = true)
     boolean exists(String path) throws ServiceException;
 
     /**
@@ -66,5 +73,6 @@ public interface FileManagementService {
      *
      * @return List of {@link AcceptorInfoVO} holding information about acceptors
      */
+    @Deprecated(forRemoval = true)
     List<AcceptorInfoVO> getAcceptorInfo();
 }

@@ -46,9 +46,11 @@ import java.util.concurrent.TimeUnit;
  * Controller for file related endpoints.
  *
  * @author Peter Smith
+ * @deprecated LSRS service is taking over the respective functionality
  */
 @RestController
 @RequestMapping(BaseController.BASE_PATH_FILES)
+@Deprecated(forRemoval = true)
 public class FilesController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FilesController.class);
