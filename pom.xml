@@ -6,7 +6,7 @@
 
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>1.15.0-dev</version>
+    <version>1.16.0-dev</version>
 
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
