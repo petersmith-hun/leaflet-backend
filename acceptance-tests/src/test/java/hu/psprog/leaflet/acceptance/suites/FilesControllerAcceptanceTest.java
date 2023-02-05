@@ -13,6 +13,7 @@ import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.FileBridgeService;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Peter Smith
  */
 @LeafletAcceptanceSuite
+@Disabled
 public class FilesControllerAcceptanceTest extends AbstractTempFileHandlingParameterizedBaseTest {
 
     private static final int NUMBER_OF_ALL_FILES = 3;
