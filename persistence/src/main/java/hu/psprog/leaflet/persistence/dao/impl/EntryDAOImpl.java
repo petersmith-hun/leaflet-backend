@@ -1,22 +1,20 @@
 package hu.psprog.leaflet.persistence.dao.impl;
 
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
-import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
-import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.persistence.repository.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * DAO implementation for {@link EntryRepository}.
@@ -27,28 +25,13 @@ import java.util.Objects;
 public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements EntryDAO {
 
     @Autowired
-    public EntryDAOImpl(final EntryRepository entryRepository) {
-        super(entryRepository);
+    public EntryDAOImpl(final EntryRepository entryRepository, JpaContext jpaContext) {
+        super(entryRepository, jpaContext);
     }
 
     @Override
     public Entry findByLink(String link) {
         return ((EntryRepository) jpaRepository).findByLink(link);
-    }
-
-    @Override
-    public List<Entry> findByUser(User user) {
-        return ((EntryRepository) jpaRepository).findByUser(user);
-    }
-
-    @Override
-    public List<Entry> findByCategory(Category category) {
-        return ((EntryRepository) jpaRepository).findByCategory(category);
-    }
-
-    @Override
-    public List<Entry> findByTags(Tag tag) {
-        return ((EntryRepository) jpaRepository).findByTags(tag);
     }
 
     @Override
@@ -60,46 +43,40 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
     @Override
     public void updateAttachments(Long id, List<UploadedFile> attachments) {
 
-        Entry currentEntry = jpaRepository.getOne(id);
-        if (Objects.nonNull(currentEntry)) {
+        findEntry(id).ifPresent(currentEntry -> {
             currentEntry.setAttachments(attachments);
             jpaRepository.flush();
-        }
+        });
     }
 
     @Transactional
     @Override
     public void updateTags(Long id, List<Tag> tags) {
 
-        Entry currentEntry = jpaRepository.getOne(id);
-        if (Objects.nonNull(currentEntry)) {
+        findEntry(id).ifPresent(currentEntry -> {
             currentEntry.setTags(tags);
             jpaRepository.flush();
-        }
+        });
     }
 
-    @Transactional
     @Override
-    public Entry updateOne(Long id, Entry updatedEntity) {
+    protected void doUpdate(Entry currentEntity, Entry updatedEntity) {
 
-        Entry currentEntry = jpaRepository.getOne(id);
-        if (Objects.nonNull(currentEntry)) {
-            currentEntry.setTitle(updatedEntity.getTitle());
-            currentEntry.setRawContent(updatedEntity.getRawContent());
-            currentEntry.setPrologue(updatedEntity.getPrologue());
-            currentEntry.setSeoTitle(updatedEntity.getSeoTitle());
-            currentEntry.setSeoDescription(updatedEntity.getSeoDescription());
-            currentEntry.setSeoKeywords(updatedEntity.getSeoKeywords());
-            currentEntry.setLink(updatedEntity.getLink());
-            currentEntry.setCategory(updatedEntity.getCategory());
-            currentEntry.setLastModified(new Date());
-            currentEntry.setStatus(updatedEntity.getStatus());
-            currentEntry.setEnabled(updatedEntity.isEnabled());
-            currentEntry.setLocale(updatedEntity.getLocale());
-            currentEntry.setPublished(updatedEntity.getPublished());
-            jpaRepository.flush();
-        }
+        currentEntity.setTitle(updatedEntity.getTitle());
+        currentEntity.setRawContent(updatedEntity.getRawContent());
+        currentEntity.setPrologue(updatedEntity.getPrologue());
+        currentEntity.setSeoTitle(updatedEntity.getSeoTitle());
+        currentEntity.setSeoDescription(updatedEntity.getSeoDescription());
+        currentEntity.setSeoKeywords(updatedEntity.getSeoKeywords());
+        currentEntity.setLink(updatedEntity.getLink());
+        currentEntity.setCategory(updatedEntity.getCategory());
+        currentEntity.setStatus(updatedEntity.getStatus());
+        currentEntity.setEnabled(updatedEntity.isEnabled());
+        currentEntity.setLocale(updatedEntity.getLocale());
+        currentEntity.setPublished(updatedEntity.getPublished());
+    }
 
-        return currentEntry;
+    private Optional<Entry> findEntry(Long id) {
+        return jpaRepository.findById(id);
     }
 }

@@ -5,10 +5,9 @@ import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,8 +19,8 @@ import java.util.List;
 public class CategoryDAOImpl extends SelfStatusAwareDAOImpl<Category, Long> implements CategoryDAO {
 
     @Autowired
-    public CategoryDAOImpl(final CategoryRepository categoryRepository) {
-        super(categoryRepository);
+    public CategoryDAOImpl(final CategoryRepository categoryRepository, JpaContext jpaContext) {
+        super(categoryRepository, jpaContext);
     }
 
     @Override
@@ -29,18 +28,10 @@ public class CategoryDAOImpl extends SelfStatusAwareDAOImpl<Category, Long> impl
         return ((CategoryRepository) jpaRepository).findAll(specification);
     }
 
-    @Transactional
     @Override
-    public Category updateOne(Long id, Category updatedEntity) {
+    protected void doUpdate(Category currentEntity, Category updatedEntity) {
 
-        Category currentCategory = jpaRepository.getOne(id);
-        if (currentCategory != null) {
-            currentCategory.setTitle(updatedEntity.getTitle());
-            currentCategory.setDescription(updatedEntity.getDescription());
-            currentCategory.setLastModified(new Date());
-            jpaRepository.flush();
-        }
-
-        return currentCategory;
+        currentEntity.setTitle(updatedEntity.getTitle());
+        currentEntity.setDescription(updatedEntity.getDescription());
     }
 }

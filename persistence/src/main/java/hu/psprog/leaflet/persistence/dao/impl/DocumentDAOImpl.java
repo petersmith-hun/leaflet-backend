@@ -5,10 +5,9 @@ import hu.psprog.leaflet.persistence.entity.Document;
 import hu.psprog.leaflet.persistence.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,8 +19,8 @@ import java.util.List;
 public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> implements DocumentDAO {
 
     @Autowired
-    public DocumentDAOImpl(final DocumentRepository documentRepository) {
-        super(documentRepository);
+    public DocumentDAOImpl(final DocumentRepository documentRepository, JpaContext jpaContext) {
+        super(documentRepository, jpaContext);
     }
 
     @Override
@@ -34,24 +33,16 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
         return ((DocumentRepository) jpaRepository).findByLink(link);
     }
 
-    @Transactional
     @Override
-    public Document updateOne(Long id, Document updatedEntity) {
+    protected void doUpdate(Document currentEntity, Document updatedEntity) {
 
-        Document currentDocument = jpaRepository.getOne(id);
-        if (currentDocument != null) {
-            currentDocument.setTitle(updatedEntity.getTitle());
-            currentDocument.setRawContent(updatedEntity.getRawContent());
-            currentDocument.setSeoTitle(updatedEntity.getSeoTitle());
-            currentDocument.setSeoDescription(updatedEntity.getSeoDescription());
-            currentDocument.setSeoKeywords(updatedEntity.getSeoKeywords());
-            currentDocument.setLink(updatedEntity.getLink());
-            currentDocument.setLocale(updatedEntity.getLocale());
-            currentDocument.setEnabled(updatedEntity.isEnabled());
-            currentDocument.setLastModified(new Date());
-            jpaRepository.flush();
-        }
-
-        return currentDocument;
+        currentEntity.setTitle(updatedEntity.getTitle());
+        currentEntity.setRawContent(updatedEntity.getRawContent());
+        currentEntity.setSeoTitle(updatedEntity.getSeoTitle());
+        currentEntity.setSeoDescription(updatedEntity.getSeoDescription());
+        currentEntity.setSeoKeywords(updatedEntity.getSeoKeywords());
+        currentEntity.setLink(updatedEntity.getLink());
+        currentEntity.setLocale(updatedEntity.getLocale());
+        currentEntity.setEnabled(updatedEntity.isEnabled());
     }
 }

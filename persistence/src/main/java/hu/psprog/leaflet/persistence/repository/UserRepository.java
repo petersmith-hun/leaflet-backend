@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * User repository interface for Hibernate JPA persistence manager.
@@ -45,15 +44,10 @@ public interface UserRepository extends SelfStatusAwareJpaRepository<User, Long>
     void updateRole(@Param("id") Long id, @Param("role") Role role);
 
     /**
-     * Updates last login date of given user.
+     * Updates given user's "last modification" date to the current timestamp.
      *
-     * @param email email address of {@link User}
+     * @param id identifier of {@link User}
      */
-    @Transactional
-    @Modifying(clearAutomatically = true)
-    @Query("UPDATE User u SET u.lastLogin = now() WHERE u.email = :email")
-    void updateLastLogin(@Param("email") String email);
-
     @Modifying(clearAutomatically = true)
     @Query("UPDATE User u SET u.lastModified = now() WHERE u.id = :id")
     void updateLastModified(@Param("id") Long id);

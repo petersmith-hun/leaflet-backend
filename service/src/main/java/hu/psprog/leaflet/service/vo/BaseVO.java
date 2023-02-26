@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service.vo;
 
+import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.io.Serializable;
  *
  * @author Peter Smith
  */
+@Data
 @SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
 public class BaseVO implements Serializable {
 

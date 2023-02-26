@@ -3,6 +3,7 @@ package hu.psprog.leaflet.persistence.dao.impl;
 import hu.psprog.leaflet.persistence.dao.SelfStatusAwareDAO;
 import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
 import hu.psprog.leaflet.persistence.repository.SelfStatusAwareJpaRepository;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.io.Serializable;
@@ -15,8 +16,8 @@ import java.io.Serializable;
 public abstract class SelfStatusAwareDAOImpl<T extends SelfStatusAwareIdentifiableEntity<ID>, ID extends Serializable>
         extends BaseDAOImpl<T, ID> implements SelfStatusAwareDAO<ID> {
 
-    public SelfStatusAwareDAOImpl(JpaRepository<T, ID> jpaRepository) {
-        super(jpaRepository);
+    public SelfStatusAwareDAOImpl(JpaRepository<T, ID> jpaRepository, JpaContext jpaContext) {
+        super(jpaRepository, jpaContext);
     }
 
     @Override

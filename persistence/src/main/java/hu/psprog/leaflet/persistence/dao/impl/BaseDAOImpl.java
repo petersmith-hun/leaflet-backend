@@ -3,11 +3,11 @@ package hu.psprog.leaflet.persistence.dao.impl;
 import hu.psprog.leaflet.persistence.dao.BaseDAO;
 import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
 import hu.psprog.leaflet.persistence.entity.SerializableEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -23,11 +23,11 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
 
     protected JpaRepository<T, ID> jpaRepository;
 
-    @Autowired
-    private JpaContext jpaContext;
+    private final JpaContext jpaContext;
 
-    public BaseDAOImpl(JpaRepository<T, ID> jpaRepository) {
+    public BaseDAOImpl(JpaRepository<T, ID> jpaRepository, JpaContext jpaContext) {
         this.jpaRepository = jpaRepository;
+        this.jpaContext = jpaContext;
     }
 
     @Override
@@ -65,7 +65,7 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
     public <S extends T> S save(S entity) {
 
         if (entity instanceof SelfStatusAwareIdentifiableEntity) {
-            ((SelfStatusAwareIdentifiableEntity) entity).setCreated(new Date());
+            ((SelfStatusAwareIdentifiableEntity<?>) entity).setCreated(new Date());
         }
 
         S savedEntity = jpaRepository.saveAndFlush(entity);
@@ -74,8 +74,29 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
         return savedEntity;
     }
 
+    @Transactional
+    @Override
+    public T updateOne(ID id, T updatedEntity) {
+
+        return jpaRepository.findById(id)
+                .map(currentEntity -> {
+
+                    doUpdate(currentEntity, updatedEntity);
+                    if (currentEntity instanceof SelfStatusAwareIdentifiableEntity) {
+                        ((SelfStatusAwareIdentifiableEntity<?>) currentEntity).setLastModified(new Date());
+                    }
+
+                    jpaRepository.flush();
+
+                    return currentEntity;
+                })
+                .orElse(null);
+    }
+
     @Override
     public long count() {
         return jpaRepository.count();
     }
+
+    protected abstract void doUpdate(T currentEntity, T updatedEntity);
 }
