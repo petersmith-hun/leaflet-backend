@@ -15,6 +15,4 @@ public interface UserDAO extends BaseDAO<User, Long>, SelfStatusAwareDAO<Long> {
     void updatePassword(Long id, String password);
 
     void updateRole(Long id, Role role);
-
-    void updateLastLogin(String email);
 }

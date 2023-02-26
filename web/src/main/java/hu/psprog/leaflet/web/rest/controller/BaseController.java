@@ -3,7 +3,6 @@ package hu.psprog.leaflet.web.rest.controller;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
 import hu.psprog.leaflet.api.rest.response.common.ValidationErrorMessageListDataModel;
-import hu.psprog.leaflet.web.exception.AuthenticationFailureException;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
@@ -17,8 +16,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Exception handlers, common constants and operations.
@@ -35,7 +32,6 @@ public class BaseController {
     static final String BASE_PATH_DCP = "/dcp";
     static final String BASE_PATH_DOCUMENTS = "/documents";
     static final String BASE_PATH_COMMENTS = "/comments";
-    static final String BASE_PATH_FILES = "/files";
     static final String BASE_PATH_ATTACHMENTS = "/attachments";
     static final String BASE_PATH_TAGS = "/tags";
     static final String BASE_PATH_ROUTES = "/routes";
@@ -45,14 +41,10 @@ public class BaseController {
     static final String PATH_VARIABLE_ID = "id";
     static final String PATH_VARIABLE_PAGE = "page";
     static final String PATH_VARIABLE_LINK = "link";
-    static final String PATH_VARIABLE_FILENAME = "storedFilename";
-    static final String PATH_VARIABLE_FILE_IDENTIFIER = "fileIdentifier";
 
     static final String PATH_PART_ID = "/{id}";
     static final String PATH_PART_PAGE = "/{page}";
     static final String PATH_PART_LINK = "/{link}";
-    static final String PATH_PART_FILENAME = "/{storedFilename}";
-    static final String PATH_PART_FILE_IDENTIFIER = "/{fileIdentifier}";
 
     static final String PATH_CHANGE_STATUS = PATH_PART_ID + "/status";
     static final String PATH_PUBLIC = "/public";
@@ -78,7 +70,7 @@ public class BaseController {
      * HTTP 404 exception handler.
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorMessageDataModel> resourceNotFoundExceptionHandler(HttpServletRequest request, Exception exception) {
+    public ResponseEntity<ErrorMessageDataModel> resourceNotFoundExceptionHandler(Exception exception) {
 
         LOGGER.error("Requested resource is not available.", exception);
         exceptionHandlerCounters.resourceNotFound();
@@ -93,8 +85,8 @@ public class BaseController {
     /**
      * HTTP 401 exception handler.
      */
-    @ExceptionHandler({AuthenticationFailureException.class, AuthenticationException.class})
-    public ResponseEntity<ErrorMessageDataModel> authenticationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorMessageDataModel> authenticationFailureExceptionHandler(Exception exception) {
 
         LOGGER.error("Exception thrown during user authentication.", exception);
         exceptionHandlerCounters.authenticationFailure();
@@ -110,7 +102,7 @@ public class BaseController {
      * HTTP 403 exception handler.
      */
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorMessageDataModel> authorizationFailureExceptionHandler(HttpServletRequest request, Exception exception) {
+    public ResponseEntity<ErrorMessageDataModel> authorizationFailureExceptionHandler(Exception exception) {
 
         LOGGER.error("Unauthorized operation attempt was made by user.", exception);
         exceptionHandlerCounters.authorizationFailure();
@@ -126,7 +118,7 @@ public class BaseController {
      * HTTP 409 exception handler.
      */
     @ExceptionHandler(RequestCouldNotBeFulfilledException.class)
-    public ResponseEntity<ErrorMessageDataModel> requestCouldNotBeFulfilledExceptionHandler(HttpServletRequest request, Exception exception) {
+    public ResponseEntity<ErrorMessageDataModel> requestCouldNotBeFulfilledExceptionHandler(Exception exception) {
 
         LOGGER.error("User interaction caused a recognized exception.", exception);
         exceptionHandlerCounters.requestCouldNotBeFulfilled();
@@ -142,7 +134,7 @@ public class BaseController {
      * Temporary exception handler, specific handlers shall be created later!
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorMessageDataModel> defaultExceptionHandler(HttpServletRequest request, Exception exception) {
+    public ResponseEntity<ErrorMessageDataModel> defaultExceptionHandler(Exception exception) {
 
         LOGGER.error("Default handler caught exception.", exception);
         exceptionHandlerCounters.defaultExceptionHandler();

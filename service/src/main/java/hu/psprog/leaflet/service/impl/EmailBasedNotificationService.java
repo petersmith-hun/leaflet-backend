@@ -8,9 +8,6 @@ import hu.psprog.leaflet.lens.api.domain.MailRequestWrapper;
 import hu.psprog.leaflet.lens.api.domain.SystemStartup;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
 import hu.psprog.leaflet.service.NotificationService;
-import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
-import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
-import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,16 +49,6 @@ public class EmailBasedNotificationService implements NotificationService {
     }
 
     @Override
-    public void passwordResetRequested(PasswordResetRequest passwordResetRequest) {
-        throw new UnsupportedOperationException("Functionality is not part of Leaflet any longer");
-    }
-
-    @Override
-    public void successfulPasswordReset(PasswordResetSuccess passwordResetSuccess) {
-        throw new UnsupportedOperationException("Functionality is not part of Leaflet any longer");
-    }
-
-    @Override
     public void commentNotification(hu.psprog.leaflet.service.mail.domain.CommentNotification commentNotification) {
 
         var commentNotificationMail = MailRequestWrapper.<CommentNotification>builder()
@@ -92,11 +79,6 @@ public class EmailBasedNotificationService implements NotificationService {
                 .build();
 
         submit(contactRequestMail);
-    }
-
-    @Override
-    public void signUpConfirmation(SignUpConfirmation signUpConfirmation) {
-        throw new UnsupportedOperationException("Functionality is not part of Leaflet any longer");
     }
 
     private void submit(MailRequestWrapper<? extends MailContent> mailRequestWrapper) {

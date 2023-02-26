@@ -36,7 +36,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -306,21 +305,6 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldReclaimPasswordWithSuccess() throws EntityNotFoundException {
-
-        // given
-        Long id = 1L;
-        String updatedPassword = "new password";
-        given(userDAO.exists(id)).willReturn(true);
-
-        // when
-        userService.reclaimPassword(id, updatedPassword);
-
-        // then
-        verify(userDAO).updatePassword(id, updatedPassword);
-    }
-
-    @Test
     public void testChangePasswordWithFailure() {
 
         // given
@@ -427,37 +411,6 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testUpdateLastLoginWithSuccess() throws EntityNotFoundException {
-
-        // given
-        String email = "lflt66test@leaflet.dev";
-        given(userDAO.findByEmail(email)).willReturn(new User());
-
-        // when
-        userService.updateLastLogin(email);
-
-        // then
-        verify(userDAO).findByEmail(email);
-        verify(userDAO).updateLastLogin(email);
-    }
-
-    @Test
-    public void testUpdateLastLoginWithNonExistingUser() {
-
-        // given
-        String email = "lflt66test@leaflet.dev";
-        given(userDAO.findByEmail(email)).willReturn(null);
-
-        // when
-        Assertions.assertThrows(EntityNotFoundException.class, () -> userService.updateLastLogin(email));
-
-        // then
-        // expected exception
-        verify(userDAO).findByEmail(email);
-        verify(userDAO, never()).updateLastLogin(anyString());
-    }
-
-    @Test
     public void testSilentGetUserByEmailWithExistingUser() {
 
         // given
@@ -490,30 +443,6 @@ public class UserServiceImplTest {
         assertThat(result, nullValue());
         verify(userDAO).findByEmail(email);
         verify(userToUserVOConverter, never()).convert(any(User.class));
-    }
-
-    @Test
-    public void shouldRegister() throws ServiceException {
-
-        // given
-        given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userDAO.save(user)).willReturn(user);
-
-        // when
-        Long result = userService.register(userVO);
-
-        // then
-        assertThat(result, equalTo(user.getId()));
-    }
-
-    @Test
-    public void shouldRegisterWithFailure() {
-
-        // when
-        Assertions.assertThrows(ServiceException.class, () -> userService.register(USER_VO_WITH_ADMIN_ROLE));
-
-        // then
-        // exception expected
     }
 
     @Test

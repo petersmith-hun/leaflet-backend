@@ -144,17 +144,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PermitScope.DenyAlways
-    public Long register(UserVO entity) throws ServiceException {
-
-        if (!isUserRole(entity)) {
-            throw new ServiceException("Only users with role USER can be created via register service entry point.");
-        }
-
-        return createOne(entity);
-    }
-
-    @Override
     public Long registerNoLogin(UserVO entity) throws ServiceException {
 
         if (!isNoLoginRole(entity)) {
@@ -174,12 +163,6 @@ public class UserServiceImpl implements UserService {
 
         userDAO.updatePassword(id, password);
         LOGGER.info("Password has been updated for user [{}]", id);
-    }
-
-    @Override
-    @PermitScope.DenyAlways
-    public void reclaimPassword(Long id, String password) throws EntityNotFoundException {
-        changePassword(id, password);
     }
 
     @Override
@@ -230,26 +213,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateLastLogin(String email) throws EntityNotFoundException {
-
-        User user = userDAO.findByEmail(email);
-        if(user == null) {
-            throw new EntityNotFoundException(User.class, email);
-        }
-        userDAO.updateLastLogin(email);
-    }
-
-    @Override
     public UserVO silentGetUserByEmail(String email) {
 
         return Optional.ofNullable(userDAO.findByEmail(email))
                 .map(userToUserVOConverter::convert)
                 .orElse(null);
-    }
-
-    private boolean isUserRole(UserVO entity) {
-        return entity.getAuthorities().stream()
-                .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.USER));
     }
 
     private boolean isNoLoginRole(UserVO entity) {

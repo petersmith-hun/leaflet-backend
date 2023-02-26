@@ -3,7 +3,7 @@
     "created": "2017-05-13T15:00:00Z",
     "originalFilename": "original_filename_3.jpg",
     "path": "images/stored_filename_3.jpg",
-    "acceptedAs": "image/jpeg",
+    "mime": "image/jpeg",
     "storedFilename": "stored_filename_3.jpg",
     "pathUUID": "058c9d47-6ce4-3e48-9c44-35bb9c74b378",
     "description": "Uploaded file #3",

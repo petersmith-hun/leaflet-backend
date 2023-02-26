@@ -21,7 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Peter Smith
  */
 @LeafletAcceptanceSuite
-public class AttachmentsControllerAcceptanceTest extends AbstractTempFileHandlingParameterizedBaseTest {
+public class AttachmentsControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
     private static final Long ENTRY_ID_1 = 1L;
     private static final Long ENTRY_ID_2 = 2L;

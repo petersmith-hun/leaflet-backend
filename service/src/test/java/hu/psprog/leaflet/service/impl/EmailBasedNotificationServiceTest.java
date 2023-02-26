@@ -6,9 +6,6 @@ import hu.psprog.leaflet.lens.api.domain.MailRequestWrapper;
 import hu.psprog.leaflet.lens.api.domain.SystemStartup;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
 import hu.psprog.leaflet.service.mail.domain.CommentNotification;
-import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
-import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
-import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -32,7 +28,6 @@ import static org.mockito.Mockito.verify;
 public class EmailBasedNotificationServiceTest {
 
     private static final String DESTINATION_EMAIL_ADDRESS = "destination-email-address";
-    private static final String USER_1 = "user1";
     private static final String VERSION = "v1";
     private static final String USERNAME = "User 1";
     private static final String EMAIL = "user1@dev.local";
@@ -75,37 +70,6 @@ public class EmailBasedNotificationServiceTest {
 
         // then
         // silent failure expected
-    }
-
-    @Test
-    public void shouldSendPasswordResetRequestedNotificationThrowUnsupportedOperationException() {
-
-        // given
-        PasswordResetRequest passwordResetRequest = PasswordResetRequest.getBuilder()
-                .withParticipant(DESTINATION_EMAIL_ADDRESS)
-                .build();
-
-        // when
-        assertThrows(UnsupportedOperationException.class, () -> emailBasedNotificationService.passwordResetRequested(passwordResetRequest));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    public void shouldSendPasswordResetConfirmationNotificationUnsupportedOperationException() {
-
-        // given
-        PasswordResetSuccess passwordResetSuccess = PasswordResetSuccess.getBuilder()
-                .withUsername(USER_1)
-                .withParticipant(DESTINATION_EMAIL_ADDRESS)
-                .build();
-
-        // when
-        assertThrows(UnsupportedOperationException.class, () -> emailBasedNotificationService.successfulPasswordReset(passwordResetSuccess));
-
-        // then
-        // exception expected
     }
 
     @Test
@@ -160,18 +124,5 @@ public class EmailBasedNotificationServiceTest {
 
         // then
         verify(eventNotificationServiceClient).requestMailNotification(contactRequestMail);
-    }
-
-    @Test
-    public void shouldSendSignUpConfirmationUnsupportedOperationException() {
-
-        // given
-        SignUpConfirmation signUpConfirmation = new SignUpConfirmation("username", "email");
-
-        // when
-        assertThrows(UnsupportedOperationException.class, () -> emailBasedNotificationService.signUpConfirmation(signUpConfirmation));
-
-        // then
-        // exception expected
     }
 }

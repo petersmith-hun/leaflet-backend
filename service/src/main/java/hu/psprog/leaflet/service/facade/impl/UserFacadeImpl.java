@@ -1,18 +1,11 @@
 package hu.psprog.leaflet.service.facade.impl;
 
-import hu.psprog.leaflet.service.NotificationService;
-import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
-import hu.psprog.leaflet.service.exception.EntityNotFoundException;
-import hu.psprog.leaflet.service.exception.ReAuthenticationFailureException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.UserFacade;
-import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
-import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,18 +19,13 @@ import java.util.List;
 @Service
 public class UserFacadeImpl implements UserFacade {
 
-    private UserService userService;
-    private UserAuthenticationService authenticationService;
-    private PasswordEncoder passwordEncoder;
-    private NotificationService notificationService;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserFacadeImpl(UserService userService, UserAuthenticationService authenticationService,
-                          PasswordEncoder passwordEncoder, NotificationService notificationService) {
+    public UserFacadeImpl(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.authenticationService = authenticationService;
         this.passwordEncoder = passwordEncoder;
-        this.notificationService = notificationService;
     }
 
     @Override
@@ -75,54 +63,10 @@ public class UserFacadeImpl implements UserFacade {
 
     @Override
     public UserVO updateUserPassword(Long userID, String currentPassword, String newPassword) throws ServiceException {
-        try {
-            authenticationService.reAuthenticate(currentPassword);
-            userService.changePassword(userID, passwordEncoder.encode(newPassword));
 
-            return userService.getOne(userID);
-        } catch (AuthenticationException e) {
-            throw new ReAuthenticationFailureException(e);
-        }
-    }
+        userService.changePassword(userID, passwordEncoder.encode(newPassword));
 
-    @Override
-    public String login(LoginContextVO loginContext) throws EntityNotFoundException {
-
-        String token = authenticationService.claimToken(loginContext);
-        userService.updateLastLogin(loginContext.getUsername());
-
-        return token;
-    }
-
-    @Override
-    public Long register(UserVO userData) throws ServiceException {
-
-        UserVO rebuiltUserVO = rebuildUserDataWithHashedPassword(userData);
-        Long registeredUserID = userService.register(rebuiltUserVO);
-        notificationService.signUpConfirmation(new SignUpConfirmation(userData.getUsername(), userData.getEmail()));
-
-        return registeredUserID;
-    }
-
-    @Override
-    public void logout() {
-        authenticationService.revokeToken();
-    }
-
-    @Override
-    public void demandPasswordReset(LoginContextVO loginContext) {
-        authenticationService.demandPasswordReset(loginContext);
-    }
-
-    @Override
-    public void confirmPasswordReset(String password) throws EntityNotFoundException {
-        Long userID = authenticationService.confirmPasswordReset();
-        userService.reclaimPassword(userID, passwordEncoder.encode(password));
-    }
-
-    @Override
-    public String extendSession(LoginContextVO loginContext) {
-        return authenticationService.extendSession(loginContext);
+        return userService.getOne(userID);
     }
 
     private UserVO rebuildUserDataWithHashedPassword(UserVO originalUserVO) {

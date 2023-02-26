@@ -10,13 +10,9 @@ import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
-import hu.psprog.leaflet.api.rest.request.file.FileUploadRequestModel;
-import hu.psprog.leaflet.api.rest.request.file.UpdateFileMetaInfoRequestModel;
 import hu.psprog.leaflet.api.rest.request.routing.FrontEndRouteUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagAssignmentRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagCreateRequestModel;
-import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
-import hu.psprog.leaflet.api.rest.request.user.PasswordResetDemandRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
@@ -35,10 +31,7 @@ import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
-import hu.psprog.leaflet.api.rest.response.file.DirectoryDataModel;
-import hu.psprog.leaflet.api.rest.response.file.DirectoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
-import hu.psprog.leaflet.api.rest.response.file.FileListDataModel;
 import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteDataModel;
 import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteListDataModel;
 import hu.psprog.leaflet.api.rest.response.routing.FrontEndRouteDataModel;
@@ -46,42 +39,32 @@ import hu.psprog.leaflet.api.rest.response.routing.FrontEndRouteListDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagListDataModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
-import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.service.common.Authority;
-import hu.psprog.leaflet.service.vo.AcceptorInfoVO;
 import hu.psprog.leaflet.service.vo.AttachmentRequestVO;
-import hu.psprog.leaflet.service.vo.AuthRequestVO;
-import hu.psprog.leaflet.service.vo.AuthResponseVO;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import hu.psprog.leaflet.service.vo.FileInputVO;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
-import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.TagAssignmentVO;
 import hu.psprog.leaflet.service.vo.TagVO;
-import hu.psprog.leaflet.service.vo.UpdateFileMetaInfoVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import hu.psprog.leaflet.web.rest.conversion.JULocaleToLeafletLocaleConverter;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -130,13 +113,6 @@ public abstract class ConversionTestObjects {
     private static final ZonedDateTime ZONED_DATE_TIME_PUBLISHED = ZonedDateTime.of(2019, 2, 14, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final ZonedDateTime ZONED_DATE_TIME_LAST_MODIFIED = ZonedDateTime.of(2019, 2, 8, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final ZonedDateTime ZONED_DATE_TIME_LAST_LOGIN = ZonedDateTime.of(2019, 2, 1, 19, 0, 0, 0, ZoneId.systemDefault());
-    private static final String IMAGE = "IMAGE";
-    private static final String SUB_1 = "sub1";
-    private static final String SUB_2 = "sub2";
-    private static final String IMAGE_JPG = "image/jpg";
-    private static final MockMultipartFile MOCK_MULTIPART_FILE = new MockMultipartFile(ORIGINAL_FILENAME, ORIGINAL_FILENAME, IMAGE_JPG, CONTENT.getBytes());
-    private static final String IMAGE_GIF = "image/gif";
-    private static final String ROOT_DIRECTORY_NAME = "images";
     private static final String ADMIN = "ADMIN";
     private static final String ROUTE_ID = "route-test";
     private static final String NAME = "Test Route";
@@ -146,13 +122,10 @@ public abstract class ConversionTestObjects {
     private static final String MESSAGE = "contact message";
     private static final FrontEndRouteAuthRequirement AUTH_REQUIREMENT = FrontEndRouteAuthRequirement.AUTHENTICATED;
 
-    protected static final String TOKEN = "token";
     protected static final String PASSWORD = "test-pw";
     protected static final String USERNAME = "username";
     protected static final Locale LOCALE = Locale.EN;
     protected static final String EMAIL = "test@leaflet.dev";
-    protected static final String REMOTE_ADDRESS = "localhost";
-    protected static final UUID DEVICE_ID = UUID.randomUUID();
 
     protected static final List<ObjectError> OBJECT_ERROR_LIST = Arrays.asList(
             prepareObjectError(true),
@@ -246,55 +219,8 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final UserInitializeRequestModel USER_INITIALIZE_REQUEST_MODEL = prepareUserInitializeRequestModel();
-
     protected static final UserCreateRequestModel USER_CREATE_REQUEST_MODEL = prepareUserCreateRequestModel();
-
-    protected static final AuthRequestVO AUTH_REQUEST_VO = AuthRequestVO.getBuilder()
-            .withPassword(PASSWORD)
-            .withUsername(EMAIL)
-            .build();
-
-    protected static final LoginRequestModel LOGIN_REQUEST_MODEL = prepareLoginRequestModel();
-
-    protected static final AuthResponseVO AUTH_RESPONSE_VO_WITH_SUCCESS = AuthResponseVO.getBuilder()
-            .withAuthenticationResult(AuthResponseVO.AuthenticationResult.AUTH_SUCCESS)
-            .withToken(TOKEN)
-            .build();
-
-    protected static final AuthResponseVO AUTH_RESPONSE_VO_WITH_FAILURE = AuthResponseVO.getBuilder()
-            .withAuthenticationResult(AuthResponseVO.AuthenticationResult.INVALID_CREDENTIALS)
-            .build();
-
-    protected static final LoginResponseDataModel LOGIN_RESPONSE_DATA_MODEL_WITH_SUCCESS = LoginResponseDataModel.getBuilder()
-            .withToken(TOKEN)
-            .withStatus(LoginResponseDataModel.AuthenticationResult.AUTH_SUCCESS)
-            .build();
-
-    protected static final LoginResponseDataModel LOGIN_RESPONSE_DATA_MODEL_WITH_FAILURE = LoginResponseDataModel.getBuilder()
-            .withStatus(LoginResponseDataModel.AuthenticationResult.INVALID_CREDENTIALS)
-            .build();
-
     protected static final UpdateProfileRequestModel UPDATE_PROFILE_REQUEST_MODEL = prepareUpdateProfileRequestModel();
-
-    protected static final PasswordResetDemandRequestModel PASSWORD_RESET_DEMAND_REQUEST_MODEL = preparePasswordResetDemandRequestModel();
-
-    protected static final LoginContextVO LOGIN_CONTEXT_VO_FOR_LOGIN = LoginContextVO.getBuilder()
-            .withUsername(EMAIL)
-            .withPassword(PASSWORD)
-            .withRemoteAddress(REMOTE_ADDRESS)
-            .withDeviceID(DEVICE_ID)
-            .build();
-
-    protected static final LoginContextVO LOGIN_CONTEXT_VO_FOR_PASSWORD_RESET = LoginContextVO.getBuilder()
-            .withUsername(EMAIL)
-            .withRemoteAddress(REMOTE_ADDRESS)
-            .withDeviceID(DEVICE_ID)
-            .build();
-
-    protected static final LoginContextVO LOGIN_CONTEXT_VO_FOR_RENEWAL = LoginContextVO.getBuilder()
-            .withRemoteAddress(REMOTE_ADDRESS)
-            .withDeviceID(DEVICE_ID)
-            .build();
 
     protected static final UploadedFileVO UPLOADED_FILE_VO = UploadedFileVO.getBuilder()
             .withId(ID)
@@ -316,39 +242,6 @@ public abstract class ConversionTestObjects {
             .withDescription(DESCRIPTION)
             .withPath(PATH)
             .build();
-
-    protected static final FileListDataModel FILE_LIST_DATA_MODEL = FileListDataModel.getBuilder()
-            .withItem(FILE_DATA_MODEL)
-            .build();
-
-    protected static final AcceptorInfoVO ACCEPTOR_INFO_VO = AcceptorInfoVO.getBuilder()
-            .withId(IMAGE)
-            .withChildrenDirectories(Arrays.asList(SUB_1, SUB_2))
-            .withAcceptableMimeTypes(Arrays.asList(IMAGE_JPG, IMAGE_GIF))
-            .withRootDirectoryName(ROOT_DIRECTORY_NAME)
-            .build();
-
-    protected static final DirectoryDataModel DIRECTORY_DATA_MODEL = DirectoryDataModel.getBuilder()
-            .withId(IMAGE)
-            .withChildren(Arrays.asList(SUB_1, SUB_2))
-            .withAcceptableMimeTypes(Arrays.asList(IMAGE_JPG, IMAGE_GIF))
-            .withRoot(ROOT_DIRECTORY_NAME)
-            .build();
-
-    protected static final DirectoryListDataModel DIRECTORY_LIST_DATA_MODEL = DirectoryListDataModel.getBuilder()
-            .withItem(DIRECTORY_DATA_MODEL)
-            .build();
-
-    protected static final FileUploadRequestModel FILE_UPLOAD_REQUEST_MODEL = prepareFileUploadRequestModel();
-
-    protected static final FileInputVO FILE_INPUT_VO = prepareFileInputVO();
-
-    protected static final UpdateFileMetaInfoVO UPDATE_FILE_META_INFO_VO = UpdateFileMetaInfoVO.getBuilder()
-            .withOriginalFilename(ORIGINAL_FILENAME)
-            .withDescription(DESCRIPTION)
-            .build();
-
-    protected static final UpdateFileMetaInfoRequestModel UPDATE_FILE_META_INFO_REQUEST_MODEL = prepareUpdateFileMetaInfoRequestModel();
 
     protected static final TagVO TAG_VO = TagVO.getBuilder()
             .withId(ID)
@@ -806,25 +699,6 @@ public abstract class ConversionTestObjects {
         return entryCreateRequestModel;
     }
 
-    private static FileUploadRequestModel prepareFileUploadRequestModel() {
-
-        FileUploadRequestModel fileUploadRequestModel = new FileUploadRequestModel();
-        fileUploadRequestModel.setInputFile(MOCK_MULTIPART_FILE);
-        fileUploadRequestModel.setDescription(DESCRIPTION);
-        fileUploadRequestModel.setSubFolder(SUB_1);
-
-        return fileUploadRequestModel;
-    }
-
-    private static UpdateFileMetaInfoRequestModel prepareUpdateFileMetaInfoRequestModel() {
-
-        UpdateFileMetaInfoRequestModel updateFileMetaInfoRequestModel = new UpdateFileMetaInfoRequestModel();
-        updateFileMetaInfoRequestModel.setDescription(DESCRIPTION);
-        updateFileMetaInfoRequestModel.setOriginalFilename(ORIGINAL_FILENAME);
-
-        return updateFileMetaInfoRequestModel;
-    }
-
     private static TagAssignmentRequestModel prepareTagAssignmentRequestModel() {
 
         TagAssignmentRequestModel tagAssignmentRequestModel = new TagAssignmentRequestModel();
@@ -840,15 +714,6 @@ public abstract class ConversionTestObjects {
         tagCreateRequestModel.setName(TITLE);
 
         return tagCreateRequestModel;
-    }
-
-    private static LoginRequestModel prepareLoginRequestModel() {
-
-        LoginRequestModel loginRequestModel = new LoginRequestModel();
-        loginRequestModel.setEmail(EMAIL);
-        loginRequestModel.setPassword(PASSWORD);
-
-        return loginRequestModel;
     }
 
     private static UpdateProfileRequestModel prepareUpdateProfileRequestModel() {
@@ -886,15 +751,6 @@ public abstract class ConversionTestObjects {
         return userCreateRequestModel;
     }
 
-    private static PasswordResetDemandRequestModel preparePasswordResetDemandRequestModel() {
-
-        PasswordResetDemandRequestModel passwordResetDemandRequestModel = new PasswordResetDemandRequestModel();
-        passwordResetDemandRequestModel.setEmail(EMAIL);
-
-        return passwordResetDemandRequestModel;
-    }
-
-
     private static ContactRequestModel prepareContactRequestModel() {
 
         ContactRequestModel contactRequestModel = new ContactRequestModel();
@@ -913,22 +769,6 @@ public abstract class ConversionTestObjects {
         calendar.add(Calendar.DAY_OF_MONTH, dayOffset);
 
         return calendar.getTime();
-    }
-
-    private static FileInputVO prepareFileInputVO() {
-        try {
-            return FileInputVO.getBuilder()
-                    .withContentType(IMAGE_JPG)
-                    .withOriginalFilename(ORIGINAL_FILENAME)
-                    .withSize(CONTENT.length())
-                    .withFileContentStream(MOCK_MULTIPART_FILE.getInputStream())
-                    .withRelativePath(SUB_1)
-                    .withDescription(DESCRIPTION)
-                    .build();
-        } catch (IOException e) {
-            Assertions.fail("Failed to init test");
-            return null;
-        }
     }
 
     private static FrontEndRouteUpdateRequestModel prepareFrontEndRouteUpdateRequestModel() {

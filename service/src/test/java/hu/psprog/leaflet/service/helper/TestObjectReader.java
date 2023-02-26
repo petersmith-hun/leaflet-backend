@@ -40,7 +40,6 @@ public class TestObjectReader {
      * Object group directories under TEST_OBJECT_BASE_DIRECTORY directory.
      */
     public enum ObjectDirectory {
-        ENTITY("entity/"),
         VO("vo/");
 
         private final String directoryName;

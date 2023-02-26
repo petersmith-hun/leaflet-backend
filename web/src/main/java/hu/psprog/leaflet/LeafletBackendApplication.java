@@ -4,10 +4,6 @@ import hu.psprog.leaflet.web.config.EmbeddedWebServerAJPCustomization;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
-import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
@@ -16,11 +12,7 @@ import org.springframework.context.annotation.Profile;
  *
  * @author Peter Smith
  */
-@SpringBootApplication(exclude = {
-        H2ConsoleAutoConfiguration.class,
-        JdbcTemplateAutoConfiguration.class,
-        MailSenderAutoConfiguration.class,
-        ThymeleafAutoConfiguration.class})
+@SpringBootApplication
 public class LeafletBackendApplication {
 
     public static void main(String[] args) {

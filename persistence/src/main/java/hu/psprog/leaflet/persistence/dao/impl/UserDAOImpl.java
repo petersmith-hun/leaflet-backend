@@ -50,11 +50,6 @@ public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements U
         });
     }
 
-    @Override
-    public void updateLastLogin(String email) {
-        ((UserRepository) jpaRepository).updateLastLogin(email);
-    }
-
     @Transactional
     @Override
     public User updateOne(Long id, User updatedEntity) {

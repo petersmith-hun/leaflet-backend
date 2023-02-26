@@ -11,7 +11,6 @@ import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.Tag;
-import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.vo.CategoryVO;
@@ -20,7 +19,6 @@ import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.service.vo.TagVO;
-import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -28,7 +26,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Test objects for conversion tests.
@@ -51,11 +48,6 @@ public abstract class ConversionTestObjects {
     private static final Date LAST_LOGIN = createDate(0);
     private static final List<GrantedAuthority> AUTHORITIES = Collections.singletonList(Authority.ADMIN);
     private static final Role ROLE = Role.ADMIN;
-    private static final String PATH = "path";
-    private static final String ORIGINAL_FILENAME = "original-filename";
-    private static final String MIME = "mime";
-    private static final UUID PATH_UUID = UUID.randomUUID();
-    private static final String STORED_FILENAME = "stored-filename";
     private static final String CONTENT = "content";
     private static final String RAW_CONTENT = "raw-content";
     private static final String LINK = "link";
@@ -122,32 +114,6 @@ public abstract class ConversionTestObjects {
 
     static final User USER_MINIMUM = User.getBuilder()
             .withId(ID)
-            .build();
-
-    static final UploadedFileVO UPLOADED_FILE_VO = UploadedFileVO.getBuilder()
-            .withId(ID)
-            .withCreated(CREATED)
-            .withLastModified(LAST_MODIFIED)
-            .withEnabled(ENABLED)
-            .withPath(PATH)
-            .withOriginalFilename(ORIGINAL_FILENAME)
-            .withAcceptedAs(MIME)
-            .withPathUUID(PATH_UUID)
-            .withStoredFilename(STORED_FILENAME)
-            .withDescription(DESCRIPTION)
-            .build();
-
-    static final UploadedFile UPLOADED_FILE = UploadedFile.getBuilder()
-            .withId(ID)
-            .withCreated(CREATED)
-            .withLastModified(LAST_MODIFIED)
-            .withEnabled(ENABLED)
-            .withPath(PATH)
-            .withOriginalFilename(ORIGINAL_FILENAME)
-            .withMime(MIME)
-            .withPathUUID(PATH_UUID)
-            .withStoredFilename(STORED_FILENAME)
-            .withDescription(DESCRIPTION)
             .build();
 
     static final TagVO TAG_VO = TagVO.getBuilder()
