@@ -5,7 +5,7 @@ package hu.psprog.leaflet.service.vo;
  *
  * @author Peter Smith
  */
-public interface CustomSEODataProviderVO<T extends BaseVO> {
+public interface CustomSEODataProviderVO {
 
     /**
      * Returns custom SEO title provided by the entity.
@@ -27,11 +27,4 @@ public interface CustomSEODataProviderVO<T extends BaseVO> {
      * @return SEO keywords
      */
     String getSeoKeywords();
-
-    /**
-     * Returns parent entity.
-     *
-     * @return parent entity of {@link BaseVO}
-     */
-    T getEntity();
 }

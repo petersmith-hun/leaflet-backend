@@ -416,7 +416,7 @@ public class UserServiceImplTest {
         // given
         String email = "lflt123test@leaflet.dev";
         User user = new User();
-        UserVO userVO = new UserVO();
+        UserVO userVO = UserVO.wrapMinimumVO(1L);
         given(userDAO.findByEmail(email)).willReturn(user);
         given(userToUserVOConverter.convert(user)).willReturn(userVO);
 

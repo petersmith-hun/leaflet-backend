@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentToDocumentVOConverter implements Converter<Document, DocumentVO> {
 
-    private UserToUserVOConverter userToUserVOConverter;
+    private final UserToUserVOConverter userToUserVOConverter;
 
     @Autowired
     public DocumentToDocumentVOConverter(UserToUserVOConverter userToUserVOConverter) {
@@ -24,7 +24,7 @@ public class DocumentToDocumentVOConverter implements Converter<Document, Docume
     @Override
     public DocumentVO convert(Document source) {
 
-        DocumentVO.DocumentVOBuilder builder = DocumentVO.getBuilder();
+        DocumentVO.DocumentVOBuilder<?, ?> builder = DocumentVO.getBuilder();
         builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withEnabled(source.isEnabled())

@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.processor.impl;
 
-import hu.psprog.leaflet.service.vo.BaseVO;
 import hu.psprog.leaflet.service.vo.CustomSEODataProviderVO;
 import hu.psprog.leaflet.web.processor.ResponseProcessor;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
@@ -15,9 +14,9 @@ import javax.servlet.http.HttpServletRequest;
  * @author Peter Smith
  */
 @Component
-public class CustomSEODataProviderResponseProcessor implements ResponseProcessor<CustomSEODataProviderVO<? extends BaseVO>> {
+public class CustomSEODataProviderResponseProcessor implements ResponseProcessor<CustomSEODataProviderVO> {
 
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
 
     @Autowired
     public CustomSEODataProviderResponseProcessor(HttpServletRequest httpServletRequest) {
@@ -30,7 +29,7 @@ public class CustomSEODataProviderResponseProcessor implements ResponseProcessor
      * @param response service response of type {@link CustomSEODataProviderVO}
      */
     @Override
-    public void process(CustomSEODataProviderVO<? extends BaseVO> response) {
+    public void process(CustomSEODataProviderVO response) {
         httpServletRequest.setAttribute(RequestParameter.SEO_META_TITLE, response.getSeoTitle());
         httpServletRequest.setAttribute(RequestParameter.SEO_META_DESCRIPTION, response.getSeoDescription());
         httpServletRequest.setAttribute(RequestParameter.SEO_META_KEYWORDS, response.getSeoKeywords());

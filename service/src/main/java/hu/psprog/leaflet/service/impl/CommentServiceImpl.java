@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
-    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.getBuilder()
+    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.<CommentVO>getBuilder()
             .withEntitiesOnPage(Collections.emptyList())
             .build();
 

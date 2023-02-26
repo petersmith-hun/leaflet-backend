@@ -25,8 +25,8 @@ class ResponseProcessorAspect {
     private static final String RETURNING_ENTITY_PAGE_VO = "entityPageVO";
     private static final String RETURNING_CUSTOM_SEO_PROVIDER = "customSEODataProviderVO";
 
-    private CustomSEODataProviderResponseProcessor customSEODataProviderResponseProcessor;
-    private EntityPageResponseProcessor entityPageResponseProcessor;
+    private final CustomSEODataProviderResponseProcessor customSEODataProviderResponseProcessor;
+    private final EntityPageResponseProcessor entityPageResponseProcessor;
 
     @Autowired
     public ResponseProcessorAspect(CustomSEODataProviderResponseProcessor customSEODataProviderResponseProcessor,
@@ -57,7 +57,7 @@ class ResponseProcessorAspect {
     @AfterReturning(
             value = POINTCUT_CUSTOM_SEO_PROVIDER,
             returning = RETURNING_CUSTOM_SEO_PROVIDER)
-    void aspectToHandleCustomSEODataProviders(CustomSEODataProviderVO<? extends BaseVO> customSEODataProviderVO) {
+    void aspectToHandleCustomSEODataProviders(CustomSEODataProviderVO customSEODataProviderVO) {
         customSEODataProviderResponseProcessor.process(customSEODataProviderVO);
     }
 }

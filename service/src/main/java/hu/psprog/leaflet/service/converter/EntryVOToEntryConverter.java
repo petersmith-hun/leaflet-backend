@@ -21,7 +21,7 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
     @Override
     public Entry convert(EntryVO source) {
 
-        Entry.EntryBuilder builder = Entry.getBuilder();
+        Entry.EntryBuilder<?, ?> builder = Entry.getBuilder();
         builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withPublished(source.getPublished())

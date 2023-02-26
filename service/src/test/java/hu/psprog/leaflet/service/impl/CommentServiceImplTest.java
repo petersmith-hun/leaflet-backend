@@ -53,9 +53,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceImplTest {
 
-    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.getBuilder()
+    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.<CommentVO>getBuilder()
             .withEntitiesOnPage(Collections.emptyList())
             .build();
+    private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(5L);
 
     @Mock(lenient = true)
     private CommentDAO commentDAO;
@@ -167,7 +168,7 @@ public class CommentServiceImplTest {
         given(commentDAO.findByEntry(any(Pageable.class), any(Entry.class))).willReturn(commentPage);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, new EntryVO());
+        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, ENTRY_VO);
 
         // then
         assertThat(result, notNullValue());
@@ -182,7 +183,7 @@ public class CommentServiceImplTest {
         given(commentDAO.findByEntry(any(Specification.class), any(Pageable.class), any(Entry.class))).willReturn(commentPage);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, new EntryVO());
+        EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, ENTRY_VO);
 
         // then
         assertThat(result, notNullValue());
@@ -205,7 +206,7 @@ public class CommentServiceImplTest {
 
         // given
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        UserVO userVO = new UserVO();
+        UserVO userVO = UserVO.wrapMinimumVO(6L);
         given(userVOToUserConverter.convert(userVO)).willReturn(new User());
         given(commentDAO.findByUser(any(Pageable.class), any(User.class))).willReturn(commentPage);
         given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);

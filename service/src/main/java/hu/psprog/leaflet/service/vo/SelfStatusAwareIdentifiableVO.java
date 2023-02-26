@@ -1,9 +1,10 @@
 package hu.psprog.leaflet.service.vo;
 
 import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,57 +14,13 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-public abstract class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SelfStatusAwareIdentifiableEntity<ID>>
-        extends IdentifiableVO<ID, T> {
+@Data
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
+public abstract class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SelfStatusAwareIdentifiableEntity<ID>> extends IdentifiableVO<ID> {
 
-    protected Date created;
-    protected Date lastModified;
-    protected boolean enabled;
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public Date getLastModified() {
-        return lastModified;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (!(o instanceof SelfStatusAwareIdentifiableVO)) return false;
-
-        SelfStatusAwareIdentifiableVO<?, ?> that = (SelfStatusAwareIdentifiableVO<?, ?>) o;
-
-        return new EqualsBuilder()
-                .appendSuper(super.equals(o))
-                .append(enabled, that.enabled)
-                .append(created, that.created)
-                .append(lastModified, that.lastModified)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(created)
-                .append(lastModified)
-                .append(enabled)
-                .toHashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("id", getId())
-                .append("created", created)
-                .append("lastModified", lastModified)
-                .append("enabled", enabled)
-                .toString();
-    }
+    private final Date created;
+    private final Date lastModified;
+    private final boolean enabled;
 }

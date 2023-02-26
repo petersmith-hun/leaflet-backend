@@ -56,6 +56,9 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class EntryServiceImplTest {
 
+    private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(1L);
+    private static final CategoryVO CATEGORY_VO = CategoryVO.wrapMinimumVO(2L);
+    private static final TagVO TAG_VO = TagVO.wrapMinimumVO(3L);
     @Mock(lenient = true)
     private EntryDAO entryDAO;
 
@@ -152,7 +155,7 @@ public class EntryServiceImplTest {
 
         // given
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(entryDAO.findAll(any(Pageable.class))).willReturn(entryPage);
 
         // when
@@ -168,7 +171,7 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "published", "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
@@ -184,14 +187,14 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(categoryVOToCategoryConverter.convert(any(CategoryVO.class))).willReturn(Category.getBuilder()
                 .withId(1L)
                 .build());
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
-        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(new CategoryVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(CATEGORY_VO,1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
 
         // then
         assertThat(result, notNullValue());
@@ -203,14 +206,14 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(tagVOToTagConverter.convert(any(TagVO.class))).willReturn(Tag.getBuilder()
                 .withId(1L)
                 .build());
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
-        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(new TagVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(TAG_VO,1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
 
         // then
         assertThat(result, notNullValue());
@@ -222,7 +225,7 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when

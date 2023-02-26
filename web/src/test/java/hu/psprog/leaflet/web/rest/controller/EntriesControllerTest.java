@@ -76,7 +76,7 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfPublicEntries() {
 
         // given
-        given(entryFacade.getPageOfPublicEntries(PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(entryFacade.getPageOfPublicEntries(PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<EntryVO>getBuilder()
                 .withEntitiesOnPage(ENTRY_VO_LIST)
                 .build());
 
@@ -91,7 +91,7 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfEntries() {
 
         // given
-        given(entryFacade.getEntityPage(PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(entryFacade.getEntityPage(PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<EntryVO>getBuilder()
                 .withEntitiesOnPage(ENTRY_VO_LIST)
                 .build());
 
@@ -106,7 +106,7 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfPublicEntriesByCategory() {
 
         // given
-        given(entryFacade.getPageOfPublicEntriesUnderCategory(CATEGORY_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(entryFacade.getPageOfPublicEntriesUnderCategory(CATEGORY_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<EntryVO>getBuilder()
                 .withEntitiesOnPage(ENTRY_VO_LIST)
                 .build());
 
@@ -121,7 +121,7 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfPublicEntriesByTag() {
 
         // given
-        given(entryFacade.getPageOfPublicEntriesUnderTag(TAG_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(entryFacade.getPageOfPublicEntriesUnderTag(TAG_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<EntryVO>getBuilder()
                 .withEntitiesOnPage(ENTRY_VO_LIST)
                 .build());
 
@@ -136,7 +136,7 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfPublicEntriesByContent() {
 
         // given
-        given(entryFacade.getPageOfPublicEntriesByContent(CONTENT, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(entryFacade.getPageOfPublicEntriesByContent(CONTENT, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<EntryVO>getBuilder()
                 .withEntitiesOnPage(ENTRY_VO_LIST)
                 .build());
 

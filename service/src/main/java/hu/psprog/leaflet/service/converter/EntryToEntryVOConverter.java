@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 @Component
 public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
 
-    private UserToUserVOConverter userToUserVOConverter;
-    private CategoryToCategoryVOConverter categoryToCategoryVOConverter;
-    private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
-    private TagToTagVOConverter tagToTagVOConverter;
+    private final UserToUserVOConverter userToUserVOConverter;
+    private final CategoryToCategoryVOConverter categoryToCategoryVOConverter;
+    private final UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
+    private final TagToTagVOConverter tagToTagVOConverter;
 
     @Autowired
     public EntryToEntryVOConverter(UserToUserVOConverter userToUserVOConverter, CategoryToCategoryVOConverter categoryToCategoryVOConverter,
@@ -41,7 +41,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     @Override
     public EntryVO convert(Entry source) {
 
-        EntryVO.EntryVOBuilder builder = EntryVO.getBuilder();
+        EntryVO.EntryVOBuilder<?, ?> builder = EntryVO.getBuilder();
         builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withPublished(source.getPublished())

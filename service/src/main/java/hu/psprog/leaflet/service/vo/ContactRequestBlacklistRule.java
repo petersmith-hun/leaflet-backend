@@ -1,8 +1,7 @@
 package hu.psprog.leaflet.service.vo;
 
 import hu.psprog.leaflet.service.exception.InvalidBlacklistRule;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import lombok.Data;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -23,6 +22,7 @@ import java.util.regex.Pattern;
  *
  * @author Peter Smith
  */
+@Data
 public class ContactRequestBlacklistRule {
 
     private static final Pattern RULE_PATTERN = Pattern.compile("(name|message|email) (equals|contains) '(.*)'", Pattern.CASE_INSENSITIVE);
@@ -74,36 +74,6 @@ public class ContactRequestBlacklistRule {
                 BlacklistOperator.valueOf(ruleMatcher.group(2).toUpperCase()),
                 ruleMatcher.group(3)
         );
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ContactRequestBlacklistRule that = (ContactRequestBlacklistRule) o;
-
-        return new EqualsBuilder()
-                .append(object, that.object)
-                .append(operator, that.operator)
-                .append(value, that.value)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-
-        return new HashCodeBuilder(17, 37)
-                .append(object)
-                .append(operator)
-                .append(value)
-                .toHashCode();
     }
 
     @Override

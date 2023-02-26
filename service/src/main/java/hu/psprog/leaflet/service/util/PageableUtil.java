@@ -52,7 +52,7 @@ public class PageableUtil {
 
         Page<T> remappedPage = page.map(converter::convert);
 
-        return EntityPageVO.getBuilder()
+        return EntityPageVO.<T>getBuilder()
                 .withPageCount(remappedPage.getTotalPages())
                 .withPageSize(remappedPage.getSize())
                 .withPageNumber(remappedPage.getNumber() + 1) // Page would count page number from 0, so let's increase by 1
