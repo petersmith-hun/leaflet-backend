@@ -30,7 +30,7 @@ public class EntryDAOImpl extends SelfStatusAwareDAOImpl<Entry, Long> implements
     }
 
     @Override
-    public Entry findByLink(String link) {
+    public Optional<Entry> findByLink(String link) {
         return ((EntryRepository) jpaRepository).findByLink(link);
     }
 

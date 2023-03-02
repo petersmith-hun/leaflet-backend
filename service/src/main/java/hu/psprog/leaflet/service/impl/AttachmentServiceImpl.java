@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,7 +65,10 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private List<UploadedFile> getCurrentAttachments(EntryVO entryVO) {
-        return entryDAO.findOne(entryVO.getId()).getAttachments();
+
+        return entryDAO.findById(entryVO.getId())
+                .map(Entry::getAttachments)
+                .orElseGet(Collections::emptyList);
     }
 
     private boolean isAttached(List<UploadedFile> currentAttachments, UploadedFile uploadedFile) {

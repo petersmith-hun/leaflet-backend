@@ -3,17 +3,14 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.service.DocumentService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.DocumentVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -37,20 +34,14 @@ import static org.hamcrest.Matchers.notNullValue;
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class DocumentServiceImplIT {
 
-    private static final String DOCUMENT_1 = "document_1";
-    private static final String DOCUMENT_NEW = "document_new";
-
     @Autowired
     private DocumentService documentService;
-
-    @Autowired
-    private TestObjectReader testObjectReader;
 
     private DocumentVO controlDocumentVO;
 
     @BeforeEach
     public void setup() throws IOException {
-        controlDocumentVO = testObjectReader.read(DOCUMENT_1, TestObjectReader.ObjectDirectory.VO, DocumentVO.class);
+        controlDocumentVO = TestObjects.DOCUMENT_VO_1;
     }
 
     @Test
@@ -112,22 +103,10 @@ public class DocumentServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_DOCUMENTS)
-    public void testCount() {
-
-        // when
-        Long result = documentService.count();
-
-        // then
-        assertThat(result, equalTo(4L));
-    }
-
-    @Test
-    @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_DOCUMENTS)
-    public void testCreateOne() throws IOException, ServiceException {
+    public void testCreateOne() throws ServiceException {
 
         // given
-        DocumentVO documentToCreate = testObjectReader.read(DOCUMENT_NEW, TestObjectReader.ObjectDirectory.VO, DocumentVO.class);
+        DocumentVO documentToCreate = TestObjects.DOCUMENT_VO_NEW;
 
         // when
         Long result = documentService.createOne(documentToCreate);
@@ -174,8 +153,9 @@ public class DocumentServiceImplIT {
         documentService.deleteByID(id);
 
         // then
-        assertThat(documentService.count(), equalTo(3L));
-        assertThat(documentService.getAll().stream().noneMatch(documentToDelete::equals), equalTo(true));
+        List<DocumentVO> allDocuments = documentService.getAll();
+        assertThat(allDocuments.size(), equalTo(3));
+        assertThat(allDocuments.stream().noneMatch(documentToDelete::equals), equalTo(true));
     }
 
     @Test

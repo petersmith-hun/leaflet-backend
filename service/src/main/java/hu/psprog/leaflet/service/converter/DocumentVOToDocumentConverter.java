@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * Converts {@link DocumentVO} value object to {@link Document} entity.
  *
@@ -37,7 +39,7 @@ public class DocumentVOToDocumentConverter implements Converter<DocumentVO, Docu
                 .withSeoKeywords(source.getSeoKeywords())
                 .withTitle(source.getTitle());
 
-        if (source.getOwner() != null) {
+        if (Objects.nonNull(source.getOwner())) {
             builder.withUser(userVOToUserConverter.convert(source.getOwner()));
         }
 

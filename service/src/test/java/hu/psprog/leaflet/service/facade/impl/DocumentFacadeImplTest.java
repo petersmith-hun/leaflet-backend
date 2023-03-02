@@ -9,8 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -72,20 +70,6 @@ public class DocumentFacadeImplTest {
 
         // then
         verify(documentService).getPublicDocuments();
-    }
-
-    @Test
-    public void shouldCount() {
-
-        // given
-        long count = 10;
-        given(documentService.count()).willReturn(count);
-
-        // when
-        long result = documentFacade.count();
-
-        // then
-        assertThat(result, equalTo(count));
     }
 
     @Test

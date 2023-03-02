@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * DAO implementation for {@link DocumentRepository}.
@@ -29,7 +30,7 @@ public class DocumentDAOImpl extends SelfStatusAwareDAOImpl<Document, Long> impl
     }
 
     @Override
-    public Document findByLink(String link) {
+    public Optional<Document> findByLink(String link) {
         return ((DocumentRepository) jpaRepository).findByLink(link);
     }
 

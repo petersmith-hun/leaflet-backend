@@ -5,9 +5,7 @@ import hu.psprog.leaflet.persistence.entity.Document;
 import hu.psprog.leaflet.persistence.repository.specification.DocumentSpecification;
 import hu.psprog.leaflet.service.converter.DocumentToDocumentVOConverter;
 import hu.psprog.leaflet.service.converter.DocumentVOToDocumentConverter;
-import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.DocumentVO;
@@ -22,6 +20,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -52,9 +51,6 @@ public class DocumentServiceImplTest {
     private DocumentVOToDocumentConverter documentVOToDocumentConverter;
 
     @Mock
-    private UserVOToUserConverter userVOToUserConverter;
-
-    @Mock
     private Document document;
 
     @Mock
@@ -68,7 +64,7 @@ public class DocumentServiceImplTest {
 
         // given
         Long id = 1L;
-        given(documentDAO.findOne(id)).willReturn(document);
+        given(documentDAO.findById(id)).willReturn(Optional.of(document));
         given(documentToDocumentVOConverter.convert(document)).willReturn(documentVO);
 
         // when
@@ -76,7 +72,7 @@ public class DocumentServiceImplTest {
 
         // then
         assertThat(result, equalTo(documentVO));
-        verify(documentDAO).findOne(id);
+        verify(documentDAO).findById(id);
         verify(documentToDocumentVOConverter).convert(document);
     }
 
@@ -85,14 +81,14 @@ public class DocumentServiceImplTest {
 
         // given
         Long id = 1L;
-        given(documentDAO.findOne(id)).willReturn(null);
+        given(documentDAO.findById(id)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.getOne(id));
 
         // then
         // expected exception
-        verify(documentDAO).findOne(id);
+        verify(documentDAO).findById(id);
         verify(documentToDocumentVOConverter, never()).convert(document);
     }
 
@@ -146,25 +142,11 @@ public class DocumentServiceImplTest {
     }
 
     @Test
-    public void testCount() {
-
-        // given
-        Long count = 5L;
-        given(documentDAO.count()).willReturn(count);
-
-        // when
-        Long result = documentService.count();
-
-        // then
-        assertThat(result, equalTo(count));
-    }
-
-    @Test
     public void testGetByLinkWithExistingDocument() throws ServiceException {
 
         // given
         String link = "document-link";
-        given(documentDAO.findByLink(link)).willReturn(document);
+        given(documentDAO.findByLink(link)).willReturn(Optional.of(document));
         given(documentToDocumentVOConverter.convert(document)).willReturn(documentVO);
 
         // when
@@ -181,7 +163,7 @@ public class DocumentServiceImplTest {
 
         // given
         String link = "document-link";
-        given(documentDAO.findByLink(link)).willReturn(null);
+        given(documentDAO.findByLink(link)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.getByLink(link));
@@ -208,23 +190,6 @@ public class DocumentServiceImplTest {
         verify(documentVOToDocumentConverter).convert(documentVO);
         verify(documentDAO).save(document);
         verify(document, atLeastOnce()).getId();
-    }
-
-    @Test
-    public void testCreateOneWithFailure() {
-
-        // given
-        given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
-        given(documentDAO.save(document)).willReturn(null);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> documentService.createOne(documentVO));
-
-        // then
-        // expected exception
-        verify(documentVOToDocumentConverter).convert(documentVO);
-        verify(documentDAO).save(document);
-        verify(document, never()).getId();
     }
 
     @Test
@@ -261,7 +226,7 @@ public class DocumentServiceImplTest {
         // given
         Long id = 1L;
         given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
-        given(documentDAO.updateOne(id, document)).willReturn(document);
+        given(documentDAO.updateOne(id, document)).willReturn(Optional.of(document));
         given(documentToDocumentVOConverter.convert(document)).willReturn(documentVO);
 
         // when
@@ -280,7 +245,7 @@ public class DocumentServiceImplTest {
         // given
         Long id = 1L;
         given(documentVOToDocumentConverter.convert(documentVO)).willReturn(document);
-        given(documentDAO.updateOne(id, document)).willReturn(null);
+        given(documentDAO.updateOne(id, document)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> documentService.updateOne(id, documentVO));

@@ -20,7 +20,7 @@ public class CommentVOToCommentConverter implements Converter<CommentVO, Comment
     @Override
     public Comment convert(CommentVO source) {
 
-        Comment.CommentBuilder builder = Comment.getBuilder()
+        Comment.CommentBuilder<?, ?> builder = Comment.getBuilder()
                 .withId(source.getId())
                 .withContent(source.getContent())
                 .withCreated(source.getCreated())

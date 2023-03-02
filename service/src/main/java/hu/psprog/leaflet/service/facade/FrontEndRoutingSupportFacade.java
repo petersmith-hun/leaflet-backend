@@ -55,13 +55,6 @@ public interface FrontEndRoutingSupportFacade {
     List<FrontEndRouteVO> getAll();
 
     /**
-     * Returns number of front-end route items.
-     *
-     * @return number of front-end route items
-     */
-    Long count();
-
-    /**
      * Updates front-end route item specified by given ID. Returns updated front-end route item.
      *
      * @param id ID of front-end route item

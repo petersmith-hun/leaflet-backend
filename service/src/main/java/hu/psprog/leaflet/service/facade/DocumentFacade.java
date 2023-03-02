@@ -53,13 +53,6 @@ public interface DocumentFacade {
     DocumentVO getByLink(String link) throws ServiceException;
 
     /**
-     * Returns number of documents.
-     *
-     * @return number of documents
-     */
-    Long count();
-
-    /**
      * Updates document specified by given ID. Returns updated document.
      *
      * @param id ID of document

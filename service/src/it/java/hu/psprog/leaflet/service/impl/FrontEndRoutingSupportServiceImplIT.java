@@ -5,20 +5,16 @@ import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,15 +37,10 @@ public class FrontEndRoutingSupportServiceImplIT {
     private static final String EXPECTED_DYNAMIC_URL_PATTERN_1 = "/route/dynamic/entry-pattern-1/lorem-ipsum-dolor-sit-amet-20160818";
     private static final String EXPECTED_DYNAMIC_URL_PATTERN_2 = "/route/dynamic/entry-pattern-2/lorem-ipsum-dolor-sit-amet-20160818";
     private static final List<FrontEndRouteVO> EXPECTED_DYNAMIC_ROUTES = Arrays.asList(
-            prepareDynamicRoute(EXPECTED_DYNAMIC_ROUTE_NAME, EXPECTED_DYNAMIC_URL_PATTERN_1),
-            prepareDynamicRoute(EXPECTED_DYNAMIC_ROUTE_NAME, EXPECTED_DYNAMIC_URL_PATTERN_2));
-    private static final String FRONT_END_ROUTE_NEW = "front_end_route_new";
-    private static final String FRONT_END_ROUTE_1 = "front_end_route_1";
+            prepareDynamicRoute(EXPECTED_DYNAMIC_URL_PATTERN_1),
+            prepareDynamicRoute(EXPECTED_DYNAMIC_URL_PATTERN_2));
     private static final long CONTROL_ID = 1L;
-    private static final long NUMBER_OF_ALL_RECORDS = 13L;
-
-    @Autowired
-    private TestObjectReader testObjectReader;
+    private static final int NUMBER_OF_ALL_RECORDS = 13;
 
     @Autowired
     private FrontEndRoutingSupportService frontEndRoutingSupportService;
@@ -109,10 +100,10 @@ public class FrontEndRoutingSupportServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_FRONT_END_ROUTES)
-    public void shouldGetOne() throws IOException, ServiceException {
+    public void shouldGetOne() throws ServiceException {
 
         // given
-        FrontEndRouteVO expectedFrontEndRouteVO = testObjectReader.read(FRONT_END_ROUTE_1, TestObjectReader.ObjectDirectory.VO, FrontEndRouteVO.class);
+        FrontEndRouteVO expectedFrontEndRouteVO = TestObjects.FRONT_END_ROUTE_VO_1;
 
         // when
         FrontEndRouteVO result = frontEndRoutingSupportService.getOne(CONTROL_ID);
@@ -123,16 +114,16 @@ public class FrontEndRoutingSupportServiceImplIT {
 
     @Test
     @Transactional
-    public void shouldCreateOne() throws IOException, ServiceException {
+    public void shouldCreateOne() throws ServiceException {
 
         // given
-        FrontEndRouteVO frontEndRouteVOToSave = testObjectReader.read(FRONT_END_ROUTE_NEW, TestObjectReader.ObjectDirectory.VO, FrontEndRouteVO.class);
+        FrontEndRouteVO frontEndRouteVOToSave = TestObjects.FRONT_END_ROUTE_VO_NEW;
 
         // when
         Long result = frontEndRoutingSupportService.createOne(frontEndRouteVOToSave);
 
         // then
-        assertThat(frontEndRoutingSupportService.count(), equalTo(1L));
+        assertThat(frontEndRoutingSupportService.getAll().size(), equalTo(1));
         assertThat(frontEndRoutingSupportService.getOne(result).getName(), equalTo(frontEndRouteVOToSave.getName()));
     }
 
@@ -143,13 +134,13 @@ public class FrontEndRoutingSupportServiceImplIT {
 
         // given
         // make an assertion for the initial record count
-        assertThat(frontEndRoutingSupportService.count(), equalTo(NUMBER_OF_ALL_RECORDS));
+        assertThat(frontEndRoutingSupportService.getAll().size(), equalTo(NUMBER_OF_ALL_RECORDS));
 
         // when
         frontEndRoutingSupportService.deleteByID(CONTROL_ID);
 
         // then
-        assertThat(frontEndRoutingSupportService.count(), equalTo(12L));
+        assertThat(frontEndRoutingSupportService.getAll().size(), equalTo(12));
         try {
             frontEndRoutingSupportService.getOne(CONTROL_ID);
             Assertions.fail("Call should have failed");
@@ -161,25 +152,13 @@ public class FrontEndRoutingSupportServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_FRONT_END_ROUTES)
-    public void shouldCount() {
-
-        // when
-        Long result = frontEndRoutingSupportService.count();
-
-        // then
-        assertThat(result, equalTo(NUMBER_OF_ALL_RECORDS));
-    }
-
-    @Test
-    @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_FRONT_END_ROUTES)
     public void shouldGetAll() {
 
         // when
         List<FrontEndRouteVO> result = frontEndRoutingSupportService.getAll();
 
         // then
-        assertThat(result.size(), equalTo((int) NUMBER_OF_ALL_RECORDS));
+        assertThat(result.size(), equalTo(NUMBER_OF_ALL_RECORDS));
     }
 
     @Test
@@ -233,9 +212,9 @@ public class FrontEndRoutingSupportServiceImplIT {
         assertThat(result.isEnabled(), equalTo(updatedFrontEndRouteVO.isEnabled()));
     }
 
-    private static FrontEndRouteVO prepareDynamicRoute(String name, String url) {
+    private static FrontEndRouteVO prepareDynamicRoute(String url) {
         return FrontEndRouteVO.getBuilder()
-                .withName(name)
+                .withName(FrontEndRoutingSupportServiceImplIT.EXPECTED_DYNAMIC_ROUTE_NAME)
                 .withUrl(url)
                 .build();
     }

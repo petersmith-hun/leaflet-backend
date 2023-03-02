@@ -114,13 +114,6 @@ public interface EntryFacade {
     List<EntryVO> getAll();
 
     /**
-     * Returns number of entries.
-     *
-     * @return number of entries
-     */
-    Long count();
-
-    /**
      * Updates entry specified by given ID. Returns updated entry.
      *
      * @param id ID of entry

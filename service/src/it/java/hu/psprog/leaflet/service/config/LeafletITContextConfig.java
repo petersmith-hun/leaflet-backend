@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -65,11 +64,6 @@ public class LeafletITContextConfig {
     @Bean
     public EventNotificationServiceClient eventNotificationServiceClient() {
         return Mockito.mock(EventNotificationServiceClient.class);
-    }
-
-    @Bean
-    public TestObjectReader testObjectReader() {
-        return new TestObjectReader();
     }
 
     @Bean

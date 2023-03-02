@@ -49,7 +49,7 @@ public class EmailBasedNotificationService implements NotificationService {
     }
 
     @Override
-    public void commentNotification(hu.psprog.leaflet.service.mail.domain.CommentNotification commentNotification) {
+    public void commentNotification(hu.psprog.leaflet.service.vo.mail.CommentNotification commentNotification) {
 
         var commentNotificationMail = MailRequestWrapper.<CommentNotification>builder()
                 .recipients(commentNotification.getAuthorEmail())

@@ -47,7 +47,7 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
             builder.withCategory(category);
         }
 
-        if (source.getOwner() != null) {
+        if (Objects.nonNull(source.getOwner())) {
             User user = User.getBuilder()
                     .withId(source.getOwner().getId())
                     .build();

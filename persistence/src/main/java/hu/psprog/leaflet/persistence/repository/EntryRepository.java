@@ -4,6 +4,8 @@ import hu.psprog.leaflet.persistence.entity.Entry;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Entry repository interface for Hibernate JPA persistence manager.
  *
@@ -18,5 +20,5 @@ public interface EntryRepository extends SelfStatusAwareJpaRepository<Entry, Lon
      * @param link entry link
      * @return Entry object identified by given link or {@code null} if no Entry found
      */
-    Entry findByLink(String link);
+    Optional<Entry> findByLink(String link);
 }

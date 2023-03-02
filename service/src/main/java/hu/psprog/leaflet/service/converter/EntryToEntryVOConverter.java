@@ -71,6 +71,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     }
 
     private List<UploadedFileVO> mapAttachments(List<UploadedFile> uploadedFiles) {
+
         return Optional.ofNullable(uploadedFiles)
                 .orElse(Collections.emptyList()).stream()
                 .map(uploadedFileToUploadedFileVOConverter::convert)
@@ -78,6 +79,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     }
 
     private List<TagVO> mapTags(List<Tag> tags) {
+
         return Optional.ofNullable(tags)
                 .orElse(Collections.emptyList()).stream()
                 .map(tagToTagVOConverter::convert)

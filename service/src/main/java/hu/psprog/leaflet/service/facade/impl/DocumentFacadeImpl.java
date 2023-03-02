@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class DocumentFacadeImpl implements DocumentFacade {
 
-    private DocumentService documentService;
+    private final DocumentService documentService;
 
     @Autowired
     public DocumentFacadeImpl(DocumentService documentService) {
@@ -48,11 +48,6 @@ public class DocumentFacadeImpl implements DocumentFacade {
     @Override
     public DocumentVO getByLink(String link) throws ServiceException {
         return documentService.getByLink(link);
-    }
-
-    @Override
-    public Long count() {
-        return documentService.count();
     }
 
     @Override

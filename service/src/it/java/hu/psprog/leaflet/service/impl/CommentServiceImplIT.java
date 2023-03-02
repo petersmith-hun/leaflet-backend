@@ -5,7 +5,7 @@ import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -23,7 +23,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -48,24 +47,17 @@ public class CommentServiceImplIT {
 
     static final String DELETED_COMMENT = "DELETED_COMMENT";
 
-    private static final String COMMENT_1 = "comment_1";
-    private static final String COMMENT_NEW = "comment_new";
-    private static final String ENTRY_1 = "entry_1";
-
     @Autowired
     @Qualifier("commentServiceImpl")
     private CommentService commentService;
-
-    @Autowired
-    private TestObjectReader testObjectReader;
 
     private CommentVO controlCommentVO;
     private EntryVO controlEntryVO;
 
     @BeforeEach
     public void setup() throws Exception {
-        controlCommentVO = testObjectReader.read(COMMENT_1, TestObjectReader.ObjectDirectory.VO, CommentVO.class);
-        controlEntryVO = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
+        controlCommentVO = TestObjects.COMMENT_VO_1;
+        controlEntryVO = TestObjects.ENTRY_VO_1;
     }
 
     @Test
@@ -186,22 +178,10 @@ public class CommentServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
-    public void testCount() {
-
-        // when
-        Long result = commentService.count();
-
-        // then
-        assertThat(result, equalTo(10L));
-    }
-
-    @Test
-    @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_COMMENTS)
-    public void testCreateOne() throws IOException, ServiceException {
+    public void testCreateOne() throws ServiceException {
 
         // given
-        CommentVO createdComment = testObjectReader.read(COMMENT_NEW, TestObjectReader.ObjectDirectory.VO, CommentVO.class);
+        CommentVO createdComment = TestObjects.COMMENT_VO_NEW;
 
         // when
         Long result = commentService.createOne(createdComment);
@@ -248,8 +228,9 @@ public class CommentServiceImplIT {
         commentService.deleteByID(id);
 
         // then
-        assertThat(commentService.count(), equalTo(9L));
-        assertThat(commentService.getAll().stream().noneMatch(commentToDelete::equals), equalTo(true));
+        List<CommentVO> allComments = commentService.getAll();
+        assertThat(allComments.size(), equalTo(9));
+        assertThat(allComments.stream().noneMatch(commentToDelete::equals), equalTo(true));
     }
 
     @Test

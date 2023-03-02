@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -63,7 +64,7 @@ public class AttachmentServiceImplTest {
                 .withPathUUID(UUID.randomUUID())
                 .withId(UPLOADED_FILE_ID)
                 .build();
-        given(entryDAO.findOne(ENTRY_ID)).willReturn(mockedEntry);
+        given(entryDAO.findById(ENTRY_ID)).willReturn(Optional.of(mockedEntry));
     }
 
     @Test
@@ -173,7 +174,7 @@ public class AttachmentServiceImplTest {
 
         assertThat(attachments.size(), equalTo(numberOfAttachments));
         assertThat(attachments.contains(controlUploadedFile), is(controlIncluded));
-        verify(entryDAO).findOne(ENTRY_ID);
+        verify(entryDAO).findById(ENTRY_ID);
         if (updateCalled) {
             verify(entryDAO).updateAttachments(ENTRY_ID, attachments);
         } else {

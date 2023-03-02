@@ -25,8 +25,8 @@ public class CategoryRouteMaskProcessor implements RouteMaskProcessor {
 
     private static final String ROUTE_MASK = "%s/%d/%s";
 
-    private CategoryFacade categoryFacade;
-    private FilenameGeneratorUtil filenameGeneratorUtil;
+    private final CategoryFacade categoryFacade;
+    private final FilenameGeneratorUtil filenameGeneratorUtil;
 
     @Autowired
     public CategoryRouteMaskProcessor(CategoryFacade categoryFacade, FilenameGeneratorUtil filenameGeneratorUtil) {
@@ -53,13 +53,9 @@ public class CategoryRouteMaskProcessor implements RouteMaskProcessor {
 
     private String prepareURL(CategoryVO categoryVO, FrontEndRouteVO frontEndRouteVO) {
 
-        String url;
-        if (Objects.nonNull(frontEndRouteVO.getUrl())) {
-            url = String.format(ROUTE_MASK, frontEndRouteVO.getUrl(), categoryVO.getId(), filenameGeneratorUtil.doCleanFilename(categoryVO.getTitle()));
-        } else {
-            url = StringUtils.EMPTY;
-        }
+        return Objects.nonNull(frontEndRouteVO.getUrl())
+                ? String.format(ROUTE_MASK, frontEndRouteVO.getUrl(), categoryVO.getId(), filenameGeneratorUtil.doCleanFilename(categoryVO.getTitle()))
+                : StringUtils.EMPTY;
 
-        return url;
     }
 }

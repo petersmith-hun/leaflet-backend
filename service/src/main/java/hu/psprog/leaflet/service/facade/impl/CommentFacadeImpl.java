@@ -38,10 +38,10 @@ public class CommentFacadeImpl implements CommentFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentFacadeImpl.class);
     private static final String COMMENT_NOTIFICATION_ENABLED = "${mail.event.comment-notification.enabled}";
 
-    private CommentService commentService;
-    private UserService userService;
-    private EntryService entryService;
-    private boolean commentNotificationEnabled;
+    private final CommentService commentService;
+    private final UserService userService;
+    private final EntryService entryService;
+    private final boolean commentNotificationEnabled;
 
     @Autowired
     public CommentFacadeImpl(CommentService commentService, UserService userService, EntryService entryService,
@@ -93,30 +93,14 @@ public class CommentFacadeImpl implements CommentFacade {
     }
 
     @Override
-    public Long count() {
-        return commentService.count();
-    }
-
-    @Override
     public Long createOne(CommentVO entity) throws ServiceException {
-        CommentVO commentToBeCreated = entity;
-        if (Objects.isNull(entity.getOwner().getId())) {
-            UserVO user = userService.silentGetUserByEmail(entity.getOwner().getEmail());
-            if (Objects.isNull(user)) {
-                LOGGER.info("Registering anonymous commenter [{}]", entity.getOwner().getEmail());
-                Long id = userService.registerNoLogin(createNoLoginUser(entity.getOwner()));
-                commentToBeCreated = updateCommentOwner(entity, id);
-            } else {
-                if (user.getAuthorities().containsAll(NO_LOGIN_AUTHORITY)) {
-                    LOGGER.info("Attaching comment to returning anonymous commenter [{}]", entity.getOwner().getEmail());
-                    commentToBeCreated = updateCommentOwner(entity, user.getId());
-                } else {
-                    LOGGER.error("Login-enabled user already exists with given email={}", entity.getOwner().getEmail());
-                    throw new EntityCreationException(Comment.class);
-                }
-            }
-        }
+
+        CommentVO commentToBeCreated = Objects.isNull(entity.getOwner().getId())
+                ? recreateCommentWithUserAttached(entity)
+                : entity;
+
         Long commentID = commentService.createOne(commentToBeCreated);
+
         if (commentNotificationEnabled) {
             commentService.notifyEntryAuthor(commentID);
         }
@@ -177,7 +161,30 @@ public class CommentFacadeImpl implements CommentFacade {
         return orderDirection;
     }
 
+    private CommentVO recreateCommentWithUserAttached(CommentVO entity) throws ServiceException {
+
+        CommentVO commentToBeCreated;
+        UserVO user = userService.silentGetUserByEmail(entity.getOwner().getEmail());
+
+        if (Objects.isNull(user)) {
+            LOGGER.info("Registering anonymous commenter [{}]", entity.getOwner().getEmail());
+            Long id = userService.registerNoLogin(createNoLoginUser(entity.getOwner()));
+            commentToBeCreated = updateCommentOwner(entity, id);
+
+        } else if (isReturningNoLoginUser(user)) {
+            LOGGER.info("Attaching comment to returning anonymous commenter [{}]", entity.getOwner().getEmail());
+            commentToBeCreated = updateCommentOwner(entity, user.getId());
+
+        } else {
+            LOGGER.error("Login-enabled user already exists with given email={}", entity.getOwner().getEmail());
+            throw new EntityCreationException(Comment.class);
+        }
+
+        return commentToBeCreated;
+    }
+
     private CommentVO updateCommentOwner(CommentVO comment, Long updatedUserID) {
+
         return CommentVO.getBuilder()
                 .withContent(comment.getContent())
                 .withOwner(UserVO.getBuilder()
@@ -190,6 +197,7 @@ public class CommentFacadeImpl implements CommentFacade {
     }
 
     private UserVO createNoLoginUser(UserVO owner) {
+
         return UserVO.getBuilder()
                 .withEmail(owner.getEmail())
                 .withUsername(owner.getUsername())
@@ -197,5 +205,9 @@ public class CommentFacadeImpl implements CommentFacade {
                 .withEnabled(true)
                 .withLocale(Locale.EN)
                 .build();
+    }
+
+    private boolean isReturningNoLoginUser(UserVO user) {
+        return user.getAuthorities().containsAll(NO_LOGIN_AUTHORITY);
     }
 }

@@ -5,7 +5,7 @@ import hu.psprog.leaflet.service.AttachmentService;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,13 +35,6 @@ import static org.hamcrest.Matchers.is;
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class AttachmentServiceImplIT {
 
-    private static final String ENTRY_1 = "entry_1";
-    private static final String ALREADY_ATTACHED_FILE = "uploaded_file_already_attached";
-    private static final String FILE_TO_ATTACH = "uploaded_file_to_attach";
-
-    @Autowired
-    private TestObjectReader testObjectReader;
-
     @Autowired
     private AttachmentService attachmentService;
 
@@ -54,9 +47,9 @@ public class AttachmentServiceImplIT {
 
     @BeforeEach
     public void setup() throws IOException {
-        controlEntry = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
-        alreadyAttachedFile = testObjectReader.read(ALREADY_ATTACHED_FILE, TestObjectReader.ObjectDirectory.VO, UploadedFile.class);
-        fileToAttach = testObjectReader.read(FILE_TO_ATTACH, TestObjectReader.ObjectDirectory.VO, UploadedFile.class);
+        controlEntry = TestObjects.ENTRY_VO_1;
+        alreadyAttachedFile = TestObjects.UPLOADED_FILE_ALREADY_ATTACHED;
+        fileToAttach = TestObjects.UPLOADED_FILE_TO_ATTACH;
     }
 
     @Test

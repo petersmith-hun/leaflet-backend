@@ -7,7 +7,6 @@ import hu.psprog.leaflet.service.DocumentService;
 import hu.psprog.leaflet.service.converter.DocumentToDocumentVOConverter;
 import hu.psprog.leaflet.service.converter.DocumentVOToDocumentConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
@@ -19,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -50,13 +50,9 @@ public class DocumentServiceImpl implements DocumentService {
     @PermitScope.Read.Documents
     public DocumentVO getOne(Long id) throws ServiceException {
 
-        Document document = documentDAO.findOne(id);
-
-        if (document == null) {
-            throw new EntityNotFoundException(Document.class, id);
-        }
-
-        return documentToDocumentVOConverter.convert(document);
+        return documentDAO.findById(id)
+                .map(documentToDocumentVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Document.class, id));
     }
 
     @Override
@@ -79,65 +75,47 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public DocumentVO getByLink(String link) throws ServiceException {
 
-        Document document = documentDAO.findByLink(link);
-
-        if (document == null) {
-            throw new EntityNotFoundException(Document.class, link);
-        }
-
-        return documentToDocumentVOConverter.convert(document);
-    }
-
-    @Override
-    @PermitScope.Read.Documents
-    public Long count() {
-
-        return documentDAO.count();
+        return documentDAO.findByLink(link)
+                .map(documentToDocumentVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Document.class, link));
     }
 
     @Override
     @PermitScope.Write.Documents
     public Long createOne(DocumentVO entity) throws ServiceException {
 
-        Document document = documentVOToDocumentConverter.convert(entity);
-        Document savedDocument;
         try {
-            savedDocument = documentDAO.save(document);
+            Document document = documentVOToDocumentConverter.convert(entity);
+            Document savedDocument = documentDAO.save(document);
+
+            LOGGER.info("New document [{}] has been created with ID [{}]", savedDocument.getTitle(), savedDocument.getId());
+
+            return savedDocument.getId();
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(A_DOCUMENT_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
         } catch (Exception e) {
             throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
-
-        if (savedDocument == null) {
-            throw new EntityCreationException(Document.class);
-        }
-
-        LOGGER.info("New document [{}] has been created with ID [{}]", savedDocument.getTitle(), savedDocument.getId());
-
-        return savedDocument.getId();
     }
 
     @Override
     @PermitScope.Write.Documents
     public DocumentVO updateOne(Long id, DocumentVO updatedEntity) throws ServiceException {
 
-        Document updatedDocument;
         try {
-            updatedDocument = documentDAO.updateOne(id, documentVOToDocumentConverter.convert(updatedEntity));
+            return documentDAO.updateOne(id, documentVOToDocumentConverter.convert(updatedEntity))
+                    .map(logUpdate())
+                    .map(documentToDocumentVOConverter::convert)
+                    .orElseThrow(() -> new EntityNotFoundException(Document.class, id));
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(A_DOCUMENT_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
+        } catch (EntityNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
-
-        if (updatedDocument == null) {
-            throw new EntityNotFoundException(Document.class, id);
-        }
-
-        LOGGER.info("Existing document [{}] with ID [{}] has been updated", updatedDocument.getTitle(), id);
-
-        return documentToDocumentVOConverter.convert(updatedDocument);
     }
 
     @Override
@@ -174,5 +152,13 @@ public class DocumentServiceImpl implements DocumentService {
 
         documentDAO.disable(id);
         LOGGER.info("Disabled document of ID [{}]", id);
+    }
+
+    private Function<Document, Document> logUpdate() {
+
+        return document -> {
+            LOGGER.info("Existing document [{}] with ID [{}] has been updated", document.getTitle(), document.getId());
+            return document;
+        };
     }
 }

@@ -9,7 +9,6 @@ import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.helper.UserEntityTestDataGenerator;
@@ -30,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -89,7 +89,7 @@ public class UserServiceImplTest {
 
         // given
         Long userID = 1L;
-        given(userDAO.findOne(userID)).willReturn(user);
+        given(userDAO.findById(userID)).willReturn(Optional.of(user));
         given(userToUserVOConverter.convert(user)).willReturn(userVO);
 
         // when
@@ -104,7 +104,7 @@ public class UserServiceImplTest {
 
         // given
         Long userID = 1L;
-        given(userDAO.findOne(userID)).willReturn(null);
+        given(userDAO.findById(userID)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getOne(userID));
@@ -125,20 +125,6 @@ public class UserServiceImplTest {
 
         // then
         assertThat(result, equalTo(Collections.singletonList(userVO)));
-    }
-
-    @Test
-    public void testCount() {
-
-        // given
-        Long count = 5L;
-        given(userDAO.count()).willReturn(count);
-
-        // when
-        Long result = userService.count();
-
-        // then
-        assertThat(result, equalTo(count));
     }
 
     @Test
@@ -184,22 +170,6 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testCreateOneWithException() {
-
-        // given
-        given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userDAO.save(user)).willReturn(null);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> userService.createOne(userVO));
-
-        // then
-        // expected exception
-        verify(userVOToUserConverter).convert(userVO);
-        verify(userDAO).save(user);
-    }
-
-    @Test
     public void testCreateShouldThrowConstraintViolationException() {
 
         // given
@@ -232,7 +202,8 @@ public class UserServiceImplTest {
 
         // given
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userDAO.updateOne(user.getId(), user)).willReturn(user);
+        given(userDAO.updateOne(user.getId(), user)).willReturn(Optional.of(user));
+        given(userToUserVOConverter.convert(user)).willReturn(userVO);
 
         // when
         userService.updateOne(user.getId(), userVO);
@@ -248,7 +219,7 @@ public class UserServiceImplTest {
 
         // given
         given(userVOToUserConverter.convert(userVO)).willReturn(user);
-        given(userDAO.updateOne(user.getId(), user)).willReturn(null);
+        given(userDAO.updateOne(user.getId(), user)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> userService.updateOne(user.getId(), userVO));

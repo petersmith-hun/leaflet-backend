@@ -136,18 +136,6 @@ public class UserServiceImplIT {
     @Test
     @Transactional
     @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
-    public void testCount() {
-
-        // when
-        long result = userService.count();
-
-        // then
-        assertThat(result, equalTo(5L));
-    }
-
-    @Test
-    @Transactional
-    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
     public void testCreateOne() throws ServiceException {
 
         // when

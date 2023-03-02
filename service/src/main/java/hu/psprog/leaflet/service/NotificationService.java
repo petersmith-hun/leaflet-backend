@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.service;
 
-import hu.psprog.leaflet.service.mail.domain.CommentNotification;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 
 /**

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * DAO for {@link hu.psprog.leaflet.persistence.repository.EntryRepository}.
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public interface EntryDAO extends BaseDAO<Entry, Long>, SelfStatusAwareDAO<Long> {
 
-    Entry findByLink(String link);
+    Optional<Entry> findByLink(String link);
 
     Page<Entry> findAll(Specification<Entry> specification, Pageable pageable);
 

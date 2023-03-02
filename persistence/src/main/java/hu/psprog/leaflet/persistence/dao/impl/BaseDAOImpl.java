@@ -36,12 +36,6 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
     }
 
     @Override
-    public T findOne(ID id) {
-        return jpaRepository.findById(id)
-                .orElse(null);
-    }
-
-    @Override
     public Optional<T> findById(ID id) {
         return jpaRepository.findById(id);
     }
@@ -76,7 +70,7 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
 
     @Transactional
     @Override
-    public T updateOne(ID id, T updatedEntity) {
+    public Optional<T> updateOne(ID id, T updatedEntity) {
 
         return jpaRepository.findById(id)
                 .map(currentEntity -> {
@@ -89,13 +83,7 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
                     jpaRepository.flush();
 
                     return currentEntity;
-                })
-                .orElse(null);
-    }
-
-    @Override
-    public long count() {
-        return jpaRepository.count();
+                });
     }
 
     protected abstract void doUpdate(T currentEntity, T updatedEntity);

@@ -5,7 +5,7 @@ import hu.psprog.leaflet.lens.api.domain.ContactRequest;
 import hu.psprog.leaflet.lens.api.domain.MailRequestWrapper;
 import hu.psprog.leaflet.lens.api.domain.SystemStartup;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
-import hu.psprog.leaflet.service.mail.domain.CommentNotification;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -38,13 +38,6 @@ public interface TagFacade {
     TagVO getOne(Long id) throws ServiceException;
 
     /**
-     * Returns number of all tags.
-     *
-     * @return number of all tags
-     */
-    Long count();
-
-    /**
      * Creates a new tag.
      *
      * @param entity tag data

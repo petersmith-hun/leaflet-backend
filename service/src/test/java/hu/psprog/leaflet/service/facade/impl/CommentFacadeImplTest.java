@@ -19,8 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.AuthorityUtils;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -220,20 +218,6 @@ public class CommentFacadeImplTest {
 
         // then
         verify(commentService).disable(COMMENT_ID);
-    }
-
-    @Test
-    public void shouldCount() {
-
-        // given
-        long count = 10;
-        given(commentService.count()).willReturn(count);
-
-        // when
-        long result = commentFacade.count();
-
-        // then
-        assertThat(result, equalTo(count));
     }
 
     @Test

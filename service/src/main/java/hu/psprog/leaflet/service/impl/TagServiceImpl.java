@@ -8,7 +8,6 @@ import hu.psprog.leaflet.persistence.repository.specification.TagSpecification;
 import hu.psprog.leaflet.service.TagService;
 import hu.psprog.leaflet.service.converter.TagToTagVOConverter;
 import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
@@ -19,7 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -49,13 +50,9 @@ public class TagServiceImpl implements TagService {
     @PermitScope.Read.Tags
     public TagVO getOne(Long id) throws ServiceException {
 
-        Tag tag = tagDAO.findOne(id);
-
-        if (tag == null) {
-            throw new EntityNotFoundException(Tag.class, id);
-        }
-        
-        return tagToTagVOConverter.convert(tag);
+        return tagDAO.findById(id)
+                .map(tagToTagVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Tag.class, id));
     }
 
     @Override
@@ -76,22 +73,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @PermitScope.Read.Tags
-    public Long count() {
-
-        return tagDAO.count();
-    }
-
-    @Override
     @PermitScope.Write.Tags
     public Long createOne(TagVO entity) throws ServiceException {
 
         Tag tag = tagVOToTagConverter.convert(entity);
         Tag savedTag = tagDAO.save(tag);
-
-        if (savedTag == null) {
-            throw new EntityCreationException(Tag.class);
-        }
 
         LOGGER.info("New tag [{}] has been created with ID [{}]", savedTag.getTitle(), savedTag.getId());
 
@@ -136,15 +122,10 @@ public class TagServiceImpl implements TagService {
     @PermitScope.Write.Tags
     public TagVO updateOne(Long id, TagVO updatedEntity) throws ServiceException {
 
-        Tag updatedTag = tagDAO.updateOne(id, tagVOToTagConverter.convert(updatedEntity));
-
-        if (updatedTag == null) {
-            throw new EntityNotFoundException(Tag.class, id);
-        }
-
-        LOGGER.info("Existing tag [{}] with ID [{}] has been updated", updatedTag.getTitle(), id);
-
-        return tagToTagVOConverter.convert(updatedTag);
+        return tagDAO.updateOne(id, tagVOToTagConverter.convert(updatedEntity))
+                .map(logUpdate())
+                .map(tagToTagVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Tag.class, id));
     }
 
     @Override
@@ -184,7 +165,10 @@ public class TagServiceImpl implements TagService {
     }
 
     private List<Tag> getCurrentTags(EntryVO entryVO) {
-        return entryDAO.findOne(entryVO.getId()).getTags();
+
+        return entryDAO.findById(entryVO.getId())
+                .map(Entry::getTags)
+                .orElseGet(Collections::emptyList);
     }
 
     private void assertState(TagVO tagVO, EntryVO entryVO) throws EntityNotFoundException {
@@ -197,5 +181,13 @@ public class TagServiceImpl implements TagService {
             LOGGER.error("Tag identified by [{}] not found", tagVO.getId());
             throw new EntityNotFoundException(Tag.class, tagVO.getId());
         }
+    }
+
+    private Function<Tag, Tag> logUpdate() {
+
+        return tag -> {
+            LOGGER.info("Existing tag [{}] with ID [{}] has been updated", tag.getTitle(), tag.getId());
+            return tag;
+        };
     }
 }

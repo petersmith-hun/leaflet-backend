@@ -4,7 +4,7 @@ import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.TagService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.SelfStatusAwareIdentifiableVO;
 import hu.psprog.leaflet.service.vo.TagVO;
@@ -37,20 +37,11 @@ import static org.hamcrest.Matchers.notNullValue;
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class TagServiceImplIT {
 
-    private static final String TAG_1 = "tag_1";
-    private static final String TAG_NEW = "tag_new";
-    private static final String ENTRY_1 = "entry_1";
-    private static final String TAG_TO_ATTACH = "tag_to_attach";
-    private static final String ALREADY_ATTACHED_TAG = "tag_already_attached";
-
     @Autowired
     private TagService tagService;
 
     @Autowired
     private EntryService entryService;
-
-    @Autowired
-    private TestObjectReader testObjectReader;
 
     private TagVO controlTagVO;
     private TagVO alreadyAttachedTag;
@@ -59,10 +50,10 @@ public class TagServiceImplIT {
 
     @BeforeEach
     public void setup() throws IOException {
-        controlTagVO = testObjectReader.read(TAG_1, TestObjectReader.ObjectDirectory.VO, TagVO.class);
-        controlEntryVO = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
-        alreadyAttachedTag = testObjectReader.read(ALREADY_ATTACHED_TAG, TestObjectReader.ObjectDirectory.VO, TagVO.class);
-        tagToAttach = testObjectReader.read(TAG_TO_ATTACH, TestObjectReader.ObjectDirectory.VO, TagVO.class);
+        controlTagVO = TestObjects.TAG_VO_1;
+        controlEntryVO = TestObjects.ENTRY_VO_1;
+        alreadyAttachedTag = TestObjects.TAG_VO_ALREADY_ATTACHED;
+        tagToAttach = TestObjects.TAG_VO_TO_ATTACH;
     }
 
     @Test
@@ -108,22 +99,10 @@ public class TagServiceImplIT {
     @Test
     @Transactional
     @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
-    public void testCount() {
-
-        // when
-        Long result = tagService.count();
-
-        // then
-        assertThat(result, equalTo(20L));
-    }
-
-    @Test
-    @Transactional
-    @Sql({LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES, LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_TAGS})
-    public void testCreateOne() throws ServiceException, IOException {
+    public void testCreateOne() throws ServiceException {
 
         // given
-        TagVO tagToCreate = testObjectReader.read(TAG_NEW, TestObjectReader.ObjectDirectory.VO, TagVO.class);
+        TagVO tagToCreate = TestObjects.TAG_VO_NEW;
 
         // when
         Long result = tagService.createOne(tagToCreate);
@@ -170,8 +149,9 @@ public class TagServiceImplIT {
         tagService.deleteByID(id);
 
         // then
-        assertThat(tagService.count(), equalTo(19L));
-        assertThat(tagService.getAll().stream().noneMatch(tagToDelete::equals), equalTo(true));
+        List<TagVO> allTags = tagService.getAll();
+        assertThat(allTags.size(), equalTo(19));
+        assertThat(allTags.stream().noneMatch(tagToDelete::equals), equalTo(true));
     }
 
     @Test
