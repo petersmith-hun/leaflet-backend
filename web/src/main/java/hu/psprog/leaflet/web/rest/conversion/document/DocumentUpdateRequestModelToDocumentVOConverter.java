@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentUpdateRequestModelToDocumentVOConverter implements Converter<DocumentUpdateRequestModel, DocumentVO> {
 
-    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+    private final JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Autowired
     public DocumentUpdateRequestModelToDocumentVOConverter(JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
@@ -28,7 +28,7 @@ public class DocumentUpdateRequestModelToDocumentVOConverter implements Converte
     @Override
     public DocumentVO convert(DocumentUpdateRequestModel source) {
 
-        DocumentVO.DocumentVOBuilder builder = DocumentVO.getBuilder()
+        DocumentVO.DocumentVOBuilder<?, ?> builder = DocumentVO.getBuilder()
                 .withTitle(source.getTitle())
                 .withRawContent(source.getRawContent())
                 .withLink(source.getLink())

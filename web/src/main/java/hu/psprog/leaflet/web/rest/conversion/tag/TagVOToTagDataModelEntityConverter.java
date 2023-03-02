@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TagVOToTagDataModelEntityConverter implements Converter<TagVO, TagDataModel> {
 
-    private DateConverter dateConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public TagVOToTagDataModelEntityConverter(DateConverter dateConverter) {
@@ -24,6 +24,7 @@ public class TagVOToTagDataModelEntityConverter implements Converter<TagVO, TagD
 
     @Override
     public TagDataModel convert(TagVO source) {
+
         return TagDataModel.getBuilder()
                 .withId(source.getId())
                 .withCreated(dateConverter.convert(source.getCreated()))

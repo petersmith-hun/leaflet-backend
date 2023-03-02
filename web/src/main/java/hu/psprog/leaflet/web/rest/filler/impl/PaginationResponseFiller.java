@@ -18,7 +18,7 @@ import java.util.Objects;
 @Component
 public class PaginationResponseFiller implements ResponseFiller {
 
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
 
     @Autowired
     public PaginationResponseFiller(HttpServletRequest httpServletRequest) {
@@ -26,7 +26,7 @@ public class PaginationResponseFiller implements ResponseFiller {
     }
 
     @Override
-    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder wrapperBodyDataModelBuilder) {
+    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> wrapperBodyDataModelBuilder) {
 
         PaginationDataModel paginationDataModel = PaginationDataModel.getBuilder()
                 .withEntityCount((long) httpServletRequest.getAttribute(RequestParameter.PAGINATION_ENTITY_COUNT))

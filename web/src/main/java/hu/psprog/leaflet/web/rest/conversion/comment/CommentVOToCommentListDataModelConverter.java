@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class CommentVOToCommentListDataModelConverter implements Converter<List<CommentVO>, CommentListDataModel> {
 
-    private CommentVOToCommentDataModelConverter commentVOToCommentDataModelConverter;
+    private final CommentVOToCommentDataModelConverter commentVOToCommentDataModelConverter;
 
     @Autowired
     public CommentVOToCommentListDataModelConverter(CommentVOToCommentDataModelConverter commentVOToCommentDataModelConverter) {
@@ -27,7 +27,9 @@ public class CommentVOToCommentListDataModelConverter implements Converter<List<
     public CommentListDataModel convert(List<CommentVO> source) {
 
         CommentListDataModel.CommentListDataModelBuilder builder = CommentListDataModel.getBuilder();
-        source.forEach(commentVO -> builder.withItem(commentVOToCommentDataModelConverter.convert(commentVO)));
+        source.stream()
+                .map(commentVOToCommentDataModelConverter::convert)
+                .forEach(builder::withItem);
 
         return builder.build();
     }

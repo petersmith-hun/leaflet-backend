@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class EntryUpdateRequestModelToEntryVOConverter implements Converter<EntryUpdateRequestModel, EntryVO> {
 
-    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+    private final JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Autowired
     public EntryUpdateRequestModelToEntryVOConverter(JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter) {
@@ -28,7 +28,7 @@ public class EntryUpdateRequestModelToEntryVOConverter implements Converter<Entr
     @Override
     public EntryVO convert(EntryUpdateRequestModel entryUpdateRequestModel) {
 
-        EntryVO.EntryVOBuilder builder = EntryVO.getBuilder()
+        EntryVO.EntryVOBuilder<?, ?> builder = EntryVO.getBuilder()
                 .withTitle(entryUpdateRequestModel.getTitle())
                 .withLink(entryUpdateRequestModel.getLink())
                 .withPrologue(entryUpdateRequestModel.getPrologue())

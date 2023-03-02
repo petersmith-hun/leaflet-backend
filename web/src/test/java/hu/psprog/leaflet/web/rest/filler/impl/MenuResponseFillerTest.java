@@ -58,7 +58,7 @@ public class MenuResponseFillerTest {
     public void shouldFill() {
 
         // given
-        WrapperBodyDataModel.WrapperBodyDataModelBuilder builder = WrapperBodyDataModel.getBuilder();
+        WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> builder = WrapperBodyDataModel.getBuilder();
         given(frontEndRoutingSupportFacade.getStaticRoutes()).willReturn(STATIC_ROUTES);
         given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRouteDataModel.class)).willReturn(FrontEndRouteDataModel.getBuilder().withUrl(URL_1).build());
         given(conversionService.convert(FRONT_END_ROUTE_VO_2, FrontEndRouteDataModel.class)).willReturn(FrontEndRouteDataModel.getBuilder().withUrl(URL_2).build());
@@ -68,7 +68,7 @@ public class MenuResponseFillerTest {
         menuResponseFiller.fill(builder);
 
         // then
-        WrapperBodyDataModel builtWrapper = builder.build();
+        WrapperBodyDataModel<?> builtWrapper = builder.build();
         assertThat(builtWrapper.getMenu(), notNullValue());
         assertThat(builtWrapper.getMenu().getHeader().size(), equalTo(2));
         assertThat(builtWrapper.getMenu().getHeader().get(0).getUrl(), equalTo(URL_1));
@@ -82,13 +82,13 @@ public class MenuResponseFillerTest {
     public void shouldFillWithNullSections() {
 
         // given
-        WrapperBodyDataModel.WrapperBodyDataModelBuilder builder = WrapperBodyDataModel.getBuilder();
+        WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> builder = WrapperBodyDataModel.getBuilder();
 
         // when
         menuResponseFiller.fill(builder);
 
         // then
-        WrapperBodyDataModel builtWrapper = builder.build();
+        WrapperBodyDataModel<?> builtWrapper = builder.build();
         assertThat(builtWrapper.getMenu(), notNullValue());
         assertThat(builtWrapper.getMenu().getHeader().isEmpty(), is(true));
         assertThat(builtWrapper.getMenu().getFooter().isEmpty(), is(true));

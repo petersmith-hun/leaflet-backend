@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class EntryVOToEntryDataModelListConverter implements Converter<List<EntryVO>, EntryListDataModel> {
 
-    private EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter;
+    private final EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter;
 
     @Autowired
     public EntryVOToEntryDataModelListConverter(EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter) {
@@ -27,7 +27,9 @@ public class EntryVOToEntryDataModelListConverter implements Converter<List<Entr
     public EntryListDataModel convert(List<EntryVO> entryVOList) {
 
         EntryListDataModel.EntryListDataModelBuilder builder = EntryListDataModel.getBuilder();
-        entryVOList.forEach(entryVO -> builder.withItem(entryVOToEntryDataModelEntityConverter.convert(entryVO)));
+        entryVOList.stream()
+                .map(entryVOToEntryDataModelEntityConverter::convert)
+                .forEach(builder::withItem);
 
         return builder.build();
     }

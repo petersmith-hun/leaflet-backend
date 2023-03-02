@@ -22,7 +22,7 @@ public class ReCaptchaValidationServiceImpl implements ReCaptchaValidationServic
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReCaptchaValidationServiceImpl.class);
 
-    private ReCaptchaClient reCaptchaClient;
+    private final ReCaptchaClient reCaptchaClient;
 
     @Autowired
     public ReCaptchaValidationServiceImpl(ReCaptchaClient reCaptchaClient) {

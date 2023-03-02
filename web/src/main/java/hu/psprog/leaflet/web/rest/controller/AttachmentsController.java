@@ -6,9 +6,11 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.AttachmentFacade;
 import hu.psprog.leaflet.service.vo.AttachmentRequestVO;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,10 +31,12 @@ public class AttachmentsController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttachmentsController.class);
 
-    private AttachmentFacade attachmentFacade;
+    private final AttachmentFacade attachmentFacade;
 
     @Autowired
-    public AttachmentsController(AttachmentFacade attachmentFacade) {
+    public AttachmentsController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                                 AttachmentFacade attachmentFacade) {
+        super(conversionService, exceptionHandlerCounters);
         this.attachmentFacade = attachmentFacade;
     }
 

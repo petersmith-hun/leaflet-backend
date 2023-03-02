@@ -19,7 +19,7 @@ public class CommentUpdateRequestModelToCommentVOConverter implements Converter<
     @Override
     public CommentVO convert(CommentUpdateRequestModel source) {
 
-        CommentVO.CommentVOBuilder builder = CommentVO.getBuilder()
+        CommentVO.CommentVOBuilder<?, ?> builder = CommentVO.getBuilder()
                 .withContent(source.getContent());
 
         if (source instanceof CommentCreateRequestModel) {

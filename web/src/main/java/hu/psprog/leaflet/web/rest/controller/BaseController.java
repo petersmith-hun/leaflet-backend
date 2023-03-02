@@ -8,7 +8,6 @@ import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,11 +59,13 @@ public class BaseController {
 
     static final String CONSTRAINT_VIOLATION = "Constraint violation";
 
-    @Autowired
-    ConversionService conversionService;
+    protected final ConversionService conversionService;
+    private final ExceptionHandlerCounters exceptionHandlerCounters;
 
-    @Autowired
-    private ExceptionHandlerCounters exceptionHandlerCounters;
+    protected BaseController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters) {
+        this.conversionService = conversionService;
+        this.exceptionHandlerCounters = exceptionHandlerCounters;
+    }
 
     /**
      * HTTP 404 exception handler.

@@ -6,9 +6,11 @@ import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.ContactService;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -30,10 +32,12 @@ public class ContactRequestController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContactRequestController.class);
 
-    private ContactService contactService;
+    private final ContactService contactService;
 
     @Autowired
-    public ContactRequestController(ContactService contactService) {
+    public ContactRequestController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                                    ContactService contactService) {
+        super(conversionService, exceptionHandlerCounters);
         this.contactService = contactService;
     }
 

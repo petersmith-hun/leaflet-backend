@@ -13,14 +13,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class JULocaleToLeafletLocaleConverter implements Converter<java.util.Locale, Locale> {
 
+    private static final String HUNGARIAN_LANGUAGE_CODE = "hu";
+
     @Override
     public Locale convert(java.util.Locale locale) {
 
-        switch (locale.getLanguage()) {
-            case "hu":
-                return Locale.HU;
-            default:
-                return Locale.EN;
-        }
+        return HUNGARIAN_LANGUAGE_CODE.equals(locale.getLanguage())
+                ? Locale.HU
+                : Locale.EN;
     }
 }

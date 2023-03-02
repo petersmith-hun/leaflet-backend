@@ -25,11 +25,14 @@ public class RESTAuthenticationEntryPoint implements AuthenticationEntryPoint, A
     private static final String UNAUTHORIZED_ACCESS = "Unauthorized access";
     private static final String CONTENT_TYPE = "application/json";
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+    private final ExceptionHandlerCounters exceptionHandlerCounters;
 
     @Autowired
-    private ExceptionHandlerCounters exceptionHandlerCounters;
+    public RESTAuthenticationEntryPoint(ObjectMapper objectMapper, ExceptionHandlerCounters exceptionHandlerCounters) {
+        this.objectMapper = objectMapper;
+        this.exceptionHandlerCounters = exceptionHandlerCounters;
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {

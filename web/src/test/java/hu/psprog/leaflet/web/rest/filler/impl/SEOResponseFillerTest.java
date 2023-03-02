@@ -45,7 +45,7 @@ public class SEOResponseFillerTest {
 
         // given
         prepareFillerMockWithFullParameterSet();
-        WrapperBodyDataModel.WrapperBodyDataModelBuilder builder = WrapperBodyDataModel.getBuilder();
+        WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> builder = WrapperBodyDataModel.getBuilder();
 
         // when
         responseFiller.fill(builder);
@@ -64,7 +64,7 @@ public class SEOResponseFillerTest {
 
         // given
         prepareFillerMockWithPartialParameterSet();
-        WrapperBodyDataModel.WrapperBodyDataModelBuilder builder = WrapperBodyDataModel.getBuilder();
+        WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> builder = WrapperBodyDataModel.getBuilder();
 
         // when
         responseFiller.fill(builder);
@@ -83,7 +83,7 @@ public class SEOResponseFillerTest {
 
         // given
         prepareFillerMock(new MockHttpServletRequest());
-        WrapperBodyDataModel.WrapperBodyDataModelBuilder builder = WrapperBodyDataModel.getBuilder();
+        WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> builder = WrapperBodyDataModel.getBuilder();
 
         // when
         responseFiller.fill(builder);

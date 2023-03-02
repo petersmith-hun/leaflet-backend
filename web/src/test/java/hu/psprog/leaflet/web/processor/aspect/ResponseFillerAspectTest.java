@@ -65,7 +65,6 @@ public class ResponseFillerAspectTest {
     private ProceedingJoinPoint proceedingJoinPoint;
 
     private ResponseFillerAspect responseFillerAspect;
-    private MockedResponseFiller responseFiller;
 
     @Test
     public void shouldWrapAndFillResponseWithStandardBody() throws Throwable {
@@ -186,7 +185,7 @@ public class ResponseFillerAspectTest {
 
     private EntriesController prepareEntriesControllerMock() {
 
-        EntriesController controller = new EntriesController(entryFacade);
+        EntriesController controller = new EntriesController(conversionService, null, entryFacade);
         Field conversionServiceField = ReflectionUtils.findField(EntriesController.class, "conversionService");
         conversionServiceField.setAccessible(true);
         ReflectionUtils.setField(conversionServiceField, controller, conversionService);
@@ -195,7 +194,7 @@ public class ResponseFillerAspectTest {
     }
 
     private void prepareAspect(boolean shouldFill) {
-        responseFiller = MockedResponseFiller.create(shouldFill);
+        MockedResponseFiller responseFiller = MockedResponseFiller.create(shouldFill);
         responseFillerAspect = new ResponseFillerAspect(Collections.singletonList(responseFiller));
     }
 
@@ -217,7 +216,7 @@ public class ResponseFillerAspectTest {
 
     private static class MockedResponseFiller implements ResponseFiller {
 
-        private boolean shouldFill;
+        private final boolean shouldFill;
 
         private MockedResponseFiller(boolean shouldFill) {
             this.shouldFill = shouldFill;
@@ -228,7 +227,7 @@ public class ResponseFillerAspectTest {
         }
 
         @Override
-        public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder wrapperBodyDataModelBuilder) {
+        public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> wrapperBodyDataModelBuilder) {
             wrapperBodyDataModelBuilder.withSeo(TEST_WRAPPING);
         }
 

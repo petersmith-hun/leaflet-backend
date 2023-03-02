@@ -22,6 +22,7 @@ public class DateConverter {
      * @return converted {@link ZonedDateTime}
      */
     public ZonedDateTime convert(Date date) {
+
         return Optional.ofNullable(date)
                 .map(originalDate -> originalDate.toInstant().atZone(ZoneId.systemDefault()))
                 .orElse(null);

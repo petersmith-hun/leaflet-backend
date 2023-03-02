@@ -19,7 +19,9 @@ public class FrontEndRouteVOListToSitemapConverter implements Converter<List<Fro
     public Sitemap convert(List<FrontEndRouteVO> source) {
 
         Sitemap.SitemapBuilder builder = Sitemap.getBuilder();
-        source.forEach(route -> builder.withLocation(route.getUrl()));
+        source.stream()
+                .map(FrontEndRouteVO::getUrl)
+                .forEach(builder::withLocation);
 
         return builder.build();
     }

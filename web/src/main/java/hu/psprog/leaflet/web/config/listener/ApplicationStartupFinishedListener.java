@@ -26,9 +26,9 @@ public class ApplicationStartupFinishedListener implements ApplicationListener<C
     private static final String STARTUP_EVENT_EMAIL_ENABLED = "${mail.event.startup.enabled:true}";
     private static final String UNKNOWN_BUILD_TIME = "unknown";
 
-    private EmailBasedNotificationService emailBasedNotificationService;
-    private boolean startupEventEmailEnabled;
-    private Optional<BuildProperties> optionalBuildProperties;
+    private final EmailBasedNotificationService emailBasedNotificationService;
+    private final boolean startupEventEmailEnabled;
+    private final Optional<BuildProperties> optionalBuildProperties;
 
     @Autowired
     public ApplicationStartupFinishedListener(EmailBasedNotificationService emailBasedNotificationService,
@@ -41,6 +41,7 @@ public class ApplicationStartupFinishedListener implements ApplicationListener<C
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+
         optionalBuildProperties.ifPresent(buildProperties -> {
             LOGGER.info("Application loaded successfully, running version v{}, built on {}", buildProperties.getVersion(), getBuildTime(buildProperties));
             if (startupEventEmailEnabled) {
@@ -50,6 +51,7 @@ public class ApplicationStartupFinishedListener implements ApplicationListener<C
     }
 
     private String getBuildTime(BuildProperties buildProperties) {
+
         return Optional.ofNullable(buildProperties.getTime())
                 .map(buildTime -> buildTime.atZone(ZoneId.systemDefault()))
                 .map(ZonedDateTime::toString)

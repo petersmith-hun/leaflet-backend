@@ -7,14 +7,19 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.RequestContextFilter;
 
+/**
+ * Web layer generic configuration.
+ */
 @Configuration
 @EnableAspectJAutoProxy
 public class ApplicationContextConfig {
 
     @Bean
     public RequestContextFilter requestContextFilter() {
+
         OrderedRequestContextFilter orderedRequestContextFilter = new OrderedRequestContextFilter();
         orderedRequestContextFilter.setOrder(Ordered.HIGHEST_PRECEDENCE);
+
         return orderedRequestContextFilter;
     }
 }

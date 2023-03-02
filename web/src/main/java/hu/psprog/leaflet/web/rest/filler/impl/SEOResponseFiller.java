@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 @Component
 public class SEOResponseFiller extends AbstractAjaxRequestAwareResponseFiller {
 
-    private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
+    private final DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
 
     @Autowired
     public SEOResponseFiller(DynamicConfigurationPropertyService dynamicConfigurationPropertyService, HttpServletRequest httpServletRequest) {
@@ -29,7 +29,7 @@ public class SEOResponseFiller extends AbstractAjaxRequestAwareResponseFiller {
     }
 
     @Override
-    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder wrapperBodyDataModelBuilder) {
+    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> wrapperBodyDataModelBuilder) {
 
         SEODataModel seoDataModel = SEODataModel.getBuilder()
                 .withPageTitle(getParameter(RequestParameter.SEO_PAGE_TITLE))
@@ -46,7 +46,7 @@ public class SEOResponseFiller extends AbstractAjaxRequestAwareResponseFiller {
         return Stream.of(httpServletRequest.getAttribute(key), dynamicConfigurationPropertyService.get(key))
                 .filter(Objects::nonNull)
                 .findFirst()
-                    .map(String::valueOf)
-                    .orElse(StringUtils.EMPTY);
+                .map(String::valueOf)
+                .orElse(StringUtils.EMPTY);
     }
 }

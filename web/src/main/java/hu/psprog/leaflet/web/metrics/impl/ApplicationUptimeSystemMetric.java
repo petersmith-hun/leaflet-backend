@@ -16,7 +16,7 @@ public class ApplicationUptimeSystemMetric implements SystemMetric<Long> {
 
     private static final String METRIC_NAME = "uptime";
 
-    private RuntimeMXBean runtimeMXBean;
+    private final RuntimeMXBean runtimeMXBean;
 
     public ApplicationUptimeSystemMetric() {
         this.runtimeMXBean = ManagementFactory.getRuntimeMXBean();

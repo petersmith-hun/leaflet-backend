@@ -14,9 +14,11 @@ import hu.psprog.leaflet.service.facade.UserFacade;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -53,7 +55,9 @@ public class UsersController extends BaseController {
     private final UserFacade userFacade;
 
     @Autowired
-    public UsersController(UserFacade userFacade) {
+    public UsersController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                           UserFacade userFacade) {
+        super(conversionService, exceptionHandlerCounters);
         this.userFacade = userFacade;
     }
 

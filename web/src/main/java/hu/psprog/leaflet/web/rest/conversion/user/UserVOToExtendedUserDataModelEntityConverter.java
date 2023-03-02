@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserVOToExtendedUserDataModelEntityConverter implements Converter<UserVO, ExtendedUserDataModel> {
 
-    private DateConverter dateConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public UserVOToExtendedUserDataModelEntityConverter(DateConverter dateConverter) {

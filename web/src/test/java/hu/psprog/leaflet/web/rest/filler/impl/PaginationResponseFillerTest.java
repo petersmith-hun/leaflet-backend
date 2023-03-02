@@ -38,7 +38,7 @@ public class PaginationResponseFillerTest {
 
         // given
         prepareFillerMock(true);
-        WrapperBodyDataModel.WrapperBodyDataModelBuilder builder = WrapperBodyDataModel.getBuilder();
+        WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> builder = WrapperBodyDataModel.getBuilder();
 
         // when
         responseFiller.fill(builder);

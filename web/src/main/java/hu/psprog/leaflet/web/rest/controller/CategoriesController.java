@@ -10,9 +10,11 @@ import hu.psprog.leaflet.service.facade.CategoryFacade;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -43,10 +45,12 @@ public class CategoriesController extends BaseController {
     private static final String CATEGORY_COULD_NOT_BE_CREATED = "Category could not be created. See details:";
     private static final String CATEGORY_COULD_NOT_BE_CREATED_TRY_AGAIN = "Category could not be created, please try again later.";
 
-    private CategoryFacade categoryFacade;
+    private final CategoryFacade categoryFacade;
 
     @Autowired
-    public CategoriesController(CategoryFacade categoryFacade) {
+    public CategoriesController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                                CategoryFacade categoryFacade) {
+        super(conversionService, exceptionHandlerCounters);
         this.categoryFacade = categoryFacade;
     }
 
