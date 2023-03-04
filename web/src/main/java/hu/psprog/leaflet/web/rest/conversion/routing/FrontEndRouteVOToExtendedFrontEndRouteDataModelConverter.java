@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter implements Converter<FrontEndRouteVO, ExtendedFrontEndRouteDataModel> {
 
-    private DateConverter dateConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter(DateConverter dateConverter) {

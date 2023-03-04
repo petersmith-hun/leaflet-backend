@@ -31,7 +31,7 @@ public class BaseControllerTest extends AbstractControllerBaseTest {
     public void shouldHandleResourceNotFoundException() {
 
         // when
-        ResponseEntity<ErrorMessageDataModel> result = baseController.resourceNotFoundExceptionHandler(httpServletRequest, EXCEPTION);
+        ResponseEntity<ErrorMessageDataModel> result = baseController.resourceNotFoundExceptionHandler(EXCEPTION);
 
         // then
         assertResponse(result, HttpStatus.NOT_FOUND, ERROR_MESSAGE_DATA_MODEL);
@@ -42,7 +42,7 @@ public class BaseControllerTest extends AbstractControllerBaseTest {
     public void shouldHandleAuthenticationFailureException() {
 
         // when
-        ResponseEntity<ErrorMessageDataModel> result = baseController.authenticationFailureExceptionHandler(httpServletRequest, EXCEPTION);
+        ResponseEntity<ErrorMessageDataModel> result = baseController.authenticationFailureExceptionHandler(EXCEPTION);
 
         // then
         assertResponse(result, HttpStatus.UNAUTHORIZED, ERROR_MESSAGE_DATA_MODEL);
@@ -53,7 +53,7 @@ public class BaseControllerTest extends AbstractControllerBaseTest {
     public void shouldHandleAuthorizationFailureException() {
 
         // when
-        ResponseEntity<ErrorMessageDataModel> result = baseController.authorizationFailureExceptionHandler(httpServletRequest, EXCEPTION);
+        ResponseEntity<ErrorMessageDataModel> result = baseController.authorizationFailureExceptionHandler(EXCEPTION);
 
         // then
         assertResponse(result, HttpStatus.FORBIDDEN, ERROR_MESSAGE_DATA_MODEL);
@@ -64,7 +64,7 @@ public class BaseControllerTest extends AbstractControllerBaseTest {
     public void shouldHandleRequestCouldNotBeFulfilledException() {
 
         // when
-        ResponseEntity<ErrorMessageDataModel> result = baseController.requestCouldNotBeFulfilledExceptionHandler(httpServletRequest, EXCEPTION);
+        ResponseEntity<ErrorMessageDataModel> result = baseController.requestCouldNotBeFulfilledExceptionHandler(EXCEPTION);
 
         // then
         assertResponse(result, HttpStatus.CONFLICT, ERROR_MESSAGE_DATA_MODEL);
@@ -75,7 +75,7 @@ public class BaseControllerTest extends AbstractControllerBaseTest {
     public void shouldHandleAnyOtherExceptions() {
 
         // when
-        ResponseEntity<ErrorMessageDataModel> result = baseController.defaultExceptionHandler(httpServletRequest, EXCEPTION);
+        ResponseEntity<ErrorMessageDataModel> result = baseController.defaultExceptionHandler(EXCEPTION);
 
         // then
         assertResponse(result, HttpStatus.INTERNAL_SERVER_ERROR, ERROR_MESSAGE_DATA_MODEL);

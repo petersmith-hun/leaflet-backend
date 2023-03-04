@@ -5,10 +5,8 @@ import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.persistence.repository.UploadedFileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -17,35 +15,17 @@ import java.util.UUID;
  * @author Peter Smith
  */
 @Component
-public class UploadedFileDAOImpl extends SelfStatusAwareDAOImpl<UploadedFile, Long> implements UploadedFileDAO {
+public class UploadedFileDAOImpl implements UploadedFileDAO {
+
+    private final UploadedFileRepository uploadedFileRepository;
 
     @Autowired
     public UploadedFileDAOImpl(final UploadedFileRepository uploadedFileRepository) {
-        super(uploadedFileRepository);
+        this.uploadedFileRepository = uploadedFileRepository;
     }
 
     @Override
-    public UploadedFile findByPath(String path) {
-        return ((UploadedFileRepository) jpaRepository).findByPath(path);
-    }
-
-    @Override
-    public UploadedFile findByPathUUID(UUID pathUUID) {
-        return ((UploadedFileRepository) jpaRepository).findByPathUUID(pathUUID);
-    }
-
-    @Transactional
-    @Override
-    public UploadedFile updateOne(Long id, UploadedFile updatedEntity) {
-
-        UploadedFile currentUploadedFile = jpaRepository.getOne(id);
-        if (Objects.nonNull(currentUploadedFile)) {
-            currentUploadedFile.setOriginalFilename(updatedEntity.getOriginalFilename());
-            currentUploadedFile.setDescription(updatedEntity.getDescription());
-            currentUploadedFile.setLastModified(new Date());
-            jpaRepository.flush();
-        }
-
-        return currentUploadedFile;
+    public Optional<UploadedFile> findByPathUUID(UUID pathUUID) {
+        return uploadedFileRepository.findByPathUUID(pathUUID);
     }
 }

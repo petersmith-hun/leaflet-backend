@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class CategoryVOToCategoryDataModelListConverter implements Converter<List<CategoryVO>, CategoryListDataModel> {
 
-    private CategoryVOToCategoryDataModelEntityConverter categoryVOToCategoryDataModelEntityConverter;
+    private final CategoryVOToCategoryDataModelEntityConverter categoryVOToCategoryDataModelEntityConverter;
 
     @Autowired
     public CategoryVOToCategoryDataModelListConverter(CategoryVOToCategoryDataModelEntityConverter categoryVOToCategoryDataModelEntityConverter) {
@@ -27,7 +27,9 @@ public class CategoryVOToCategoryDataModelListConverter implements Converter<Lis
     public CategoryListDataModel convert(List<CategoryVO> source) {
 
         CategoryListDataModel.CategoryListDataModelBuilder builder = CategoryListDataModel.getBuilder();
-        source.forEach(category -> builder.withItem(categoryVOToCategoryDataModelEntityConverter.convert(category)));
+        source.stream()
+                .map(categoryVOToCategoryDataModelEntityConverter::convert)
+                .forEach(builder::withItem);
 
         return builder.build();
     }

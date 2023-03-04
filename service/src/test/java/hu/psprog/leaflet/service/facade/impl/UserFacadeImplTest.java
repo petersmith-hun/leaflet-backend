@@ -1,16 +1,9 @@
 package hu.psprog.leaflet.service.facade.impl;
 
-import hu.psprog.leaflet.service.NotificationService;
-import hu.psprog.leaflet.service.UserAuthenticationService;
 import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.Authority;
-import hu.psprog.leaflet.service.exception.EntityNotFoundException;
-import hu.psprog.leaflet.service.exception.ReAuthenticationFailureException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
-import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,17 +12,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.stream.Stream;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -51,21 +39,12 @@ public class UserFacadeImplTest {
     private static final UserVO REBUILT_USER = UserVO.getBuilder()
             .withPassword(ENCODED_PASSWORD)
             .build();
-    private static final LoginContextVO LOGIN_CONTEXT = LoginContextVO.getBuilder()
-            .withUsername("username")
-            .build();
 
     @Mock
     private UserService userService;
 
     @Mock
-    private UserAuthenticationService authenticationService;
-
-    @Mock
     private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private NotificationService notificationService;
 
     @InjectMocks
     private UserFacadeImpl userFacade;
@@ -148,97 +127,8 @@ public class UserFacadeImplTest {
         userFacade.updateUserPassword(USER_ID, PASSWORD, NEW_PASSWORD);
 
         // then
-        verify(authenticationService).reAuthenticate(PASSWORD);
         verify(userService).changePassword(USER_ID, ENCODED_PASSWORD);
         verify(userService).getOne(USER_ID);
-    }
-
-    @Test
-    public void shouldUpdatePasswordWithReAuthenticationException() {
-
-        // given
-        doThrow(BadCredentialsException.class).when(authenticationService).reAuthenticate(PASSWORD);
-
-        // when
-        Assertions.assertThrows(ReAuthenticationFailureException.class, () -> userFacade.updateUserPassword(USER_ID, PASSWORD, NEW_PASSWORD));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    public void shouldLogin() throws EntityNotFoundException {
-
-        // given
-        String token = "token";
-        given(authenticationService.claimToken(any(LoginContextVO.class))).willReturn(token);
-
-        // when
-        String result = userFacade.login(LOGIN_CONTEXT);
-
-        // then
-        assertThat(result, equalTo(token));
-        verify(authenticationService).claimToken(LOGIN_CONTEXT);
-        verify(userService).updateLastLogin(LOGIN_CONTEXT.getUsername());
-    }
-
-    @Test
-    public void shouldRegister() throws ServiceException {
-
-        // given
-        given(passwordEncoder.encode(PASSWORD)).willReturn(ENCODED_PASSWORD);
-        SignUpConfirmation expectedSignUpConfirmation = new SignUpConfirmation(USER_TO_CREATE.getUsername(), USER_TO_CREATE.getEmail());
-
-        // when
-        userFacade.register(USER_TO_CREATE);
-
-        // then
-        verify(userService).register(REBUILT_USER);
-        verify(notificationService).signUpConfirmation(expectedSignUpConfirmation);
-    }
-
-    @Test
-    public void shouldLogout() {
-
-        // when
-        userFacade.logout();
-
-        // then
-        verify(authenticationService).revokeToken();
-    }
-
-    @Test
-    public void shouldDemandPasswordReset() {
-
-        // when
-        userFacade.demandPasswordReset(LOGIN_CONTEXT);
-
-        // then
-        verify(authenticationService).demandPasswordReset(LOGIN_CONTEXT);
-    }
-
-    @Test
-    public void shouldConfirmPasswordReset() throws EntityNotFoundException {
-
-        // given
-        given(authenticationService.confirmPasswordReset()).willReturn(USER_ID);
-        given(passwordEncoder.encode(PASSWORD)).willReturn(ENCODED_PASSWORD);
-
-        // when
-        userFacade.confirmPasswordReset(PASSWORD);
-
-        // then
-        verify(userService).reclaimPassword(USER_ID, ENCODED_PASSWORD);
-    }
-
-    @Test
-    public void shouldExtendSession() {
-
-        // when
-        userFacade.extendSession(LOGIN_CONTEXT);
-
-        // then
-        verify(authenticationService).extendSession(LOGIN_CONTEXT);
     }
 
     private static Stream<Arguments> authorityDataProvider() {

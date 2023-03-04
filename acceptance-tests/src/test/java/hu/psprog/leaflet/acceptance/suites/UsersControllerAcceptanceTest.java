@@ -2,23 +2,18 @@ package hu.psprog.leaflet.acceptance.suites;
 
 import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
-import hu.psprog.leaflet.api.rest.request.user.LoginRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.PasswordChangeRequestModel;
-import hu.psprog.leaflet.api.rest.request.user.PasswordResetDemandRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserPasswordRequestModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
-import hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
-import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.ForbiddenOperationException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
-import hu.psprog.leaflet.bridge.client.exception.UnauthorizedAccessException;
 import hu.psprog.leaflet.bridge.client.impl.AccessTokenTestUtility;
 import hu.psprog.leaflet.bridge.service.UserBridgeService;
 import hu.psprog.leaflet.persistence.entity.Role;
@@ -33,11 +28,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static hu.psprog.leaflet.api.rest.response.user.LoginResponseDataModel.AuthenticationResult.AUTH_SUCCESS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -51,27 +44,18 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     private static final String HEADER_PARAMETER_AUTHORIZATION = "Authorization";
     private static final String AUTHORIZATION_SCHEMA = "Bearer {0}";
 
-    private static final String TEST_ADMIN_EMAIL = "test-admin@ac-leaflet.local";
     private static final String TEST_USER_1_EMAIL = "test-user-1@ac-leaflet.local";
-    private static final String TEST_EDITOR_2_EMAIL = "test-editor-2@ac-leaflet.local";
-    private static final String TEST_USER_3_EMAIL = "test-user-3@ac-leaflet.local";
-    private static final String TEST_EDITOR_4_EMAIL = "test-editor-4@ac-leaflet.local";
-    private static final String TEST_EDITOR_5_EMAIL = "test-editor-5@ac-leaflet.local";
-    private static final String TEST_USER_6_EMAIL = "test-user-6@ac-leaflet.local";
     private static final String TEST_USER_7_EMAIL = "test-user-7@ac-leaflet.local";
     private static final String TEST_EDITOR_8_EMAIL = "test-editor-8@ac-leaflet.local";
-    private static final String NON_EXISTING_USER_EMAIL = "non-existing-user@ac-leaflet.local";
 
     private static final long ADMIN_USER_ID = 1L;
     private static final long TEST_USER_1_ID = 2L;
-    private static final long TEST_EDITOR_5_ID = 6L;
     private static final long TEST_USER_7_ID = 8L;
 
     private static final String TEST_PASSWORD = "testpw01";
     private static final String UPDATED_PASSWORD = "new-pw";
     private static final String ADMIN_USER_NAME = "Administrator";
     private static final String CONTROL_USER_CREATE = "user-create";
-    private static final String CONTROL_USER_REGISTER = "user-register";
 
     @Autowired
     private UserBridgeService userBridgeService;
@@ -170,131 +154,23 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     public void shouldUpdatePassword() throws CommunicationFailureException {
 
         // given
-        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
+        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel();
 
         // when
         userBridgeService.updatePassword(ADMIN_USER_ID, userPasswordRequestModel);
 
         // then
-        LoginResponseDataModel loginResponse = userBridgeService.claimToken(prepareLoginRequestModel(TEST_ADMIN_EMAIL, UPDATED_PASSWORD));
-        assertThat(loginResponse.getStatus(), equalTo(AUTH_SUCCESS));
-    }
-
-    @Test
-    public void shouldFailUpdatingPasswordWithIncorrectCurrentPassword() {
-
-        // given
-        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
-        ((PasswordChangeRequestModel) userPasswordRequestModel).setCurrentPassword("incorrect-password");
-
-        // when
-        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.updatePassword(ADMIN_USER_ID, userPasswordRequestModel));
-
-        // then
-        // exception expected
+        // silently succeeding
     }
 
     @Test
     public void shouldFailUpdatingDifferentUserPassword() {
 
         // given
-        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(false);
+        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel();
 
         // when
         Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.updatePassword(TEST_USER_1_ID, userPasswordRequestModel));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    public void shouldClaimTokenWithExistingUser() throws CommunicationFailureException {
-
-        // given
-        LoginRequestModel loginRequestModel = prepareLoginRequestModel(TEST_EDITOR_2_EMAIL, TEST_PASSWORD);
-
-        // when
-        LoginResponseDataModel result = userBridgeService.claimToken(loginRequestModel);
-
-        // then
-        assertThat(result, notNullValue());
-        assertThat(result.getStatus(), equalTo(AUTH_SUCCESS));
-        assertThat(result.getToken(), notNullValue());
-    }
-
-    @Test
-    public void shouldClaimTokenWithNonExistingUser() {
-
-        // given
-        LoginRequestModel loginRequestModel = prepareLoginRequestModel(NON_EXISTING_USER_EMAIL, TEST_PASSWORD);
-
-        // when
-        Assertions.assertThrows(UnauthorizedAccessException.class, () -> userBridgeService.claimToken(loginRequestModel));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    public void shouldStartPasswordResetProcess() {
-
-        // given
-        PasswordResetDemandRequestModel passwordResetDemandRequestModel = new PasswordResetDemandRequestModel();
-        passwordResetDemandRequestModel.setEmail(TEST_USER_3_EMAIL);
-
-        // when
-        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.demandPasswordReset(passwordResetDemandRequestModel, RECAPTCHA_TOKEN));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @ResetDatabase
-    public void shouldConfirmPasswordReset() {
-
-        // given
-        UserPasswordRequestModel userPasswordRequestModel = prepareUserPasswordRequestModel(true);
-
-        // when
-        Assertions.assertThrows(ConflictingRequestException.class, () -> {
-            prepareMockedRequestAuthentication(preparePasswordResetConfirmation(TEST_EDITOR_4_EMAIL));
-            userBridgeService.confirmPasswordReset(userPasswordRequestModel, RECAPTCHA_TOKEN);
-        });
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    public void shouldRevokeToken() {
-
-        // given
-        oauthLogin(TEST_EDITOR_5_EMAIL);
-        try {
-            UserDataModel userData = userBridgeService.getUserByID(TEST_EDITOR_5_ID);
-            assertThat(userData.getId(), equalTo(TEST_EDITOR_5_ID));
-        } catch (Exception e) {
-            // this call should have been successful
-            fail("User should be able to query their own user data.");
-        }
-
-        // when
-        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.revokeToken());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    public void shouldRenewSession() throws InterruptedException {
-
-        // given
-        oauthLogin(TEST_USER_6_EMAIL);
-        Thread.sleep(1200); // without this, test is so fast, it fails
-
-        // when
-        Assertions.assertThrows(ConflictingRequestException.class, () -> userBridgeService.renewToken());
 
         // then
         // exception expected
@@ -353,35 +229,6 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         // exception expected
     }
 
-    @Test
-    @ResetDatabase
-    public void shouldRegister() {
-
-        // given
-        UserInitializeRequestModel userInitializeRequestModel = getControl(CONTROL_USER_REGISTER, UserInitializeRequestModel.class);
-
-        // when
-        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @ResetDatabase
-    public void shouldNotRegisterWithAlreadyRegisteredEmail() {
-
-        // given
-        UserInitializeRequestModel userInitializeRequestModel = getControl(CONTROL_USER_REGISTER, UserInitializeRequestModel.class);
-        userInitializeRequestModel.setEmail(TEST_USER_1_EMAIL);
-
-        // when
-        Assertions.assertThrows(ForbiddenOperationException.class, () -> userBridgeService.signUp(userInitializeRequestModel, RECAPTCHA_TOKEN));
-
-        // then
-        // exception expected
-    }
-
     private void assertCreatedUser(UserInitializeRequestModel userInitializeRequestModel, long createdUserID) throws CommunicationFailureException {
 
         ExtendedUserDataModel userData = userBridgeService.getUserByID(createdUserID);
@@ -419,14 +266,12 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         prepareMockedRequestAuthentication(token);
     }
 
-    private UserPasswordRequestModel prepareUserPasswordRequestModel(boolean forPasswordReset) {
+    private UserPasswordRequestModel prepareUserPasswordRequestModel() {
 
         PasswordChangeRequestModel userPasswordRequestModel = new PasswordChangeRequestModel();
         userPasswordRequestModel.setPassword(UPDATED_PASSWORD);
         userPasswordRequestModel.setPasswordConfirmation(UPDATED_PASSWORD);
-        if (!forPasswordReset) {
-            userPasswordRequestModel.setCurrentPassword(TEST_PASSWORD);
-        }
+        userPasswordRequestModel.setCurrentPassword(TEST_PASSWORD);
 
         return userPasswordRequestModel;
     }
@@ -436,23 +281,5 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         Map<String, String> authenticationHeader = new HashMap<>();
         authenticationHeader.put(HEADER_PARAMETER_AUTHORIZATION, MessageFormat.format(AUTHORIZATION_SCHEMA, token));
         given(requestAuthentication.getAuthenticationHeader()).willReturn(authenticationHeader);
-    }
-
-    private String preparePasswordResetConfirmation(String email) throws CommunicationFailureException {
-
-        PasswordResetDemandRequestModel passwordResetDemandRequestModel = new PasswordResetDemandRequestModel();
-        passwordResetDemandRequestModel.setEmail(email);
-        userBridgeService.demandPasswordReset(passwordResetDemandRequestModel, RECAPTCHA_TOKEN);
-
-        return notificationService.getPasswordResetRequest().getToken();
-    }
-
-    private LoginRequestModel prepareLoginRequestModel(String email, String password) {
-
-        LoginRequestModel loginRequestModel = new LoginRequestModel();
-        loginRequestModel.setEmail(email);
-        loginRequestModel.setPassword(password);
-
-        return loginRequestModel;
     }
 }

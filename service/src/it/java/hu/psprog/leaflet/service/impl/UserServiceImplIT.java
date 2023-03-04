@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 /**
@@ -132,18 +131,6 @@ public class UserServiceImplIT {
         // then
         assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.get(0), equalTo(controlUserVO));
-    }
-
-    @Test
-    @Transactional
-    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
-    public void testCount() {
-
-        // when
-        long result = userService.count();
-
-        // then
-        assertThat(result, equalTo(5L));
     }
 
     @Test
@@ -264,23 +251,5 @@ public class UserServiceImplIT {
 
         // then
         assertThat(userService.getOne(USER_ID1_ID).isEnabled(), equalTo(true));
-    }
-
-    @Test
-    @Transactional
-    @Sql(scripts = LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_USERS)
-    public void testUpdateLastLogin() throws ServiceException {
-
-        // given
-        assertThat(userService.getOne(USER_ID1_ID).getLastLogin(), nullValue());
-
-        // when
-        userService.updateLastLogin(USER_ID1_EMAIL);
-
-        // then
-        UserVO user = userService.getOne(USER_ID1_ID);
-        assertThat(user.getLastLogin(), notNullValue());
-        long diff = Math.abs(System.currentTimeMillis() - user.getLastLogin().getTime());
-        assertThat(diff < 3000, equalTo(true));
     }
 }

@@ -1,10 +1,11 @@
 package hu.psprog.leaflet.service.impl;
 
+import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.service.AttachmentService;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,9 +17,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 
 /**
@@ -32,13 +35,6 @@ import static org.hamcrest.Matchers.is;
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class AttachmentServiceImplIT {
 
-    private static final String ENTRY_1 = "entry_1";
-    private static final String ALREADY_ATTACHED_FILE = "uploaded_file_already_attached";
-    private static final String FILE_TO_ATTACH = "uploaded_file_to_attach";
-
-    @Autowired
-    private TestObjectReader testObjectReader;
-
     @Autowired
     private AttachmentService attachmentService;
 
@@ -46,14 +42,14 @@ public class AttachmentServiceImplIT {
     private EntryService entryService;
 
     private EntryVO controlEntry;
-    private UploadedFileVO alreadyAttachedFile;
-    private UploadedFileVO fileToAttach;
+    private UploadedFile alreadyAttachedFile;
+    private UploadedFile fileToAttach;
 
     @BeforeEach
     public void setup() throws IOException {
-        controlEntry = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
-        alreadyAttachedFile = testObjectReader.read(ALREADY_ATTACHED_FILE, TestObjectReader.ObjectDirectory.VO, UploadedFileVO.class);
-        fileToAttach = testObjectReader.read(FILE_TO_ATTACH, TestObjectReader.ObjectDirectory.VO, UploadedFileVO.class);
+        controlEntry = TestObjects.ENTRY_VO_1;
+        alreadyAttachedFile = TestObjects.UPLOADED_FILE_ALREADY_ATTACHED;
+        fileToAttach = TestObjects.UPLOADED_FILE_TO_ATTACH;
     }
 
     @Test
@@ -68,8 +64,10 @@ public class AttachmentServiceImplIT {
         EntryVO result = entryService.findByLink(controlEntry.getLink());
         assertThat(result.getAttachments().isEmpty(), is(false));
         assertThat(result.getAttachments().size(), equalTo(2));
-        assertThat(result.getAttachments().contains(alreadyAttachedFile), is(true));
-        assertThat(result.getAttachments().contains(fileToAttach), is(true));
+        assertThat(result.getAttachments()
+                .stream()
+                .map(UploadedFileVO::getPath)
+                .collect(Collectors.toList()), hasItems(alreadyAttachedFile.getPath(), fileToAttach.getPath()));
     }
 
     @Test

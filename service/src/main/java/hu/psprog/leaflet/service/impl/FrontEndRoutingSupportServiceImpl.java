@@ -4,8 +4,9 @@ import hu.psprog.leaflet.persistence.dao.FrontEndRouteDAO;
 import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
 import hu.psprog.leaflet.persistence.repository.specification.FrontEndRouteSpecification;
 import hu.psprog.leaflet.service.FrontEndRoutingSupportService;
+import hu.psprog.leaflet.service.converter.FrontEndRouteToFrontEndRouteVOConverter;
+import hu.psprog.leaflet.service.converter.FrontEndRouteVOToFrontEndRouteConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.support.routing.RouteMaskProcessor;
@@ -14,7 +15,6 @@ import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -38,14 +39,18 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     private static final String A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS = "A route with the specified ID already exists";
 
     private final FrontEndRouteDAO frontEndRouteDAO;
-    private final ConversionService conversionService;
     private final List<RouteMaskProcessor> routeMaskProcessors;
+    private final FrontEndRouteToFrontEndRouteVOConverter frontEndRouteToFrontEndRouteVOConverter;
+    private final FrontEndRouteVOToFrontEndRouteConverter frontEndRouteVOToFrontEndRouteConverter;
 
     @Autowired
-    public FrontEndRoutingSupportServiceImpl(FrontEndRouteDAO frontEndRouteDAO, ConversionService conversionService, List<RouteMaskProcessor> routeMaskProcessors) {
+    public FrontEndRoutingSupportServiceImpl(FrontEndRouteDAO frontEndRouteDAO, List<RouteMaskProcessor> routeMaskProcessors,
+                                             FrontEndRouteToFrontEndRouteVOConverter frontEndRouteToFrontEndRouteVOConverter,
+                                             FrontEndRouteVOToFrontEndRouteConverter frontEndRouteVOToFrontEndRouteConverter) {
         this.frontEndRouteDAO = frontEndRouteDAO;
-        this.conversionService = conversionService;
         this.routeMaskProcessors = routeMaskProcessors;
+        this.frontEndRouteToFrontEndRouteVOConverter = frontEndRouteToFrontEndRouteVOConverter;
+        this.frontEndRouteVOToFrontEndRouteConverter = frontEndRouteVOToFrontEndRouteConverter;
     }
 
     @Override
@@ -67,7 +72,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     public List<FrontEndRouteVO> getDynamicRoutes() {
 
         return frontEndRouteDAO.findAll(buildFilter(FrontEndRouteSpecification.IS_MASK)).stream()
-                .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
+                .map(frontEndRouteToFrontEndRouteVOConverter::convert)
                 .flatMap(frontEndRoute -> routeMaskProcessors.stream()
                         .filter(processor -> processor.supports(frontEndRoute))
                         .flatMap(processor -> processor.process(frontEndRoute).stream()))
@@ -78,22 +83,18 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     @PermitScope.Write.Admin
     public Long createOne(FrontEndRouteVO entity) throws ServiceException {
 
-        FrontEndRoute createdRoute;
         try {
-            createdRoute = frontEndRouteDAO.save(conversionService.convert(entity, FrontEndRoute.class));
+            FrontEndRoute createdRoute = frontEndRouteDAO.save(frontEndRouteVOToFrontEndRouteConverter.convert(entity));
+
+            LOGGER.info("New route [{}] has been created with ID [{}]", createdRoute.getRouteId(), createdRoute.getId());
+
+            return createdRoute.getId();
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS, e);
         } catch (Exception exc) {
             throw new ServiceException(COULD_NOT_PERSIST_FRONT_END_ROUTE, exc);
         }
-
-        if (Objects.isNull(createdRoute)) {
-            throw new EntityCreationException(FrontEndRoute.class);
-        }
-
-        LOGGER.info("New route [{}] has been created with ID [{}]", createdRoute.getRouteId(), createdRoute.getId());
-
-        return createdRoute.getId();
     }
 
     @Override
@@ -109,9 +110,9 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     @PermitScope.Read.Admin
     public FrontEndRouteVO getOne(Long id) throws ServiceException {
 
-        assertExisting(id);
-
-        return conversionService.convert(frontEndRouteDAO.findOne(id), FrontEndRouteVO.class);
+        return frontEndRouteDAO.findById(id)
+                .map(frontEndRouteToFrontEndRouteVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(FrontEndRoute.class, id));
     }
 
     @Override
@@ -119,13 +120,8 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     public List<FrontEndRouteVO> getAll() {
 
         return frontEndRouteDAO.findAll().stream()
-                .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
+                .map(frontEndRouteToFrontEndRouteVOConverter::convert)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Long count() {
-        return frontEndRouteDAO.count();
     }
 
     @Override
@@ -150,22 +146,19 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     @PermitScope.Write.Admin
     public FrontEndRouteVO updateOne(Long id, FrontEndRouteVO updatedEntity) throws ServiceException {
 
-        FrontEndRoute updatedRoute;
         try {
-            updatedRoute = frontEndRouteDAO.updateOne(id, conversionService.convert(updatedEntity, FrontEndRoute.class));
+            return frontEndRouteDAO.updateOne(id, frontEndRouteVOToFrontEndRouteConverter.convert(updatedEntity))
+                    .map(logUpdate())
+                    .map(frontEndRouteToFrontEndRouteVOConverter::convert)
+                    .orElseThrow(() -> new EntityNotFoundException(FrontEndRoute.class, id));
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS, e);
+        } catch (EntityNotFoundException e) {
+            throw e;
         } catch (Exception exc) {
             throw new ServiceException(COULD_NOT_PERSIST_FRONT_END_ROUTE, exc);
         }
-
-        if (Objects.isNull(updatedRoute)) {
-            throw new EntityNotFoundException(FrontEndRoute.class, id);
-        }
-
-        LOGGER.info("Existing route [{}] with ID [{}] has been updated", updatedRoute.getRouteId(), id);
-
-        return conversionService.convert(updatedRoute, FrontEndRouteVO.class);
     }
 
     private void assertExisting(Long id) throws EntityNotFoundException {
@@ -178,7 +171,7 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
     private List<FrontEndRouteVO> filterPublicRoutesWithSpecification(Specification<FrontEndRoute> specification) {
 
         return frontEndRouteDAO.findAll(buildFilter(specification)).stream()
-                .map(frontEndRoute -> conversionService.convert(frontEndRoute, FrontEndRouteVO.class))
+                .map(frontEndRouteToFrontEndRouteVOConverter::convert)
                 .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(FrontEndRouteVO::getSequenceNumber))
                 .collect(Collectors.toList());
@@ -189,5 +182,13 @@ public class FrontEndRoutingSupportServiceImpl implements FrontEndRoutingSupport
         return Specification
                 .where(FrontEndRouteSpecification.IS_ENABLED)
                 .and(specification);
+    }
+
+    private Function<FrontEndRoute, FrontEndRoute> logUpdate() {
+
+        return frontEndRoute -> {
+            LOGGER.info("Existing route [{}] with ID [{}] has been updated", frontEndRoute.getRouteId(), frontEndRoute.getId());
+            return frontEndRoute;
+        };
     }
 }

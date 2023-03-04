@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
 
 /**
  * DAO implementation for {@link CommentRepository}.
@@ -24,8 +22,8 @@ import java.util.Date;
 public class CommentDAOImpl extends LogicallyDeletableSelfStatusAwareDAOImpl<Comment, Long> implements CommentDAO {
 
     @Autowired
-    public CommentDAOImpl(final CommentRepository commentRepository) {
-        super(commentRepository);
+    public CommentDAOImpl(final CommentRepository commentRepository, JpaContext jpaContext) {
+        super(commentRepository, jpaContext);
     }
 
     @Override
@@ -44,16 +42,8 @@ public class CommentDAOImpl extends LogicallyDeletableSelfStatusAwareDAOImpl<Com
         return ((CommentRepository) jpaRepository).findByUser(pageable, user);
     }
 
-    @Transactional
     @Override
-    public Comment updateOne(Long id, Comment updatedEntity) {
-
-        Comment currentComment = jpaRepository.getOne(id);
-        if (currentComment != null) {
-            currentComment.setContent(updatedEntity.getContent());
-            currentComment.setLastModified(new Date());
-        }
-
-        return currentComment;
+    protected void doUpdate(Comment currentEntity, Comment updatedEntity) {
+        currentEntity.setContent(updatedEntity.getContent());
     }
 }

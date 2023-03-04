@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class CategoryFacadeImpl implements CategoryFacade {
 
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
 
     @Autowired
     public CategoryFacadeImpl(CategoryService categoryService) {
@@ -43,11 +43,6 @@ public class CategoryFacadeImpl implements CategoryFacade {
     @Override
     public List<CategoryVO> getAllPublic() {
         return categoryService.getAllPublic();
-    }
-
-    @Override
-    public Long count() {
-        return categoryService.count();
     }
 
     @Override

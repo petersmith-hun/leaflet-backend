@@ -29,8 +29,8 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
 
     private static final String RELATIVE_URL_PREFIX = "/";
 
-    private FrontEndRoutingSupportService frontEndRoutingSupportService;
-    private String serverName;
+    private final FrontEndRoutingSupportService frontEndRoutingSupportService;
+    private final String serverName;
 
     @Autowired
     public FrontEndRoutingSupportFacadeImpl(FrontEndRoutingSupportService frontEndRoutingSupportService,
@@ -83,11 +83,6 @@ public class FrontEndRoutingSupportFacadeImpl implements FrontEndRoutingSupportF
     @Override
     public List<FrontEndRouteVO> getAll() {
         return frontEndRoutingSupportService.getAll();
-    }
-
-    @Override
-    public Long count() {
-        return frontEndRoutingSupportService.count();
     }
 
     @Override

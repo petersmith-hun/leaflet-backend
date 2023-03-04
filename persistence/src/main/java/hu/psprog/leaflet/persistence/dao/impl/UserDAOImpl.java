@@ -1,15 +1,15 @@
 package hu.psprog.leaflet.persistence.dao.impl;
 
+import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -21,8 +21,8 @@ import java.util.Optional;
 public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements UserDAO {
 
     @Autowired
-    public UserDAOImpl(final UserRepository userRepository) {
-        super(userRepository);
+    public UserDAOImpl(final UserRepository userRepository, JpaContext jpaContext) {
+        super(userRepository, jpaContext);
     }
 
     @Override
@@ -51,28 +51,14 @@ public class UserDAOImpl extends SelfStatusAwareDAOImpl<User, Long> implements U
     }
 
     @Override
-    public void updateLastLogin(String email) {
-        ((UserRepository) jpaRepository).updateLastLogin(email);
-    }
-
-    @Transactional
-    @Override
-    public User updateOne(Long id, User updatedEntity) {
-
-        return findUser(id)
-                .map(currentUser -> {
-                    currentUser.setDefaultLocale(updatedEntity.getDefaultLocale());
-                    currentUser.setEmail(updatedEntity.getEmail());
-                    currentUser.setLastModified(new Date());
-                    currentUser.setUsername(updatedEntity.getUsername());
-                    jpaRepository.flush();
-
-                    return currentUser;
-                })
-                .orElse(null);
+    protected void doUpdate(User currentEntity, User updatedEntity) {
+        
+        currentEntity.setDefaultLocale(updatedEntity.getDefaultLocale());
+        currentEntity.setEmail(updatedEntity.getEmail());
+        currentEntity.setUsername(updatedEntity.getUsername());
     }
 
     private Optional<User> findUser(Long id) {
-        return Optional.ofNullable(jpaRepository.getOne(id));
+        return jpaRepository.findById(id);
     }
 }

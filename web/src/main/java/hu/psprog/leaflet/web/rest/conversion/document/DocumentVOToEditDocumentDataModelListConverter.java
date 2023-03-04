@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class DocumentVOToEditDocumentDataModelListConverter implements Converter<List<DocumentVO>, DocumentListDataModel> {
 
-    private DocumentVOToEditDocumentDataModelEntityConverter documentVOToEditDocumentDataModelEntityConverter;
+    private final DocumentVOToEditDocumentDataModelEntityConverter documentVOToEditDocumentDataModelEntityConverter;
 
     @Autowired
     public DocumentVOToEditDocumentDataModelListConverter(DocumentVOToEditDocumentDataModelEntityConverter documentVOToEditDocumentDataModelEntityConverter) {

@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 @Component
 public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
 
-    private UserToUserVOConverter userToUserVOConverter;
-    private CategoryToCategoryVOConverter categoryToCategoryVOConverter;
-    private UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
-    private TagToTagVOConverter tagToTagVOConverter;
+    private final UserToUserVOConverter userToUserVOConverter;
+    private final CategoryToCategoryVOConverter categoryToCategoryVOConverter;
+    private final UploadedFileToUploadedFileVOConverter uploadedFileToUploadedFileVOConverter;
+    private final TagToTagVOConverter tagToTagVOConverter;
 
     @Autowired
     public EntryToEntryVOConverter(UserToUserVOConverter userToUserVOConverter, CategoryToCategoryVOConverter categoryToCategoryVOConverter,
@@ -41,7 +41,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     @Override
     public EntryVO convert(Entry source) {
 
-        EntryVO.EntryVOBuilder builder = EntryVO.getBuilder();
+        EntryVO.EntryVOBuilder<?, ?> builder = EntryVO.getBuilder();
         builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withPublished(source.getPublished())
@@ -71,6 +71,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     }
 
     private List<UploadedFileVO> mapAttachments(List<UploadedFile> uploadedFiles) {
+
         return Optional.ofNullable(uploadedFiles)
                 .orElse(Collections.emptyList()).stream()
                 .map(uploadedFileToUploadedFileVOConverter::convert)
@@ -78,6 +79,7 @@ public class EntryToEntryVOConverter implements Converter<Entry, EntryVO> {
     }
 
     private List<TagVO> mapTags(List<Tag> tags) {
+
         return Optional.ofNullable(tags)
                 .orElse(Collections.emptyList()).stream()
                 .map(tagToTagVOConverter::convert)

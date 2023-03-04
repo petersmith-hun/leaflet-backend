@@ -22,8 +22,9 @@ abstract class AbstractAjaxRequestAwareResponseFiller implements ResponseFiller 
 
     @Override
     public boolean shouldFill() {
+
         return Optional.ofNullable(httpServletRequest.getAttribute(RequestParameter.IS_AJAX_REQUEST))
-                .map(attribute -> !Boolean.valueOf(attribute.toString()))
+                .map(attribute -> !Boolean.parseBoolean(attribute.toString()))
                 .orElse(true);
     }
 }

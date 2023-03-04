@@ -20,8 +20,8 @@ import java.util.List;
 @Service
 public class TagFacadeImpl implements TagFacade {
 
-    private TagService tagService;
-    private EntryService entryService;
+    private final TagService tagService;
+    private final EntryService entryService;
 
     @Autowired
     public TagFacadeImpl(TagService tagService, EntryService entryService) {
@@ -42,11 +42,6 @@ public class TagFacadeImpl implements TagFacade {
     @Override
     public List<TagVO> getAll() {
         return tagService.getAll();
-    }
-
-    @Override
-    public Long count() {
-        return tagService.count();
     }
 
     @Override

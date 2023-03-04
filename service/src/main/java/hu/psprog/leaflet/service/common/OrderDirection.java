@@ -12,7 +12,7 @@ public enum OrderDirection {
     ASC(Sort.Direction.ASC),
     DESC(Sort.Direction.DESC);
 
-    private Sort.Direction direction;
+    private final Sort.Direction direction;
 
     OrderDirection(Sort.Direction direction) {
         this.direction = direction;

@@ -14,9 +14,11 @@ import hu.psprog.leaflet.service.vo.DocumentVO;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -50,10 +52,12 @@ public class DocumentsController extends BaseController {
     private static final String DOCUMENT_COULD_NOT_BE_CREATED_SEE_DETAILS = "Document could not be created, please try again later.";
     private static final String DOCUMENT_COULD_NOT_BE_CREATED = "Document could not be created. See details: ";
 
-    private DocumentFacade documentFacade;
+    private final DocumentFacade documentFacade;
 
     @Autowired
-    public DocumentsController(DocumentFacade documentFacade) {
+    public DocumentsController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                               DocumentFacade documentFacade) {
+        super(conversionService, exceptionHandlerCounters);
         this.documentFacade = documentFacade;
     }
 

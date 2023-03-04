@@ -64,7 +64,7 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfPublicCommentsForEntry() {
 
         // given
-        given(commentFacade.getPageOfPublicCommentsForEntry(ENTRY_LINK, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(commentFacade.getPageOfPublicCommentsForEntry(ENTRY_LINK, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<CommentVO>getBuilder()
                 .withEntitiesOnPage(COMMENT_VO_LIST)
                 .build());
 
@@ -79,7 +79,7 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfCommentsForEntry() {
 
         // given
-        given(commentFacade.getPageOfCommentsForEntry(ENTRY_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(commentFacade.getPageOfCommentsForEntry(ENTRY_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<CommentVO>getBuilder()
                 .withEntitiesOnPage(COMMENT_VO_LIST)
                 .build());
 
@@ -94,7 +94,7 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
     public void shouldGetPageOfCommentsForUser() {
 
         // given
-        given(commentFacade.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.getBuilder()
+        given(commentFacade.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<CommentVO>getBuilder()
                 .withEntitiesOnPage(COMMENT_VO_LIST)
                 .build());
 

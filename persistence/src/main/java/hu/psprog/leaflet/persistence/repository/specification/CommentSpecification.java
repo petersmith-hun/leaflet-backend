@@ -17,11 +17,6 @@ public class CommentSpecification {
      */
     public static final Specification<Comment> IS_ENABLED = (root, query, builder) -> builder.equal(root.get(Comment_.enabled), true);
 
-    /**
-     * Filter to list comments not marked as logically deleted.
-     */
-    public static final Specification<Comment> IS_NOT_DELETED = (root, query, builder) -> builder.equal(root.get(Comment_.deleted), false);
-
     private CommentSpecification() {}
 
     /**

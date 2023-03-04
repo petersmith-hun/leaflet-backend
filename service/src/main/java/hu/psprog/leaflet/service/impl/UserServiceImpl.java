@@ -9,7 +9,6 @@ import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -61,13 +61,9 @@ public class UserServiceImpl implements UserService {
     @PermitScope.Read.OwnUserOrElevated
     public UserVO getOne(@P("id") Long userID) throws ServiceException {
 
-        User user = userDAO.findOne(userID);
-
-        if(user == null) {
-            throw new EntityNotFoundException(User.class, userID);
-        }
-
-        return userToUserVOConverter.convert(user);
+        return userDAO.findById(userID)
+                .map(userToUserVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(User.class, userID));
     }
 
     @Override
@@ -77,13 +73,6 @@ public class UserServiceImpl implements UserService {
         return userDAO.findAll().stream()
                 .map(userToUserVOConverter::convert)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @PermitScope.Read.Users
-    public Long count() {
-
-        return userDAO.count();
     }
 
     @Override
@@ -102,56 +91,38 @@ public class UserServiceImpl implements UserService {
     @PermitScope.Write.Users
     public Long createOne(UserVO entity) throws ServiceException {
 
-        User user = userVOToUserConverter.convert(entity);
-        User savedUser;
         try {
-            savedUser = userDAO.save(user);
+            User user = userVOToUserConverter.convert(entity);
+            User savedUser = userDAO.save(user);
+
+            LOGGER.info("[{}] user has been created with ID [{}]", savedUser.getRole(), savedUser.getId());
+
+            return savedUser.getId();
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(EMAIL_ADDRESS_IS_ALREADY_IN_USE, e);
         } catch (Exception e) {
             throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
-
-        if (savedUser == null) {
-            throw new EntityCreationException(User.class);
-        }
-
-        LOGGER.info("[{}] user has been created with ID [{}]", savedUser.getRole(), savedUser.getId());
-
-        return savedUser.getId();
     }
 
     @Override
     @PermitScope.Write.OwnUser
     public UserVO updateOne(Long id, UserVO updatedEntity) throws ServiceException {
 
-        User updatedUser;
         try {
-            updatedUser = userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity));
+            return userDAO.updateOne(id, userVOToUserConverter.convert(updatedEntity))
+                    .map(logUpdate())
+                    .map(userToUserVOConverter::convert)
+                    .orElseThrow(() -> new EntityNotFoundException(User.class, id));
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(EMAIL_ADDRESS_IS_ALREADY_IN_USE, e);
+        } catch (EntityNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
-
-        if (updatedUser == null) {
-            throw new EntityNotFoundException(User.class, id);
-        }
-
-        LOGGER.info("User of ID [{}] has been updated", id);
-
-        return userToUserVOConverter.convert(updatedUser);
-    }
-
-    @Override
-    @PermitScope.DenyAlways
-    public Long register(UserVO entity) throws ServiceException {
-
-        if (!isUserRole(entity)) {
-            throw new ServiceException("Only users with role USER can be created via register service entry point.");
-        }
-
-        return createOne(entity);
     }
 
     @Override
@@ -174,12 +145,6 @@ public class UserServiceImpl implements UserService {
 
         userDAO.updatePassword(id, password);
         LOGGER.info("Password has been updated for user [{}]", id);
-    }
-
-    @Override
-    @PermitScope.DenyAlways
-    public void reclaimPassword(Long id, String password) throws EntityNotFoundException {
-        changePassword(id, password);
     }
 
     @Override
@@ -230,16 +195,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateLastLogin(String email) throws EntityNotFoundException {
-
-        User user = userDAO.findByEmail(email);
-        if(user == null) {
-            throw new EntityNotFoundException(User.class, email);
-        }
-        userDAO.updateLastLogin(email);
-    }
-
-    @Override
     public UserVO silentGetUserByEmail(String email) {
 
         return Optional.ofNullable(userDAO.findByEmail(email))
@@ -247,13 +202,17 @@ public class UserServiceImpl implements UserService {
                 .orElse(null);
     }
 
-    private boolean isUserRole(UserVO entity) {
-        return entity.getAuthorities().stream()
-                .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.USER));
-    }
-
     private boolean isNoLoginRole(UserVO entity) {
+
         return entity.getAuthorities().stream()
                 .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.NO_LOGIN));
+    }
+
+    private Function<User, User> logUpdate() {
+
+        return user -> {
+            LOGGER.info("User of ID [{}] has been updated", user.getId());
+            return user;
+        };
     }
 }

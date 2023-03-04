@@ -16,9 +16,11 @@ import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -58,10 +60,12 @@ public class EntriesController extends BaseController {
     private static final String REQUESTED_ENTRY_NOT_FOUND = "Requested entry not found";
     private static final String AN_ENTRY_WITH_THE_SAME_LINK_ALREADY_EXISTS = "An entry with the same 'link' already exists.";
 
-    private EntryFacade entryFacade;
+    private final EntryFacade entryFacade;
 
     @Autowired
-    public EntriesController(EntryFacade entryFacade) {
+    public EntriesController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                             EntryFacade entryFacade) {
+        super(conversionService, exceptionHandlerCounters);
         this.entryFacade = entryFacade;
     }
 

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentVOToEditDocumentDataModelEntityConverter implements Converter<DocumentVO, EditDocumentDataModel> {
 
-    private DateConverter dateConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public DocumentVOToEditDocumentDataModelEntityConverter(DateConverter dateConverter) {

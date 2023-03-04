@@ -1,9 +1,6 @@
 package hu.psprog.leaflet.service;
 
-import hu.psprog.leaflet.service.mail.domain.CommentNotification;
-import hu.psprog.leaflet.service.mail.domain.PasswordResetRequest;
-import hu.psprog.leaflet.service.mail.domain.PasswordResetSuccess;
-import hu.psprog.leaflet.service.mail.domain.SignUpConfirmation;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 
 /**
@@ -21,24 +18,6 @@ public interface NotificationService {
     void startupFinished(String version);
 
     /**
-     * Sends response mail for password reset request.
-     *
-     * @param passwordResetRequest domain object holding required parameters
-     * @deprecated Functionality is not part of Leaflet any longer, use LAGS instead
-     */
-    @Deprecated
-    void passwordResetRequested(PasswordResetRequest passwordResetRequest);
-
-    /**
-     * Sends notification of successful password reset.
-     *
-     * @param passwordResetSuccess domain object holding required parameters
-     * @deprecated Functionality is not part of Leaflet any longer, use LAGS instead
-     */
-    @Deprecated
-    void successfulPasswordReset(PasswordResetSuccess passwordResetSuccess);
-
-    /**
      * Sends notification about comment creation.
      *
      * @param commentNotification domain object holding required parameters
@@ -51,13 +30,4 @@ public interface NotificationService {
      * @param contactRequestVO domain object holding required parameters
      */
     void contactRequestReceived(ContactRequestVO contactRequestVO);
-
-    /**
-     * Sends notification about successful sign-up.
-     *
-     * @param signUpConfirmation {@link SignUpConfirmation} domain object holding required parameters
-     * @deprecated Functionality is not part of Leaflet any longer, use LAGS instead
-     */
-    @Deprecated
-    void signUpConfirmation(SignUpConfirmation signUpConfirmation);
 }

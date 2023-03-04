@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -65,7 +66,7 @@ public class PublishHandlerTest {
     public void shouldUpdatePublishDateSetPublishDateUponUpdate(Entry storedEntry, Entry entryToBeUpdated, String expectedPublishDate) {
 
         // given
-        given(entryDAO.findOne(ENTRY_ID)).willReturn(storedEntry);
+        given(entryDAO.findById(ENTRY_ID)).willReturn(Optional.of(storedEntry));
 
         // when
         publishHandler.updatePublishDate(ENTRY_ID, entryToBeUpdated);

@@ -1,13 +1,9 @@
 package hu.psprog.leaflet.service.facade;
 
-import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.vo.LoginContextVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 
 import java.util.List;
-
-import static hu.psprog.leaflet.service.config.ServiceConfiguration.AUTH_OPERATION_DEPRECATED_SINCE;
 
 /**
  * User operations facade.
@@ -82,69 +78,4 @@ public interface UserFacade {
      * @throws ServiceException if user could not be found
      */
     UserVO updateUserPassword(Long userID, String currentPassword, String newPassword) throws ServiceException;
-
-    /**
-     * Handles login process.
-     *  - Claims user token.
-     *  - Updates last login date of user.
-     *
-     * @param loginContext {@link LoginContextVO} object holding full login information (username, password, device ID and remote address)
-     * @return token on successful login
-     * @throws EntityNotFoundException if user could not be found
-     * @deprecated Functionality has been moved to LAGS
-     */
-    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
-    String login(LoginContextVO loginContext) throws EntityNotFoundException;
-
-    /**
-     * Registers a new user on public site.
-     *
-     * @param userData user data
-     * @return ID of the created user
-     * @throws ServiceException if failed to process registration (ex.: already registered email address)
-     * @deprecated Functionality has been moved to LAGS
-     */
-    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
-    Long register(UserVO userData) throws ServiceException;
-
-    /**
-     * Handles logout process.
-     * Security Context will be used to retrieve user identification information.
-     *
-     * @deprecated Functionality has been moved to LAGS
-     */
-    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
-    void logout();
-
-    /**
-     * Starts password reset process.
-     *
-     * @param loginContext {@link LoginContextVO} object holding user information required for password reset (username, device ID and remote address)
-     * @deprecated Functionality has been moved to LAGS
-     */
-    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
-    void demandPasswordReset(LoginContextVO loginContext);
-
-    /**
-     * Confirms password reset request by updating password.
-     * Also deals with password hashing.
-     * Security Context will be used to retrieve user identification information.
-     *
-     * @param password new password
-     * @throws EntityNotFoundException if user could not be found
-     * @deprecated Functionality has been moved to LAGS
-     */
-    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
-    void confirmPasswordReset(String password) throws EntityNotFoundException;
-
-    /**
-     * Requests session extension.
-     * Security Context will be used to retrieve user identification information.
-     *
-     * @param loginContext {@link LoginContextVO} object holding information required for session extension (device ID and remote address)
-     * @return generated new token
-     * @deprecated Functionality has been moved to LAGS
-     */
-    @Deprecated(since = AUTH_OPERATION_DEPRECATED_SINCE, forRemoval = true)
-    String extendSession(LoginContextVO loginContext);
 }

@@ -7,7 +7,6 @@ import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.repository.specification.TagSpecification;
 import hu.psprog.leaflet.service.converter.TagToTagVOConverter;
 import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -83,7 +83,7 @@ public class TagServiceImplTest {
 
         // given
         Long id = 1L;
-        given(tagDAO.findOne(id)).willReturn(tag);
+        given(tagDAO.findById(id)).willReturn(Optional.of(tag));
         given(tagToTagVOConverter.convert(tag)).willReturn(tagVO);
 
         // when
@@ -91,7 +91,7 @@ public class TagServiceImplTest {
 
         // then
         assertThat(result, equalTo(tagVO));
-        verify(tagDAO).findOne(id);
+        verify(tagDAO).findById(id);
         verify(tagToTagVOConverter).convert(tag);
     }
 
@@ -100,14 +100,14 @@ public class TagServiceImplTest {
 
         // given
         Long id = 1L;
-        given(tagDAO.findOne(id)).willReturn(null);
+        given(tagDAO.findById(id)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.getOne(id));
 
         // then
         // expected exception
-        verify(tagDAO).findOne(id);
+        verify(tagDAO).findById(id);
         verify(tagToTagVOConverter, never()).convert(tag);
     }
 
@@ -161,20 +161,6 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void testCount() {
-
-        // given
-        Long count = 5L;
-        given(tagDAO.count()).willReturn(count);
-
-        // when
-        Long result = tagService.count();
-
-        // then
-        assertThat(result, equalTo(count));
-    }
-
-    @Test
     public void testCreateOneWithSuccess() throws ServiceException {
 
         // given
@@ -193,29 +179,12 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void testCreateOneWithFailure() {
-
-        // given
-        given(tagVOToTagConverter.convert(tagVO)).willReturn(tag);
-        given(tagDAO.save(tag)).willReturn(null);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> tagService.createOne(tagVO));
-
-        // then
-        // expected exception
-        verify(tagVOToTagConverter).convert(tagVO);
-        verify(tagDAO).save(tag);
-        verify(tag, never()).getId();
-    }
-
-    @Test
     public void testUpdateOneWithSuccess() throws ServiceException {
 
         // given
         Long id = 1L;
         given(tagVOToTagConverter.convert(tagVO)).willReturn(tag);
-        given(tagDAO.updateOne(id, tag)).willReturn(tag);
+        given(tagDAO.updateOne(id, tag)).willReturn(Optional.of(tag));
         given(tagToTagVOConverter.convert(tag)).willReturn(tagVO);
 
         // when
@@ -234,7 +203,7 @@ public class TagServiceImplTest {
         // given
         Long id = 1L;
         given(tagVOToTagConverter.convert(tagVO)).willReturn(tag);
-        given(tagDAO.updateOne(id, tag)).willReturn(null);
+        given(tagDAO.updateOne(id, tag)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> tagService.updateOne(id, tagVO));
@@ -446,7 +415,7 @@ public class TagServiceImplTest {
     private void prepareMocks(boolean includeControlVO) {
         prepareTestEntities();
         prepareTags(includeControlVO);
-        given(entryDAO.findOne(anyLong())).willReturn(entry);
+        given(entryDAO.findById(anyLong())).willReturn(Optional.of(entry));
         given(entry.getTags()).willReturn(attachedTags);
         given(tagVOToTagConverter.convert(inputTagVO)).willReturn(controlTag);
         given(entryDAO.exists(ENTRY_ID)).willReturn(true);
@@ -486,7 +455,7 @@ public class TagServiceImplTest {
     private void assertResults(int numberOfTags, boolean controlIncluded, boolean updateCalled) {
         assertThat(attachedTags.size(), equalTo(numberOfTags));
         assertThat(attachedTags.contains(controlTag), is(controlIncluded));
-        verify(entryDAO).findOne(ENTRY_ID);
+        verify(entryDAO).findById(ENTRY_ID);
         verify(tagVOToTagConverter).convert(inputTagVO);
         if (updateCalled) {
             verify(entryDAO).updateTags(ENTRY_ID, attachedTags);

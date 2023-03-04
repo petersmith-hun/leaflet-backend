@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentVOToExtendedCommentDataModelConverter implements Converter<CommentVO, ExtendedCommentDataModel> {
 
-    private EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter;
-    private DateConverter dateConverter;
+    private final EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public CommentVOToExtendedCommentDataModelConverter(EntryVOToEntryDataModelEntityConverter entryVOToEntryDataModelEntityConverter, DateConverter dateConverter) {
@@ -28,6 +28,7 @@ public class CommentVOToExtendedCommentDataModelConverter implements Converter<C
 
     @Override
     public ExtendedCommentDataModel convert(CommentVO source) {
+
         return ExtendedCommentDataModel.getExtendedBuilder()
                 .withId(source.getId())
                 .withOwner(UserDataModel.getBuilder()

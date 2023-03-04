@@ -13,26 +13,30 @@ import hu.psprog.leaflet.bridge.client.impl.InvocationFactoryConfig;
 import hu.psprog.leaflet.service.NotificationService;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
+import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import java.sql.SQLException;
 import java.text.DateFormat;
 
 /**
@@ -42,14 +46,20 @@ import java.text.DateFormat;
  */
 @TestConfiguration
 @Import(InvocationFactoryConfig.class)
-@ComponentScan(basePackages = {
-        "hu.psprog.leaflet.security",
-        "hu.psprog.leaflet.bridge"})
+@ComponentScan(basePackages = {"hu.psprog.leaflet.bridge"})
 @Profile("acceptance")
 public class AcceptanceTestConfig {
 
-    private static final String INIT_SCRIPT = "classpath:jwt_session_store_init.sql";
-    private static final String DATABASE_NAME = "acceptance-session-store";
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @PostConstruct
+    public void executeDataSQL() throws SQLException {
+
+        DataSource dataSource = applicationContext.getBean(DataSource.class);
+        ClassPathResource dataSQL = new ClassPathResource("data.sql");
+        ScriptUtils.executeSqlScript(dataSource.getConnection(), dataSQL);
+    }
 
     @Bean
     @Primary
@@ -80,11 +90,6 @@ public class AcceptanceTestConfig {
     }
 
     @Bean
-    public NamedParameterJdbcTemplate sessionStoreJDBCTemplate() {
-        return new NamedParameterJdbcTemplate(sessionStoreDataSource());
-    }
-
-    @Bean
     @SuppressWarnings("deprecation")
     public PasswordEncoder passwordEncoder() {
         // suppressing warning: NoOp password encoding is only used for acceptance tests
@@ -94,6 +99,11 @@ public class AcceptanceTestConfig {
     @Bean
     public NotificationService notificationService() {
         return new MockNotificationService();
+    }
+
+    @Bean
+    public String jwtSecret(@Value("${test-auth.jwt-secret}") String jwtSecret) {
+        return jwtSecret;
     }
 
     @Bean
@@ -112,14 +122,5 @@ public class AcceptanceTestConfig {
     @Bean
     public BridgeClient lens() {
         return Mockito.mock(BridgeClientImpl.class);
-    }
-
-    private DataSource sessionStoreDataSource() {
-
-        return new EmbeddedDatabaseBuilder()
-                .setType(EmbeddedDatabaseType.H2)
-                .setName(DATABASE_NAME)
-                .addScript(INIT_SCRIPT)
-                .build();
     }
 }

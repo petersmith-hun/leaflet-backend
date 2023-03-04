@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Component to properly set date of publish of an entry.
@@ -17,7 +16,7 @@ import java.util.Objects;
 @Component
 public class PublishHandler {
 
-    private EntryDAO entryDAO;
+    private final EntryDAO entryDAO;
 
     @Autowired
     public PublishHandler(EntryDAO entryDAO) {
@@ -26,12 +25,11 @@ public class PublishHandler {
 
     /**
      * Sets publish date of a newly created entry, if its status is {@link EntryStatus#PUBLIC}.
-     * Otherwise sets it to null.
+     * Otherwise, sets it to null.
      *
      * @param entryToBeCreated {@link Entry} object to be updated
      */
     public void updatePublishDate(Entry entryToBeCreated) {
-
         updateIfPublished(entryToBeCreated);
     }
 
@@ -47,17 +45,17 @@ public class PublishHandler {
      */
     public void updatePublishDate(Long entryID, Entry entryToBeUpdated) {
 
-        Entry currentEntry = entryDAO.findOne(entryID);
-        if (Objects.nonNull(currentEntry)) {
+        entryDAO.findById(entryID).ifPresent(currentEntry -> {
             if (isPublic(currentEntry)) {
                 entryToBeUpdated.setPublished(currentEntry.getPublished());
             } else {
                 updateIfPublished(entryToBeUpdated);
             }
-        }
+        });
     }
 
     private void updateIfPublished(Entry entry) {
+
         entry.setPublished(isPublic(entry)
                 ? new Date()
                 : null);

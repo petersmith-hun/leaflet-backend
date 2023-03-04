@@ -25,6 +25,7 @@ import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.data.domain.PageImpl;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -91,7 +92,7 @@ public class ResponseProcessorAspectTest {
     public void shouldNotActivatePageHandlerPointcut() throws ServiceException {
 
         // given
-        given(entryDAO.findOne(ENTRY_ID)).willReturn(ENTRY);
+        given(entryDAO.findById(ENTRY_ID)).willReturn(Optional.of(ENTRY));
         given(entryToEntryVOConverter.convert(any())).willReturn(ENTRY_VO);
 
         // when
@@ -105,7 +106,7 @@ public class ResponseProcessorAspectTest {
     public void shouldHandleCustomSEODataProvider() throws EntityNotFoundException {
 
         // given
-        given(entryDAO.findByLink(ENTRY_LINK)).willReturn(ENTRY);
+        given(entryDAO.findByLink(ENTRY_LINK)).willReturn(Optional.of(ENTRY));
         given(entryToEntryVOConverter.convert(any())).willReturn(ENTRY_VO);
 
         // when

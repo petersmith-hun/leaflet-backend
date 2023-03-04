@@ -2,6 +2,7 @@ package hu.psprog.leaflet.persistence.dao;
 
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -9,9 +10,7 @@ import java.util.UUID;
  *
  * @author Peter Smith
  */
-public interface UploadedFileDAO extends BaseDAO<UploadedFile, Long>, SelfStatusAwareDAO<Long> {
+public interface UploadedFileDAO {
 
-    UploadedFile findByPath(String path);
-
-    UploadedFile findByPathUUID(UUID pathUUID);
+    Optional<UploadedFile> findByPathUUID(UUID pathUUID);
 }

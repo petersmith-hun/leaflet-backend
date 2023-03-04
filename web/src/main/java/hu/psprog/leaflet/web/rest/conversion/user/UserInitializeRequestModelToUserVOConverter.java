@@ -25,8 +25,8 @@ public class UserInitializeRequestModelToUserVOConverter implements Converter<Us
 
     private static final String USERS_ENABLED_BY_DEFAULT = "${usersEnabledByDefault:true}";
 
-    private boolean enabled;
-    private JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
+    private final boolean enabled;
+    private final JULocaleToLeafletLocaleConverter juLocaleToLeafletLocaleConverter;
 
     @Autowired
     public UserInitializeRequestModelToUserVOConverter(@Value(USERS_ENABLED_BY_DEFAULT) boolean enabled,

@@ -3,7 +3,7 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.service.CategoryService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,20 +31,14 @@ import static org.hamcrest.Matchers.equalTo;
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class CategoryServiceImplIT {
 
-    private static final String CATEGORY_1 = "category_1";
-    private static final String CATEGORY_NEW = "category_new";
-
     @Autowired
     private CategoryService categoryService;
-    
-    @Autowired
-    private TestObjectReader testObjectReader;
     
     private CategoryVO controlCategoryVO;
     
     @BeforeEach
     public void setup() throws IOException {
-        controlCategoryVO = testObjectReader.read(CATEGORY_1, TestObjectReader.ObjectDirectory.VO, CategoryVO.class);
+        controlCategoryVO = TestObjects.CATEGORY_VO_1;
     }
 
     @Test
@@ -75,22 +69,10 @@ public class CategoryServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_CATEGORIES)
-    public void testCount() {
-
-        // when
-        long result = categoryService.count();
-
-        // then
-        assertThat(result, equalTo(3L));
-    }
-
-    @Test
-    @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_CATEGORIES)
-    public void testCreateOne() throws IOException, ServiceException {
+    public void testCreateOne() throws ServiceException {
 
         // given
-        CategoryVO createdCategory = testObjectReader.read(CATEGORY_NEW, TestObjectReader.ObjectDirectory.VO, CategoryVO.class);
+        CategoryVO createdCategory = TestObjects.CATEGORY_VO_NEW;
 
         // when
         Long result = categoryService.createOne(createdCategory);

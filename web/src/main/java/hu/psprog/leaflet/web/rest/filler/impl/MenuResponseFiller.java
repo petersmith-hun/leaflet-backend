@@ -26,18 +26,19 @@ import java.util.stream.Collectors;
 @Component
 public class MenuResponseFiller extends AbstractAjaxRequestAwareResponseFiller {
 
-    private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
-    private ConversionService conversionService;
+    private final FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
+    private final ConversionService conversionService;
 
     @Autowired
-    public MenuResponseFiller(HttpServletRequest httpServletRequest, FrontEndRoutingSupportFacade frontEndRoutingSupportFacade, ConversionService conversionService) {
+    public MenuResponseFiller(HttpServletRequest httpServletRequest, FrontEndRoutingSupportFacade frontEndRoutingSupportFacade,
+                              ConversionService conversionService) {
         super(httpServletRequest);
         this.frontEndRoutingSupportFacade = frontEndRoutingSupportFacade;
         this.conversionService = conversionService;
     }
 
     @Override
-    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder wrapperBodyDataModelBuilder) {
+    public void fill(WrapperBodyDataModel.WrapperBodyDataModelBuilder<?> wrapperBodyDataModelBuilder) {
 
         Map<FrontEndRouteType, List<FrontEndRouteVO>> allRoutesByType = frontEndRoutingSupportFacade.getStaticRoutes();
         MenuDataModel menuDataModel = MenuDataModel.getBuilder()

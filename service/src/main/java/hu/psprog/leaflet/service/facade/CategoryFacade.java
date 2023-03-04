@@ -44,13 +44,6 @@ public interface CategoryFacade {
     List<CategoryVO> getAllPublic();
 
     /**
-     * Returns number of categories.
-     *
-     * @return number of categories
-     */
-    Long count();
-
-    /**
      * Updates category specified by given ID. Returns updated category.
      *
      * @param id ID of category

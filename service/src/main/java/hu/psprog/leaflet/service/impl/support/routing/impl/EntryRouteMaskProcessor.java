@@ -24,7 +24,7 @@ public class EntryRouteMaskProcessor implements RouteMaskProcessor {
 
     private static final String ROUTE_MASK = "%s/%s";
 
-    private EntryFacade entryFacade;
+    private final EntryFacade entryFacade;
 
     @Autowired
     public EntryRouteMaskProcessor(EntryFacade entryFacade) {
@@ -33,7 +33,6 @@ public class EntryRouteMaskProcessor implements RouteMaskProcessor {
 
     @Override
     public boolean supports(FrontEndRouteVO frontEndRouteVO) {
-
         return frontEndRouteVO.getType() == FrontEndRouteType.ENTRY_ROUTE_MASK;
     }
 
@@ -51,13 +50,9 @@ public class EntryRouteMaskProcessor implements RouteMaskProcessor {
 
     private String prepareURL(EntryVO entryVO, FrontEndRouteVO frontEndRouteVO) {
 
-        String url;
-        if (Objects.nonNull(frontEndRouteVO.getUrl())) {
-            url = String.format(ROUTE_MASK, frontEndRouteVO.getUrl(), entryVO.getLink());
-        } else {
-            url = StringUtils.EMPTY;
-        }
+        return Objects.nonNull(frontEndRouteVO.getUrl())
+                ? String.format(ROUTE_MASK, frontEndRouteVO.getUrl(), entryVO.getLink())
+                : StringUtils.EMPTY;
 
-        return url;
     }
 }

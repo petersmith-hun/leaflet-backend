@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -34,14 +35,18 @@ public class UserVOToUserConverter implements Converter<UserVO, User> {
 
     private Role mapRole(UserVO source) {
 
-        Role role = null;
-        if (Objects.nonNull(source.getAuthorities())) {
-            role = source.getAuthorities().stream()
-                    .findFirst()
-                    .map(grantedAuthority -> Role.valueOf(grantedAuthority.getAuthority()))
-                    .orElse(null);
-        }
+        return Objects.nonNull(source.getAuthorities())
+                ? mapAuthorities(source)
+                : null;
 
-        return role;
+    }
+
+    private Role mapAuthorities(UserVO source) {
+
+        return source.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .map(Role::valueOf)
+                .orElse(null);
     }
 }

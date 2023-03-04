@@ -19,19 +19,15 @@ public interface BaseDAO<T extends SerializableEntity, ID extends Serializable> 
 
     boolean exists(ID id);
 
-    T findOne(ID id);
-    
     Optional<T> findById(ID id);
 
     List<T> findAll();
 
     Page<T> findAll(Pageable pageable);
 
-    T updateOne(ID id, T updatedEntity);
+    Optional<T> updateOne(ID id, T updatedEntity);
 
     void delete(ID id);
 
     <S extends T> S save(S entity);
-
-    long count();
 }

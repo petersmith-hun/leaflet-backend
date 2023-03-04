@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoryVOToCategoryDataModelEntityConverter implements Converter<CategoryVO, CategoryDataModel> {
 
-    private DateConverter dateConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public CategoryVOToCategoryDataModelEntityConverter(DateConverter dateConverter) {

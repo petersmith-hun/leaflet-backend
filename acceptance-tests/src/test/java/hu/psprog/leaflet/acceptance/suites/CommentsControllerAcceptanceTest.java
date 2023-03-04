@@ -16,7 +16,7 @@ import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.RequestProcessingFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.CommentBridgeService;
-import hu.psprog.leaflet.service.mail.domain.CommentNotification;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -55,8 +55,6 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
     private static final String DELETED_COMMENT = "DELETED_COMMENT";
     private static final String CONTROL_COMMENT_AUTH = "comment-auth";
     private static final String CONTROL_COMMENT_ANON = "comment-anon";
-    private static final String CONTROL_COMMENT_NOTIFICATION_ANON = "comment-notification-anon";
-    private static final String CONTROL_COMMENT_NOTIFICATION_AUTH = "comment-notification-auth";
 
     private static final String ANONYMOUS_USER_NAME = "Anonymous User";
     private static final String TEST_USER_1_EMAIL = "test-user-1@ac-leaflet.local";
@@ -136,6 +134,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
         // given
         CommentCreateRequestModel control = getControl(CONTROL_COMMENT_AUTH, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
+        CommentNotification expectedCommentNotification = prepareCommentNotification("Administrator", "test-admin@ac-leaflet.local");
 
         // when
         CommentDataModel result = commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
@@ -147,7 +146,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(current.getAssociatedEntry().getId(), equalTo(control.getEntryId()));
         assertThat(current.getOwner().getId(), equalTo(1L));
         assertThat(notificationService.getCommentNotification(), notNullValue());
-        assertThat(notificationService.getCommentNotification(), equalTo(getControl(CONTROL_COMMENT_NOTIFICATION_AUTH, CommentNotification.class)));
+        assertThat(notificationService.getCommentNotification(), equalTo(expectedCommentNotification));
     }
 
     @Test
@@ -157,6 +156,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         // given
         clearAuthentication();
         CommentCreateRequestModel control = getControl(CONTROL_COMMENT_ANON, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
+        CommentNotification expectedCommentNotification = prepareCommentNotification("Anonymous User", "anonymous@ac-leaflet.local");
 
         // when
         CommentDataModel result = commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
@@ -169,7 +169,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertThat(current.getAssociatedEntry().getId(), equalTo(control.getEntryId()));
         assertThat(current.getOwner().getUsername(), equalTo(ANONYMOUS_USER_NAME));
         assertThat(notificationService.getCommentNotification(), notNullValue());
-        assertThat(notificationService.getCommentNotification(), equalTo(getControl(CONTROL_COMMENT_NOTIFICATION_ANON, CommentNotification.class)));
+        assertThat(notificationService.getCommentNotification(), equalTo(expectedCommentNotification));
     }
 
     @Test
@@ -266,6 +266,18 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         Assertions.assertThrows(ResourceNotFoundException.class, () -> commentBridgeService.getComment(CONTROL_COMMENT_ID));
     }
 
+    private CommentNotification prepareCommentNotification(String username, String email) {
+
+        return CommentNotification.getBuilder()
+                .withEmail(email)
+                .withUsername(username)
+                .withContent("lorem ipsum dolor sit amet comment")
+                .withAuthorEmail("test-admin@ac-leaflet.local")
+                .withAuthorName("Administrator")
+                .withEntryTitle("Entry #01 title")
+                .build();
+    }
+
     private void assertLogicallyDeletedComments(List<? extends CommentDataModel> result, int expectedLogicallyDeletedCount) {
         assertThat(result.stream()
                 .filter(CommentDataModel::isDeleted)
@@ -283,11 +295,9 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
     private Comparator<CommentDataModel> getComparator(OrderBy.Comment orderBy, OrderDirection orderDirection) {
 
-        if (orderBy == CREATED && orderDirection == ASC) {
-            return ASC_CREATED;
-        } else {
-            return DESC_CREATED;
-        }
+        return orderBy == CREATED && orderDirection == ASC
+                ? ASC_CREATED
+                : DESC_CREATED;
     }
 
     private void assertPaginatedResult(WrapperBodyDataModel<CommentListDataModel> result, Comparator<CommentDataModel> comparator,

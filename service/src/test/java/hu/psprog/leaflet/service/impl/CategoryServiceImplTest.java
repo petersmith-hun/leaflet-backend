@@ -5,7 +5,6 @@ import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.repository.specification.CategorySpecification;
 import hu.psprog.leaflet.service.converter.CategoryToCategoryVOConverter;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
@@ -18,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -58,7 +58,7 @@ public class CategoryServiceImplTest {
 
         // given
         Long id = 1L;
-        given(categoryDAO.findOne(id)).willReturn(category);
+        given(categoryDAO.findById(id)).willReturn(Optional.of(category));
         given(categoryToCategoryVOConverter.convert(category)).willReturn(categoryVO);
 
         // when
@@ -66,7 +66,7 @@ public class CategoryServiceImplTest {
 
         // then
         assertThat(result, equalTo(categoryVO));
-        verify(categoryDAO).findOne(id);
+        verify(categoryDAO).findById(id);
         verify(categoryToCategoryVOConverter).convert(category);
     }
 
@@ -75,14 +75,14 @@ public class CategoryServiceImplTest {
 
         // given
         Long id = 1L;
-        given(categoryDAO.findOne(id)).willReturn(null);
+        given(categoryDAO.findById(id)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> categoryService.getOne(id));
 
         // then
         // expected exception
-        verify(categoryDAO).findOne(id);
+        verify(categoryDAO).findById(id);
         verify(categoryToCategoryVOConverter, never()).convert(any());
     }
 
@@ -121,20 +121,6 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void testCount() {
-
-        // given
-        Long count = 5L;
-        given(categoryDAO.count()).willReturn(count);
-
-        // when
-        Long result = categoryService.count();
-
-        // then
-        assertThat(result, equalTo(count));
-    }
-
-    @Test
     public void testCreateOneWithSuccess() throws ServiceException {
 
         // given
@@ -151,29 +137,13 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void testCreateOneWithFailure() {
-
-        // given
-        given(categoryVOToCategoryConverter.convert(categoryVO)).willReturn(category);
-        given(categoryDAO.save(category)).willReturn(null);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> categoryService.createOne(categoryVO));
-
-        // then
-        // expected exception
-        verify(categoryVOToCategoryConverter).convert(categoryVO);
-        verify(categoryDAO).save(category);
-    }
-
-    @Test
     public void testUpdateOneWithSuccess() throws ServiceException {
 
         // given
         Long id = 1L;
         given(categoryVOToCategoryConverter.convert(categoryVO)).willReturn(category);
         given(categoryToCategoryVOConverter.convert(category)).willReturn(categoryVO);
-        given(categoryDAO.updateOne(id, category)).willReturn(category);
+        given(categoryDAO.updateOne(id, category)).willReturn(Optional.of(category));
 
         // when
         CategoryVO result = categoryService.updateOne(id, categoryVO);
@@ -191,7 +161,7 @@ public class CategoryServiceImplTest {
         // given
         Long id = 1L;
         given(categoryVOToCategoryConverter.convert(categoryVO)).willReturn(category);
-        given(categoryDAO.updateOne(id, category)).willReturn(null);
+        given(categoryDAO.updateOne(id, category)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> categoryService.updateOne(id, categoryVO));

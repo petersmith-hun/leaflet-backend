@@ -3,8 +3,9 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.FrontEndRouteDAO;
 import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
+import hu.psprog.leaflet.service.converter.FrontEndRouteToFrontEndRouteVOConverter;
+import hu.psprog.leaflet.service.converter.FrontEndRouteVOToFrontEndRouteConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.support.routing.RouteMaskProcessor;
@@ -17,7 +18,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -26,6 +26,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -60,13 +61,16 @@ public class FrontEndRoutingSupportServiceImplTest {
     private FrontEndRouteDAO frontEndRouteDAO;
 
     @Mock(lenient = true)
-    private ConversionService conversionService;
-
-    @Mock(lenient = true)
     private RouteMaskProcessor firstRouteMaskProcessor;
 
     @Mock(lenient = true)
     private RouteMaskProcessor secondRouteMaskProcessor;
+
+    @Mock(lenient = true)
+    private FrontEndRouteToFrontEndRouteVOConverter frontEndRouteToFrontEndRouteVOConverter;
+
+    @Mock(lenient = true)
+    private FrontEndRouteVOToFrontEndRouteConverter frontEndRouteVOToFrontEndRouteConverter;
 
     @Mock
     private Root<FrontEndRoute> root;
@@ -84,13 +88,14 @@ public class FrontEndRoutingSupportServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        given(conversionService.convert(FRONT_END_ROUTE_1, FrontEndRouteVO.class)).willReturn(FRONT_END_ROUTE_VO_1);
-        given(conversionService.convert(FRONT_END_ROUTE_2, FrontEndRouteVO.class)).willReturn(FRONT_END_ROUTE_VO_2);
-        given(conversionService.convert(FRONT_END_ROUTE_3, FrontEndRouteVO.class)).willReturn(FRONT_END_ROUTE_VO_3);
+
+        given(frontEndRouteToFrontEndRouteVOConverter.convert(FRONT_END_ROUTE_1)).willReturn(FRONT_END_ROUTE_VO_1);
+        given(frontEndRouteToFrontEndRouteVOConverter.convert(FRONT_END_ROUTE_2)).willReturn(FRONT_END_ROUTE_VO_2);
+        given(frontEndRouteToFrontEndRouteVOConverter.convert(FRONT_END_ROUTE_3)).willReturn(FRONT_END_ROUTE_VO_3);
         given(frontEndRouteDAO.findAll(any(Specification.class))).willReturn(Arrays.asList(FRONT_END_ROUTE_2, FRONT_END_ROUTE_3, FRONT_END_ROUTE_1));
 
-        frontEndRoutingSupportService = new FrontEndRoutingSupportServiceImpl(frontEndRouteDAO, conversionService,
-                Arrays.asList(firstRouteMaskProcessor, secondRouteMaskProcessor));
+        frontEndRoutingSupportService = new FrontEndRoutingSupportServiceImpl(frontEndRouteDAO, Arrays.asList(firstRouteMaskProcessor, secondRouteMaskProcessor),
+                frontEndRouteToFrontEndRouteVOConverter, frontEndRouteVOToFrontEndRouteConverter);
     }
 
     @Test
@@ -148,7 +153,7 @@ public class FrontEndRoutingSupportServiceImplTest {
     public void shouldCreate() throws ServiceException {
 
         // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteVOToFrontEndRouteConverter.convert(FRONT_END_ROUTE_VO_1)).willReturn(FRONT_END_ROUTE_1);
         given(frontEndRouteDAO.save(FRONT_END_ROUTE_1)).willReturn(FRONT_END_ROUTE_1);
 
         // when
@@ -159,23 +164,10 @@ public class FrontEndRoutingSupportServiceImplTest {
     }
 
     @Test
-    public void shouldCreateFailWithEntityCreationException() {
-
-        // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> frontEndRoutingSupportService.createOne(FRONT_END_ROUTE_VO_1));
-
-        // then
-        // exception expected
-    }
-
-    @Test
     public void shouldCreateFailWithConstraintViolationException() {
 
         // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteVOToFrontEndRouteConverter.convert(FRONT_END_ROUTE_VO_1)).willReturn(FRONT_END_ROUTE_1);
         doThrow(DataIntegrityViolationException.class).when(frontEndRouteDAO).save(any());
 
         // when
@@ -189,7 +181,7 @@ public class FrontEndRoutingSupportServiceImplTest {
     public void shouldCreateFailWithServiceException() {
 
         // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteVOToFrontEndRouteConverter.convert(FRONT_END_ROUTE_VO_1)).willReturn(FRONT_END_ROUTE_1);
         doThrow(RuntimeException.class).when(frontEndRouteDAO).save(any());
 
         // when
@@ -203,8 +195,8 @@ public class FrontEndRoutingSupportServiceImplTest {
     public void shouldUpdate() throws ServiceException {
 
         // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
-        given(frontEndRouteDAO.updateOne(CONTROL_ID, FRONT_END_ROUTE_1)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteVOToFrontEndRouteConverter.convert(FRONT_END_ROUTE_VO_1)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteDAO.updateOne(CONTROL_ID, FRONT_END_ROUTE_1)).willReturn(Optional.of(FRONT_END_ROUTE_1));
 
         // when
         FrontEndRouteVO result = frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1);
@@ -217,7 +209,7 @@ public class FrontEndRoutingSupportServiceImplTest {
     public void shouldUpdateFailWithEntityNotFoundException() {
 
         // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteVOToFrontEndRouteConverter.convert(FRONT_END_ROUTE_VO_1)).willReturn(FRONT_END_ROUTE_1);
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> frontEndRoutingSupportService.updateOne(CONTROL_ID, FRONT_END_ROUTE_VO_1));
@@ -230,7 +222,7 @@ public class FrontEndRoutingSupportServiceImplTest {
     public void shouldUpdateFailWithConstraintViolationException() {
 
         // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteVOToFrontEndRouteConverter.convert(FRONT_END_ROUTE_VO_1)).willReturn(FRONT_END_ROUTE_1);
         doThrow(DataIntegrityViolationException.class).when(frontEndRouteDAO).updateOne(anyLong(), any());
 
         // when
@@ -244,7 +236,7 @@ public class FrontEndRoutingSupportServiceImplTest {
     public void shouldUpdateFailWithServiceException() {
 
         // given
-        given(conversionService.convert(FRONT_END_ROUTE_VO_1, FrontEndRoute.class)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteVOToFrontEndRouteConverter.convert(FRONT_END_ROUTE_VO_1)).willReturn(FRONT_END_ROUTE_1);
         doThrow(RuntimeException.class).when(frontEndRouteDAO).updateOne(anyLong(), any());
 
         // when
@@ -285,7 +277,7 @@ public class FrontEndRoutingSupportServiceImplTest {
 
         // given
         given(frontEndRouteDAO.exists(CONTROL_ID)).willReturn(true);
-        given(frontEndRouteDAO.findOne(CONTROL_ID)).willReturn(FRONT_END_ROUTE_1);
+        given(frontEndRouteDAO.findById(CONTROL_ID)).willReturn(Optional.of(FRONT_END_ROUTE_1));
 
         // when
         FrontEndRouteVO result = frontEndRoutingSupportService.getOne(CONTROL_ID);
@@ -318,19 +310,6 @@ public class FrontEndRoutingSupportServiceImplTest {
 
         // then
         assertThat(result.containsAll(Arrays.asList(FRONT_END_ROUTE_VO_1, FRONT_END_ROUTE_VO_2, FRONT_END_ROUTE_VO_3)), is(true));
-    }
-
-    @Test
-    public void shouldCount() {
-
-        // given
-        given(frontEndRouteDAO.count()).willReturn(3L);
-
-        // when
-        Long result = frontEndRoutingSupportService.count();
-
-        // when
-        assertThat(result, equalTo(3L));
     }
 
     @Test

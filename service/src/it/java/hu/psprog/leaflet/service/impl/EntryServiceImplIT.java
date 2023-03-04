@@ -4,7 +4,7 @@ import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.helper.TestObjectReader;
+import hu.psprog.leaflet.service.testdata.TestObjects;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,20 +32,14 @@ import static org.hamcrest.Matchers.equalTo;
 @ActiveProfiles(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
 public class EntryServiceImplIT {
 
-    private static final String ENTRY_1 = "entry_1";
-    private static final String ENTRY_NEW = "entry_new";
-
     @Autowired
     private EntryService entryService;
-
-    @Autowired
-    private TestObjectReader testObjectReader;
 
     private EntryVO controlEntryVO;
 
     @BeforeEach
     public void setup() throws IOException {
-        controlEntryVO = testObjectReader.read(ENTRY_1, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
+        controlEntryVO = TestObjects.ENTRY_VO_1;
     }
 
     @Test
@@ -76,22 +70,10 @@ public class EntryServiceImplIT {
     @Test
     @Transactional
     @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES)
-    public void testCount() {
-
-        // when
-        long result = entryService.count();
-
-        // then
-        assertThat(result, equalTo(3L));
-    }
-
-    @Test
-    @Transactional
-    @Sql(LeafletITContextConfig.INTEGRATION_TEST_DB_SCRIPT_ENTRIES)
-    public void testCreateOne() throws IOException, ServiceException {
+    public void testCreateOne() throws ServiceException {
 
         // given
-        EntryVO createdEntry = testObjectReader.read(ENTRY_NEW, TestObjectReader.ObjectDirectory.VO, EntryVO.class);
+        EntryVO createdEntry = TestObjects.ENTRY_VO_NEW;
 
         // when
         Long result = entryService.createOne(createdEntry);

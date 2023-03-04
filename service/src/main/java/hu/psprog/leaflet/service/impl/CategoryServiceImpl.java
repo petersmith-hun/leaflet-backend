@@ -6,7 +6,6 @@ import hu.psprog.leaflet.persistence.repository.specification.CategorySpecificat
 import hu.psprog.leaflet.service.CategoryService;
 import hu.psprog.leaflet.service.converter.CategoryToCategoryVOConverter;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
@@ -45,13 +44,9 @@ public class CategoryServiceImpl implements CategoryService {
     @PermitScope.Read.Categories
     public CategoryVO getOne(Long id) throws ServiceException {
 
-        Category category = categoryDAO.findOne(id);
-
-        if (category == null) {
-            throw new EntityNotFoundException(Category.class, id);
-        }
-
-        return categoryToCategoryVOConverter.convert(category);
+        return categoryDAO.findById(id)
+                .map(categoryToCategoryVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Category.class, id));
     }
 
     @Override
@@ -72,22 +67,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    @PermitScope.Read.Categories
-    public Long count() {
-
-        return categoryDAO.count();
-    }
-
-    @Override
     @PermitScope.Write.Categories
     public Long createOne(CategoryVO entity) throws ServiceException {
 
         Category category = categoryVOToCategoryConverter.convert(entity);
         Category savedCategory = categoryDAO.save(category);
-
-        if (savedCategory == null) {
-            throw new EntityCreationException(Category.class);
-        }
 
         LOGGER.info("New category [{}] has been created with ID [{}]", entity.getTitle(), savedCategory.getId());
 
@@ -98,11 +82,8 @@ public class CategoryServiceImpl implements CategoryService {
     @PermitScope.Write.Categories
     public CategoryVO updateOne(Long id, CategoryVO updatedEntity) throws ServiceException {
 
-        Category updatedCategory = categoryDAO.updateOne(id, categoryVOToCategoryConverter.convert(updatedEntity));
-
-        if (updatedCategory == null) {
-            throw new EntityNotFoundException(Category.class, id);
-        }
+        Category updatedCategory = categoryDAO.updateOne(id, categoryVOToCategoryConverter.convert(updatedEntity))
+                .orElseThrow(() -> new EntityNotFoundException(Category.class, id));
 
         LOGGER.info("Existing category [{}] with ID [{}] has been updated", updatedCategory.getTitle(), id);
 

@@ -7,9 +7,11 @@ import hu.psprog.leaflet.api.rest.response.dcp.DCPListDataModel;
 import hu.psprog.leaflet.service.DynamicConfigurationPropertyService;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -37,10 +39,12 @@ public class DCPStoreController extends BaseController {
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_UPDATED = "Configuration entry could not be updated.";
     private static final String NEW_CONFIGURATION_ENTRY_COULD_NOT_BE_DELETED = "Configuration entry could not be deleted.";
 
-    private DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
+    private final DynamicConfigurationPropertyService dynamicConfigurationPropertyService;
 
     @Autowired
-    public DCPStoreController(DynamicConfigurationPropertyService dynamicConfigurationPropertyService) {
+    public DCPStoreController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                              DynamicConfigurationPropertyService dynamicConfigurationPropertyService) {
+        super(conversionService, exceptionHandlerCounters);
         this.dynamicConfigurationPropertyService = dynamicConfigurationPropertyService;
     }
 

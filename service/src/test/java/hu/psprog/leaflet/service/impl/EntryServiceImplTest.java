@@ -10,7 +10,6 @@ import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.util.PublishHandler;
@@ -35,6 +34,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -56,6 +56,9 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class EntryServiceImplTest {
 
+    private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(1L);
+    private static final CategoryVO CATEGORY_VO = CategoryVO.wrapMinimumVO(2L);
+    private static final TagVO TAG_VO = TagVO.wrapMinimumVO(3L);
     @Mock(lenient = true)
     private EntryDAO entryDAO;
 
@@ -88,7 +91,7 @@ public class EntryServiceImplTest {
 
         // given
         Long id = 1L;
-        given(entryDAO.findOne(id)).willReturn(entry);
+        given(entryDAO.findById(id)).willReturn(Optional.of(entry));
         given(entryToEntryVOConverter.convert(entry)).willReturn(entryVO);
 
         // when
@@ -96,7 +99,7 @@ public class EntryServiceImplTest {
 
         // then
         assertThat(result, equalTo(entryVO));
-        verify(entryDAO).findOne(id);
+        verify(entryDAO).findById(id);
         verify(entryToEntryVOConverter).convert(entry);
     }
 
@@ -105,14 +108,14 @@ public class EntryServiceImplTest {
 
         // given
         Long id = 1L;
-        given(entryDAO.findOne(id)).willReturn(null);
+        given(entryDAO.findById(id)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.getOne(id));
 
         // then
         // expected exception
-        verify(entryDAO).findOne(id);
+        verify(entryDAO).findById(id);
         verify(entryToEntryVOConverter, never()).convert(any());
     }
 
@@ -134,25 +137,11 @@ public class EntryServiceImplTest {
     }
 
     @Test
-    public void testCount() {
-
-        // given
-        Long count = 5L;
-        given(entryDAO.count()).willReturn(count);
-
-        // when
-        Long result = entryService.count();
-
-        // then
-        assertThat(result, equalTo(count));
-    }
-
-    @Test
     public void testGetEntityPage() {
 
         // given
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(entryDAO.findAll(any(Pageable.class))).willReturn(entryPage);
 
         // when
@@ -168,7 +157,7 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "published", "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
@@ -184,14 +173,14 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(categoryVOToCategoryConverter.convert(any(CategoryVO.class))).willReturn(Category.getBuilder()
                 .withId(1L)
                 .build());
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
-        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(new CategoryVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(CATEGORY_VO,1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
 
         // then
         assertThat(result, notNullValue());
@@ -203,14 +192,14 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(tagVOToTagConverter.convert(any(TagVO.class))).willReturn(Tag.getBuilder()
                 .withId(1L)
                 .build());
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
-        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(new TagVO(),1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(TAG_VO,1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
 
         // then
         assertThat(result, notNullValue());
@@ -222,7 +211,7 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(new EntryVO());
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
         given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
 
         // when
@@ -265,22 +254,6 @@ public class EntryServiceImplTest {
     }
 
     @Test
-    public void testCreateOneWithFailure() {
-
-        // given
-        given(entryVOToEntryConverter.convert(entryVO)).willReturn(entry);
-        given(entryDAO.save(entry)).willReturn(null);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> entryService.createOne(entryVO));
-
-        // then
-        // expected exception
-        verify(entryVOToEntryConverter).convert(entryVO);
-        verify(entryDAO).save(entry);
-    }
-
-    @Test
     public void testCreateShouldThrowConstraintViolationException() {
 
         // given
@@ -315,7 +288,7 @@ public class EntryServiceImplTest {
         Long id = 1L;
         given(entryVOToEntryConverter.convert(entryVO)).willReturn(entry);
         given(entryToEntryVOConverter.convert(entry)).willReturn(entryVO);
-        given(entryDAO.updateOne(id, entry)).willReturn(entry);
+        given(entryDAO.updateOne(id, entry)).willReturn(Optional.of(entry));
 
         // when
         EntryVO result = entryService.updateOne(id, entryVO);
@@ -334,7 +307,7 @@ public class EntryServiceImplTest {
         // given
         Long id = 1L;
         given(entryVOToEntryConverter.convert(entryVO)).willReturn(entry);
-        given(entryDAO.updateOne(id, entry)).willReturn(null);
+        given(entryDAO.updateOne(id, entry)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.updateOne(id, entryVO));
@@ -380,7 +353,7 @@ public class EntryServiceImplTest {
 
         // given
         String link = "link-lflt-49-ut";
-        given(entryDAO.findByLink(link)).willReturn(entry);
+        given(entryDAO.findByLink(link)).willReturn(Optional.of(entry));
         given(entryToEntryVOConverter.convert(entry)).willReturn(entryVO);
 
         // when
@@ -397,7 +370,7 @@ public class EntryServiceImplTest {
 
         // given
         String link = "link-lflt-49-ut";
-        given(entryDAO.findByLink(link)).willReturn(null);
+        given(entryDAO.findByLink(link)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.findByLink(link));

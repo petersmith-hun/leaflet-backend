@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class EntityPageResponseProcessor implements ResponseProcessor<EntityPageVO<? extends BaseVO>> {
 
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
 
     @Autowired
     public EntityPageResponseProcessor(HttpServletRequest httpServletRequest) {

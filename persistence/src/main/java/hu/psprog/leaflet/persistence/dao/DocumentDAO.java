@@ -4,6 +4,7 @@ import hu.psprog.leaflet.persistence.entity.Document;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * DAO for {@link hu.psprog.leaflet.persistence.repository.DocumentRepository}.
@@ -14,5 +15,5 @@ public interface DocumentDAO extends BaseDAO<Document, Long>, SelfStatusAwareDAO
 
     List<Document> findAll(Specification<Document> specification);
 
-    Document findByLink(String link);
+    Optional<Document> findByLink(String link);
 }

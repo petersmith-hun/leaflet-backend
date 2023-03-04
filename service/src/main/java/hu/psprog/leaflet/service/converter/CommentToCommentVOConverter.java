@@ -16,11 +16,14 @@ public class CommentToCommentVOConverter implements Converter<Comment, CommentVO
 
     private static final String DELETED_COMMENT = "DELETED_COMMENT";
 
-    @Autowired
-    private UserToUserVOConverter userToUserVOConverter;
+    private final UserToUserVOConverter userToUserVOConverter;
+    private final EntryToEntryVOConverter entryToEntryVOConverter;
 
     @Autowired
-    private EntryToEntryVOConverter entryToEntryVOConverter;
+    public CommentToCommentVOConverter(UserToUserVOConverter userToUserVOConverter, EntryToEntryVOConverter entryToEntryVOConverter) {
+        this.userToUserVOConverter = userToUserVOConverter;
+        this.entryToEntryVOConverter = entryToEntryVOConverter;
+    }
 
     @Override
     public CommentVO convert(Comment source) {

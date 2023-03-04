@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * Converts {@link Document} to {@link DocumentVO} object.
  *
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentToDocumentVOConverter implements Converter<Document, DocumentVO> {
 
-    private UserToUserVOConverter userToUserVOConverter;
+    private final UserToUserVOConverter userToUserVOConverter;
 
     @Autowired
     public DocumentToDocumentVOConverter(UserToUserVOConverter userToUserVOConverter) {
@@ -24,7 +26,7 @@ public class DocumentToDocumentVOConverter implements Converter<Document, Docume
     @Override
     public DocumentVO convert(Document source) {
 
-        DocumentVO.DocumentVOBuilder builder = DocumentVO.getBuilder();
+        DocumentVO.DocumentVOBuilder<?, ?> builder = DocumentVO.getBuilder();
         builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withEnabled(source.isEnabled())
@@ -37,7 +39,7 @@ public class DocumentToDocumentVOConverter implements Converter<Document, Docume
                 .withSeoKeywords(source.getSeoKeywords())
                 .withTitle(source.getTitle());
 
-        if (source.getUser() != null) {
+        if (Objects.nonNull(source.getUser())) {
             builder.withOwner(userToUserVOConverter.convert(source.getUser()));
         }
 

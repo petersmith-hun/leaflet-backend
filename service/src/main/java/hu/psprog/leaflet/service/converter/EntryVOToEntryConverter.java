@@ -21,7 +21,7 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
     @Override
     public Entry convert(EntryVO source) {
 
-        Entry.EntryBuilder builder = Entry.getBuilder();
+        Entry.EntryBuilder<?, ?> builder = Entry.getBuilder();
         builder.withRawContent(source.getRawContent())
                 .withCreated(source.getCreated())
                 .withPublished(source.getPublished())
@@ -47,7 +47,7 @@ public class EntryVOToEntryConverter implements Converter<EntryVO, Entry> {
             builder.withCategory(category);
         }
 
-        if (source.getOwner() != null) {
+        if (Objects.nonNull(source.getOwner())) {
             User user = User.getBuilder()
                     .withId(source.getOwner().getId())
                     .build();

@@ -44,7 +44,7 @@ public class EntityPageResponseProcessorTest {
     public void shouldProcessResponse() {
 
         // given
-        EntityPageVO<EntryVO> entityPageVO = EntityPageVO.getBuilder()
+        EntityPageVO<EntryVO> entityPageVO = EntityPageVO.<EntryVO>getBuilder()
                 .withEntityCount(ENTITY_COUNT)
                 .withEntityCountOnPage(ENTITY_COUNT_ON_PAGE)
                 .withPageCount(PAGE_COUNT)

@@ -4,6 +4,8 @@ import hu.psprog.leaflet.persistence.entity.Document;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Document repository interface for Hibernate JPA persistence manager.
  *
@@ -18,5 +20,5 @@ public interface DocumentRepository extends SelfStatusAwareJpaRepository<Documen
      * @param link link of document
      * @return document identified by given link
      */
-    Document findByLink(String link);
+    Optional<Document> findByLink(String link);
 }

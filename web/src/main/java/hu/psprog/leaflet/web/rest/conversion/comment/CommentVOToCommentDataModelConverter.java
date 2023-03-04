@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentVOToCommentDataModelConverter implements Converter<CommentVO, CommentDataModel> {
 
-    private DateConverter dateConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public CommentVOToCommentDataModelConverter(DateConverter dateConverter) {
@@ -25,6 +25,7 @@ public class CommentVOToCommentDataModelConverter implements Converter<CommentVO
 
     @Override
     public CommentDataModel convert(CommentVO source) {
+
         return CommentDataModel.getBuilder()
                 .withId(source.getId())
                 .withOwner(UserDataModel.getBuilder()

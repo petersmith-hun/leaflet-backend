@@ -12,7 +12,6 @@ import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
@@ -32,6 +31,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -84,13 +84,9 @@ public class EntryServiceImpl implements EntryService {
     @PermitScope.Read.Entries
     public EntryVO getOne(Long id) throws ServiceException {
 
-        Entry entry = entryDAO.findOne(id);
-
-        if (entry == null) {
-            throw new EntityNotFoundException(Entry.class, id);
-        }
-
-        return entryToEntryVOConverter.convert(entry);
+        return entryDAO.findById(id)
+                .map(entryToEntryVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Entry.class, id));
     }
 
     @Override
@@ -103,70 +99,53 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
-    @PermitScope.Read.Entries
-    public Long count() {
-
-        return entryDAO.count();
-    }
-
-    @Override
     @PermitScope.Write.Entries
     public Long createOne(EntryVO entity) throws ServiceException {
 
         Entry entry = entryVOToEntryConverter.convert(entity);
         publishHandler.updatePublishDate(entry);
-        Entry savedEntry;
+
         try {
-            savedEntry = entryDAO.save(entry);
+            Entry savedEntry = entryDAO.save(entry);
+
+            LOGGER.info("New entry [{}] has been created with ID [{}]", savedEntry.getTitle(), savedEntry.getId());
+
+            return savedEntry.getId();
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
         } catch (Exception e) {
             throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
-
-        if (savedEntry == null) {
-            throw new EntityCreationException(Entry.class);
-        }
-
-        LOGGER.info("New entry [{}] has been created with ID [{}]", savedEntry.getTitle(), savedEntry.getId());
-
-        return entry.getId();
     }
 
     @Override
     @PermitScope.Write.OwnEntryOrElevated
     public EntryVO updateOne(Long id, EntryVO updatedEntity) throws ServiceException {
 
-        Entry updatedEntry;
         try {
             Entry updatedEntryData = entryVOToEntryConverter.convert(updatedEntity);
             publishHandler.updatePublishDate(id, updatedEntryData);
-            updatedEntry = entryDAO.updateOne(id, updatedEntryData);
+            return entryDAO.updateOne(id, updatedEntryData)
+                    .map(logUpdate())
+                    .map(entryToEntryVOConverter::convert)
+                    .orElseThrow(() -> new EntityNotFoundException(Entry.class, id));
+
         } catch (DataIntegrityViolationException e) {
             throw new ConstraintViolationException(AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS, e);
+        } catch (EntityNotFoundException e) {
+            throw e;
         } catch (Exception e) {
             throw new ServiceException(ENTITY_COULD_NOT_BE_PERSISTED, e);
         }
-
-        if (updatedEntry == null) {
-            throw new EntityNotFoundException(Entry.class, id);
-        }
-
-        LOGGER.info("Existing entry [{}] with ID [{}] has been updated", updatedEntry.getTitle(), id);
-
-        return entryToEntryVOConverter.convert(updatedEntry);
     }
 
     @Override
     public EntryVO findByLink(String link) throws EntityNotFoundException {
 
-        Entry entry = entryDAO.findByLink(link);
-
-        if (entry == null) {
-            throw new EntityNotFoundException(Entry.class, link);
-        }
-
-        return entryToEntryVOConverter.convert(entry);
+        return entryDAO.findByLink(link)
+                .map(entryToEntryVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Entry.class, link));
     }
 
     @Override
@@ -247,5 +226,13 @@ public class EntryServiceImpl implements EntryService {
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+    }
+
+    private Function<Entry, Entry> logUpdate() {
+
+        return entry -> {
+            LOGGER.info("Existing entry [{}] with ID [{}] has been updated", entry.getTitle(), entry.getId());
+            return entry;
+        };
     }
 }

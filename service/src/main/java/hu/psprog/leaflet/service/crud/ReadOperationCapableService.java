@@ -29,11 +29,4 @@ public interface ReadOperationCapableService<T extends BaseVO, ID extends Serial
      * @return list of all entities of type T
      */
     List<T> getAll();
-
-    /**
-     * Returns number of entities.
-     *
-     * @return number of entities
-     */
-    Long count();
 }

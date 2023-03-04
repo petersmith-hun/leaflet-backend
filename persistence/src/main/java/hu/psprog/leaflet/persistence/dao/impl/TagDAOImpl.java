@@ -5,10 +5,9 @@ import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,8 +19,8 @@ import java.util.List;
 public class TagDAOImpl extends SelfStatusAwareDAOImpl<Tag, Long> implements TagDAO {
 
     @Autowired
-    public TagDAOImpl(final TagRepository tagRepository) {
-        super(tagRepository);
+    public TagDAOImpl(final TagRepository tagRepository, JpaContext jpaContext) {
+        super(tagRepository, jpaContext);
     }
 
     @Override
@@ -29,17 +28,8 @@ public class TagDAOImpl extends SelfStatusAwareDAOImpl<Tag, Long> implements Tag
         return ((TagRepository) jpaRepository).findAll(specification);
     }
 
-    @Transactional
     @Override
-    public Tag updateOne(Long id, Tag updatedEntity) {
-
-        Tag currentTag = jpaRepository.getOne(id);
-        if (currentTag != null) {
-            currentTag.setTitle(updatedEntity.getTitle());
-            currentTag.setLastModified(new Date());
-            jpaRepository.flush();
-        }
-
-        return currentTag;
+    protected void doUpdate(Tag currentEntity, Tag updatedEntity) {
+        currentEntity.setTitle(updatedEntity.getTitle());
     }
 }

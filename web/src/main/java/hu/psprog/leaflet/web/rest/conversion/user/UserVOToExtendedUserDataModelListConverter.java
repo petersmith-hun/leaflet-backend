@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class UserVOToExtendedUserDataModelListConverter implements Converter<List<UserVO>, UserListDataModel> {
 
-    private UserVOToExtendedUserDataModelEntityConverter userVOToExtendedUserDataModelEntityConverter;
+    private final UserVOToExtendedUserDataModelEntityConverter userVOToExtendedUserDataModelEntityConverter;
 
     @Autowired
     public UserVOToExtendedUserDataModelListConverter(UserVOToExtendedUserDataModelEntityConverter userVOToExtendedUserDataModelEntityConverter) {
@@ -28,7 +28,9 @@ public class UserVOToExtendedUserDataModelListConverter implements Converter<Lis
     public UserListDataModel convert(List<UserVO> userVOList) {
 
         UserListDataModel.UserListDataModelBuilder builder = UserListDataModel.getBuilder();
-        userVOList.forEach(userVO -> builder.withItem(userVOToExtendedUserDataModelEntityConverter.convert(userVO)));
+        userVOList.stream()
+                .map(userVOToExtendedUserDataModelEntityConverter::convert)
+                .forEach(builder::withItem);
 
         return builder.build();
     }

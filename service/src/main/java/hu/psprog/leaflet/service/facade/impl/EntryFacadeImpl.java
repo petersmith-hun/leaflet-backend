@@ -26,7 +26,7 @@ public class EntryFacadeImpl implements EntryFacade {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryFacadeImpl.class);
 
-    private EntryService entryService;
+    private final EntryService entryService;
 
     @Autowired
     public EntryFacadeImpl(EntryService entryService) {
@@ -82,11 +82,6 @@ public class EntryFacadeImpl implements EntryFacade {
     @Override
     public List<EntryVO> getAll() {
         return entryService.getAll();
-    }
-
-    @Override
-    public Long count() {
-        return entryService.count();
     }
 
     @Override

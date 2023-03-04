@@ -1,14 +1,15 @@
 package hu.psprog.leaflet.service.facade.impl;
 
+import hu.psprog.leaflet.persistence.dao.UploadedFileDAO;
+import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.service.AttachmentService;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.AttachmentFacade;
-import hu.psprog.leaflet.service.facade.FileManagementFacade;
 import hu.psprog.leaflet.service.vo.AttachmentRequestVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import hu.psprog.leaflet.service.vo.UploadedFileVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,39 +19,44 @@ import org.springframework.stereotype.Service;
  * @author Peter Smith
  */
 @Service
+@Slf4j
 public class AttachmentFacadeImpl implements AttachmentFacade {
 
     private final EntryService entryService;
-    private final FileManagementFacade fileManagementFacade;
     private final AttachmentService attachmentService;
+    private final UploadedFileDAO uploadedFileDAO;
 
     @Autowired
-    public AttachmentFacadeImpl(EntryService entryService, FileManagementFacade fileManagementFacade, AttachmentService attachmentService) {
+    public AttachmentFacadeImpl(EntryService entryService, AttachmentService attachmentService,
+                                UploadedFileDAO uploadedFileDAO) {
         this.entryService = entryService;
-        this.fileManagementFacade = fileManagementFacade;
         this.attachmentService = attachmentService;
+        this.uploadedFileDAO = uploadedFileDAO;
     }
 
     @Override
     public void attachFileToEntry(AttachmentRequestVO attachmentRequestVO) throws ServiceException {
-        UploadedFileVO checkedUploadedFileVO = getUploadedFileVO(attachmentRequestVO);
+
+        UploadedFile uploadedFile = getUploadedFile(attachmentRequestVO);
         EntryVO checkedEntryVO = getEntryVO(attachmentRequestVO);
-        attachmentService.attachFileToEntry(checkedUploadedFileVO, checkedEntryVO);
+        attachmentService.attachFileToEntry(uploadedFile, checkedEntryVO);
     }
 
     @Override
     public void detachFileFromEntry(AttachmentRequestVO attachmentRequestVO) throws ServiceException {
-        UploadedFileVO checkedUploadedFileVO = getUploadedFileVO(attachmentRequestVO);
+
+        UploadedFile uploadedFile = getUploadedFile(attachmentRequestVO);
         EntryVO checkedEntryVO = getEntryVO(attachmentRequestVO);
-        attachmentService.detachFileFromEntry(checkedUploadedFileVO, checkedEntryVO);
+        attachmentService.detachFileFromEntry(uploadedFile, checkedEntryVO);
     }
 
     private EntryVO getEntryVO(AttachmentRequestVO attachmentRequestVO) throws ServiceException {
         return entryService.getOne(attachmentRequestVO.getEntryID());
     }
 
-    private UploadedFileVO getUploadedFileVO(AttachmentRequestVO attachmentRequestVO) throws ServiceException {
-        return fileManagementFacade.getCheckedMetaInfo(attachmentRequestVO.getPathUUID())
-                .orElseThrow(() -> new EntityNotFoundException(UploadedFileVO.class, attachmentRequestVO.getPathUUID()));
+    private UploadedFile getUploadedFile(AttachmentRequestVO attachmentRequestVO) throws ServiceException {
+
+        return uploadedFileDAO.findByPathUUID(attachmentRequestVO.getPathUUID())
+                .orElseThrow(() -> new EntityNotFoundException(UploadedFile.class, attachmentRequestVO.getPathUUID()));
     }
 }

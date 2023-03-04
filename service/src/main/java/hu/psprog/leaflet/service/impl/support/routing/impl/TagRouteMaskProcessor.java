@@ -25,8 +25,8 @@ public class TagRouteMaskProcessor implements RouteMaskProcessor {
 
     private static final String ROUTE_MASK = "%s/%d/%s";
 
-    private TagFacade tagFacade;
-    private FilenameGeneratorUtil filenameGeneratorUtil;
+    private final TagFacade tagFacade;
+    private final FilenameGeneratorUtil filenameGeneratorUtil;
 
     @Autowired
     public TagRouteMaskProcessor(TagFacade tagFacade, FilenameGeneratorUtil filenameGeneratorUtil) {
@@ -53,13 +53,8 @@ public class TagRouteMaskProcessor implements RouteMaskProcessor {
 
     private String prepareURL(TagVO tagVO, FrontEndRouteVO frontEndRouteVO) {
 
-        String url;
-        if (Objects.nonNull(frontEndRouteVO.getUrl())) {
-            url = String.format(ROUTE_MASK, frontEndRouteVO.getUrl(), tagVO.getId(), filenameGeneratorUtil.doCleanFilename(tagVO.getTitle()));
-        } else {
-            url = StringUtils.EMPTY;
-        }
-
-        return url;
+        return Objects.nonNull(frontEndRouteVO.getUrl())
+                ? String.format(ROUTE_MASK, frontEndRouteVO.getUrl(), tagVO.getId(), filenameGeneratorUtil.doCleanFilename(tagVO.getTitle()))
+                : StringUtils.EMPTY;
     }
 }

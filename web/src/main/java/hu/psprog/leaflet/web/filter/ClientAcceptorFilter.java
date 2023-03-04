@@ -6,6 +6,9 @@ import hu.psprog.leaflet.web.filter.restrictions.exception.MissingClientIDHeader
 import hu.psprog.leaflet.web.filter.restrictions.exception.SecurityRestrictionViolationException;
 import hu.psprog.leaflet.web.filter.restrictions.exception.UnknownClientException;
 import hu.psprog.leaflet.web.filter.restrictions.strategy.RestrictionValidatorStrategy;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +54,8 @@ import java.util.stream.Collectors;
 @ConfigurationProperties(prefix = "leaflet-link")
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @ConditionalOnProperty(value = "leaflet-link.security-checks-enabled", havingValue = "true")
+@Getter
+@Setter(AccessLevel.PACKAGE)
 public class ClientAcceptorFilter extends OncePerRequestFilter {
 
     public static final String HEADER_CLIENT_ID = "X-Client-ID";
@@ -61,9 +66,10 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
+    private final Map<RestrictionType, RestrictionValidatorStrategy> restrictionValidatorStrategies;
+
     private Map<UUID, ClientAcceptorConfiguration> clients;
     private List<String> excludedRoutes;
-    private Map<RestrictionType, RestrictionValidatorStrategy> restrictionValidatorStrategies;
     private Map<UUID, List<RestrictionValidatorStrategy>> clientValidationMapping;
 
     @Autowired
@@ -74,12 +80,14 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
 
     @PostConstruct
     public void init() {
+
         clients.forEach((key, value) -> LOGGER.info(ACCEPTED_CLIENT_LOG_MESSAGE, value.getName(), key, value.getRestrictions()));
         clientValidationMapping = clients.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getRestrictions().stream()
                         .map(restrictionValidatorStrategies::get)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList())));
+
         if (Objects.isNull(excludedRoutes)) {
             excludedRoutes = Collections.emptyList();
         }
@@ -100,22 +108,6 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
             LOGGER.error("Error occurred while performing security validation of request", exc);
             response.sendError(HttpServletResponse.SC_FORBIDDEN, exc.getMessage());
         }
-    }
-
-    public Map<UUID, ClientAcceptorConfiguration> getClients() {
-        return clients;
-    }
-
-    public void setClients(Map<UUID, ClientAcceptorConfiguration> clients) {
-        this.clients = clients;
-    }
-
-    public List<String> getExcludedRoutes() {
-        return excludedRoutes;
-    }
-
-    public void setExcludedRoutes(List<String> excludedRoutes) {
-        this.excludedRoutes = excludedRoutes;
     }
 
     private boolean isRouteExcluded(HttpServletRequest request) {

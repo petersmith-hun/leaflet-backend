@@ -152,19 +152,6 @@ public class FrontEndRoutingSupportFacadeImplTest {
     }
 
     @Test
-    public void shouldCount() {
-
-        // given
-        given(frontEndRoutingSupportService.count()).willReturn(3L);
-
-        // when
-        Long result = frontEndRoutingSupportFacade.count();
-
-        // then
-        assertThat(result, equalTo(3L));
-    }
-
-    @Test
     public void shouldUpdate() throws ServiceException {
 
         // given

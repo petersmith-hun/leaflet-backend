@@ -4,9 +4,7 @@ import hu.psprog.leaflet.web.interceptor.ResponseFillerInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -18,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMVCConfiguration implements WebMvcConfigurer {
 
-    private ResponseFillerInterceptor responseFillerInterceptor;
+    private final ResponseFillerInterceptor responseFillerInterceptor;
 
     @Autowired
     public WebMVCConfiguration(ResponseFillerInterceptor responseFillerInterceptor) {
@@ -33,11 +31,5 @@ public class WebMVCConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(responseFillerInterceptor);
-    }
-
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.favorPathExtension(false)
-                .defaultContentType(MediaType.APPLICATION_JSON);
     }
 }

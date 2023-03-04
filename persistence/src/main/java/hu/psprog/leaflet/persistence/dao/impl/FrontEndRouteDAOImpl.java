@@ -5,12 +5,10 @@ import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
 import hu.psprog.leaflet.persistence.repository.FrontEndRouteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaContext;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Implementation of {@link FrontEndRouteDAO}.
@@ -21,8 +19,8 @@ import java.util.Objects;
 public class FrontEndRouteDAOImpl extends SelfStatusAwareDAOImpl<FrontEndRoute, Long> implements FrontEndRouteDAO {
 
     @Autowired
-    public FrontEndRouteDAOImpl(FrontEndRouteRepository frontEndRouteRepository) {
-        super(frontEndRouteRepository);
+    public FrontEndRouteDAOImpl(FrontEndRouteRepository frontEndRouteRepository, JpaContext jpaContext) {
+        super(frontEndRouteRepository, jpaContext);
     }
 
     @Override
@@ -30,23 +28,15 @@ public class FrontEndRouteDAOImpl extends SelfStatusAwareDAOImpl<FrontEndRoute, 
         return ((FrontEndRouteRepository) jpaRepository).findAll(specification);
     }
 
-    @Transactional
     @Override
-    public FrontEndRoute updateOne(Long id, FrontEndRoute updatedEntity) {
-
-        FrontEndRoute entity = jpaRepository.getOne(id);
-        if (Objects.nonNull(entity)) {
-            entity.setRouteId(updatedEntity.getRouteId());
-            entity.setName(updatedEntity.getName());
-            entity.setUrl(updatedEntity.getUrl());
-            entity.setSequenceNumber(updatedEntity.getSequenceNumber());
-            entity.setType(updatedEntity.getType());
-            entity.setAuthRequirement(updatedEntity.getAuthRequirement());
-            entity.setEnabled(updatedEntity.isEnabled());
-            entity.setLastModified(new Date());
-            jpaRepository.flush();
-        }
-
-        return entity;
+    protected void doUpdate(FrontEndRoute currentEntity, FrontEndRoute updatedEntity) {
+        
+        currentEntity.setRouteId(updatedEntity.getRouteId());
+        currentEntity.setName(updatedEntity.getName());
+        currentEntity.setUrl(updatedEntity.getUrl());
+        currentEntity.setSequenceNumber(updatedEntity.getSequenceNumber());
+        currentEntity.setType(updatedEntity.getType());
+        currentEntity.setAuthRequirement(updatedEntity.getAuthRequirement());
+        currentEntity.setEnabled(updatedEntity.isEnabled());
     }
 }

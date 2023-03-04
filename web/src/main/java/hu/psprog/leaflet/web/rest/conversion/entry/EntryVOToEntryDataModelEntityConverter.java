@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
 @Component
 public class EntryVOToEntryDataModelEntityConverter implements Converter<EntryVO, EntryDataModel> {
 
-    private UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter;
-    private TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter;
-    private DateConverter dateConverter;
+    private final UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter;
+    private final TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter;
+    private final DateConverter dateConverter;
 
     @Autowired
     public EntryVOToEntryDataModelEntityConverter(UploadedFileVOToFileDataModelConverter uploadedFileVOToFileDataModelConverter,

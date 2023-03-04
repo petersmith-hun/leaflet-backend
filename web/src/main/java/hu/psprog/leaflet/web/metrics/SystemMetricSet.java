@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 @Component
 public class SystemMetricSet implements MetricSet {
 
-    private List<SystemMetric> systemMetrics;
+    private final List<SystemMetric<?>> systemMetrics;
 
     @Autowired
-    public SystemMetricSet(List<SystemMetric> systemMetrics) {
+    public SystemMetricSet(List<SystemMetric<?>> systemMetrics) {
         this.systemMetrics = systemMetrics;
     }
 

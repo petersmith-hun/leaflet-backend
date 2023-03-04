@@ -3,7 +3,9 @@ package hu.psprog.leaflet.web.rest.controller;
 import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +22,12 @@ import java.util.List;
 @RestController
 public class SitemapController extends BaseController {
 
-    private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
+    private final FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
 
     @Autowired
-    public SitemapController(FrontEndRoutingSupportFacade frontEndRoutingSupportFacade) {
+    public SitemapController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                             FrontEndRoutingSupportFacade frontEndRoutingSupportFacade) {
+        super(conversionService, exceptionHandlerCounters);
         this.frontEndRoutingSupportFacade = frontEndRoutingSupportFacade;
     }
 

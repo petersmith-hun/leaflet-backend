@@ -17,7 +17,7 @@ public enum Locale {
      */
     EN("en_US");
 
-    private String code;
+    private final String code;
 
     Locale(String code) {
         this.code = code;

@@ -12,10 +12,9 @@ import hu.psprog.leaflet.service.converter.CommentToCommentVOConverter;
 import hu.psprog.leaflet.service.converter.CommentVOToCommentConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.mail.domain.CommentNotification;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.vo.CommentVO;
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommentServiceImpl.class);
-    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.getBuilder()
+    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.<CommentVO>getBuilder()
             .withEntitiesOnPage(Collections.emptyList())
             .build();
 
@@ -71,13 +70,9 @@ public class CommentServiceImpl implements CommentService {
     @PermitScope.Read.OwnCommentsOrElevated
     public CommentVO getOne(Long id) throws ServiceException {
 
-        Comment comment = commentDAO.findOne(id);
-
-        if (comment == null) {
-            throw new EntityNotFoundException(Comment.class, id);
-        }
-
-        return commentToCommentVOConverter.convert(comment);
+        return commentDAO.findById(id)
+                .map(commentToCommentVOConverter::convert)
+                .orElseThrow(() -> new EntityNotFoundException(Comment.class, id));
     }
 
     @Override
@@ -131,22 +126,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void notifyEntryAuthor(Long commentID) {
 
-        Comment comment = commentDAO.findOne(commentID);
-        notificationService.commentNotification(CommentNotification.getBuilder()
-                .withUsername(comment.getUser().getUsername())
-                .withEmail(comment.getUser().getEmail())
-                .withContent(comment.getContent())
-                .withEntryTitle(comment.getEntry().getTitle())
-                .withAuthorEmail(comment.getEntry().getUser().getEmail())
-                .withAuthorName(comment.getEntry().getUser().getUsername())
-                .build());
-    }
-
-    @Override
-    @PermitScope.Read.Comments
-    public Long count() {
-
-        return commentDAO.count();
+        commentDAO.findById(commentID)
+                .map(comment -> CommentNotification.getBuilder()
+                        .withUsername(comment.getUser().getUsername())
+                        .withEmail(comment.getUser().getEmail())
+                        .withContent(comment.getContent())
+                        .withEntryTitle(comment.getEntry().getTitle())
+                        .withAuthorEmail(comment.getEntry().getUser().getEmail())
+                        .withAuthorName(comment.getEntry().getUser().getUsername())
+                        .build())
+                .ifPresent(notificationService::commentNotification);
     }
 
     @Override
@@ -154,10 +143,6 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = commentVOToCommentConverter.convert(entity);
         Comment savedComment = commentDAO.save(comment);
-
-        if (savedComment == null) {
-            throw new EntityCreationException(Comment.class);
-        }
 
         LOGGER.info("New comment has been created by user [{}] with ID [{}]", savedComment.getUser().getId(), savedComment.getId());
 
@@ -168,11 +153,8 @@ public class CommentServiceImpl implements CommentService {
     @PermitScope.Write.OwnCommentOrElevated
     public CommentVO updateOne(Long id, CommentVO updatedEntity) throws ServiceException {
 
-        Comment updatedComment = commentDAO.updateOne(id, commentVOToCommentConverter.convert(updatedEntity));
-
-        if (updatedComment == null) {
-            throw new EntityNotFoundException(Entry.class, id);
-        }
+        Comment updatedComment = commentDAO.updateOne(id, commentVOToCommentConverter.convert(updatedEntity))
+                .orElseThrow(() -> new EntityNotFoundException(Entry.class, id));
 
         LOGGER.info("Comment of ID [{}] has been updated by user [{}]", id, updatedComment.getUser().getId());
 

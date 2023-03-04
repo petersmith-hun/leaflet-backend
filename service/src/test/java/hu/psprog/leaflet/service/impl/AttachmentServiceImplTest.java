@@ -1,14 +1,11 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
-import hu.psprog.leaflet.persistence.dao.UploadedFileDAO;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
-import hu.psprog.leaflet.service.converter.UploadedFileVOToUploadedFileConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntryVO;
-import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,19 +43,12 @@ public class AttachmentServiceImplTest {
     private EntryDAO entryDAO;
 
     @Mock(lenient = true)
-    private UploadedFileDAO uploadedFileDAO;
-
-    @Mock(lenient = true)
-    private UploadedFileVOToUploadedFileConverter uploadedFileVOToUploadedFileConverter;
-
-    @Mock(lenient = true)
     private Entry mockedEntry;
 
     @InjectMocks
     private AttachmentServiceImpl attachmentService;
 
     private EntryVO entryVO;
-    private UploadedFileVO uploadedFileVO;
     private UploadedFile controlUploadedFile;
     private List<UploadedFile> attachments;
 
@@ -67,17 +58,13 @@ public class AttachmentServiceImplTest {
                 .withId(ENTRY_ID)
                 .withTitle("Test entry")
                 .build();
-        uploadedFileVO = UploadedFileVO.getBuilder()
-                .withId(UPLOADED_FILE_ID)
-                .withPath("images/stored_control_15.jpg")
-                .build();
         controlUploadedFile = UploadedFile.getBuilder()
                 .withStoredFilename("stored_control_15.jpg")
                 .withOriginalFilename("original_control_15.jpg")
                 .withPathUUID(UUID.randomUUID())
                 .withId(UPLOADED_FILE_ID)
                 .build();
-        given(entryDAO.findOne(ENTRY_ID)).willReturn(mockedEntry);
+        given(entryDAO.findById(ENTRY_ID)).willReturn(Optional.of(mockedEntry));
     }
 
     @Test
@@ -87,7 +74,7 @@ public class AttachmentServiceImplTest {
         prepareMocks(true);
 
         // when
-        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
+        attachmentService.attachFileToEntry(controlUploadedFile, entryVO);
 
         // then
         assertResults(6, true, false);
@@ -100,7 +87,7 @@ public class AttachmentServiceImplTest {
         prepareMocks(false);
 
         // when
-        attachmentService.attachFileToEntry(uploadedFileVO, entryVO);
+        attachmentService.attachFileToEntry(controlUploadedFile, entryVO);
 
         // then
         assertResults(6, true, true);
@@ -113,7 +100,7 @@ public class AttachmentServiceImplTest {
         prepareMocks(false);
 
         // when
-        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
+        attachmentService.detachFileFromEntry(controlUploadedFile, entryVO);
 
         // then
         assertResults(5, false, false);
@@ -126,24 +113,10 @@ public class AttachmentServiceImplTest {
         prepareMocks(true);
 
         // when
-        attachmentService.detachFileFromEntry(uploadedFileVO, entryVO);
+        attachmentService.detachFileFromEntry(controlUploadedFile, entryVO);
 
         // then
         assertResults(5, false, true);
-    }
-
-    @Test
-    public void shouldThrowExceptionOnAttachIfUploadedFileDoesNotExist() {
-
-        // given
-        prepareMocks(false);
-        given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(false);
-
-        // when
-        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.attachFileToEntry(uploadedFileVO, entryVO));
-
-        // then
-        // expected exception
     }
 
     @Test
@@ -154,21 +127,7 @@ public class AttachmentServiceImplTest {
         given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.attachFileToEntry(uploadedFileVO, entryVO));
-
-        // then
-        // expected exception
-    }
-
-    @Test
-    public void shouldThrowExceptionOnDetachIfUploadedFileDoesNotExist() {
-
-        // given
-        prepareMocks(false);
-        given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(false);
-
-        // when
-        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.detachFileFromEntry(uploadedFileVO, entryVO));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.attachFileToEntry(controlUploadedFile, entryVO));
 
         // then
         // expected exception
@@ -182,7 +141,7 @@ public class AttachmentServiceImplTest {
         given(entryDAO.exists(ENTRY_ID)).willReturn(false);
 
         // when
-        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.detachFileFromEntry(uploadedFileVO, entryVO));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> attachmentService.detachFileFromEntry(controlUploadedFile, entryVO));
 
         // then
         // expected exception
@@ -191,9 +150,7 @@ public class AttachmentServiceImplTest {
     private void prepareMocks(boolean includeControlVO) {
         prepareAttachments(includeControlVO);
         given(mockedEntry.getAttachments()).willReturn(attachments);
-        given(uploadedFileVOToUploadedFileConverter.convert(uploadedFileVO)).willReturn(controlUploadedFile);
         given(entryDAO.exists(ENTRY_ID)).willReturn(true);
-        given(uploadedFileDAO.exists(UPLOADED_FILE_ID)).willReturn(true);
     }
 
     private void prepareAttachments(boolean includeControlVO) {
@@ -214,10 +171,10 @@ public class AttachmentServiceImplTest {
     }
 
     private void assertResults(int numberOfAttachments, boolean controlIncluded, boolean updateCalled) {
+
         assertThat(attachments.size(), equalTo(numberOfAttachments));
         assertThat(attachments.contains(controlUploadedFile), is(controlIncluded));
-        verify(entryDAO).findOne(ENTRY_ID);
-        verify(uploadedFileVOToUploadedFileConverter).convert(uploadedFileVO);
+        verify(entryDAO).findById(ENTRY_ID);
         if (updateCalled) {
             verify(entryDAO).updateAttachments(ENTRY_ID, attachments);
         } else {

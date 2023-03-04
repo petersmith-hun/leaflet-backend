@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class FrontEndRouteVOToFrontEndRouteDataModelListConverter implements Converter<List<FrontEndRouteVO>, FrontEndRouteListDataModel> {
 
-    private FrontEndRouteVOToFrontEndRouteDataModelConverter singleConverter;
+    private final FrontEndRouteVOToFrontEndRouteDataModelConverter singleConverter;
 
     @Autowired
     public FrontEndRouteVOToFrontEndRouteDataModelListConverter(FrontEndRouteVOToFrontEndRouteDataModelConverter singleConverter) {
@@ -27,7 +27,9 @@ public class FrontEndRouteVOToFrontEndRouteDataModelListConverter implements Con
     public FrontEndRouteListDataModel convert(List<FrontEndRouteVO> source) {
 
         FrontEndRouteListDataModel.FrontEndRouteListDataModelBuilder builder = FrontEndRouteListDataModel.getBuilder();
-        source.forEach(frontEndRouteVO -> builder.withItem(singleConverter.convert(frontEndRouteVO)));
+        source.stream()
+                .map(singleConverter::convert)
+                .forEach(builder::withItem);
 
         return builder.build();
     }

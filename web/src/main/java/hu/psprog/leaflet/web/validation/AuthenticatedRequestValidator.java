@@ -33,19 +33,22 @@ public class AuthenticatedRequestValidator implements ConstraintValidator<Authen
     @Override
     public boolean isValid(AuthenticatedRequestModel value, ConstraintValidatorContext context) {
 
-        boolean valid = false;
-        if (Objects.isNull(value.getAuthenticatedUserId())) {
-            valid = true;
-        } else {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication instanceof JwtAuthenticationToken) {
-                Map<String, Object> payload = ((JwtAuthenticationToken) authentication).getTokenAttributes();
-                Long userID = (Long) payload.getOrDefault(USER_ID_TOKEN_ATTRIBUTE, 0);
-                valid = userID.equals(value.getAuthenticatedUserId());
+        return Objects.isNull(value.getAuthenticatedUserId())
+                || verifySameUser(value);
+    }
 
-                if (!valid) {
-                    LOGGER.warn("Request validation failed for userID={} - current userID={} is different", value.getAuthenticatedUserId(), userID);
-                }
+    private boolean verifySameUser(AuthenticatedRequestModel value) {
+
+        boolean valid = false;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication instanceof JwtAuthenticationToken) {
+            Map<String, Object> payload = ((JwtAuthenticationToken) authentication).getTokenAttributes();
+            Long userID = (Long) payload.getOrDefault(USER_ID_TOKEN_ATTRIBUTE, 0);
+            valid = userID.equals(value.getAuthenticatedUserId());
+
+            if (!valid) {
+                LOGGER.warn("Request validation failed for userID={} - current userID={} is different", value.getAuthenticatedUserId(), userID);
             }
         }
 

@@ -1,8 +1,10 @@
 package hu.psprog.leaflet.persistence.repository;
 
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -11,15 +13,7 @@ import java.util.UUID;
  * @author Peter Smith
  */
 @Repository
-public interface UploadedFileRepository extends SelfStatusAwareJpaRepository<UploadedFile, Long> {
-
-    /**
-     * Retrieves {@link UploadedFile} by path.
-     *
-     * @param path path value
-     * @return stored file meta info as {@link UploadedFile}
-     */
-    UploadedFile findByPath(String path);
+public interface UploadedFileRepository extends JpaRepository<UploadedFile, Long> {
 
     /**
      * Retrieves {@link UploadedFile} by path UUID.
@@ -27,5 +21,5 @@ public interface UploadedFileRepository extends SelfStatusAwareJpaRepository<Upl
      * @param pathUUID path UUID value
      * @return stored file meta info as {@link UploadedFile}
      */
-    UploadedFile findByPathUUID(UUID pathUUID);
+    Optional<UploadedFile> findByPathUUID(UUID pathUUID);
 }

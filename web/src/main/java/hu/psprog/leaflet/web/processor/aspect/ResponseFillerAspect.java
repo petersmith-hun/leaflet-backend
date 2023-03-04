@@ -31,7 +31,7 @@ public class ResponseFillerAspect {
             + "and @annotation(hu.psprog.leaflet.web.annotation.FillResponse)";
     private static final String NON_PROCESSABLE_RESPONSE = "Received endpoint response is non-changeable - expected 'ResponseEntity<T extends BaseBodyDataModel>' type.";
 
-    private List<ResponseFiller> responseFillers;
+    private final List<ResponseFiller> responseFillers;
 
     @Autowired
     public ResponseFillerAspect(List<ResponseFiller> responseFillers) {

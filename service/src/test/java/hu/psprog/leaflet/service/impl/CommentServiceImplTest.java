@@ -10,10 +10,9 @@ import hu.psprog.leaflet.service.converter.CommentToCommentVOConverter;
 import hu.psprog.leaflet.service.converter.CommentVOToCommentConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.mail.domain.CommentNotification;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -33,6 +32,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -53,9 +53,10 @@ import static org.mockito.Mockito.verifyNoInteractions;
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceImplTest {
 
-    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.getBuilder()
+    private static final EntityPageVO<CommentVO> EMPTY_ENTITY_PAGE_VO = EntityPageVO.<CommentVO>getBuilder()
             .withEntitiesOnPage(Collections.emptyList())
             .build();
+    private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(5L);
 
     @Mock(lenient = true)
     private CommentDAO commentDAO;
@@ -98,7 +99,7 @@ public class CommentServiceImplTest {
 
         // given
         Long id = 1L;
-        given(commentDAO.findOne(id)).willReturn(comment);
+        given(commentDAO.findById(id)).willReturn(Optional.of(comment));
         given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
 
         // when
@@ -106,7 +107,7 @@ public class CommentServiceImplTest {
 
         // then
         assertThat(result, equalTo(commentVO));
-        verify(commentDAO).findOne(id);
+        verify(commentDAO).findById(id);
         verify(commentToCommentVOConverter).convert(comment);
     }
 
@@ -115,14 +116,14 @@ public class CommentServiceImplTest {
 
         // given
         Long id = 1L;
-        given(commentDAO.findOne(id)).willReturn(null);
+        given(commentDAO.findById(id)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> commentService.getOne(id));
 
         // then
         // expected exception
-        verify(commentDAO).findOne(id);
+        verify(commentDAO).findById(id);
         verify(commentToCommentVOConverter, never()).convert(comment);
     }
 
@@ -167,7 +168,7 @@ public class CommentServiceImplTest {
         given(commentDAO.findByEntry(any(Pageable.class), any(Entry.class))).willReturn(commentPage);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, new EntryVO());
+        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, ENTRY_VO);
 
         // then
         assertThat(result, notNullValue());
@@ -182,7 +183,7 @@ public class CommentServiceImplTest {
         given(commentDAO.findByEntry(any(Specification.class), any(Pageable.class), any(Entry.class))).willReturn(commentPage);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, new EntryVO());
+        EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, ENTRY_VO);
 
         // then
         assertThat(result, notNullValue());
@@ -205,7 +206,7 @@ public class CommentServiceImplTest {
 
         // given
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        UserVO userVO = new UserVO();
+        UserVO userVO = UserVO.wrapMinimumVO(6L);
         given(userVOToUserConverter.convert(userVO)).willReturn(new User());
         given(commentDAO.findByUser(any(Pageable.class), any(User.class))).willReturn(commentPage);
         given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
@@ -215,20 +216,6 @@ public class CommentServiceImplTest {
 
         // then
         assertThat(result, notNullValue());
-    }
-
-    @Test
-    public void testCount() {
-
-        // given
-        Long count = 5L;
-        given(commentDAO.count()).willReturn(count);
-
-        // when
-        Long result = commentService.count();
-
-        // then
-        assertThat(result, equalTo(count));
     }
 
     @Test
@@ -250,7 +237,7 @@ public class CommentServiceImplTest {
                         .build())
                 .build();
         Long commentID = 1L;
-        given(commentDAO.findOne(commentID)).willReturn(comment);
+        given(commentDAO.findById(commentID)).willReturn(Optional.of(comment));
 
         // when
         commentService.notifyEntryAuthor(commentID);
@@ -285,29 +272,12 @@ public class CommentServiceImplTest {
     }
 
     @Test
-    public void testCreateOneWithFailure() {
-
-        // given
-        given(commentVOToCommentConverter.convert(commentVO)).willReturn(comment);
-        given(commentDAO.save(comment)).willReturn(null);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> commentService.createOne(commentVO));
-
-        // then
-        // expected exception
-        verify(commentVOToCommentConverter).convert(commentVO);
-        verify(commentDAO).save(comment);
-        verify(comment, never()).getId();
-    }
-
-    @Test
     public void testUpdateOneWithSuccess() throws ServiceException {
 
         // given
         Long id = 1L;
         given(commentVOToCommentConverter.convert(commentVO)).willReturn(comment);
-        given(commentDAO.updateOne(id, comment)).willReturn(comment);
+        given(commentDAO.updateOne(id, comment)).willReturn(Optional.of(comment));
         given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
 
         // when
@@ -326,7 +296,7 @@ public class CommentServiceImplTest {
         // given
         Long id = 1L;
         given(commentVOToCommentConverter.convert(commentVO)).willReturn(comment);
-        given(commentDAO.updateOne(id, comment)).willReturn(null);
+        given(commentDAO.updateOne(id, comment)).willReturn(Optional.empty());
 
         // when
         Assertions.assertThrows(EntityNotFoundException.class, () -> commentService.updateOne(id, commentVO));

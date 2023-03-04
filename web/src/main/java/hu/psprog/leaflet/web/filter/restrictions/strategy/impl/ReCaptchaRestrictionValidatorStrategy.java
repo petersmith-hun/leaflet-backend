@@ -6,6 +6,9 @@ import hu.psprog.leaflet.web.filter.restrictions.domain.RestrictionType;
 import hu.psprog.leaflet.web.filter.restrictions.exception.ClientSecurityViolationException;
 import hu.psprog.leaflet.web.filter.restrictions.strategy.RestrictionValidatorStrategy;
 import hu.psprog.leaflet.web.filter.restrictions.strategy.impl.recaptcha.service.ReCaptchaValidationService;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,8 @@ import static hu.psprog.leaflet.web.filter.ClientAcceptorFilter.HEADER_CLIENT_ID
  */
 @Component
 @ConfigurationProperties(prefix = "leaflet-link.captcha")
+@Getter
+@Setter(AccessLevel.PACKAGE)
 public class ReCaptchaRestrictionValidatorStrategy implements RestrictionValidatorStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReCaptchaRestrictionValidatorStrategy.class);
@@ -45,7 +50,7 @@ public class ReCaptchaRestrictionValidatorStrategy implements RestrictionValidat
     private static final int STRIP_AT_LENGTH = 30;
     private static final String STRIPPED_PART_INDICATOR = "...";
 
-    private ReCaptchaValidationService reCaptchaValidationService;
+    private final ReCaptchaValidationService reCaptchaValidationService;
     private String secret;
     private List<RestrictionRoute> routes;
 
@@ -64,49 +69,26 @@ public class ReCaptchaRestrictionValidatorStrategy implements RestrictionValidat
     @Override
     public void validate(HttpServletRequest request) throws ClientSecurityViolationException {
 
-        if (isCaptchaValidationRequired(request)) {
+        if (!isCaptchaValidationRequired(request)) {
+            return;
+        }
 
-            String reCaptchaResponse = request.getHeader(CAPTCHA_RESPONSE_HEADER);
-            if (!StringUtils.isEmpty(reCaptchaResponse)) {
+        String reCaptchaResponse = request.getHeader(CAPTCHA_RESPONSE_HEADER);
+        if (StringUtils.isEmpty(reCaptchaResponse)) {
+            throwClientSecurityViolation(request, "Missing mandatory ReCaptcha response in request from client [{}]");
+        }
 
-                LOGGER.info("Performing ReCaptcha validation for token [{}] (request origin is [{}])", stripResponseToken(reCaptchaResponse), request.getRemoteAddr());
-                ReCaptchaRequest reCaptchaRequest = ReCaptchaRequest.getBuilder()
-                        .withResponse(reCaptchaResponse)
-                        .withSecret(secret)
-                        .withRemoteIp(request.getRemoteAddr())
-                        .build();
+        LOGGER.info("Performing ReCaptcha validation for token [{}] (request origin is [{}])", stripResponseToken(reCaptchaResponse), request.getRemoteAddr());
+        ReCaptchaRequest reCaptchaRequest = createReCaptchaRequest(request, reCaptchaResponse);
 
-                if (!reCaptchaValidationService.isValid(reCaptchaRequest)) {
-                    LOGGER.error("ReCaptcha validation failed for request from client [{}]", request.getHeader(HEADER_CLIENT_ID));
-                    throw new ClientSecurityViolationException();
-                }
-
-            } else {
-                LOGGER.error("Missing mandatory ReCaptcha response in request from client [{}]", request.getHeader(HEADER_CLIENT_ID));
-                throw new ClientSecurityViolationException();
-            }
+        if (!reCaptchaValidationService.isValid(reCaptchaRequest)) {
+            throwClientSecurityViolation(request, "ReCaptcha validation failed for request from client [{}]");
         }
     }
 
     @Override
     public RestrictionType forRestrictionType() {
         return RestrictionType.CAPTCHA_TOKEN;
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public List<RestrictionRoute> getRoutes() {
-        return routes;
-    }
-
-    public void setRoutes(List<RestrictionRoute> routes) {
-        this.routes = routes;
     }
 
     public static String stripResponseToken(String response) {
@@ -124,5 +106,20 @@ public class ReCaptchaRestrictionValidatorStrategy implements RestrictionValidat
 
     private boolean isMethodMatching(RestrictionRoute restrictionRoute, HttpServletRequest request) {
         return request.getMethod().equals(restrictionRoute.getMethod().name());
+    }
+
+    private ReCaptchaRequest createReCaptchaRequest(HttpServletRequest request, String reCaptchaResponse) {
+
+        return ReCaptchaRequest.getBuilder()
+                .withResponse(reCaptchaResponse)
+                .withSecret(secret)
+                .withRemoteIp(request.getRemoteAddr())
+                .build();
+    }
+
+    private void throwClientSecurityViolation(HttpServletRequest request, String messageTemplate) {
+
+        LOGGER.error(messageTemplate, request.getHeader(HEADER_CLIENT_ID));
+        throw new ClientSecurityViolationException();
     }
 }

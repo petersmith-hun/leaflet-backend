@@ -74,13 +74,6 @@ public interface CommentFacade {
     List<CommentVO> getAll();
 
     /**
-     * Returns number of comments.
-     *
-     * @return number of comments
-     */
-    Long count();
-
-    /**
      * Updates comment specified by given ID. Returns updated comment.
      *
      * @param id ID of comment

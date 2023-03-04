@@ -10,9 +10,11 @@ import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -44,10 +46,12 @@ public class FrontEndRoutingSupportController extends BaseController {
     private static final String ROUTE_COULD_NOT_BE_CREATED_PLEASE_TRY_AGAIN_LATER = "Route could not be created, please try again later.";
     private static final String A_ROUTE_WITH_THE_SPECIFIED_ID_ALREADY_EXISTS = "A route with the specified ID already exists";
 
-    private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
+    private final FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
 
     @Autowired
-    public FrontEndRoutingSupportController(FrontEndRoutingSupportFacade frontEndRoutingSupportFacade) {
+    public FrontEndRoutingSupportController(ConversionService conversionService, ExceptionHandlerCounters exceptionHandlerCounters,
+                                            FrontEndRoutingSupportFacade frontEndRoutingSupportFacade) {
+        super(conversionService, exceptionHandlerCounters);
         this.frontEndRoutingSupportFacade = frontEndRoutingSupportFacade;
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class TagVOToTagDataModelListConverter implements Converter<List<TagVO>, TagListDataModel> {
 
-    private TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter;
+    private final TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter;
 
     @Autowired
     public TagVOToTagDataModelListConverter(TagVOToTagDataModelEntityConverter tagVOToTagDataModelEntityConverter) {
@@ -25,10 +25,12 @@ public class TagVOToTagDataModelListConverter implements Converter<List<TagVO>, 
 
     @Override
     public TagListDataModel convert(List<TagVO> source) {
+
         TagListDataModel.TagListDataModelBuilder builder = TagListDataModel.getBuilder();
         source.stream()
                 .map(tagVOToTagDataModelEntityConverter::convert)
                 .forEach(builder::withItem);
+
         return builder.build();
     }
 }
