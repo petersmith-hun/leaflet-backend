@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
+import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
@@ -9,6 +10,7 @@ import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -350,6 +352,32 @@ public class EntriesController extends BaseController {
             return ResponseEntity
                     .created(buildLocation(id))
                     .body(conversionService.convert(updatedEntryVO, EditEntryDataModel.class));
+        } catch (ServiceException e) {
+            LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
+            throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);
+        }
+    }
+
+    /**
+     * PUT /entries/{id}/publication/{status}
+     * Changes publication status of an existing entry.
+     *
+     * @param id ID of an existing entry
+     * @param status new publication status to transition entry to
+     * @return updated entry data
+     */
+    @RequestMapping(method = RequestMethod.PUT, value = PATH_CHANGE_PUBLICATION_STATUS)
+    public ResponseEntity<EditEntryDataModel> changePublicationStatus(@PathVariable(PATH_VARIABLE_ID) Long id, @PathVariable("status") EntryInitialStatus status)
+            throws ResourceNotFoundException, RequestCouldNotBeFulfilledException {
+
+        try {
+            EntryVO updatedEntryVO = entryFacade.changePublicationStatus(id, status.name());
+
+            return ResponseEntity
+                    .created(buildLocation(id))
+                    .body(conversionService.convert(updatedEntryVO, EditEntryDataModel.class));
+        } catch (InvalidTransitionException e) {
+            throw new RequestCouldNotBeFulfilledException(e.getMessage());
         } catch (ServiceException e) {
             LOGGER.error(REQUESTED_ENTRY_NOT_FOUND, e);
             throw new ResourceNotFoundException(THE_ENTRY_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING);

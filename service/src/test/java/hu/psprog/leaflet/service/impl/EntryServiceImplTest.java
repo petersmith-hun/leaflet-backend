@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
@@ -11,6 +12,7 @@ import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.util.PublishHandler;
 import hu.psprog.leaflet.service.vo.CategoryVO;
@@ -20,6 +22,9 @@ import hu.psprog.leaflet.service.vo.TagVO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,6 +40,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -59,6 +65,7 @@ public class EntryServiceImplTest {
     private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(1L);
     private static final CategoryVO CATEGORY_VO = CategoryVO.wrapMinimumVO(2L);
     private static final TagVO TAG_VO = TagVO.wrapMinimumVO(3L);
+
     @Mock(lenient = true)
     private EntryDAO entryDAO;
 
@@ -460,6 +467,84 @@ public class EntryServiceImplTest {
         Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.disable(id));
 
         // then
-        // exception expected;
+        // exception expected
+    }
+
+    @ParameterizedTest
+    @MethodSource("publicationStatusChangeDataProvider")
+    public void shouldChangePublicationStatusOfExistingEntry(EntryStatus currentStatus, EntryStatus newStatus) throws ServiceException {
+
+        // given
+        Long entryID = 1L;
+
+        given(entryDAO.findById(entryID)).willReturn(Optional.of(entry));
+        given(entry.getStatus()).willReturn(currentStatus);
+        given(entryToEntryVOConverter.convert(entry)).willReturn(entryVO);
+
+        // when
+        EntryVO result = entryService.changePublicationStatus(entryID, newStatus.name());
+
+        // then
+        assertThat(result, equalTo(entryVO));
+
+        verify(entry).setStatus(newStatus);
+        verify(publishHandler).updatePublishDate(entryID, entry);
+        verify(entryDAO).updateOne(entryID, entry);
+    }
+
+    @ParameterizedTest
+    @MethodSource("publicationStatusChangeInvalidDataProvider")
+    public void shouldChangePublicationStatusThrowExceptionOnInvalidTransition(EntryStatus currentStatus, EntryStatus newStatus) {
+
+        // given
+        Long entryID = 1L;
+
+        given(entryDAO.findById(entryID)).willReturn(Optional.of(entry));
+        given(entry.getStatus()).willReturn(currentStatus);
+        given(entry.getId()).willReturn(entryID);
+
+        // when
+        Assertions.assertThrows(InvalidTransitionException.class, () -> entryService.changePublicationStatus(entryID, newStatus.name()));
+
+        // then
+        // exception expected
+        verify(entry, never()).setStatus(newStatus);
+        verify(entryDAO, never()).updateOne(entryID, entry);
+    }
+
+    @Test
+    public void shouldChangePublicationStatusThrowExceptionOnMissingEntry() {
+
+        // given
+        Long entryID = 1L;
+
+        given(entryDAO.findById(entryID)).willReturn(Optional.empty());
+
+        // when
+        Assertions.assertThrows(EntityNotFoundException.class, () -> entryService.changePublicationStatus(entryID, EntryStatus.PUBLIC.name()));
+
+        // then
+        // exception expected
+    }
+
+    private static Stream<Arguments> publicationStatusChangeDataProvider() {
+
+        return Stream.of(
+                Arguments.of(EntryStatus.DRAFT, EntryStatus.REVIEW),
+                Arguments.of(EntryStatus.REVIEW, EntryStatus.PUBLIC),
+                Arguments.of(EntryStatus.PUBLIC, EntryStatus.DRAFT)
+        );
+    }
+
+    private static Stream<Arguments> publicationStatusChangeInvalidDataProvider() {
+
+        return Stream.of(
+                Arguments.of(EntryStatus.DRAFT, EntryStatus.PUBLIC),
+                Arguments.of(EntryStatus.DRAFT, EntryStatus.DRAFT),
+                Arguments.of(EntryStatus.REVIEW, EntryStatus.DRAFT),
+                Arguments.of(EntryStatus.REVIEW, EntryStatus.REVIEW),
+                Arguments.of(EntryStatus.PUBLIC, EntryStatus.REVIEW),
+                Arguments.of(EntryStatus.PUBLIC, EntryStatus.PUBLIC)
+        );
     }
 }
