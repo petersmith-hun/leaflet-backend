@@ -3,6 +3,7 @@ package hu.psprog.leaflet.acceptance.suites;
 import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
+import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.MenuDataModel;
 import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
@@ -13,6 +14,7 @@ import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.bridge.client.domain.OrderBy;
 import hu.psprog.leaflet.bridge.client.domain.OrderDirection;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
+import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.EntryBridgeService;
 import org.junit.jupiter.api.Assertions;
@@ -222,6 +224,29 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                 .noneMatch(entryDataModel -> CONTROL_ENTRY_LINK.equals(entryDataModel.getLink())), is(true));
     }
 
+    @ParameterizedTest
+    @MethodSource("publicationStatusChangeDataProvider")
+    @ResetDatabase
+    public void shouldChangePublicationStatus(Long entryID, EntryInitialStatus newStatus) throws CommunicationFailureException {
+
+        // when
+        entryBridgeService.changePublicationStatus(entryID, newStatus);
+
+        // then
+        assertThat(entryBridgeService.getEntryByID(entryID).getBody().getEntryStatus(), is(newStatus.name()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("publicationStatusChangeInvalidDataProvider")
+    public void shouldChangePublicationStatusInvalidScenarios(Long entryID, EntryInitialStatus newStatus) {
+
+        // when
+        Assertions.assertThrows(ConflictingRequestException.class, () -> entryBridgeService.changePublicationStatus(entryID, newStatus));
+
+        // then
+        // exception expected
+    }
+
     @Test
     @ResetDatabase
     public void shouldDeleteEntry() throws CommunicationFailureException {
@@ -347,6 +372,27 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                 Arguments.of("Prologue #25",    1, 5, CREATED, ASC, 1,  1, 1, false, false),
                 Arguments.of("Entry #21 title", 1, 5, CREATED, ASC, 1,  1, 1, false, false),
                 Arguments.of("content entry",   3, 5, CREATED, ASC, 19, 5, 4, true,  true)
+        );
+    }
+
+    private static Stream<Arguments> publicationStatusChangeDataProvider() {
+
+        return Stream.of(
+                Arguments.of(1L, EntryInitialStatus.DRAFT),
+                Arguments.of(2L, EntryInitialStatus.REVIEW),
+                Arguments.of(4L, EntryInitialStatus.PUBLIC)
+        );
+    }
+
+    private static Stream<Arguments> publicationStatusChangeInvalidDataProvider() {
+
+        return Stream.of(
+                Arguments.of(1L, EntryInitialStatus.REVIEW),
+                Arguments.of(1L, EntryInitialStatus.PUBLIC),
+                Arguments.of(2L, EntryInitialStatus.PUBLIC),
+                Arguments.of(2L, EntryInitialStatus.DRAFT),
+                Arguments.of(4L, EntryInitialStatus.DRAFT),
+                Arguments.of(4L, EntryInitialStatus.REVIEW)
         );
     }
 }

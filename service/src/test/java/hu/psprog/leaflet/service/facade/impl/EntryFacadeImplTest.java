@@ -1,5 +1,6 @@
 package hu.psprog.leaflet.service.facade.impl;
 
+import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
@@ -147,6 +148,19 @@ public class EntryFacadeImplTest {
 
         // then
         verify(entryService).disable(ENTRY_ID);
+    }
+
+    @Test
+    public void shouldChangePublicationStatusDelegateCallToService() throws ServiceException {
+
+        // given
+        String newStatus = EntryStatus.PUBLIC.name();
+
+        // when
+        entryFacade.changePublicationStatus(ENTRY_ID, newStatus);
+
+        // then
+        verify(entryService).changePublicationStatus(ENTRY_ID, newStatus);
     }
 
     @Test

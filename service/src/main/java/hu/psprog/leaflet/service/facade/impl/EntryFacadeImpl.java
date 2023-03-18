@@ -108,6 +108,11 @@ public class EntryFacadeImpl implements EntryFacade {
         return entryService.getOne(id);
     }
 
+    @Override
+    public EntryVO changePublicationStatus(Long id, String newStatus) throws ServiceException {
+        return entryService.changePublicationStatus(id, newStatus);
+    }
+
     private EntryVO.OrderBy parseOrderBy(String by) {
 
         EntryVO.OrderBy orderBy = EntryVO.OrderBy.CREATED;

@@ -8,6 +8,7 @@ import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
 import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -90,4 +91,16 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @return list of public entries
      */
     List<EntryVO> getListOfPublicEntries();
+
+    /**
+     * Changes entry publication status.
+     * Publication status is changed in a cycle, in a strict order: entries in draft status can be transitioned to
+     * review, then to public status. Public entries can also be transitioned back to draft.
+     *
+     * @param id ID of entry to change publication status of
+     * @param newStatus new publication status to transition entry into
+     * @return updated entry data
+     * @throws ServiceException if entry cannot be found or status change cannot be performed
+     */
+    EntryVO changePublicationStatus(Long id, String newStatus) throws ServiceException;
 }

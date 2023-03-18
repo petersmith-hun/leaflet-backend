@@ -1,11 +1,13 @@
 package hu.psprog.leaflet.web.rest.controller;
 
+import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
@@ -42,6 +44,7 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     private static final long TAG_ID = 6L;
     private static final String ENTRY_LINK = "entry-link";
     private static final long ENTRY_ID = 1L;
+    private static final EntryInitialStatus PUBLICATION_STATUS = EntryInitialStatus.PUBLIC;
     private static final String LOCATION_HEADER = "/entries/" + ENTRY_ID;
     private static final String CONTENT = "content";
 
@@ -330,6 +333,46 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
 
         // when
         Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changeStatus(ENTRY_ID));
+
+        // then
+        // exception expected
+    }
+
+    @Test
+    public void shouldChangePublicationStatus() throws ServiceException, RequestCouldNotBeFulfilledException, ResourceNotFoundException {
+
+        // given
+        given(entryFacade.changePublicationStatus(ENTRY_ID, PUBLICATION_STATUS.name())).willReturn(ENTRY_VO);
+        given(conversionService.convert(ENTRY_VO, EditEntryDataModel.class)).willReturn(EDIT_ENTRY_DATA_MODEL);
+
+        // when
+        ResponseEntity<EditEntryDataModel> result = controller.changePublicationStatus(ENTRY_ID, PUBLICATION_STATUS);
+
+        // then
+        assertResponse(result, HttpStatus.CREATED, EDIT_ENTRY_DATA_MODEL, LOCATION_HEADER);
+    }
+
+    @Test
+    public void shouldChangePublicationStatusHandleInvalidTransitionException() throws ServiceException {
+
+        // given
+        doThrow(InvalidTransitionException.class).when(entryFacade).changePublicationStatus(ENTRY_ID, PUBLICATION_STATUS.name());
+
+        // when
+        Assertions.assertThrows(RequestCouldNotBeFulfilledException.class, () -> controller.changePublicationStatus(ENTRY_ID, PUBLICATION_STATUS));
+
+        // then
+        // exception expected
+    }
+
+    @Test
+    public void shouldChangePublicationStatusHandleServiceException() throws ServiceException {
+
+        // given
+        doThrow(ServiceException.class).when(entryFacade).changePublicationStatus(ENTRY_ID, PUBLICATION_STATUS.name());
+
+        // when
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> controller.changePublicationStatus(ENTRY_ID, PUBLICATION_STATUS));
 
         // then
         // exception expected

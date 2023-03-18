@@ -3,6 +3,7 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
 import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.repository.specification.EntrySpecification;
 import hu.psprog.leaflet.service.EntryService;
@@ -13,6 +14,7 @@ import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
+import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.util.PageableUtil;
@@ -31,6 +33,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,6 +52,11 @@ public class EntryServiceImpl implements EntryService {
     private static final Specification<Entry> PUBLIC_ENTRIES_SPECIFICATION = Specification
             .where(EntrySpecification.IS_PUBLIC)
             .and(EntrySpecification.IS_ENABLED);
+    private static final Map<EntryStatus, EntryStatus> VALID_TRANSITIONS = Map.of(
+            EntryStatus.DRAFT, EntryStatus.REVIEW,
+            EntryStatus.REVIEW, EntryStatus.PUBLIC,
+            EntryStatus.PUBLIC, EntryStatus.DRAFT
+    );
 
     private final EntryDAO entryDAO;
     private final EntryToEntryVOConverter entryToEntryVOConverter;
@@ -183,6 +191,25 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitScope.Write.Entries
+    public EntryVO changePublicationStatus(Long id, String newStatus) throws ServiceException {
+
+        Entry entry = entryDAO.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Entry.class, id));
+
+        EntryStatus newPublicationStatus = EntryStatus.valueOf(newStatus);
+        assertValidTransition(entry, newPublicationStatus);
+        entry.setStatus(newPublicationStatus);
+
+        publishHandler.updatePublishDate(id, entry);
+        entryDAO.updateOne(id, entry);
+
+        LOGGER.info("Publication status of entry by ID [{}] has been updated to [{}]", id, newStatus);
+
+        return entryToEntryVOConverter.convert(entry);
+    }
+
+    @Override
     @PermitScope.Write.OwnEntryOrElevated
     public void enable(Long id) throws EntityNotFoundException {
 
@@ -234,5 +261,19 @@ public class EntryServiceImpl implements EntryService {
             LOGGER.info("Existing entry [{}] with ID [{}] has been updated", entry.getTitle(), entry.getId());
             return entry;
         };
+    }
+
+    private void assertValidTransition(Entry entry, EntryStatus newStatus) throws InvalidTransitionException {
+
+        boolean validTransition = VALID_TRANSITIONS.entrySet()
+                .stream()
+                .anyMatch(transition -> transition.getKey() == entry.getStatus() && transition.getValue() == newStatus);
+
+        if (!validTransition) {
+            var invalidTransitionException = new InvalidTransitionException(entry.getId(), entry.getStatus(), newStatus);
+            LOGGER.error(invalidTransitionException.getMessage());
+
+            throw invalidTransitionException;
+        }
     }
 }
