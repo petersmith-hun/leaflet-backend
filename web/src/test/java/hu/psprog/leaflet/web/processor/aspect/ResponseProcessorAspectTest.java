@@ -11,8 +11,10 @@ import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.EntryServiceImpl;
+import hu.psprog.leaflet.service.impl.search.SearchHandler;
 import hu.psprog.leaflet.service.util.PublishHandler;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.processor.impl.CustomSEODataProviderResponseProcessor;
 import hu.psprog.leaflet.web.processor.impl.EntityPageResponseProcessor;
@@ -70,6 +72,9 @@ public class ResponseProcessorAspectTest {
 
     @Mock
     private PublishHandler publishHandler;
+
+    @Mock
+    private SearchHandler<EntrySearchParametersVO, Entry> searchHandler;
 
     @InjectMocks
     private ResponseProcessorAspect responseProcessorAspect;
@@ -139,6 +144,6 @@ public class ResponseProcessorAspectTest {
     }
 
     private EntryService prepareEntryServiceMock() {
-        return new EntryServiceImpl(entryDAO, entryToEntryVOConverter, entryVOToEntryConverter, categoryVOToCategoryConverter, tagVOToTagConverter, publishHandler);
+        return new EntryServiceImpl(entryDAO, entryToEntryVOConverter, entryVOToEntryConverter, categoryVOToCategoryConverter, tagVOToTagConverter, publishHandler, searchHandler);
     }
 }

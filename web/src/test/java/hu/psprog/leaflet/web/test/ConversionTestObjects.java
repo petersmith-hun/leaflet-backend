@@ -9,6 +9,7 @@ import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
+import hu.psprog.leaflet.api.rest.request.entry.EntrySearchParameters;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.routing.FrontEndRouteUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagAssignmentRequestModel;
@@ -30,6 +31,7 @@ import hu.psprog.leaflet.api.rest.response.document.EditDocumentDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.EntrySearchResultDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.file.FileDataModel;
 import hu.psprog.leaflet.api.rest.response.routing.ExtendedFrontEndRouteDataModel;
@@ -50,6 +52,7 @@ import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import hu.psprog.leaflet.service.vo.DocumentVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.service.vo.TagAssignmentVO;
@@ -580,6 +583,10 @@ public abstract class ConversionTestObjects {
             .withEmail(EMAIL)
             .withMessage(MESSAGE)
             .build();
+
+    protected static final EntrySearchParameters ENTRY_SEARCH_PARAMETERS = new EntrySearchParameters();
+    protected static final EntrySearchParametersVO ENTRY_SEARCH_PARAMETERS_VO = EntrySearchParametersVO.builder().build();
+    protected static final EntrySearchResultDataModel ENTRY_SEARCH_RESULT_DATA_MODEL = EntrySearchResultDataModel.getBuilder().build();
 
     private static ObjectError prepareObjectError(boolean withFieldError) {
 

@@ -11,6 +11,7 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 
@@ -84,6 +85,14 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
      * @return page of public entries by given content
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy);
+
+    /**
+     * Returns a paginated list of edit-level entry data for the given search request.
+     *
+     * @param entrySearchParametersVO {@link EntrySearchParametersVO} object containing search request parameters
+     * @return page of entries filtered and paginated by the given search parameters
+     */
+    EntityPageVO<EntryVO> searchEntries(EntrySearchParametersVO entrySearchParametersVO);
 
     /**
      * Returns an un-paged list of public entries.

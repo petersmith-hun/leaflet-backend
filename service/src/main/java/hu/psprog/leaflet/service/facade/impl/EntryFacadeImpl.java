@@ -7,6 +7,7 @@ import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import org.slf4j.Logger;
@@ -66,6 +67,11 @@ public class EntryFacadeImpl implements EntryFacade {
     @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, String direction, String orderBy) {
         return entryService.getPageOfPublicEntriesByContent(content, page, limit, parseDirection(direction), parseOrderBy(orderBy));
+    }
+
+    @Override
+    public EntityPageVO<EntryVO> searchEntries(EntrySearchParametersVO entrySearchParametersVO) {
+        return entryService.searchEntries(entrySearchParametersVO);
     }
 
     @Override

@@ -4,6 +4,7 @@ import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 
 import java.util.List;
@@ -89,6 +90,14 @@ public interface EntryFacade {
      * @return page of public entries by given content expression
      */
     EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, String direction, String orderBy);
+
+    /**
+     * Returns a paginated list of edit-level entry data for the given search request.
+     *
+     * @param entrySearchParametersVO {@link EntrySearchParametersVO} object containing search request parameters
+     * @return page of entries filtered and paginated by the given search parameters
+     */
+    EntityPageVO<EntryVO> searchEntries(EntrySearchParametersVO entrySearchParametersVO);
 
     /**
      * Passes entry for persistence layer and returns ID of newly created entry.

@@ -16,11 +16,13 @@ import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.impl.search.SearchHandler;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.util.PageableUtil;
 import hu.psprog.leaflet.service.util.PublishHandler;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import org.slf4j.Logger;
@@ -64,16 +66,19 @@ public class EntryServiceImpl implements EntryService {
     private final CategoryVOToCategoryConverter categoryVOToCategoryConverter;
     private final TagVOToTagConverter tagVOToTagConverter;
     private final PublishHandler publishHandler;
+    private final SearchHandler<EntrySearchParametersVO, Entry> searchHandler;
 
     @Autowired
     public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter, EntryVOToEntryConverter entryVOToEntryConverter,
-                            CategoryVOToCategoryConverter categoryVOToCategoryConverter, TagVOToTagConverter tagVOToTagConverter, PublishHandler publishHandler) {
+                            CategoryVOToCategoryConverter categoryVOToCategoryConverter, TagVOToTagConverter tagVOToTagConverter, PublishHandler publishHandler,
+                            SearchHandler<EntrySearchParametersVO, Entry> searchHandler) {
         this.entryDAO = entryDAO;
         this.entryToEntryVOConverter = entryToEntryVOConverter;
         this.entryVOToEntryConverter = entryVOToEntryConverter;
         this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
         this.tagVOToTagConverter = tagVOToTagConverter;
         this.publishHandler = publishHandler;
+        this.searchHandler = searchHandler;
     }
 
     @Override
@@ -183,6 +188,22 @@ public class EntryServiceImpl implements EntryService {
     }
 
     @Override
+    @PermitScope.Read.Entries
+    public EntityPageVO<EntryVO> searchEntries(EntrySearchParametersVO entrySearchParametersVO) {
+
+        Specification<Entry> searchSpecification = searchHandler.createSpecification(entrySearchParametersVO);
+
+        return getPageWithWhereSpecification(
+                entrySearchParametersVO.getPage(),
+                entrySearchParametersVO.getLimit(),
+                entrySearchParametersVO.getOrderDirection(),
+                entrySearchParametersVO.getOrderBy(),
+                searchSpecification,
+                false
+                );
+    }
+
+    @Override
     public List<EntryVO> getListOfPublicEntries() {
 
         return entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, Pageable.unpaged()).getContent().stream()
@@ -244,12 +265,19 @@ public class EntryServiceImpl implements EntryService {
     }
 
     private EntityPageVO<EntryVO> getPageWithWhereSpecification(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy, Specification<Entry> whereSpecification) {
+        return getPageWithWhereSpecification(page, limit, direction, orderBy, whereSpecification, true);
+    }
+
+    private EntityPageVO<EntryVO> getPageWithWhereSpecification(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy,
+                                                                Specification<Entry> whereSpecification, boolean publicOnly) {
 
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Specification<Entry> specs = Specification
-                .where(whereSpecification)
-                .and(EntrySpecification.IS_PUBLIC)
-                .and(EntrySpecification.IS_ENABLED);
+        Specification<Entry> specs = Specification.where(whereSpecification);
+        if (publicOnly) {
+            specs = specs
+                    .and(EntrySpecification.IS_PUBLIC)
+                    .and(EntrySpecification.IS_ENABLED);
+        }
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
