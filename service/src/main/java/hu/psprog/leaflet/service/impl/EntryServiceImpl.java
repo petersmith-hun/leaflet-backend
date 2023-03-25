@@ -1,17 +1,12 @@
 package hu.psprog.leaflet.service.impl;
 
 import hu.psprog.leaflet.persistence.dao.EntryDAO;
-import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
-import hu.psprog.leaflet.persistence.entity.Tag;
-import hu.psprog.leaflet.persistence.repository.specification.EntrySpecification;
 import hu.psprog.leaflet.service.EntryService;
 import hu.psprog.leaflet.service.common.OrderDirection;
-import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
-import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.InvalidTransitionException;
@@ -36,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,9 +47,6 @@ public class EntryServiceImpl implements EntryService {
 
     private static final String AN_ENTRY_WITH_THE_SPECIFIED_LINK_ALREADY_EXISTS = "An entry with the specified link already exists.";
     private static final String ENTITY_COULD_NOT_BE_PERSISTED = "Entity could not be persisted.";
-    private static final Specification<Entry> PUBLIC_ENTRIES_SPECIFICATION = Specification
-            .where(EntrySpecification.IS_PUBLIC)
-            .and(EntrySpecification.IS_ENABLED);
     private static final Map<EntryStatus, EntryStatus> VALID_TRANSITIONS = Map.of(
             EntryStatus.DRAFT, EntryStatus.REVIEW,
             EntryStatus.REVIEW, EntryStatus.PUBLIC,
@@ -63,20 +56,16 @@ public class EntryServiceImpl implements EntryService {
     private final EntryDAO entryDAO;
     private final EntryToEntryVOConverter entryToEntryVOConverter;
     private final EntryVOToEntryConverter entryVOToEntryConverter;
-    private final CategoryVOToCategoryConverter categoryVOToCategoryConverter;
-    private final TagVOToTagConverter tagVOToTagConverter;
     private final PublishHandler publishHandler;
     private final SearchHandler<EntrySearchParametersVO, Entry> searchHandler;
 
     @Autowired
-    public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter, EntryVOToEntryConverter entryVOToEntryConverter,
-                            CategoryVOToCategoryConverter categoryVOToCategoryConverter, TagVOToTagConverter tagVOToTagConverter, PublishHandler publishHandler,
+    public EntryServiceImpl(EntryDAO entryDAO, EntryToEntryVOConverter entryToEntryVOConverter,
+                            EntryVOToEntryConverter entryVOToEntryConverter, PublishHandler publishHandler,
                             SearchHandler<EntrySearchParametersVO, Entry> searchHandler) {
         this.entryDAO = entryDAO;
         this.entryToEntryVOConverter = entryToEntryVOConverter;
         this.entryVOToEntryConverter = entryVOToEntryConverter;
-        this.categoryVOToCategoryConverter = categoryVOToCategoryConverter;
-        this.tagVOToTagConverter = tagVOToTagConverter;
         this.publishHandler = publishHandler;
         this.searchHandler = searchHandler;
     }
@@ -164,49 +153,56 @@ public class EntryServiceImpl implements EntryService {
     @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
 
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Page<Entry> entityPage = entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, pageable);
+        var entrySearchParametersVO = publicOnlySearchBuilder(page, limit, direction, orderBy)
+                .build();
 
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+        return getPageWithWhereSpecification(entrySearchParametersVO);
     }
 
     @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderCategory(CategoryVO categoryVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
-        Category category = categoryVOToCategoryConverter.convert(categoryVO);
-        return getPageWithWhereSpecification(page, limit, direction, orderBy, EntrySpecification.isUnderCategory(category));
+
+        var entrySearchParametersVO = publicOnlySearchBuilder(page, limit, direction, orderBy)
+                .categoryID(Optional.ofNullable(categoryVO.getId()))
+                .build();
+
+        return getPageWithWhereSpecification(entrySearchParametersVO);
     }
 
     @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntriesUnderTag(TagVO tagVO, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
-        Tag tag = tagVOToTagConverter.convert(tagVO);
-        return getPageWithWhereSpecification(page, limit, direction, orderBy, EntrySpecification.isUnderTag(tag));
+
+        var entrySearchParametersVO = publicOnlySearchBuilder(page, limit, direction, orderBy)
+                .tagID(Optional.ofNullable(tagVO.getId()))
+                .build();
+
+        return getPageWithWhereSpecification(entrySearchParametersVO);
     }
 
     @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntriesByContent(String content, int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
-        return getPageWithWhereSpecification(page, limit, direction, orderBy, EntrySpecification.containsExpression(content));
+
+        var entrySearchParametersVO = publicOnlySearchBuilder(page, limit, direction, orderBy)
+                .content(Optional.ofNullable(content))
+                .build();
+
+        return getPageWithWhereSpecification(entrySearchParametersVO);
     }
 
     @Override
     @PermitScope.Read.Entries
     public EntityPageVO<EntryVO> searchEntries(EntrySearchParametersVO entrySearchParametersVO) {
-
-        Specification<Entry> searchSpecification = searchHandler.createSpecification(entrySearchParametersVO);
-
-        return getPageWithWhereSpecification(
-                entrySearchParametersVO.getPage(),
-                entrySearchParametersVO.getLimit(),
-                entrySearchParametersVO.getOrderDirection(),
-                entrySearchParametersVO.getOrderBy(),
-                searchSpecification,
-                false
-                );
+        return getPageWithWhereSpecification(entrySearchParametersVO);
     }
 
     @Override
     public List<EntryVO> getListOfPublicEntries() {
 
-        return entryDAO.findAll(PUBLIC_ENTRIES_SPECIFICATION, Pageable.unpaged()).getContent().stream()
+        var entrySearchParametersVO = publicOnlySearchBuilder().build();
+        var publicOnlyEntriesSpecification = searchHandler.createSpecification(entrySearchParametersVO);
+
+        return entryDAO.findAll(publicOnlyEntriesSpecification, Pageable.unpaged())
+                .getContent().stream()
                 .map(entryToEntryVOConverter::convert)
                 .collect(Collectors.toList());
     }
@@ -264,23 +260,33 @@ public class EntryServiceImpl implements EntryService {
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
     }
 
-    private EntityPageVO<EntryVO> getPageWithWhereSpecification(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy, Specification<Entry> whereSpecification) {
-        return getPageWithWhereSpecification(page, limit, direction, orderBy, whereSpecification, true);
-    }
+    private EntityPageVO<EntryVO> getPageWithWhereSpecification(EntrySearchParametersVO entrySearchParametersVO) {
 
-    private EntityPageVO<EntryVO> getPageWithWhereSpecification(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy,
-                                                                Specification<Entry> whereSpecification, boolean publicOnly) {
-
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Specification<Entry> specs = Specification.where(whereSpecification);
-        if (publicOnly) {
-            specs = specs
-                    .and(EntrySpecification.IS_PUBLIC)
-                    .and(EntrySpecification.IS_ENABLED);
-        }
+        Pageable pageable = PageableUtil.createPage(
+                entrySearchParametersVO.getPage(),
+                entrySearchParametersVO.getLimit(),
+                entrySearchParametersVO.getOrderDirection(),
+                entrySearchParametersVO.getOrderBy().getField());
+        Specification<Entry> specs = searchHandler.createSpecification(entrySearchParametersVO);
         Page<Entry> entityPage = entryDAO.findAll(specs, pageable);
 
         return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
+    }
+
+    private EntrySearchParametersVO.EntrySearchParametersVOBuilder publicOnlySearchBuilder() {
+
+        return EntrySearchParametersVO.builder()
+                .enabled(Optional.of(true))
+                .status(Optional.of(EntryStatus.PUBLIC));
+    }
+
+    private EntrySearchParametersVO.EntrySearchParametersVOBuilder publicOnlySearchBuilder(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
+
+        return publicOnlySearchBuilder()
+                .page(page)
+                .limit(limit)
+                .orderDirection(direction)
+                .orderBy(orderBy);
     }
 
     private Function<Entry, Entry> logUpdate() {
