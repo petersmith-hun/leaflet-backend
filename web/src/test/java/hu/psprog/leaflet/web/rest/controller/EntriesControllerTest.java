@@ -4,6 +4,7 @@ import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.EntrySearchResultDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
@@ -11,6 +12,7 @@ import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
@@ -200,6 +202,21 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
 
         // then
         // exception expected
+    }
+
+    @Test
+    public void shouldSearchEntries() {
+
+        // given
+        given(conversionService.convert(ENTRY_SEARCH_PARAMETERS, EntrySearchParametersVO.class)).willReturn(ENTRY_SEARCH_PARAMETERS_VO);
+        given(entryFacade.searchEntries(ENTRY_SEARCH_PARAMETERS_VO)).willReturn(EntityPageVO.<EntryVO>getBuilder().withEntitiesOnPage(ENTRY_VO_LIST).build());
+        given(conversionService.convert(ENTRY_VO_LIST, EntrySearchResultDataModel.class)).willReturn(ENTRY_SEARCH_RESULT_DATA_MODEL);
+
+        // when
+        ResponseEntity<EntrySearchResultDataModel> result = controller.searchEntries(ENTRY_SEARCH_PARAMETERS);
+
+        // then
+        assertResponse(result, HttpStatus.OK, ENTRY_SEARCH_RESULT_DATA_MODEL);
     }
 
     @Test

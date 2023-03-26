@@ -3,10 +3,12 @@ package hu.psprog.leaflet.web.rest.controller;
 import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
+import hu.psprog.leaflet.api.rest.request.entry.EntrySearchParameters;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.EntrySearchResultDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
@@ -14,6 +16,7 @@ import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.EntryFacade;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
@@ -55,6 +58,7 @@ public class EntriesController extends BaseController {
     private static final String PATH_PAGE_OF_ENTRIES_BY_TAG = "/tag" + PATH_PART_ID + "/page" + PATH_PART_PAGE;
     private static final String PATH_PAGE_OF_ENTRIES_BY_CONTENT = "/content" + "/page" + PATH_PART_PAGE;
     private static final String PATH_ENTRY_BY_LINK = "/link" + PATH_PART_LINK;
+    private static final String PATH_SEARCH = "/search";
 
     private static final String ENTRY_COULD_NOT_BE_CREATED = "Entry could not be created. See details: ";
     private static final String BLOG_ENTRY_COULD_NOT_BE_CREATED = "Blog entry could not be created, please try again later!";
@@ -123,11 +127,13 @@ public class EntriesController extends BaseController {
      * @param limit (optional) number of entries on one page; defaults to {@code PAGINATION_DEFAULT_LIMIT}
      * @param orderBy (optional) order by (CREATED|TITLE); defaults to {@code CREATED}
      * @param orderDirection (optional) order direction (ASC|DESC); defaults to {@code ASC}
+     * @deprecated use the #searchEntries endpoint instead
      * @return page of entries
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_NON_FILTERED)
     @Timed
+    @Deprecated
     public ResponseEntity<EntryListDataModel> getPageOfEntries(
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
             @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
@@ -201,7 +207,6 @@ public class EntriesController extends BaseController {
      * GET /entries/content/page/{page}?content
      * Returns basic information of given page of public entries filtered by given content expression.
      *
-     *
      * @param content content expression to filter by
      * @param page page number (page indexing starts at 1)
      * @param limit (optional) number of entries on one page; defaults to {@code PAGINATION_DEFAULT_LIMIT}
@@ -224,6 +229,26 @@ public class EntriesController extends BaseController {
         return ResponseEntity
                 .ok()
                 .body(conversionService.convert(entryPage.getEntitiesOnPage(), EntryListDataModel.class));
+    }
+
+    /**
+     * GET /entries/search
+     * Returns a paginated list of edit-level entry data for the given search request.
+     *
+     * @param entrySearchParameters {@link EntrySearchParameters} object containing search request parameters
+     * @return page of entries filtered and paginated by the given search parameters
+     */
+    @FillResponse
+    @RequestMapping(method = RequestMethod.GET, path = PATH_SEARCH)
+    @Timed
+    public ResponseEntity<EntrySearchResultDataModel> searchEntries(EntrySearchParameters entrySearchParameters) {
+
+        var entrySearchParametersVO = conversionService.convert(entrySearchParameters, EntrySearchParametersVO.class);
+        var entityPage = entryFacade.searchEntries(entrySearchParametersVO);
+
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(entityPage.getEntitiesOnPage(), EntrySearchResultDataModel.class));
     }
 
     /**

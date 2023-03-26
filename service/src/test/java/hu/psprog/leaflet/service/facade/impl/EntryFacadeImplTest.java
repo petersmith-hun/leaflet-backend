@@ -6,6 +6,7 @@ import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.CategoryVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import org.junit.jupiter.api.Test;
@@ -85,6 +86,19 @@ public class EntryFacadeImplTest {
 
         // then
         verify(entryService).getListOfPublicEntries();
+    }
+
+    @Test
+    public void shouldSearchEntriesDelegateRequestImmediatelyToService() {
+
+        // given
+        EntrySearchParametersVO entrySearchParametersVO = EntrySearchParametersVO.builder().build();
+
+        // when
+        entryFacade.searchEntries(entrySearchParametersVO);
+
+        // then
+        verify(entryService).searchEntries(entrySearchParametersVO);
     }
 
     @Test

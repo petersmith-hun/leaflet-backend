@@ -4,12 +4,14 @@ import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
+import hu.psprog.leaflet.api.rest.request.entry.EntrySearchParameters;
 import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.MenuDataModel;
 import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EditEntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
+import hu.psprog.leaflet.api.rest.response.entry.EntrySearchResultDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.bridge.client.domain.OrderBy;
 import hu.psprog.leaflet.bridge.client.domain.OrderDirection;
@@ -139,6 +141,75 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         // then
         assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
+        assertMenu(result);
+    }
+
+    @Test
+    public void shouldSearchEntriesWithEmptySearchParameters() throws CommunicationFailureException {
+
+        // given
+        EntrySearchParameters entrySearchParameters = new EntrySearchParameters();
+
+        // when
+        WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
+
+        // then
+        assertThat(result.getPagination().getEntityCount(), equalTo(25L));
+        assertThat(result.getPagination().getEntityCountOnPage(), equalTo(10));
+        assertThat(result.getPagination().getPageCount(), equalTo(3));
+        assertMenu(result);
+    }
+
+    @Test
+    public void shouldSearchEntriesWithCategoryFilter() throws CommunicationFailureException {
+
+        // given
+        EntrySearchParameters entrySearchParameters = new EntrySearchParameters();
+        entrySearchParameters.setLimit(3);
+        entrySearchParameters.setCategoryID(2L);
+
+        // when
+        WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
+
+        // then
+        assertThat(result.getPagination().getEntityCount(), equalTo(13L));
+        assertThat(result.getPagination().getEntityCountOnPage(), equalTo(3));
+        assertThat(result.getPagination().getPageCount(), equalTo(5));
+        assertThat(result.getBody().getEntries().stream().allMatch(entry -> entry.getCategory().getId() == 2L), is(true));
+        assertMenu(result);
+    }
+
+    @Test
+    public void shouldSearchEntriesWithCategoryFilterAndDisabledEntriesOnly() throws CommunicationFailureException {
+
+        // given
+        EntrySearchParameters entrySearchParameters = new EntrySearchParameters();
+        entrySearchParameters.setCategoryID(1L);
+        entrySearchParameters.setEnabled(false);
+
+        // when
+        WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
+
+        // then
+        assertThat(result.getPagination().getEntityCount(), equalTo(1L));
+        assertThat(result.getBody().getEntries().get(0).getCategory().getId(), is(1L));
+        assertThat(result.getBody().getEntries().get(0).isEnabled(), is(false));
+        assertMenu(result);
+    }
+
+    @Test
+    public void shouldSearchEntriesOnlyInReviewStatus() throws CommunicationFailureException {
+
+        // given
+        EntrySearchParameters entrySearchParameters = new EntrySearchParameters();
+        entrySearchParameters.setStatus(EntryInitialStatus.REVIEW);
+
+        // when
+        WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
+
+        // then
+        assertThat(result.getPagination().getEntityCount(), equalTo(2L));
+        assertThat(result.getBody().getEntries().stream().allMatch(entry -> entry.getEntryStatus().equals(EntryInitialStatus.REVIEW.name())), is(true));
         assertMenu(result);
     }
 
@@ -298,7 +369,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                 .equals(result.getBody().getEntries()), is(true));
     }
 
-    private void assertMenu(WrapperBodyDataModel<EntryListDataModel> result) {
+    private void assertMenu(WrapperBodyDataModel<?> result) {
         assertThat(result.getMenu(), equalTo(getControl(CONTROL_MENU, MenuDataModel.class)));
     }
 

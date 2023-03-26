@@ -5,18 +5,19 @@ import hu.psprog.leaflet.persistence.entity.Category;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.EntryStatus;
 import hu.psprog.leaflet.persistence.entity.Tag;
+import hu.psprog.leaflet.persistence.repository.specification.EntrySpecification;
 import hu.psprog.leaflet.service.common.OrderDirection;
-import hu.psprog.leaflet.service.converter.CategoryVOToCategoryConverter;
 import hu.psprog.leaflet.service.converter.EntryToEntryVOConverter;
 import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
-import hu.psprog.leaflet.service.converter.TagVOToTagConverter;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.InvalidTransitionException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.impl.search.SearchHandler;
 import hu.psprog.leaflet.service.util.PublishHandler;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
+import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import org.junit.jupiter.api.Assertions;
@@ -48,6 +49,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -76,19 +78,16 @@ public class EntryServiceImplTest {
     private EntryToEntryVOConverter entryToEntryVOConverter;
 
     @Mock
-    private CategoryVOToCategoryConverter categoryVOToCategoryConverter;
-
-    @Mock
-    private TagVOToTagConverter tagVOToTagConverter;
-
-    @Mock
     private Entry entry;
 
     @Mock
     private EntryVO entryVO;
 
     @Mock
-    public PublishHandler publishHandler;
+    private PublishHandler publishHandler;
+
+    @Mock
+    private SearchHandler<EntrySearchParametersVO, Entry> searchHandler;
 
     @InjectMocks
     private EntryServiceImpl entryService;
@@ -164,8 +163,19 @@ public class EntryServiceImplTest {
         // given
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "published", "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
+        Specification<Entry> specification = EntrySpecification.IS_PUBLIC;
+        EntrySearchParametersVO expectedSearchParameters = EntrySearchParametersVO.builder()
+                .enabled(Optional.of(true))
+                .status(Optional.of(EntryStatus.PUBLIC))
+                .page(1)
+                .limit(10)
+                .orderDirection(OrderDirection.ASC)
+                .orderBy(EntryVO.OrderBy.PUBLISHED)
+                .build();
+
+        given(searchHandler.createSpecification(expectedSearchParameters)).willReturn(specification);
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
-        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
+        given(entryDAO.findAll(same(specification), eq(expectedPageable))).willReturn(entryPage);
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntries(1, 10, OrderDirection.ASC, EntryVO.OrderBy.PUBLISHED);
@@ -178,13 +188,23 @@ public class EntryServiceImplTest {
     public void testGetPageOfPublicEntriesUnderCategory() {
 
         // given
+        Category category = Category.getBuilder().withId(CATEGORY_VO.getId()).build();
         Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
+        Specification<Entry> specification = EntrySpecification.isUnderCategory(category);
+        EntrySearchParametersVO expectedSearchParameters = EntrySearchParametersVO.builder()
+                .enabled(Optional.of(true))
+                .status(Optional.of(EntryStatus.PUBLIC))
+                .page(1)
+                .limit(10)
+                .orderDirection(OrderDirection.ASC)
+                .orderBy(EntryVO.OrderBy.CREATED)
+                .categoryID(Optional.of(CATEGORY_VO.getId()))
+                .build();
+
+        given(searchHandler.createSpecification(expectedSearchParameters)).willReturn(specification);
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
-        given(categoryVOToCategoryConverter.convert(any(CategoryVO.class))).willReturn(Category.getBuilder()
-                .withId(1L)
-                .build());
-        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
+        given(entryDAO.findAll(same(specification), eq(expectedPageable))).willReturn(entryPage);
 
         // when
         EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderCategory(CATEGORY_VO,1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
@@ -197,16 +217,26 @@ public class EntryServiceImplTest {
     public void testGetPageOfPublicEntriesUnderTag() {
 
         // given
-        Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
+        Tag tag = Tag.getBuilder().withId(TAG_VO.getId()).build();
+        Pageable expectedPageable = PageRequest.of(4, 20, Sort.Direction.DESC, "title");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
+        Specification<Entry> specification = EntrySpecification.isUnderTag(tag);
+        EntrySearchParametersVO expectedSearchParameters = EntrySearchParametersVO.builder()
+                .enabled(Optional.of(true))
+                .status(Optional.of(EntryStatus.PUBLIC))
+                .page(5)
+                .limit(20)
+                .orderDirection(OrderDirection.DESC)
+                .orderBy(EntryVO.OrderBy.TITLE)
+                .tagID(Optional.of(TAG_VO.getId()))
+                .build();
+
+        given(searchHandler.createSpecification(expectedSearchParameters)).willReturn(specification);
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
-        given(tagVOToTagConverter.convert(any(TagVO.class))).willReturn(Tag.getBuilder()
-                .withId(1L)
-                .build());
-        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
+        given(entryDAO.findAll(same(specification), eq(expectedPageable))).willReturn(entryPage);
 
         // when
-        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(TAG_VO,1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesUnderTag(TAG_VO,5, 20, OrderDirection.DESC, EntryVO.OrderBy.TITLE);
 
         // then
         assertThat(result, notNullValue());
@@ -216,23 +246,68 @@ public class EntryServiceImplTest {
     public void testGetPageOfPublicEntriesByContent() {
 
         // given
-        Pageable expectedPageable = PageRequest.of(0, 10, Sort.Direction.ASC, "created");
+        Pageable expectedPageable = PageRequest.of(2, 25, Sort.Direction.ASC, "id");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
+        Specification<Entry> specification = EntrySpecification.containsExpression("content");
+        EntrySearchParametersVO expectedSearchParameters = EntrySearchParametersVO.builder()
+                .enabled(Optional.of(true))
+                .status(Optional.of(EntryStatus.PUBLIC))
+                .page(3)
+                .limit(25)
+                .orderDirection(OrderDirection.ASC)
+                .orderBy(EntryVO.OrderBy.ID)
+                .content(Optional.of("content"))
+                .build();
+
+        given(searchHandler.createSpecification(expectedSearchParameters)).willReturn(specification);
         given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
-        given(entryDAO.findAll(any(Specification.class), eq(expectedPageable))).willReturn(entryPage);
+        given(entryDAO.findAll(same(specification), eq(expectedPageable))).willReturn(entryPage);
 
         // when
-        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesByContent("content",1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
+        EntityPageVO<EntryVO> result = entryService.getPageOfPublicEntriesByContent("content",3, 25, OrderDirection.ASC, EntryVO.OrderBy.ID);
 
         // then
         assertThat(result, notNullValue());
     }
 
     @Test
+    public void shouldSearchEntries() {
+
+        // given
+        EntrySearchParametersVO entrySearchParametersVO = EntrySearchParametersVO.builder()
+                .page(2)
+                .limit(30)
+                .orderDirection(OrderDirection.DESC)
+                .orderBy(EntryVO.OrderBy.TITLE)
+                .build();
+        Pageable expectedPageable = PageRequest.of(1, 30, Sort.Direction.DESC, "title");
+        Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
+        Specification<Entry> specification = Specification.where(null);
+
+        given(searchHandler.createSpecification(entrySearchParametersVO)).willReturn(specification);
+        given(entryDAO.findAll(same(specification), eq(expectedPageable))).willReturn(entryPage);
+        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
+
+        // when
+        EntityPageVO<EntryVO> result = entryService.searchEntries(entrySearchParametersVO);
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getEntitiesOnPage().size(), equalTo(1));
+    }
+
+    @Test
     public void testGetListOfPublicEntries() {
 
         // given
-        given(entryDAO.findAll(any(Specification.class), eq(Pageable.unpaged()))).willReturn(new PageImpl<>(Collections.singletonList(entry)));
+        Specification<Entry> specification = EntrySpecification.IS_PUBLIC;
+        EntrySearchParametersVO entrySearchParametersVO = EntrySearchParametersVO.builder()
+                .enabled(Optional.of(true))
+                .status(Optional.of(EntryStatus.PUBLIC))
+                .build();
+
+        given(searchHandler.createSpecification(entrySearchParametersVO)).willReturn(specification);
+        given(entryDAO.findAll(same(specification), eq(Pageable.unpaged()))).willReturn(new PageImpl<>(Collections.singletonList(entry)));
         given(entryToEntryVOConverter.convert(entry)).willReturn(entryVO);
 
         // when

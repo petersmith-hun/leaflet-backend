@@ -28,6 +28,11 @@ public class EntrySpecification {
      */
     public static final Specification<Entry> IS_ENABLED = (root, query, builder) -> builder.equal(root.get(Entry_.enabled), true);
 
+    /**
+     * Filter to list entries marked as disabled.
+     */
+    public static final Specification<Entry> IS_DISABLED = (root, query, builder) -> builder.equal(root.get(Entry_.enabled), false);
+
     private EntrySpecification() {}
 
     /**
@@ -63,6 +68,16 @@ public class EntrySpecification {
                 builder.like(root.get(Entry_.title), likeExpression),
                 builder.like(root.get(Entry_.prologue), likeExpression),
                 builder.like(root.get(Entry_.rawContent), likeExpression));
+    }
+
+    /**
+     * {@link Specification} implementation to check if an entry's publication status is equal to the given one.
+     *
+     * @param status {@link EntryStatus} to check the entry against
+     * @return built {@link Specification}
+     */
+    public static Specification<Entry> isInPublicationStatus(EntryStatus status) {
+        return (root, query, builder) -> builder.equal(root.get(Entry_.status), status);
     }
 
     private static String createLikeExpression(String originalExpression) {
