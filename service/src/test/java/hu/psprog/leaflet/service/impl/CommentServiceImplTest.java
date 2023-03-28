@@ -4,12 +4,11 @@ import hu.psprog.leaflet.persistence.dao.CommentDAO;
 import hu.psprog.leaflet.persistence.entity.Comment;
 import hu.psprog.leaflet.persistence.entity.Entry;
 import hu.psprog.leaflet.persistence.entity.User;
+import hu.psprog.leaflet.persistence.repository.specification.CommentSpecification;
 import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.CommentToCommentVOConverter;
 import hu.psprog.leaflet.service.converter.CommentVOToCommentConverter;
-import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
-import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.search.SearchHandler;
@@ -63,6 +62,7 @@ public class CommentServiceImplTest {
             .withEntitiesOnPage(Collections.emptyList())
             .build();
     private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(5L);
+    private static final Entry ENTRY = Entry.getBuilder().withId(ENTRY_VO.getId()).build();
 
     @Mock(lenient = true)
     private CommentDAO commentDAO;
@@ -72,12 +72,6 @@ public class CommentServiceImplTest {
 
     @Mock
     private CommentVOToCommentConverter commentVOToCommentConverter;
-
-    @Mock
-    private EntryVOToEntryConverter entryVOToEntryConverter;
-
-    @Mock
-    private UserVOToUserConverter userVOToUserConverter;
 
     @Mock(lenient = true)
     private Comment comment;
@@ -172,12 +166,23 @@ public class CommentServiceImplTest {
     public void testGetPageOfCommentsForEntry() {
 
         // given
+        CommentSearchParametersVO commentSearchParametersVO = CommentSearchParametersVO.builder()
+                .page(3)
+                .limit(15)
+                .orderDirection(OrderDirection.ASC)
+                .orderBy(CommentVO.OrderBy.ID)
+                .entryID(Optional.of(ENTRY_VO.getId()))
+                .build();
+        Pageable expectedPageable = PageRequest.of(2, 15, Sort.Direction.ASC, "id");
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
-        given(commentDAO.findByEntry(any(Pageable.class), any(Entry.class))).willReturn(commentPage);
+        Specification<Comment> specification = CommentSpecification.isOwnedByEntry(ENTRY);
+
+        given(searchHandler.createSpecification(commentSearchParametersVO)).willReturn(specification);
+        given(commentDAO.findAll(same(specification), eq(expectedPageable))).willReturn(commentPage);
+        given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, ENTRY_VO);
+        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForEntry(3, 15, OrderDirection.ASC, CommentVO.OrderBy.ID, ENTRY_VO);
 
         // then
         assertThat(result, notNullValue());
@@ -187,12 +192,24 @@ public class CommentServiceImplTest {
     public void testGetPageOfPublicCommentsForEntry() {
 
         // given
+        CommentSearchParametersVO commentSearchParametersVO = CommentSearchParametersVO.builder()
+                .page(3)
+                .limit(15)
+                .orderDirection(OrderDirection.ASC)
+                .orderBy(CommentVO.OrderBy.ID)
+                .entryID(Optional.of(ENTRY_VO.getId()))
+                .enabled(Optional.of(true))
+                .build();
+        Pageable expectedPageable = PageRequest.of(2, 15, Sort.Direction.ASC, "id");
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        given(entryVOToEntryConverter.convert(any(EntryVO.class))).willReturn(new Entry());
-        given(commentDAO.findByEntry(any(Specification.class), any(Pageable.class), any(Entry.class))).willReturn(commentPage);
+        Specification<Comment> specification = CommentSpecification.isOwnedByEntry(ENTRY);
+
+        given(searchHandler.createSpecification(commentSearchParametersVO)).willReturn(specification);
+        given(commentDAO.findAll(same(specification), eq(expectedPageable))).willReturn(commentPage);
+        given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, ENTRY_VO);
+        EntityPageVO<CommentVO> result = commentService.getPageOfPublicCommentsForEntry(3, 15, OrderDirection.ASC, CommentVO.OrderBy.ID, ENTRY_VO);
 
         // then
         assertThat(result, notNullValue());
@@ -207,24 +224,38 @@ public class CommentServiceImplTest {
         // then
         assertThat(result, notNullValue());
         assertThat(result, equalTo(EMPTY_ENTITY_PAGE_VO));
-        verifyNoInteractions(entryVOToEntryConverter, commentDAO);
+        verifyNoInteractions(commentDAO);
     }
 
     @Test
     public void testGetPageOfCommentsForUser() {
 
         // given
+        Long userID = 6L;
+        UserVO userVO = UserVO.wrapMinimumVO(userID);
+        User user = User.getBuilder().withId(userID).build();
+
+        CommentSearchParametersVO commentSearchParametersVO = CommentSearchParametersVO.builder()
+                .page(5)
+                .limit(20)
+                .orderDirection(OrderDirection.ASC)
+                .orderBy(CommentVO.OrderBy.CREATED)
+                .userID(Optional.of(userID))
+                .build();
+        Pageable expectedPageable = PageRequest.of(4, 20, Sort.Direction.ASC, "created");
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        UserVO userVO = UserVO.wrapMinimumVO(6L);
-        given(userVOToUserConverter.convert(userVO)).willReturn(new User());
-        given(commentDAO.findByUser(any(Pageable.class), any(User.class))).willReturn(commentPage);
+        Specification<Comment> specification = CommentSpecification.isOwnedByUser(user);
+
+        given(searchHandler.createSpecification(commentSearchParametersVO)).willReturn(specification);
+        given(commentDAO.findAll(same(specification), eq(expectedPageable))).willReturn(commentPage);
         given(commentToCommentVOConverter.convert(comment)).willReturn(commentVO);
 
         // when
-        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForUser(1, 10, OrderDirection.ASC, CommentVO.OrderBy.CREATED, userVO);
+        EntityPageVO<CommentVO> result = commentService.getPageOfCommentsForUser(5, 20, OrderDirection.ASC, CommentVO.OrderBy.CREATED, userVO);
 
         // then
         assertThat(result, notNullValue());
+        assertThat(result.getEntitiesOnPage().size(), equalTo(1));
     }
 
     @Test

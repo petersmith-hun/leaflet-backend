@@ -3,26 +3,22 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.CommentDAO;
 import hu.psprog.leaflet.persistence.entity.Comment;
 import hu.psprog.leaflet.persistence.entity.Entry;
-import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.persistence.repository.specification.CommentSpecification;
 import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.NotificationService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.CommentToCommentVOConverter;
 import hu.psprog.leaflet.service.converter.CommentVOToCommentConverter;
-import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
-import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.search.SearchHandler;
-import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
-import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.util.PageableUtil;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -52,21 +49,16 @@ public class CommentServiceImpl implements CommentService {
     private final CommentDAO commentDAO;
     private final CommentToCommentVOConverter commentToCommentVOConverter;
     private final CommentVOToCommentConverter commentVOToCommentConverter;
-    private final EntryVOToEntryConverter entryVOToEntryConverter;
-    private final UserVOToUserConverter userVOToUserConverter;
     private final NotificationService notificationService;
     private final SearchHandler<CommentSearchParametersVO, Comment> searchHandler;
 
     @Autowired
     public CommentServiceImpl(CommentDAO commentDAO, CommentToCommentVOConverter commentToCommentVOConverter,
-                              CommentVOToCommentConverter commentVOToCommentConverter, EntryVOToEntryConverter entryVOToEntryConverter,
-                              UserVOToUserConverter userVOToUserConverter, NotificationService notificationService,
+                              CommentVOToCommentConverter commentVOToCommentConverter, NotificationService notificationService,
                               SearchHandler<CommentSearchParametersVO, Comment> searchHandler) {
         this.commentDAO = commentDAO;
         this.commentToCommentVOConverter = commentToCommentVOConverter;
         this.commentVOToCommentConverter = commentVOToCommentConverter;
-        this.entryVOToEntryConverter = entryVOToEntryConverter;
-        this.userVOToUserConverter = userVOToUserConverter;
         this.notificationService = notificationService;
         this.searchHandler = searchHandler;
     }
@@ -93,11 +85,11 @@ public class CommentServiceImpl implements CommentService {
     @PermitScope.Read.Comments
     public EntityPageVO<CommentVO> getPageOfCommentsForEntry(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, EntryVO entryVO) {
 
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Entry entry = entryVOToEntryConverter.convert(entryVO);
-        Page<Comment> commentPage = commentDAO.findByEntry(pageable, entry);
+        var commentSearchParametersVO = searchBuilder(page, limit, direction, orderBy)
+                .entryID(Optional.of(entryVO.getId()))
+                .build();
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+        return getPageWithWhereSpecification(commentSearchParametersVO);
     }
 
     @Override
@@ -105,13 +97,13 @@ public class CommentServiceImpl implements CommentService {
 
         EntityPageVO<CommentVO> entityPageVO = EMPTY_ENTITY_PAGE_VO;
         if (Objects.nonNull(entryVO)) {
-            Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-            Entry entry = entryVOToEntryConverter.convert(entryVO);
-            Specification<Comment> specifications = Specification
-                    .where(CommentSpecification.IS_ENABLED);
-            Page<Comment> commentPage = commentDAO.findByEntry(specifications, pageable, entry);
 
-            entityPageVO = PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+            var commentSearchParametersVO = searchBuilder(page, limit, direction, orderBy)
+                    .enabled(Optional.of(true))
+                    .entryID(Optional.of(entryVO.getId()))
+                    .build();
+
+            entityPageVO = getPageWithWhereSpecification(commentSearchParametersVO);
         }
 
         return entityPageVO;
@@ -121,26 +113,17 @@ public class CommentServiceImpl implements CommentService {
     @PermitScope.Read.OwnCommentsListOrElevated
     public EntityPageVO<CommentVO> getPageOfCommentsForUser(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy, UserVO userVO) {
 
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        User user = userVOToUserConverter.convert(userVO);
-        Page<Comment> commentPage = commentDAO.findByUser(pageable, user);
+        var commentSearchParametersVO = searchBuilder(page, limit, direction, orderBy)
+                .userID(Optional.of(userVO.getId()))
+                .build();
 
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+        return getPageWithWhereSpecification(commentSearchParametersVO);
     }
 
     @Override
     @PermitScope.Read.Comments
     public EntityPageVO<CommentVO> searchComments(CommentSearchParametersVO commentSearchParametersVO) {
-
-        Pageable pageable = PageableUtil.createPage(
-                commentSearchParametersVO.getPage(),
-                commentSearchParametersVO.getLimit(),
-                commentSearchParametersVO.getOrderDirection(),
-                commentSearchParametersVO.getOrderBy().getField());
-        Specification<Comment> specification = searchHandler.createSpecification(commentSearchParametersVO);
-        Page<Comment> commentPage = commentDAO.findAll(specification, pageable);
-
-        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+        return getPageWithWhereSpecification(commentSearchParametersVO);
     }
 
     @Override
@@ -241,5 +224,25 @@ public class CommentServiceImpl implements CommentService {
         LOGGER.info("Restored logically deleted comment of ID [{}]", entity.getId());
     }
 
+    private EntityPageVO<CommentVO> getPageWithWhereSpecification(CommentSearchParametersVO commentSearchParametersVO) {
 
+        Pageable pageable = PageableUtil.createPage(
+                commentSearchParametersVO.getPage(),
+                commentSearchParametersVO.getLimit(),
+                commentSearchParametersVO.getOrderDirection(),
+                commentSearchParametersVO.getOrderBy().getField());
+        Specification<Comment> specification = searchHandler.createSpecification(commentSearchParametersVO);
+        Page<Comment> commentPage = commentDAO.findAll(specification, pageable);
+
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+    }
+
+    private CommentSearchParametersVO.CommentSearchParametersVOBuilder searchBuilder(int page, int limit, OrderDirection direction, CommentVO.OrderBy orderBy) {
+
+        return CommentSearchParametersVO.builder()
+                .page(page)
+                .limit(limit)
+                .orderDirection(direction)
+                .orderBy(orderBy);
+    }
 }

@@ -3,6 +3,7 @@ package hu.psprog.leaflet.persistence.repository.specification;
 import hu.psprog.leaflet.persistence.entity.Comment;
 import hu.psprog.leaflet.persistence.entity.Comment_;
 import hu.psprog.leaflet.persistence.entity.Entry;
+import hu.psprog.leaflet.persistence.entity.User;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
@@ -42,6 +43,16 @@ public class CommentSpecification extends AbstractCommonSpecification {
      */
     public static Specification<Comment> isOwnedByEntry(Entry entry) {
         return (root, query, builder) -> builder.equal(root.get(Comment_.entry), entry);
+    }
+
+    /**
+     * Filter to list comments by owner user.
+     *
+     * @param user owner {@link User} entity.
+     * @return filter to list of comments owned by given user
+     */
+    public static Specification<Comment> isOwnedByUser(User user) {
+        return (root, query, builder) -> builder.equal(root.get(Comment_.user), user);
     }
 
     /**

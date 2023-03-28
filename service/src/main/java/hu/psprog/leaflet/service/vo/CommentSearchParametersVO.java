@@ -18,6 +18,8 @@ public class CommentSearchParametersVO {
     private Optional<Boolean> enabled;
     private Optional<Boolean> deleted;
     private Optional<String> content;
+    private Optional<Long> userID;
+    private Optional<Long> entryID;
 
     private CommentVO.OrderBy orderBy;
     private OrderDirection orderDirection;
@@ -29,5 +31,7 @@ public class CommentSearchParametersVO {
         private Optional<Boolean> enabled = Optional.empty();
         private Optional<Boolean> deleted = Optional.empty();
         private Optional<String> content = Optional.empty();
+        private Optional<Long> userID = Optional.empty();
+        private Optional<Long> entryID = Optional.empty();
     }
 }
