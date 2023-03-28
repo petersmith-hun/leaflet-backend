@@ -12,11 +12,13 @@ import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
-import hu.psprog.leaflet.service.vo.mail.CommentNotification;
+import hu.psprog.leaflet.service.impl.search.SearchHandler;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +28,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
@@ -39,6 +43,8 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
@@ -84,6 +90,9 @@ public class CommentServiceImplTest {
 
     @Mock
     private NotificationService notificationService;
+
+    @Mock
+    private SearchHandler<CommentSearchParametersVO, Comment> searchHandler;
 
     @InjectMocks
     private CommentServiceImpl commentService;
@@ -216,6 +225,32 @@ public class CommentServiceImplTest {
 
         // then
         assertThat(result, notNullValue());
+    }
+
+    @Test
+    public void shouldSearchComments() {
+
+        // given
+        CommentSearchParametersVO commentSearchParametersVO = CommentSearchParametersVO.builder()
+                .page(2)
+                .limit(30)
+                .orderDirection(OrderDirection.DESC)
+                .orderBy(CommentVO.OrderBy.ID)
+                .build();
+        Pageable expectedPageable = PageRequest.of(1, 30, Sort.Direction.DESC, "id");
+        Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
+        Specification<Comment> specification = Specification.where(null);
+
+        given(searchHandler.createSpecification(commentSearchParametersVO)).willReturn(specification);
+        given(commentDAO.findAll(same(specification), eq(expectedPageable))).willReturn(commentPage);
+        given(commentToCommentVOConverter.convert(any(Comment.class))).willReturn(commentVO);
+
+        // when
+        EntityPageVO<CommentVO> result = commentService.searchComments(commentSearchParametersVO);
+
+        // then
+        assertThat(result, notNullValue());
+        assertThat(result.getEntitiesOnPage().size(), equalTo(1));
     }
 
     @Test

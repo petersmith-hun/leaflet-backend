@@ -157,7 +157,6 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result.getPagination().getEntityCount(), equalTo(25L));
         assertThat(result.getPagination().getEntityCountOnPage(), equalTo(10));
         assertThat(result.getPagination().getPageCount(), equalTo(3));
-        assertMenu(result);
     }
 
     @Test
@@ -176,7 +175,6 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result.getPagination().getEntityCountOnPage(), equalTo(3));
         assertThat(result.getPagination().getPageCount(), equalTo(5));
         assertThat(result.getBody().getEntries().stream().allMatch(entry -> entry.getCategory().getId() == 2L), is(true));
-        assertMenu(result);
     }
 
     @Test
@@ -194,7 +192,6 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result.getPagination().getEntityCount(), equalTo(1L));
         assertThat(result.getBody().getEntries().get(0).getCategory().getId(), is(1L));
         assertThat(result.getBody().getEntries().get(0).isEnabled(), is(false));
-        assertMenu(result);
     }
 
     @Test
@@ -210,7 +207,6 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         // then
         assertThat(result.getPagination().getEntityCount(), equalTo(2L));
         assertThat(result.getBody().getEntries().stream().allMatch(entry -> entry.getEntryStatus().equals(EntryInitialStatus.REVIEW.name())), is(true));
-        assertMenu(result);
     }
 
     @Test

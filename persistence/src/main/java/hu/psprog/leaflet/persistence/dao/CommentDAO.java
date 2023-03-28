@@ -19,4 +19,6 @@ public interface CommentDAO extends BaseDAO<Comment, Long>, SelfStatusAwareDAO<L
     Page<Comment> findByEntry(Specification<Comment> specification, Pageable pageable, Entry entry);
 
     Page<Comment> findByUser(Pageable pageable,  User user);
+
+    Page<Comment> findAll(Specification<Comment> specification, Pageable pageable);
 }

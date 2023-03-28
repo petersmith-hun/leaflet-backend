@@ -8,6 +8,7 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
@@ -305,6 +306,19 @@ public class CommentFacadeImplTest {
 
         // then
         verify(commentService).getAll();
+    }
+
+    @Test
+    public void shouldSearchCommentsDelegateRequestImmediatelyToService() {
+
+        // given
+        CommentSearchParametersVO commentSearchParametersVO = CommentSearchParametersVO.builder().build();
+
+        // when
+        commentFacade.searchComments(commentSearchParametersVO);
+
+        // then
+        verify(commentService).searchComments(commentSearchParametersVO);
     }
 
     private CommentVO prepareCommentVO(Long userID) {

@@ -43,6 +43,11 @@ public class CommentDAOImpl extends LogicallyDeletableSelfStatusAwareDAOImpl<Com
     }
 
     @Override
+    public Page<Comment> findAll(Specification<Comment> specification, Pageable pageable) {
+        return ((CommentRepository) jpaRepository).findAll(specification, pageable);
+    }
+
+    @Override
     protected void doUpdate(Comment currentEntity, Comment updatedEntity) {
         currentEntity.setContent(updatedEntity.getContent());
     }

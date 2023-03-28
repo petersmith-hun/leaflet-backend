@@ -12,11 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
  *
  * @author Peter Smith
  */
-public class EntrySpecification {
-
-    private static final String LIKE_EXPRESSION_PATTERN = "%%%s%%";
-    private static final char CHAR_SPACE = ' ';
-    private static final char CHAR_PERCENTAGE = '%';
+public class EntrySpecification extends AbstractCommonSpecification {
 
     /**
      * Filter to list entries marked as public.
@@ -78,9 +74,5 @@ public class EntrySpecification {
      */
     public static Specification<Entry> isInPublicationStatus(EntryStatus status) {
         return (root, query, builder) -> builder.equal(root.get(Entry_.status), status);
-    }
-
-    private static String createLikeExpression(String originalExpression) {
-        return String.format(LIKE_EXPRESSION_PATTERN, String.valueOf(originalExpression).replace(CHAR_SPACE, CHAR_PERCENTAGE));
     }
 }

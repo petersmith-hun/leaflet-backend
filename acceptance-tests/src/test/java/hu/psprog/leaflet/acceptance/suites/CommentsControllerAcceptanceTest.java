@@ -3,6 +3,7 @@ package hu.psprog.leaflet.acceptance.suites;
 import hu.psprog.leaflet.acceptance.config.LeafletAcceptanceSuite;
 import hu.psprog.leaflet.acceptance.config.ResetDatabase;
 import hu.psprog.leaflet.api.rest.request.comment.CommentCreateRequestModel;
+import hu.psprog.leaflet.api.rest.request.comment.CommentSearchParameters;
 import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
@@ -126,6 +127,64 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         assertLogicallyDeletedComments(result.getBody().getComments(), expectedLogicallyDeletedCount);
         assertEnabledComments(result.getBody().getComments(), expectedEnabledCount);
         assertThat(result.getMenu(), nullValue());
+    }
+
+    @Test
+    public void shouldSearchCommentWithEmptySearchParameters() throws CommunicationFailureException {
+
+        // given
+        CommentSearchParameters commentSearchParameters = new CommentSearchParameters();
+
+        // when
+        WrapperBodyDataModel<ExtendedCommentListDataModel> result = commentBridgeService.searchComments(commentSearchParameters);
+
+        // then
+        assertThat(result.getPagination().getEntityCount(), equalTo(10L));
+        assertThat(result.getPagination().getEntityCountOnPage(), equalTo(10));
+        assertThat(result.getPagination().getPageCount(), equalTo(1));
+    }
+
+    @Test
+    public void shouldSearchCommentReturnDisabledAndNonDeletedCommentsOnly() throws CommunicationFailureException {
+
+        // given
+        CommentSearchParameters commentSearchParameters = new CommentSearchParameters();
+        commentSearchParameters.setDeleted(false);
+        commentSearchParameters.setEnabled(false);
+
+        // when
+        WrapperBodyDataModel<ExtendedCommentListDataModel> result = commentBridgeService.searchComments(commentSearchParameters);
+
+        // then
+        assertThat(result.getPagination().getEntityCount(), equalTo(2L));
+        assertThat(result.getPagination().getEntityCountOnPage(), equalTo(2));
+        assertThat(result.getPagination().getPageCount(), equalTo(1));
+        assertThat(result.getBody()
+                .getComments().stream()
+                .allMatch(CommentDataModel::isDeleted), is(false));
+        assertThat(result.getBody()
+                .getComments().stream()
+                .allMatch(CommentDataModel::isEnabled), is(false));
+    }
+
+    @Test
+    public void shouldSearchCommentReturnDeletedCommentsOnly() throws CommunicationFailureException {
+
+        // given
+        CommentSearchParameters commentSearchParameters = new CommentSearchParameters();
+        commentSearchParameters.setDeleted(true);
+        commentSearchParameters.setLimit(3);
+
+        // when
+        WrapperBodyDataModel<ExtendedCommentListDataModel> result = commentBridgeService.searchComments(commentSearchParameters);
+
+        // then
+        assertThat(result.getPagination().getEntityCount(), equalTo(5L));
+        assertThat(result.getPagination().getEntityCountOnPage(), equalTo(3));
+        assertThat(result.getPagination().getPageCount(), equalTo(2));
+        assertThat(result.getBody()
+                .getComments().stream()
+                .allMatch(CommentDataModel::isDeleted), is(true));
     }
 
     @Test
@@ -339,9 +398,9 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
                 // entry ID, page, limit, order by, order direction, exp. all comments, exp. body size, exp. num. of pages, exp. has next, exp. has previous, logically deleted
                 Arguments.of(1, 1, 4, CREATED, ASC, 10, 4, 3, true, false, 1),
                 Arguments.of(1, 2, 4, CREATED, ASC, 10, 4, 3, true, true, 2),
-                Arguments.of(1, 3, 4, CREATED, ASC, 10, 2, 3, false, true, 1),
+                Arguments.of(1, 3, 4, CREATED, ASC, 10, 2, 3, false, true, 2),
                 Arguments.of(2, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0),
-                Arguments.of(1, 1, 20, CREATED, DESC, 10, 10, 1, false, false, 4)
+                Arguments.of(1, 1, 20, CREATED, DESC, 10, 10, 1, false, false, 5)
         );
     }
 
@@ -365,7 +424,7 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
                 Arguments.of(1, 1, 4, CREATED, ASC, 0, 0, 0, false, false, 0, 0),
                 Arguments.of(2, 1, 4, CREATED, ASC, 6, 4, 2, true, false, 1, 4),
                 Arguments.of(2, 2, 4, CREATED, ASC, 6, 2, 2, false, true, 2, 2),
-                Arguments.of(4, 1, 10, CREATED, ASC, 4, 4, 1, false, false, 1, 1)
+                Arguments.of(4, 1, 10, CREATED, ASC, 4, 4, 1, false, false, 2, 1)
         );
     }
 }

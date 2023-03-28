@@ -14,6 +14,8 @@ import hu.psprog.leaflet.service.converter.EntryVOToEntryConverter;
 import hu.psprog.leaflet.service.converter.UserVOToUserConverter;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.impl.search.SearchHandler;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.security.annotation.PermitScope;
 import hu.psprog.leaflet.service.util.PageableUtil;
@@ -53,17 +55,20 @@ public class CommentServiceImpl implements CommentService {
     private final EntryVOToEntryConverter entryVOToEntryConverter;
     private final UserVOToUserConverter userVOToUserConverter;
     private final NotificationService notificationService;
+    private final SearchHandler<CommentSearchParametersVO, Comment> searchHandler;
 
     @Autowired
     public CommentServiceImpl(CommentDAO commentDAO, CommentToCommentVOConverter commentToCommentVOConverter,
                               CommentVOToCommentConverter commentVOToCommentConverter, EntryVOToEntryConverter entryVOToEntryConverter,
-                              UserVOToUserConverter userVOToUserConverter, NotificationService notificationService) {
+                              UserVOToUserConverter userVOToUserConverter, NotificationService notificationService,
+                              SearchHandler<CommentSearchParametersVO, Comment> searchHandler) {
         this.commentDAO = commentDAO;
         this.commentToCommentVOConverter = commentToCommentVOConverter;
         this.commentVOToCommentConverter = commentVOToCommentConverter;
         this.entryVOToEntryConverter = entryVOToEntryConverter;
         this.userVOToUserConverter = userVOToUserConverter;
         this.notificationService = notificationService;
+        this.searchHandler = searchHandler;
     }
 
     @Override
@@ -119,6 +124,21 @@ public class CommentServiceImpl implements CommentService {
         Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
         User user = userVOToUserConverter.convert(userVO);
         Page<Comment> commentPage = commentDAO.findByUser(pageable, user);
+
+        return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
+    }
+
+    @Override
+    @PermitScope.Read.Comments
+    public EntityPageVO<CommentVO> searchComments(CommentSearchParametersVO commentSearchParametersVO) {
+
+        Pageable pageable = PageableUtil.createPage(
+                commentSearchParametersVO.getPage(),
+                commentSearchParametersVO.getLimit(),
+                commentSearchParametersVO.getOrderDirection(),
+                commentSearchParametersVO.getOrderBy().getField());
+        Specification<Comment> specification = searchHandler.createSpecification(commentSearchParametersVO);
+        Page<Comment> commentPage = commentDAO.findAll(specification, pageable);
 
         return PageableUtil.convertPage(commentPage, commentToCommentVOConverter);
     }

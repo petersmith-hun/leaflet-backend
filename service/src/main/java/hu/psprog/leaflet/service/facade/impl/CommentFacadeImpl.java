@@ -11,6 +11,7 @@ import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
@@ -135,6 +136,11 @@ public class CommentFacadeImpl implements CommentFacade {
     @Override
     public EntityPageVO<CommentVO> getPageOfCommentsForUser(Long userID, int page, int limit, String direction, String orderBy) {
         return commentService.getPageOfCommentsForUser(page, limit, parseDirection(direction), parseOrderBy(orderBy), UserVO.wrapMinimumVO(userID));
+    }
+
+    @Override
+    public EntityPageVO<CommentVO> searchComments(CommentSearchParametersVO commentSearchParametersVO) {
+        return commentService.searchComments(commentSearchParametersVO);
     }
 
     private CommentVO.OrderBy parseOrderBy(String by) {
