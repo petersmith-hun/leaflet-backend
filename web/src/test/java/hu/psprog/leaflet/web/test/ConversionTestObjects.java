@@ -3,6 +3,7 @@ package hu.psprog.leaflet.web.test;
 import hu.psprog.leaflet.api.rest.request.attachment.AttachmentRequestModel;
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.comment.CommentCreateRequestModel;
+import hu.psprog.leaflet.api.rest.request.comment.CommentSearchParameters;
 import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.contact.ContactRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
@@ -49,6 +50,7 @@ import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.vo.AttachmentRequestVO;
 import hu.psprog.leaflet.service.vo.CategoryVO;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import hu.psprog.leaflet.service.vo.DocumentVO;
@@ -454,6 +456,9 @@ public abstract class ConversionTestObjects {
     protected static final ExtendedCommentListDataModel EXTENDED_COMMENT_LIST_DATA_MODEL = ExtendedCommentListDataModel.getBuilder()
             .withItem(EXTENDED_COMMENT_DATA_MODEL)
             .build();
+
+    protected static final CommentSearchParameters COMMENT_SEARCH_PARAMETERS = new CommentSearchParameters();
+    protected static final CommentSearchParametersVO COMMENT_SEARCH_PARAMETERS_VO = CommentSearchParametersVO.builder().build();
 
     protected static final DocumentVO DOCUMENT_VO_WITH_OWNER = DocumentVO.getBuilder()
             .withRawContent(RAW_CONTENT)

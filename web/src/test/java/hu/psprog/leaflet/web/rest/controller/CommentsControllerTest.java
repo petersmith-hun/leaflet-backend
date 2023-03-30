@@ -8,6 +8,7 @@ import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
@@ -100,6 +101,21 @@ public class CommentsControllerTest extends AbstractControllerBaseTest {
 
         // when
         ResponseEntity<ExtendedCommentListDataModel> result = controller.getPageOfCommentsForUser(USER_ID, PAGE, LIMIT, ORDER_BY, DIRECTION);
+
+        // then
+        assertResponse(result, HttpStatus.OK, EXTENDED_COMMENT_LIST_DATA_MODEL);
+    }
+
+    @Test
+    public void shouldSearchComments() {
+
+        // given
+        given(conversionService.convert(COMMENT_SEARCH_PARAMETERS, CommentSearchParametersVO.class)).willReturn(COMMENT_SEARCH_PARAMETERS_VO);
+        given(commentFacade.searchComments(COMMENT_SEARCH_PARAMETERS_VO)).willReturn(EntityPageVO.<CommentVO>getBuilder().withEntitiesOnPage(COMMENT_VO_LIST).build());
+        given(conversionService.convert(COMMENT_VO_LIST, ExtendedCommentListDataModel.class)).willReturn(EXTENDED_COMMENT_LIST_DATA_MODEL);
+
+        // when
+        ResponseEntity<ExtendedCommentListDataModel> result = controller.searchComments(COMMENT_SEARCH_PARAMETERS);
 
         // then
         assertResponse(result, HttpStatus.OK, EXTENDED_COMMENT_LIST_DATA_MODEL);

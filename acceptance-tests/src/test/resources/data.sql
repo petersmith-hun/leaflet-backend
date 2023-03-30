@@ -89,7 +89,7 @@ values
   (6, '2017-12-13 20:00:07.000', true, true, @MODIFIED_DATE, 'Test comment 6', 1, 2),
   (7, '2017-12-13 20:00:08.000', true, true, @MODIFIED_DATE, 'Test comment 7', 1, 2),
   (8, '2017-12-13 20:00:09.000', false, false, @MODIFIED_DATE, 'Test comment 8', 1, 4),
-  (9, '2017-12-13 20:00:10.000', false, false, @MODIFIED_DATE, 'Test comment 9', 1, 4),
+  (9, '2017-12-13 20:00:10.000', false, true, @MODIFIED_DATE, 'Test comment 9', 1, 4),
   (10, '2017-12-13 20:00:11.000', true, true, @MODIFIED_DATE, 'Test comment 10', 1, 2);
 
 -- insert test tags

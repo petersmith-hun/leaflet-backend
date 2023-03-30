@@ -2,6 +2,7 @@ package hu.psprog.leaflet.service.facade;
 
 import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.exception.ServiceException;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 
@@ -49,6 +50,14 @@ public interface CommentFacade {
      * @return paged list of comments created by given user
      */
     EntityPageVO<CommentVO> getPageOfCommentsForUser(Long userID, int page, int limit, String direction, String orderBy);
+
+    /**
+     * Returns a paginated list of comment data for the given search request.
+     *
+     * @param commentSearchParametersVO {@link CommentSearchParametersVO} object containing search request parameters
+     * @return page of comments filtered and paginated by the given search parameters
+     */
+    EntityPageVO<CommentVO> searchComments(CommentSearchParametersVO commentSearchParametersVO);
 
     /**
      * Passes comment for persistence layer and returns ID of newly created comment.

@@ -19,6 +19,7 @@ import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.service.vo.EntrySearchParametersVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.annotation.FillResponse;
+import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
@@ -238,7 +239,7 @@ public class EntriesController extends BaseController {
      * @param entrySearchParameters {@link EntrySearchParameters} object containing search request parameters
      * @return page of entries filtered and paginated by the given search parameters
      */
-    @FillResponse
+    @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_SEARCH)
     @Timed
     public ResponseEntity<EntrySearchResultDataModel> searchEntries(EntrySearchParameters entrySearchParameters) {

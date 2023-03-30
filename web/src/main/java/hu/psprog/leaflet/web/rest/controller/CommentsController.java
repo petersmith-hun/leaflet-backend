@@ -2,6 +2,7 @@ package hu.psprog.leaflet.web.rest.controller;
 
 import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.comment.CommentCreateRequestModel;
+import hu.psprog.leaflet.api.rest.request.comment.CommentSearchParameters;
 import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentListDataModel;
@@ -11,6 +12,7 @@ import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.exception.ConstraintViolationException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
+import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
 import hu.psprog.leaflet.web.annotation.AuthenticatedRequest;
@@ -53,6 +55,7 @@ public class CommentsController extends BaseController {
     private static final String PATH_PUBLIC_COMMENTS_FOR_ENTRY = "/entry" + PATH_PART_LINK + PATH_PART_PAGE;
     private static final String PATH_ALL_COMMENTS_FOR_ENTRY = "/entry" + PATH_PART_ID + PATH_PART_PAGE + "/all";
     private static final String PATH_ALL_COMMENTS_FOR_USER = "/user" + PATH_PART_ID + PATH_PART_PAGE;
+    private static final String PATH_SEARCH_COMMENTS = "/search";
     private static final String PATH_PERMANENT_DELETION = PATH_PART_ID + "/permanent";
     private static final String REQUESTED_COMMENT_NOT_FOUND = "Requested comment not found";
     private static final String THE_COMMENT_YOU_ARE_LOOKING_FOR_IS_NOT_EXISTING = "The comment you are looking for is not existing";
@@ -154,6 +157,26 @@ public class CommentsController extends BaseController {
         return ResponseEntity
                 .ok()
                 .body(conversionService.convert(comments.getEntitiesOnPage(), ExtendedCommentListDataModel.class));
+    }
+
+    /**
+     * GET /comments/search
+     * Returns a paginated list of comment data for the given search request.
+     *
+     * @param commentSearchParameters {@link CommentSearchParameters} object containing search request parameters
+     * @return page of comments filtered and paginated by the given search parameters
+     */
+    @FillResponse(fill = ResponseFillMode.AJAX)
+    @RequestMapping(method = RequestMethod.GET, path = PATH_SEARCH_COMMENTS)
+    @Timed
+    public ResponseEntity<ExtendedCommentListDataModel> searchComments(CommentSearchParameters commentSearchParameters) {
+
+        var commentSearchParametersVO = conversionService.convert(commentSearchParameters, CommentSearchParametersVO.class);
+        var entityPage = commentFacade.searchComments(commentSearchParametersVO);
+
+        return ResponseEntity
+                .ok()
+                .body(conversionService.convert(entityPage.getEntitiesOnPage(), ExtendedCommentListDataModel.class));
     }
 
     /**
