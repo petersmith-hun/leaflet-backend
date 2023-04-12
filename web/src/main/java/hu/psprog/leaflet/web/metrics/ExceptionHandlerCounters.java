@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.web.metrics;
 
-import com.codahale.metrics.annotation.Counted;
+import io.micrometer.core.annotation.Counted;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,23 +11,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExceptionHandlerCounters {
 
-    @Counted(monotonic = true)
+    @Counted(value = "resourceNotFound", extraTags = {"counter", "apiError"})
     public void resourceNotFound() {
     }
 
-    @Counted(monotonic = true)
+    @Counted(value = "authenticationFailure", extraTags = {"counter", "apiError"})
     public void authenticationFailure() {
     }
 
-    @Counted(monotonic = true)
+    @Counted(value = "authorizationFailure", extraTags = {"counter", "apiError"})
     public void authorizationFailure() {
     }
 
-    @Counted(monotonic = true)
+    @Counted(value = "requestCouldNotBeFulfilled", extraTags = {"counter", "apiError"})
     public void requestCouldNotBeFulfilled() {
     }
 
-    @Counted(monotonic = true)
+    @Counted(value = "defaultExceptionHandler", extraTags = {"counter", "apiError"})
     public void defaultExceptionHandler() {
     }
 }

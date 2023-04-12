@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.controller;
 
-import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.comment.CommentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.comment.CommentSearchParameters;
 import hu.psprog.leaflet.api.rest.request.comment.CommentUpdateRequestModel;
@@ -21,6 +20,7 @@ import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,7 @@ public class CommentsController extends BaseController {
      */
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_PUBLIC_COMMENTS_FOR_ENTRY)
-    @Timed
+    @Timed(value = "getPageOfPublicCommentsForEntry", extraTags = {"controller", "comments"})
     public ResponseEntity<CommentListDataModel> getPageOfPublicCommentsForEntry(
             @PathVariable(PATH_VARIABLE_LINK) String entryLink,
             @PathVariable(PATH_VARIABLE_PAGE) int page,
@@ -115,7 +115,7 @@ public class CommentsController extends BaseController {
      */
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_ALL_COMMENTS_FOR_ENTRY)
-    @Timed
+    @Timed(value = "getPageOfCommentsForEntry", extraTags = {"controller", "comments"})
     public ResponseEntity<CommentListDataModel> getPageOfCommentsForEntry(
             @PathVariable(PATH_VARIABLE_ID) Long entryID,
             @PathVariable(PATH_VARIABLE_PAGE) int page,
@@ -144,7 +144,7 @@ public class CommentsController extends BaseController {
      */
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_ALL_COMMENTS_FOR_USER)
-    @Timed
+    @Timed(value = "getPageOfCommentsForUser", extraTags = {"controller", "comments"})
     public ResponseEntity<ExtendedCommentListDataModel> getPageOfCommentsForUser(
             @PathVariable(PATH_VARIABLE_ID) Long userID,
             @PathVariable(PATH_VARIABLE_PAGE) int page,
@@ -168,7 +168,7 @@ public class CommentsController extends BaseController {
      */
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_SEARCH_COMMENTS)
-    @Timed
+    @Timed(value = "searchComments", extraTags = {"controller", "comments"})
     public ResponseEntity<ExtendedCommentListDataModel> searchComments(CommentSearchParameters commentSearchParameters) {
 
         var commentSearchParametersVO = conversionService.convert(commentSearchParameters, CommentSearchParametersVO.class);
@@ -188,7 +188,7 @@ public class CommentsController extends BaseController {
      * @throws ResourceNotFoundException if no comment found associated with given ID
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
-    @Timed
+    @Timed(value = "getCommentById", extraTags = {"controller", "comments"})
     public ResponseEntity<ExtendedCommentDataModel> getCommentById(@PathVariable(PATH_VARIABLE_ID) Long commentID)
             throws ResourceNotFoundException {
 
@@ -214,7 +214,7 @@ public class CommentsController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException if a service exception occurred
      */
     @RequestMapping(method = RequestMethod.POST)
-    @Timed
+    @Timed(value = "createComment", extraTags = {"controller", "comments"})
     public ResponseEntity<BaseBodyDataModel> createComment(@RequestBody @AuthenticatedRequest @Valid CommentCreateRequestModel commentCreateRequestModel,
                                                            BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
@@ -305,7 +305,7 @@ public class CommentsController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.DELETE, path = PATH_PART_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Timed
+    @Timed(value = "deleteCommentLogically", extraTags = {"controller", "comments"})
     public void deleteCommentLogically(@PathVariable(PATH_VARIABLE_ID) Long commentID)
             throws ResourceNotFoundException {
 

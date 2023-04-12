@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.controller;
 
-import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.user.PasswordChangeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UpdateRoleRequestModel;
@@ -15,6 +14,7 @@ import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,7 @@ public class UsersController extends BaseController {
      * @return list of existing users.
      */
     @RequestMapping(method = RequestMethod.GET)
-    @Timed
+    @Timed(value = "getAllUsers", extraTags = {"controller", "users"})
     public ResponseEntity<UserListDataModel> getAllUsers() {
 
         return ResponseEntity
@@ -115,7 +115,7 @@ public class UsersController extends BaseController {
      * @throws ResourceNotFoundException when no user exists identified by the given ID
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
-    @Timed
+    @Timed(value = "getUserByID", extraTags = {"controller", "users"})
     public ResponseEntity<ExtendedUserDataModel> getUserByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
@@ -184,7 +184,7 @@ public class UsersController extends BaseController {
      * @return updated data of given user
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PROFILE)
-    @Timed
+    @Timed(value = "updateProfile", extraTags = {"controller", "users"})
     public ResponseEntity<BaseBodyDataModel> updateProfile(@PathVariable(PATH_VARIABLE_ID) Long id,
                                       @RequestBody @Valid UpdateProfileRequestModel updateProfileRequestModel,
                                       BindingResult bindingResult)
@@ -217,7 +217,7 @@ public class UsersController extends BaseController {
      * @return updated data of given user
      */
     @RequestMapping(method = RequestMethod.PUT, path = PATH_IDENTIFIED_USER_UPDATE_PASSWORD)
-    @Timed
+    @Timed(value = "updatePassword", extraTags = {"controller", "users"})
     public ResponseEntity<BaseBodyDataModel> updatePassword(@PathVariable(PATH_VARIABLE_ID) Long id,
                                        @RequestBody @Valid PasswordChangeRequestModel passwordChangeRequestModel,
                                        BindingResult bindingResult)

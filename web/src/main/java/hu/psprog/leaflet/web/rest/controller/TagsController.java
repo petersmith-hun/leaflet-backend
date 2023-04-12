@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.controller;
 
-import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.tag.TagAssignmentRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagCreateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
@@ -14,6 +13,7 @@ import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public class TagsController extends BaseController {
      * @return list of tags
      */
     @RequestMapping(method = RequestMethod.GET)
-    @Timed
+    @Timed(value = "getAllTags", extraTags = {"controller", "tags"})
     public ResponseEntity<TagListDataModel> getAllTags() {
 
         List<TagVO> tags = tagFacade.getAll();
@@ -91,7 +91,7 @@ public class TagsController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PUBLIC_TAGS)
-    @Timed
+    @Timed(value = "getAllPublicTags", extraTags = {"controller", "tags"})
     public ResponseEntity<TagListDataModel> getAllPublicTags() {
 
         List<TagVO> tags = tagFacade.getPublicTags();

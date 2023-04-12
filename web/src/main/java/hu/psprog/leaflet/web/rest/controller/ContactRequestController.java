@@ -1,12 +1,12 @@
 package hu.psprog.leaflet.web.rest.controller;
 
-import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.contact.ContactRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
 import hu.psprog.leaflet.service.ContactService;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class ContactRequestController extends BaseController {
      * @throws RequestCouldNotBeFulfilledException thrown when an unexpected exception occurs during processing the request
      */
     @PostMapping
-    @Timed
+    @Timed(value = "processContactRequest", extraTags = {"controller", "contact"})
     public ResponseEntity<BaseBodyDataModel> processContactRequest(@RequestBody @Valid ContactRequestModel contactRequestModel, BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 
