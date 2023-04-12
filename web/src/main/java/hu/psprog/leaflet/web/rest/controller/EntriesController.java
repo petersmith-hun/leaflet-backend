@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.controller;
 
-import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.entry.EntryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.entry.EntryInitialStatus;
 import hu.psprog.leaflet.api.rest.request.entry.EntrySearchParameters;
@@ -23,6 +22,7 @@ import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +83,7 @@ public class EntriesController extends BaseController {
      * @return list of existing entries
      */
     @RequestMapping(method = RequestMethod.GET)
-    @Timed
+    @Timed(value = "getAllEntries", extraTags = {"controller", "entries"})
     public ResponseEntity<EntryListDataModel> getAllEntries() {
 
         List<EntryVO> entries = entryFacade.getAll();
@@ -105,7 +105,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES)
-    @Timed
+    @Timed(value = "getPageOfPublicEntries", extraTags = {"controller", "entries"})
     public ResponseEntity<EntryListDataModel> getPageOfPublicEntries(
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
             @RequestParam(name = REQUEST_PARAMETER_LIMIT, defaultValue = PAGINATION_DEFAULT_LIMIT) int limit,
@@ -133,7 +133,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_NON_FILTERED)
-    @Timed
+    @Timed(value = "getPageOfEntries", extraTags = {"controller", "entries"})
     @Deprecated
     public ResponseEntity<EntryListDataModel> getPageOfEntries(
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
@@ -161,7 +161,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_BY_CATEGORY)
-    @Timed
+    @Timed(value = "getPageOfPublicEntriesByCategory", extraTags = {"controller", "entries"})
     public ResponseEntity<EntryListDataModel> getPageOfPublicEntriesByCategory(
             @PathVariable(BaseController.PATH_VARIABLE_ID) Long id,
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
@@ -189,7 +189,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_BY_TAG)
-    @Timed
+    @Timed(value = "getPageOfPublicEntriesByTag", extraTags = {"controller", "entries"})
     public ResponseEntity<EntryListDataModel> getPageOfPublicEntriesByTag(
             @PathVariable(BaseController.PATH_VARIABLE_ID) Long id,
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
@@ -217,7 +217,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PAGE_OF_ENTRIES_BY_CONTENT)
-    @Timed
+    @Timed(value = "getPageOfPublicEntriesByContent", extraTags = {"controller", "entries"})
     public ResponseEntity<EntryListDataModel> getPageOfPublicEntriesByContent(
             @RequestParam(name = REQUEST_PARAMETER_CONTENT) String content,
             @PathVariable(BaseController.PATH_VARIABLE_PAGE) int page,
@@ -241,7 +241,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse(fill = ResponseFillMode.AJAX)
     @RequestMapping(method = RequestMethod.GET, path = PATH_SEARCH)
-    @Timed
+    @Timed(value = "searchEntries", extraTags = {"controller", "entries"})
     public ResponseEntity<EntrySearchResultDataModel> searchEntries(EntrySearchParameters entrySearchParameters) {
 
         var entrySearchParametersVO = conversionService.convert(entrySearchParameters, EntrySearchParametersVO.class);
@@ -261,7 +261,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_ENTRY_BY_LINK)
-    @Timed
+    @Timed(value = "getEntryByLink", extraTags = {"controller", "entries"})
     public ResponseEntity<ExtendedEntryDataModel> getEntryByLink(@PathVariable(BaseController.PATH_VARIABLE_LINK) String link)
             throws ResourceNotFoundException {
         try {
@@ -283,7 +283,7 @@ public class EntriesController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, value = PATH_PART_ID)
-    @Timed
+    @Timed(value = "getEntryByID", extraTags = {"controller", "entries"})
     public ResponseEntity<EditEntryDataModel> getEntryByID(@PathVariable(BaseController.PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {

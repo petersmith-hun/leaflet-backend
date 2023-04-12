@@ -1,5 +1,7 @@
 package hu.psprog.leaflet.web.config;
 
+import io.micrometer.core.aop.CountedAspect;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.web.servlet.filter.OrderedRequestContextFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,5 +23,10 @@ public class ApplicationContextConfig {
         orderedRequestContextFilter.setOrder(Ordered.HIGHEST_PRECEDENCE);
 
         return orderedRequestContextFilter;
+    }
+
+    @Bean
+    public CountedAspect countedAspect(MeterRegistry meterRegistry) {
+        return new CountedAspect(meterRegistry);
     }
 }

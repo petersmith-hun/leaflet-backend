@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.controller;
 
-import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.category.CategoryCreateRequestModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
@@ -11,6 +10,7 @@ import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ public class CategoriesController extends BaseController {
      * @return list of categories
      */
     @RequestMapping(method = RequestMethod.GET)
-    @Timed
+    @Timed(value = "getAllCategories", extraTags = {"controller", "categories"})
     public ResponseEntity<CategoryListDataModel> getAllCategories() {
 
         List<CategoryVO> categories = categoryFacade.getAll();
@@ -78,7 +78,7 @@ public class CategoriesController extends BaseController {
      * @return list of public categories
      */
     @RequestMapping(value = PATH_PUBLIC, method = RequestMethod.GET)
-    @Timed
+    @Timed(value = "getPublicCategories", extraTags = {"controller", "categories"})
     public ResponseEntity<CategoryListDataModel> getPublicCategories() {
 
         List<CategoryVO> categories = categoryFacade.getAllPublic();

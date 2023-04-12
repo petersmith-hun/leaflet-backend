@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.controller;
 
-import com.codahale.metrics.annotation.Timed;
 import hu.psprog.leaflet.api.rest.request.document.DocumentCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.document.DocumentUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.response.common.BaseBodyDataModel;
@@ -15,6 +14,7 @@ import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,7 @@ public class DocumentsController extends BaseController {
      * @return list of existing documents
      */
     @RequestMapping(method = RequestMethod.GET)
-    @Timed
+    @Timed(value = "getAllDocuments", extraTags = {"controller", "documents"})
     public ResponseEntity<DocumentListDataModel> getAllDocuments() {
 
         List<DocumentVO> documentVOList = documentFacade.getAll();
@@ -85,7 +85,7 @@ public class DocumentsController extends BaseController {
      * @return list of public documents
      */
     @RequestMapping(method = RequestMethod.GET, path = PATH_PUBLIC)
-    @Timed
+    @Timed(value = "getPublicDocuments", extraTags = {"controller", "documents"})
     public ResponseEntity<DocumentListDataModel> getPublicDocuments() {
 
         List<DocumentVO> documentVOList = documentFacade.getPublicDocuments();
@@ -105,7 +105,7 @@ public class DocumentsController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, path = PATH_PART_ID)
-    @Timed
+    @Timed(value = "getDocumentByID", extraTags = {"controller", "documents"})
     public ResponseEntity<EditDocumentDataModel> getDocumentByID(@PathVariable(PATH_VARIABLE_ID) Long id) throws ResourceNotFoundException {
 
         try {
@@ -130,7 +130,7 @@ public class DocumentsController extends BaseController {
      */
     @FillResponse
     @RequestMapping(method = RequestMethod.GET, path = PATH_DOCUMENT_BY_LINK)
-    @Timed
+    @Timed(value = "getDocumentByLink", extraTags = {"controller", "documents"})
     public ResponseEntity<DocumentDataModel> getDocumentByLink(@PathVariable(PATH_VARIABLE_LINK) String link) throws ResourceNotFoundException {
 
         try {
