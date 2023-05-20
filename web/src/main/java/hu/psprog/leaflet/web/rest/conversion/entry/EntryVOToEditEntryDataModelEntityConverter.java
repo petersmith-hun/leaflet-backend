@@ -36,7 +36,7 @@ public class EntryVOToEditEntryDataModelEntityConverter implements Converter<Ent
     @Override
     public EditEntryDataModel convert(EntryVO entryVO) {
 
-        EditEntryDataModel.EditEntryDataModelBuilder builder = EditEntryDataModel.getExtendedBuilder()
+        EditEntryDataModel.EditEntryDataModelBuilder builder = EditEntryDataModel.getBuilder()
                 .withRawContent(entryVO.getRawContent())
                 .withEnabled(entryVO.isEnabled())
                 .withEntryStatus(entryVO.getEntryStatus())
@@ -50,7 +50,7 @@ public class EntryVOToEditEntryDataModelEntityConverter implements Converter<Ent
                 .withLocale(entryVO.getLocale().name())
                 .withCategory(CategoryDataModel.getBuilder()
                         .withTitle(entryVO.getCategory().getTitle())
-                        .withID(entryVO.getCategory().getId())
+                        .withId(entryVO.getCategory().getId())
                         .build())
                 .withUser(UserDataModel.getBuilder()
                         .withId(entryVO.getOwner().getId())

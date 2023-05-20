@@ -20,17 +20,16 @@ public class ValidationErrorMessagesConverter implements Converter<List<ObjectEr
     @Override
     public ValidationErrorMessageListDataModel convert(List<ObjectError> objectErrors) {
 
-        ValidationErrorMessageListDataModel.ValidationErrorMessageListDataModelBuilder builder = ValidationErrorMessageListDataModel.getBuilder();
-        objectErrors.stream()
-                .map(this::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return ValidationErrorMessageListDataModel.getBuilder()
+                .withValidation(objectErrors.stream()
+                        .map(this::convert)
+                        .toList())
+                .build();
     }
 
     private ValidationErrorMessageDataModel convert(ObjectError objectError) {
 
-        ValidationErrorMessageDataModel.ValidationErrorMessageDataModelBuilder builder = ValidationErrorMessageDataModel.getExtendedBuilder();
+        ValidationErrorMessageDataModel.ValidationErrorMessageDataModelBuilder builder = ValidationErrorMessageDataModel.getBuilder();
 
         if (objectError instanceof FieldError) {
             builder.withField(((FieldError) objectError).getField());

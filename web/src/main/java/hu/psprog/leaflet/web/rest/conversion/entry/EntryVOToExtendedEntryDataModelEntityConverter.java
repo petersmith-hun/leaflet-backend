@@ -36,7 +36,7 @@ public class EntryVOToExtendedEntryDataModelEntityConverter implements Converter
     @Override
     public ExtendedEntryDataModel convert(EntryVO entryVO) {
 
-        ExtendedEntryDataModel.ExtendedEntryDataModelBuilder builder = ExtendedEntryDataModel.getExtendedBuilder()
+        ExtendedEntryDataModel.ExtendedEntryDataModelBuilder builder = ExtendedEntryDataModel.getBuilder()
                 .withRawContent(entryVO.getRawContent())
                 .withLastModified(dateConverter.convert(entryVO.getLastModified()))
                 .withTitle(entryVO.getTitle())
@@ -48,7 +48,7 @@ public class EntryVOToExtendedEntryDataModelEntityConverter implements Converter
                 .withLocale(entryVO.getLocale().name())
                 .withCategory(CategoryDataModel.getBuilder()
                         .withTitle(entryVO.getCategory().getTitle())
-                        .withID(entryVO.getCategory().getId())
+                        .withId(entryVO.getCategory().getId())
                         .build())
                 .withUser(UserDataModel.getBuilder()
                         .withId(entryVO.getOwner().getId())

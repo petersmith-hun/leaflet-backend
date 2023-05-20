@@ -42,8 +42,8 @@ public class FrontEndRoutingSupportControllerAcceptanceTest extends AbstractPara
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getRoutes().size(), equalTo(NUMBER_OF_ALL_ROUTES));
-        assertThat(result.getRoutes().contains(control), is(true));
+        assertThat(result.routes().size(), equalTo(NUMBER_OF_ALL_ROUTES));
+        assertThat(result.routes().contains(control), is(true));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class FrontEndRoutingSupportControllerAcceptanceTest extends AbstractPara
         ExtendedFrontEndRouteDataModel result = frontEndRoutingSupportBridgeService.createRoute(control);
 
         // then
-        assertModifiedRoutes(result.getId(), control);
+        assertModifiedRoutes(result.id(), control);
     }
 
     @Test
@@ -84,8 +84,8 @@ public class FrontEndRoutingSupportControllerAcceptanceTest extends AbstractPara
         ExtendedFrontEndRouteDataModel result = frontEndRoutingSupportBridgeService.updateRoute(CONTROL_ROUTE_ID, control);
 
         // then
-        assertThat(result.getId(), equalTo(CONTROL_ROUTE_ID));
-        assertModifiedRoutes(result.getId(), control);
+        assertThat(result.id(), equalTo(CONTROL_ROUTE_ID));
+        assertModifiedRoutes(result.id(), control);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class FrontEndRoutingSupportControllerAcceptanceTest extends AbstractPara
 
         // given
         // before the test case, make sure the status of the control route item is enabled
-        if (!frontEndRoutingSupportBridgeService.getRouteByID(CONTROL_ROUTE_ID).isEnabled()) {
+        if (!frontEndRoutingSupportBridgeService.getRouteByID(CONTROL_ROUTE_ID).enabled()) {
             fail("Route should be enabled");
         }
 
@@ -102,8 +102,8 @@ public class FrontEndRoutingSupportControllerAcceptanceTest extends AbstractPara
         ExtendedFrontEndRouteDataModel result = frontEndRoutingSupportBridgeService.changeStatus(CONTROL_ROUTE_ID);
 
         // then
-        assertThat(result.isEnabled(), is(false));
-        assertThat(frontEndRoutingSupportBridgeService.getRouteByID(CONTROL_ROUTE_ID).isEnabled(), is(false));
+        assertThat(result.enabled(), is(false));
+        assertThat(frontEndRoutingSupportBridgeService.getRouteByID(CONTROL_ROUTE_ID).enabled(), is(false));
     }
 
     @Test
@@ -118,17 +118,17 @@ public class FrontEndRoutingSupportControllerAcceptanceTest extends AbstractPara
 
         // then
         ExtendedFrontEndRouteListDataModel current = frontEndRoutingSupportBridgeService.getAllRoutes();
-        assertThat(current.getRoutes().size(), equalTo(12));
-        assertThat(current.getRoutes().contains(control), is(false));
+        assertThat(current.routes().size(), equalTo(12));
+        assertThat(current.routes().contains(control), is(false));
     }
 
     private void assertModifiedRoutes(Long routeID, FrontEndRouteUpdateRequestModel frontEndRouteUpdateRequestModel) throws CommunicationFailureException {
         ExtendedFrontEndRouteDataModel current = frontEndRoutingSupportBridgeService.getRouteByID(routeID);
-        assertThat(current.getName(), equalTo(frontEndRouteUpdateRequestModel.getName()));
-        assertThat(current.getUrl(), equalTo(frontEndRouteUpdateRequestModel.getUrl()));
-        assertThat(current.getType(), equalTo(frontEndRouteUpdateRequestModel.getType()));
-        assertThat(current.getRouteId(), equalTo(frontEndRouteUpdateRequestModel.getRouteId()));
-        assertThat(current.getSequenceNumber(), equalTo(frontEndRouteUpdateRequestModel.getSequenceNumber()));
-        assertThat(current.isEnabled(), is(true));
+        assertThat(current.name(), equalTo(frontEndRouteUpdateRequestModel.getName()));
+        assertThat(current.url(), equalTo(frontEndRouteUpdateRequestModel.getUrl()));
+        assertThat(current.type(), equalTo(frontEndRouteUpdateRequestModel.getType()));
+        assertThat(current.routeId(), equalTo(frontEndRouteUpdateRequestModel.getRouteId()));
+        assertThat(current.sequenceNumber(), equalTo(frontEndRouteUpdateRequestModel.getSequenceNumber()));
+        assertThat(current.enabled(), is(true));
     }
 }

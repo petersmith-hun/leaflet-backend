@@ -35,7 +35,7 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceImplTest {
     
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private CategoryDAO categoryDAO;
     
     @Mock

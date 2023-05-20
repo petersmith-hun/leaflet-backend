@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
@@ -164,8 +165,10 @@ public class DCPStoreControllerTest extends AbstractControllerBaseTest {
 
     private DCPListDataModel prepareDcpListDataModel() {
         return DCPListDataModel.getBuilder()
-                .withItem(prepareDcpDataModel(KEY_1, VALUE_1))
-                .withItem(prepareDcpDataModel(KEY_2, VALUE_2))
+                .withDcpStore(List.of(
+                        prepareDcpDataModel(KEY_1, VALUE_1),
+                        prepareDcpDataModel(KEY_2, VALUE_2)
+                ))
                 .build();
     }
 

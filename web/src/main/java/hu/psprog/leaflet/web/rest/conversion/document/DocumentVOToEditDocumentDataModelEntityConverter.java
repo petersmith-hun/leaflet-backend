@@ -26,7 +26,7 @@ public class DocumentVOToEditDocumentDataModelEntityConverter implements Convert
     @Override
     public EditDocumentDataModel convert(DocumentVO source) {
 
-        EditDocumentDataModel.EditDocumentDataModelBuilder builder = EditDocumentDataModel.getExtendedBuilder()
+        EditDocumentDataModel.EditDocumentDataModelBuilder builder = EditDocumentDataModel.getBuilder()
                 .withId(source.getId())
                 .withTitle(source.getTitle())
                 .withLink(source.getLink())

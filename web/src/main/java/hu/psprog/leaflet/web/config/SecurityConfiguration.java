@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +21,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled =  true)
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
     private static final String[] PUBLIC_GET_ENDPOINTS = {
@@ -61,28 +61,25 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
-            .authorizeRequests()
-                .antMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
-                    .permitAll()
-                .antMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
-                    .permitAll()
-                .anyRequest()
-                    .authenticated()
-                .and()
+                .authorizeHttpRequests(registry -> registry
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
+                            .permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
+                            .permitAll()
+                        .anyRequest()
+                            .authenticated())
 
-            .csrf()
-                .disable()
+                .csrf(AbstractHttpConfigurer::disable)
 
-            .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .exceptionHandling()
-                .authenticationEntryPoint(restAuthenticationEntryPoint)
-                .and()
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(restAuthenticationEntryPoint))
 
-            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .oauth2ResourceServer(resourceServer -> resourceServer
+                        .jwt(jwtConfigurer -> {}))
 
-            .build();
+                .build();
     }
 }

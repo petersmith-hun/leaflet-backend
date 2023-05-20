@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.PersistenceException;
+import jakarta.annotation.PostConstruct;
+import jakarta.persistence.PersistenceException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;

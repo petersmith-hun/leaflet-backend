@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.ConversionService;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ public class MenuResponseFillerTest {
     @Mock
     private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private ConversionService conversionService;
 
     @Mock
@@ -69,13 +69,13 @@ public class MenuResponseFillerTest {
 
         // then
         WrapperBodyDataModel<?> builtWrapper = builder.build();
-        assertThat(builtWrapper.getMenu(), notNullValue());
-        assertThat(builtWrapper.getMenu().getHeader().size(), equalTo(2));
-        assertThat(builtWrapper.getMenu().getHeader().get(0).getUrl(), equalTo(URL_1));
-        assertThat(builtWrapper.getMenu().getHeader().get(1).getUrl(), equalTo(URL_2));
-        assertThat(builtWrapper.getMenu().getFooter().size(), equalTo(0));
-        assertThat(builtWrapper.getMenu().getStandalone().size(), equalTo(1));
-        assertThat(builtWrapper.getMenu().getStandalone().get(0).getUrl(), equalTo(URL_3));
+        assertThat(builtWrapper.menu(), notNullValue());
+        assertThat(builtWrapper.menu().header().size(), equalTo(2));
+        assertThat(builtWrapper.menu().header().get(0).url(), equalTo(URL_1));
+        assertThat(builtWrapper.menu().header().get(1).url(), equalTo(URL_2));
+        assertThat(builtWrapper.menu().footer().size(), equalTo(0));
+        assertThat(builtWrapper.menu().standalone().size(), equalTo(1));
+        assertThat(builtWrapper.menu().standalone().get(0).url(), equalTo(URL_3));
     }
 
     @Test
@@ -89,10 +89,10 @@ public class MenuResponseFillerTest {
 
         // then
         WrapperBodyDataModel<?> builtWrapper = builder.build();
-        assertThat(builtWrapper.getMenu(), notNullValue());
-        assertThat(builtWrapper.getMenu().getHeader().isEmpty(), is(true));
-        assertThat(builtWrapper.getMenu().getFooter().isEmpty(), is(true));
-        assertThat(builtWrapper.getMenu().getStandalone().isEmpty(), is(true));
+        assertThat(builtWrapper.menu(), notNullValue());
+        assertThat(builtWrapper.menu().header().isEmpty(), is(true));
+        assertThat(builtWrapper.menu().footer().isEmpty(), is(true));
+        assertThat(builtWrapper.menu().standalone().isEmpty(), is(true));
     }
 
     @Test

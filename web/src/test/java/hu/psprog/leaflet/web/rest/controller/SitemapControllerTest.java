@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.rest.controller;
 
 import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
+import hu.psprog.leaflet.api.rest.response.sitemap.SitemapLocationItem;
 import hu.psprog.leaflet.service.facade.FrontEndRoutingSupportFacade;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class SitemapControllerTest extends AbstractControllerBaseTest {
 
     private static final String URL_1 = "url-1";
     private static final List<FrontEndRouteVO> FRONT_END_ROUTE_VO_LIST = Collections.singletonList(FrontEndRouteVO.getBuilder().withUrl(URL_1).build());
-    private static final Sitemap SITEMAP = Sitemap.getBuilder().withLocation(URL_1).build();
+    private static final Sitemap SITEMAP = Sitemap.getBuilder().withSitemapLocationItemList(List.of(new SitemapLocationItem(URL_1))).build();
 
     @Mock
     private FrontEndRoutingSupportFacade frontEndRoutingSupportFacade;

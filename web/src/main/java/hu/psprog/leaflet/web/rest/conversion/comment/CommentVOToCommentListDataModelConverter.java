@@ -26,11 +26,10 @@ public class CommentVOToCommentListDataModelConverter implements Converter<List<
     @Override
     public CommentListDataModel convert(List<CommentVO> source) {
 
-        CommentListDataModel.CommentListDataModelBuilder builder = CommentListDataModel.getBuilder();
-        source.stream()
-                .map(commentVOToCommentDataModelConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return CommentListDataModel.getBuilder()
+                .withComments(source.stream()
+                        .map(commentVOToCommentDataModelConverter::convert)
+                        .toList())
+                .build();
     }
 }

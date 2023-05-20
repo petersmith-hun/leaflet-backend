@@ -64,7 +64,7 @@ public class CommentServiceImplTest {
     private static final EntryVO ENTRY_VO = EntryVO.wrapMinimumVO(5L);
     private static final Entry ENTRY = Entry.getBuilder().withId(ENTRY_VO.getId()).build();
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private CommentDAO commentDAO;
 
     @Mock
@@ -73,13 +73,13 @@ public class CommentServiceImplTest {
     @Mock
     private CommentVOToCommentConverter commentVOToCommentConverter;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private Comment comment;
 
     @Mock
     private CommentVO commentVO;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private User user;
 
     @Mock

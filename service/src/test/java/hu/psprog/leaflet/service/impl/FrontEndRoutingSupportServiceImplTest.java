@@ -10,6 +10,9 @@ import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.impl.support.routing.RouteMaskProcessor;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,13 +24,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -57,19 +56,19 @@ public class FrontEndRoutingSupportServiceImplTest {
     private static final FrontEndRouteVO FRONT_END_ROUTE_VO_2 = prepareFrontEndRouteVO(2);
     private static final FrontEndRouteVO FRONT_END_ROUTE_VO_3 = prepareFrontEndRouteVO(3);
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private FrontEndRouteDAO frontEndRouteDAO;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private RouteMaskProcessor firstRouteMaskProcessor;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private RouteMaskProcessor secondRouteMaskProcessor;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private FrontEndRouteToFrontEndRouteVOConverter frontEndRouteToFrontEndRouteVOConverter;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private FrontEndRouteVOToFrontEndRouteConverter frontEndRouteVOToFrontEndRouteConverter;
 
     @Mock
@@ -145,7 +144,7 @@ public class FrontEndRoutingSupportServiceImplTest {
         assertThat(result.size(), equalTo(6));
         assertThat(result.stream()
                 .map(FrontEndRouteVO::getId)
-                .collect(Collectors.toList()).containsAll(Arrays.asList(4L, 5L, 8L, 9L, 12L, 13L)), is(true));
+                .toList().containsAll(Arrays.asList(4L, 5L, 8L, 9L, 12L, 13L)), is(true));
         verifyFilter(FrontEndRouteType.ENTRY_ROUTE_MASK, FrontEndRouteType.CATEGORY_ROUTE_MASK);
     }
 

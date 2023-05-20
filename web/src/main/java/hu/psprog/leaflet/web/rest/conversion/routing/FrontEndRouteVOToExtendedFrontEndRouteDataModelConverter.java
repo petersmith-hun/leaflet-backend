@@ -25,7 +25,7 @@ public class FrontEndRouteVOToExtendedFrontEndRouteDataModelConverter implements
     @Override
     public ExtendedFrontEndRouteDataModel convert(FrontEndRouteVO source) {
 
-        return ExtendedFrontEndRouteDataModel.getExtendedBuilder()
+        return ExtendedFrontEndRouteDataModel.getBuilder()
                 .withRouteId(source.getRouteId())
                 .withName(source.getName())
                 .withUrl(source.getUrl())

@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpMethod;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -51,7 +51,7 @@ public class ReCaptchaRestrictionValidatorStrategyTest {
     @Mock
     private ReCaptchaValidationService reCaptchaValidationService;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private HttpServletRequest request;
 
     @InjectMocks

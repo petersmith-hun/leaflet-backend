@@ -26,11 +26,10 @@ public class FrontEndRouteVOToExtendedFrontEndRouteDataModelListConverter implem
     @Override
     public ExtendedFrontEndRouteListDataModel convert(List<FrontEndRouteVO> source) {
 
-        ExtendedFrontEndRouteListDataModel.ExtendedFrontEndRouteListDataModelBuilder builder = ExtendedFrontEndRouteListDataModel.getExtendedBuilder();
-        source.stream()
-                .map(singleConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return ExtendedFrontEndRouteListDataModel.getBuilder()
+                .withRoutes(source.stream()
+                        .map(singleConverter::convert)
+                        .toList())
+                .build();
     }
 }

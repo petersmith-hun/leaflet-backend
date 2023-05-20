@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.ReflectionUtils;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;

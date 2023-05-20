@@ -91,19 +91,19 @@ public class AttachmentsControllerAcceptanceTest extends AbstractParameterizedBa
     }
 
     private void assertAttached(AttachmentRequestModel attachmentRequestModel) throws CommunicationFailureException {
-        assertThat(entryBridgeService.getEntryByID(attachmentRequestModel.getEntryID()).getBody()
-                .getAttachments().stream()
+        assertThat(entryBridgeService.getEntryByID(attachmentRequestModel.getEntryID()).body()
+                .attachments().stream()
                 .anyMatch(fileDataModel -> attachmentRequestModel.getPathUUID().equals(extractUUIDFromReference(fileDataModel))), is(true));
     }
 
     private void assertDetached(AttachmentRequestModel attachmentRequestModel) throws CommunicationFailureException {
-        assertThat(entryBridgeService.getEntryByID(attachmentRequestModel.getEntryID()).getBody()
-                .getAttachments().stream()
+        assertThat(entryBridgeService.getEntryByID(attachmentRequestModel.getEntryID()).body()
+                .attachments().stream()
                 .noneMatch(fileDataModel -> attachmentRequestModel.getPathUUID().equals(extractUUIDFromReference(fileDataModel))), is(true));
     }
 
     private UUID extractUUIDFromReference(FileDataModel fileDataModel) {
-        return UUID.fromString(fileDataModel.getReference().split("/")[1]);
+        return UUID.fromString(fileDataModel.reference().split("/")[1]);
     }
 
     private AttachmentRequestModel prepareAttachmentRequestModel(Long entryID, UUID fileID) {

@@ -26,11 +26,10 @@ public class DocumentVOToEditDocumentDataModelListConverter implements Converter
     @Override
     public DocumentListDataModel convert(List<DocumentVO> source) {
 
-        DocumentListDataModel.DocumentListDataModelBuilder builder = DocumentListDataModel.getBuilder();
-        source.stream()
-                .map(documentVOToEditDocumentDataModelEntityConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return DocumentListDataModel.getBuilder()
+                .withDocuments(source.stream()
+                        .map(documentVOToEditDocumentDataModelEntityConverter::convert)
+                        .toList())
+                .build();
     }
 }

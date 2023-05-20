@@ -15,7 +15,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.method.HandlerMethod;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -41,7 +41,7 @@ public class ResponseFillerInterceptorTest {
 
     @ParameterizedTest
     @MethodSource("preHandleDataProvider")
-    public void shouldPutAJAXFlag(String methodName, boolean expected) throws Exception {
+    public void shouldPutAJAXFlag(String methodName, boolean expected) {
 
         // given
         HandlerMethod handlerMethod = prepareHandlerMethod(methodName);
@@ -54,7 +54,7 @@ public class ResponseFillerInterceptorTest {
     }
 
     @Test
-    public void shouldNotChangeAJAXFlagIfAlreadySet() throws Exception {
+    public void shouldNotChangeAJAXFlagIfAlreadySet() {
 
         // given
         request.setAttribute(RequestParameter.IS_AJAX_REQUEST, true);

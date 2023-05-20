@@ -85,7 +85,7 @@ public class EmailBasedNotificationService implements NotificationService {
 
         try {
             eventNotificationServiceClient.requestMailNotification(mailRequestWrapper);
-            LOGGER.info("Submitted mail of type [{}]", mailRequestWrapper.getContent().getMailContentType());
+            LOGGER.info("Submitted mail of type [{}]", mailRequestWrapper.content().getMailContentType());
         } catch (CommunicationFailureException exception) {
             LOGGER.error("Failed to submit mail request", exception);
         }

@@ -71,7 +71,7 @@ public class TagRouteMaskProcessorTest {
     @Mock
     private TagFacade tagFacade;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private FilenameGeneratorUtil filenameGeneratorUtil;
 
     @InjectMocks

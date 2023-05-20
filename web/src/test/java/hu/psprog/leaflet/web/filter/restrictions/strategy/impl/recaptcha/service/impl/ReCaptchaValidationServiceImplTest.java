@@ -41,7 +41,7 @@ public class ReCaptchaValidationServiceImplTest {
 
         // given
         given(reCaptchaClient.validate(RE_CAPTCHA_REQUEST)).willReturn(ReCaptchaResponse.getBuilder()
-                .withSuccess(true)
+                .withSuccessful(true)
                 .build());
 
         // when
@@ -56,7 +56,7 @@ public class ReCaptchaValidationServiceImplTest {
 
         // given
         given(reCaptchaClient.validate(RE_CAPTCHA_REQUEST)).willReturn(ReCaptchaResponse.getBuilder()
-                .withSuccess(false)
+                .withSuccessful(false)
                 .withErrorCodes(Collections.singletonList(ReCaptchaErrorCode.TIMEOUT_OR_DUPLICATE))
                 .build());
 

@@ -5,15 +5,13 @@ import hu.psprog.leaflet.lens.api.domain.ContactRequest;
 import hu.psprog.leaflet.lens.api.domain.MailRequestWrapper;
 import hu.psprog.leaflet.lens.api.domain.SystemStartup;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
-import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import hu.psprog.leaflet.service.vo.ContactRequestVO;
+import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -45,12 +43,13 @@ public class EmailBasedNotificationServiceTest {
     public void shouldSendStartupFinishedNotification() throws CommunicationFailureException {
 
         // given
-        MailRequestWrapper<SystemStartup> systemStartupMail = new MailRequestWrapper<>();
-        systemStartupMail.setOverrideSubjectKey("mail.system.event.startup.subject.leaflet");
-        systemStartupMail.setContent(SystemStartup.builder()
-                .applicationName("Leaflet Backend")
-                .version(VERSION)
-                .build());
+        MailRequestWrapper<SystemStartup> systemStartupMail = MailRequestWrapper.<SystemStartup>builder()
+                .overrideSubjectKey("mail.system.event.startup.subject.leaflet")
+                .content(SystemStartup.builder()
+                        .applicationName("Leaflet Backend")
+                        .version(VERSION)
+                        .build())
+                .build();
 
         // when
         emailBasedNotificationService.startupFinished(VERSION);
@@ -84,16 +83,17 @@ public class EmailBasedNotificationServiceTest {
                 .withAuthorEmail(DESTINATION_EMAIL_ADDRESS)
                 .withEntryTitle(ENTRY_TITLE)
                 .build();
-        MailRequestWrapper<hu.psprog.leaflet.lens.api.domain.CommentNotification> commentNotificationMail = new MailRequestWrapper<>();
-        commentNotificationMail.setRecipients(List.of(DESTINATION_EMAIL_ADDRESS));
-        commentNotificationMail.setContent(hu.psprog.leaflet.lens.api.domain.CommentNotification.builder()
-                .username(USERNAME)
-                .email(EMAIL)
-                .content(CONTENT)
-                .authorName(AUTHOR_NAME)
-                .authorEmail(DESTINATION_EMAIL_ADDRESS)
-                .entryTitle(ENTRY_TITLE)
-                .build());
+        MailRequestWrapper<hu.psprog.leaflet.lens.api.domain.CommentNotification> commentNotificationMail = MailRequestWrapper.<hu.psprog.leaflet.lens.api.domain.CommentNotification>builder()
+                .recipients(DESTINATION_EMAIL_ADDRESS)
+                .content(hu.psprog.leaflet.lens.api.domain.CommentNotification.builder()
+                        .username(USERNAME)
+                        .email(EMAIL)
+                        .content(CONTENT)
+                        .authorName(AUTHOR_NAME)
+                        .authorEmail(DESTINATION_EMAIL_ADDRESS)
+                        .entryTitle(ENTRY_TITLE)
+                        .build())
+                .build();
 
         // when
         emailBasedNotificationService.commentNotification(commentNotification);
@@ -111,13 +111,14 @@ public class EmailBasedNotificationServiceTest {
                 .withMessage(CONTENT)
                 .withEmail(EMAIL)
                 .build();
-        MailRequestWrapper<ContactRequest> contactRequestMail = new MailRequestWrapper<>();
-        contactRequestMail.setReplyTo(EMAIL);
-        contactRequestMail.setContent(ContactRequest.builder()
-                .name(USERNAME)
-                .email(EMAIL)
-                .message(CONTENT)
-                .build());
+        MailRequestWrapper<ContactRequest> contactRequestMail = MailRequestWrapper.<ContactRequest>builder()
+                .replyTo(EMAIL)
+                .content(ContactRequest.builder()
+                        .name(USERNAME)
+                        .email(EMAIL)
+                        .message(CONTENT)
+                        .build())
+                .build();
 
         // when
         emailBasedNotificationService.contactRequestReceived(contactRequestVO);

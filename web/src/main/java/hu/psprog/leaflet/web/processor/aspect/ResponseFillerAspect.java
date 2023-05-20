@@ -82,7 +82,7 @@ public class ResponseFillerAspect {
     }
 
     private HttpStatus extractStatusCode(Object methodResponse) {
-        return ((ResponseEntity<?>) methodResponse).getStatusCode();
+        return (HttpStatus) ((ResponseEntity<?>) methodResponse).getStatusCode();
     }
 
     private BaseBodyDataModel extractBody(Object methodResponse) {

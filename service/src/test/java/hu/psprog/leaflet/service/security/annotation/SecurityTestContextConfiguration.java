@@ -10,10 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 import java.util.Optional;
 
@@ -30,8 +28,8 @@ import static org.mockito.BDDMockito.given;
 @Configuration
 @ComponentScan("hu.psprog.leaflet.service.security.evaluator")
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityTestContextConfiguration extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+public class SecurityTestContextConfiguration {
 
     static final String SECURITY_TEST_PROFILE = "securityTest";
     static final long USER_UID = 1L;
@@ -63,11 +61,6 @@ public class SecurityTestContextConfiguration extends WebSecurityConfigurerAdapt
     @Bean
     public SecurityExpressionStub securityExpressionStub() {
         return new SecurityExpressionStub();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager() throws Exception {
-        return authenticationManagerBean();
     }
 
     private static Entry prepareEntry() {

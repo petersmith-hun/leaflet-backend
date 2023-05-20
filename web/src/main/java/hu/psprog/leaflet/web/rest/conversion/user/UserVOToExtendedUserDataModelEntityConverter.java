@@ -30,7 +30,7 @@ public class UserVOToExtendedUserDataModelEntityConverter implements Converter<U
 
     private ExtendedUserDataModel convertEntity(UserVO userVO) {
 
-        return ExtendedUserDataModel.getExtendedBuilder()
+        return ExtendedUserDataModel.getBuilder()
                 .withLocale(userVO.getLocale().name())
                 .withRole(extractRole(userVO))
                 .withCreated(dateConverter.convert(userVO.getCreated()))

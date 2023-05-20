@@ -27,11 +27,10 @@ public class UserVOToExtendedUserDataModelListConverter implements Converter<Lis
     @Override
     public UserListDataModel convert(List<UserVO> userVOList) {
 
-        UserListDataModel.UserListDataModelBuilder builder = UserListDataModel.getBuilder();
-        userVOList.stream()
-                .map(userVOToExtendedUserDataModelEntityConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return UserListDataModel.getBuilder()
+                .withUsers(userVOList.stream()
+                        .map(userVOToExtendedUserDataModelEntityConverter::convert)
+                        .toList())
+                .build();
     }
 }

@@ -39,10 +39,10 @@ public class AttachmentServiceImplTest {
     private static final Long ENTRY_ID = 1L;
     private static final Long UPLOADED_FILE_ID = 15L;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private EntryDAO entryDAO;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private Entry mockedEntry;
 
     @InjectMocks
