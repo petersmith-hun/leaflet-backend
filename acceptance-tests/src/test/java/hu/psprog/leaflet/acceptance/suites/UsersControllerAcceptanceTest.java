@@ -9,7 +9,6 @@ import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
 import hu.psprog.leaflet.api.rest.request.user.UserPasswordRequestModel;
 import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
-import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ForbiddenOperationException;
@@ -76,18 +75,18 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getUsers().size(), equalTo(9));
+        assertThat(result.users().size(), equalTo(9));
     }
 
     @Test
     public void shouldGetUserByID() throws CommunicationFailureException {
 
         // when
-        UserDataModel result = userBridgeService.getUserByID(ADMIN_USER_ID);
+        ExtendedUserDataModel result = userBridgeService.getUserByID(ADMIN_USER_ID);
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getUsername(), equalTo(ADMIN_USER_NAME));
+        assertThat(result.username(), equalTo(ADMIN_USER_NAME));
     }
 
     @Test
@@ -102,7 +101,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         userBridgeService.updateRole(userID, updateRoleRequestModel);
 
         // then
-        assertThat(userBridgeService.getUserByID(userID).getRole(), equalTo(Role.EDITOR.name()));
+        assertThat(userBridgeService.getUserByID(userID).role(), equalTo(Role.EDITOR.name()));
     }
 
     @Test
@@ -131,9 +130,9 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
 
         // then
         ExtendedUserDataModel userData = userBridgeService.getUserByID(ADMIN_USER_ID);
-        assertThat(userData.getUsername(), equalTo(updateProfileRequestModel.getUsername()));
-        assertThat(userData.getEmail(), equalTo(updateProfileRequestModel.getEmail()));
-        assertThat(userData.getLocale().toLowerCase(), equalTo(updateProfileRequestModel.getDefaultLocale().getLanguage()));
+        assertThat(userData.username(), equalTo(updateProfileRequestModel.getUsername()));
+        assertThat(userData.email(), equalTo(updateProfileRequestModel.getEmail()));
+        assertThat(userData.locale().toLowerCase(), equalTo(updateProfileRequestModel.getDefaultLocale().getLanguage()));
     }
 
     @Test
@@ -212,7 +211,7 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
         ExtendedUserDataModel result = userBridgeService.createUser(userCreateRequestModel);
 
         // then
-        assertCreatedUser(userCreateRequestModel, result.getId());
+        assertCreatedUser(userCreateRequestModel, result.id());
     }
 
     @Test
@@ -232,14 +231,14 @@ public class UsersControllerAcceptanceTest extends AbstractParameterizedBaseTest
     private void assertCreatedUser(UserInitializeRequestModel userInitializeRequestModel, long createdUserID) throws CommunicationFailureException {
 
         ExtendedUserDataModel userData = userBridgeService.getUserByID(createdUserID);
-        assertThat(userData.getEmail(), equalTo(userInitializeRequestModel.getEmail()));
-        assertThat(userData.getUsername(), equalTo(userInitializeRequestModel.getUsername()));
-        assertThat(userData.getLocale().toLowerCase(), equalTo(userInitializeRequestModel.getDefaultLocale().getLanguage()));
+        assertThat(userData.email(), equalTo(userInitializeRequestModel.getEmail()));
+        assertThat(userData.username(), equalTo(userInitializeRequestModel.getUsername()));
+        assertThat(userData.locale().toLowerCase(), equalTo(userInitializeRequestModel.getDefaultLocale().getLanguage()));
 
         if (userInitializeRequestModel instanceof UserCreateRequestModel) {
-            assertThat(userData.getRole(), equalTo(((UserCreateRequestModel) userInitializeRequestModel).getRole()));
+            assertThat(userData.role(), equalTo(((UserCreateRequestModel) userInitializeRequestModel).getRole()));
         } else {
-            assertThat(userData.getRole(), equalTo(Role.USER.name()));
+            assertThat(userData.role(), equalTo(Role.USER.name()));
         }
     }
 

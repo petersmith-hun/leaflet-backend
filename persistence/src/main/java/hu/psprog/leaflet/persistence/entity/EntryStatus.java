@@ -20,5 +20,5 @@ public enum EntryStatus {
     /**
      * Created entry is finalized and public for visitors.
      */
-    PUBLIC;
+    PUBLIC
 }

@@ -19,6 +19,7 @@ import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.EntryBridgeService;
+import jakarta.ws.rs.core.GenericType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,9 +27,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.core.GenericType;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static hu.psprog.leaflet.bridge.client.domain.OrderBy.Entry.CREATED;
@@ -49,16 +48,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
     private static final int NUMBER_OF_ALL_ENTRIES = 25;
-    private static final Comparator<EntryDataModel> ASC_BY_CREATED = Comparator.comparing(EntryDataModel::getCreated);
-    private static final Comparator<EntryDataModel> DESC_BY_CREATED = Comparator.comparing(EntryDataModel::getCreated).reversed();
-    private static final Comparator<EntryDataModel> ASC_BY_TITLE = Comparator.comparing(EntryDataModel::getTitle);
-    private static final Comparator<EntryDataModel> DESC_BY_TITLE = Comparator.comparing(EntryDataModel::getTitle).reversed();
+    private static final Comparator<EntryDataModel> ASC_BY_CREATED = Comparator.comparing(EntryDataModel::created);
+    private static final Comparator<EntryDataModel> DESC_BY_CREATED = Comparator.comparing(EntryDataModel::created).reversed();
+    private static final Comparator<EntryDataModel> ASC_BY_TITLE = Comparator.comparing(EntryDataModel::title);
+    private static final Comparator<EntryDataModel> DESC_BY_TITLE = Comparator.comparing(EntryDataModel::title).reversed();
 
     private static final String CONTROL_ENTRY_LINK = "entry-1";
     private static final Long CONTROL_ENTRY_ID = 1L;
     private static final String CONTROL_ENTRY_26 = "entry-26";
-    private static final GenericType<WrapperBodyDataModel<ExtendedEntryDataModel>> GENERIC_TYPE_EXTENDED_ENTRY_DATA_MODEL = new GenericType<WrapperBodyDataModel<ExtendedEntryDataModel>>() {};
-    private static final GenericType<WrapperBodyDataModel<EditEntryDataModel>> GENERIC_TYPE_EDIT_ENTRY_DATA_MODEL = new GenericType<WrapperBodyDataModel<EditEntryDataModel>>() {};
+    private static final GenericType<WrapperBodyDataModel<ExtendedEntryDataModel>> GENERIC_TYPE_EXTENDED_ENTRY_DATA_MODEL = new GenericType<>() {};
+    private static final GenericType<WrapperBodyDataModel<EditEntryDataModel>> GENERIC_TYPE_EDIT_ENTRY_DATA_MODEL = new GenericType<>() {};
 
     @Autowired
     private EntryBridgeService entryBridgeService;
@@ -71,7 +70,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getEntries().size(), equalTo(NUMBER_OF_ALL_ENTRIES));
+        assertThat(result.entries().size(), equalTo(NUMBER_OF_ALL_ENTRIES));
     }
 
     @ParameterizedTest
@@ -154,9 +153,9 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
 
         // then
-        assertThat(result.getPagination().getEntityCount(), equalTo(25L));
-        assertThat(result.getPagination().getEntityCountOnPage(), equalTo(10));
-        assertThat(result.getPagination().getPageCount(), equalTo(3));
+        assertThat(result.pagination().entityCount(), equalTo(25L));
+        assertThat(result.pagination().entityCountOnPage(), equalTo(10));
+        assertThat(result.pagination().pageCount(), equalTo(3));
     }
 
     @Test
@@ -171,10 +170,10 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
 
         // then
-        assertThat(result.getPagination().getEntityCount(), equalTo(13L));
-        assertThat(result.getPagination().getEntityCountOnPage(), equalTo(3));
-        assertThat(result.getPagination().getPageCount(), equalTo(5));
-        assertThat(result.getBody().getEntries().stream().allMatch(entry -> entry.getCategory().getId() == 2L), is(true));
+        assertThat(result.pagination().entityCount(), equalTo(13L));
+        assertThat(result.pagination().entityCountOnPage(), equalTo(3));
+        assertThat(result.pagination().pageCount(), equalTo(5));
+        assertThat(result.body().entries().stream().allMatch(entry -> entry.category().id() == 2L), is(true));
     }
 
     @Test
@@ -189,9 +188,9 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
 
         // then
-        assertThat(result.getPagination().getEntityCount(), equalTo(1L));
-        assertThat(result.getBody().getEntries().get(0).getCategory().getId(), is(1L));
-        assertThat(result.getBody().getEntries().get(0).isEnabled(), is(false));
+        assertThat(result.pagination().entityCount(), equalTo(1L));
+        assertThat(result.body().entries().get(0).category().id(), is(1L));
+        assertThat(result.body().entries().get(0).enabled(), is(false));
     }
 
     @Test
@@ -205,8 +204,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         WrapperBodyDataModel<EntrySearchResultDataModel> result = entryBridgeService.searchEntries(entrySearchParameters);
 
         // then
-        assertThat(result.getPagination().getEntityCount(), equalTo(2L));
-        assertThat(result.getBody().getEntries().stream().allMatch(entry -> entry.getEntryStatus().equals(EntryInitialStatus.REVIEW.name())), is(true));
+        assertThat(result.pagination().entityCount(), equalTo(2L));
+        assertThat(result.body().entries().stream().allMatch(entry -> entry.entryStatus().equals(EntryInitialStatus.REVIEW.name())), is(true));
     }
 
     @Test
@@ -286,9 +285,9 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         entryBridgeService.changeStatus(CONTROL_ENTRY_ID);
 
         // then
-        assertThat(entryBridgeService.getEntryByID(CONTROL_ENTRY_ID).getBody().isEnabled(), is(false));
-        assertThat(entryBridgeService.getPageOfPublicEntries(1, 30, CREATED, ASC).getBody().getEntries().stream()
-                .noneMatch(entryDataModel -> CONTROL_ENTRY_LINK.equals(entryDataModel.getLink())), is(true));
+        assertThat(entryBridgeService.getEntryByID(CONTROL_ENTRY_ID).body().enabled(), is(false));
+        assertThat(entryBridgeService.getPageOfPublicEntries(1, 30, CREATED, ASC).body().entries().stream()
+                .noneMatch(entryDataModel -> CONTROL_ENTRY_LINK.equals(entryDataModel.link())), is(true));
     }
 
     @ParameterizedTest
@@ -300,7 +299,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         entryBridgeService.changePublicationStatus(entryID, newStatus);
 
         // then
-        assertThat(entryBridgeService.getEntryByID(entryID).getBody().getEntryStatus(), is(newStatus.name()));
+        assertThat(entryBridgeService.getEntryByID(entryID).body().entryStatus(), is(newStatus.name()));
     }
 
     @ParameterizedTest
@@ -330,22 +329,22 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     }
     
     private void assertModifiedEntry(Long entryID, EntryUpdateRequestModel expected) throws CommunicationFailureException {
-        assertThat(entryBridgeService.getEntryByLink(expected.getLink()).getBody().getRawContent(), equalTo(expected.getRawContent()));
+        assertThat(entryBridgeService.getEntryByLink(expected.getLink()).body().rawContent(), equalTo(expected.getRawContent()));
         WrapperBodyDataModel<EditEntryDataModel> current = entryBridgeService.getEntryByID(entryID);
-        assertThat(current.getBody().getCategory().getId(), equalTo(expected.getCategoryID()));
-        assertThat(current.getBody().isEnabled(), is(expected.isEnabled()));
-        assertThat(current.getBody().getLink(), equalTo(expected.getLink()));
-        assertThat(current.getBody().getLocale().toLowerCase(), equalTo(expected.getLocale().getLanguage()));
-        assertThat(current.getBody().getPrologue(), equalTo(expected.getPrologue()));
-        assertThat(current.getBody().getRawContent(), equalTo(expected.getRawContent()));
-        assertThat(current.getBody().getEntryStatus(), equalTo(expected.getStatus().name()));
-        assertThat(current.getBody().getTitle(), equalTo(expected.getTitle()));
-        assertThat(current.getSeo().getMetaDescription(), equalTo(expected.getMetaDescription()));
-        assertThat(current.getSeo().getMetaKeywords(), equalTo(expected.getMetaKeywords()));
-        assertThat(current.getSeo().getMetaTitle(), equalTo(expected.getMetaTitle()));
+        assertThat(current.body().category().id(), equalTo(expected.getCategoryID()));
+        assertThat(current.body().enabled(), is(expected.isEnabled()));
+        assertThat(current.body().link(), equalTo(expected.getLink()));
+        assertThat(current.body().locale().toLowerCase(), equalTo(expected.getLocale().getLanguage()));
+        assertThat(current.body().prologue(), equalTo(expected.getPrologue()));
+        assertThat(current.body().rawContent(), equalTo(expected.getRawContent()));
+        assertThat(current.body().entryStatus(), equalTo(expected.getStatus().name()));
+        assertThat(current.body().title(), equalTo(expected.getTitle()));
+        assertThat(current.seo().metaDescription(), equalTo(expected.getMetaDescription()));
+        assertThat(current.seo().metaKeywords(), equalTo(expected.getMetaKeywords()));
+        assertThat(current.seo().metaTitle(), equalTo(expected.getMetaTitle()));
 
         if (expected instanceof EntryCreateRequestModel) {
-            assertThat(current.getBody().getUser().getId(), equalTo(((EntryCreateRequestModel) expected).getUserID()));
+            assertThat(current.body().user().id(), equalTo(((EntryCreateRequestModel) expected).getUserID()));
         }
     }
 
@@ -353,20 +352,20 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
                                        long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious) {
 
         assertThat(result, notNullValue());
-        assertThat(result.getBody().getEntries().size(), equalTo(expectedBodySize));
-        assertThat(result.getPagination(), notNullValue());
-        assertThat(result.getPagination().getPageCount(), equalTo(expectedPageCount));
-        assertThat(result.getPagination().isHasNext(), equalTo(expectedHasNext));
-        assertThat(result.getPagination().isHasPrevious(), equalTo(expectedHasPrevious));
-        assertThat(result.getPagination().getEntityCount(), equalTo(expectedEntityCount));
-        assertThat(result.getBody().getEntries().stream()
+        assertThat(result.body().entries().size(), equalTo(expectedBodySize));
+        assertThat(result.pagination(), notNullValue());
+        assertThat(result.pagination().pageCount(), equalTo(expectedPageCount));
+        assertThat(result.pagination().hasNext(), equalTo(expectedHasNext));
+        assertThat(result.pagination().hasPrevious(), equalTo(expectedHasPrevious));
+        assertThat(result.pagination().entityCount(), equalTo(expectedEntityCount));
+        assertThat(result.body().entries().stream()
                 .sorted(comparator)
-                .collect(Collectors.toList())
-                .equals(result.getBody().getEntries()), is(true));
+                .toList()
+                .equals(result.body().entries()), is(true));
     }
 
     private void assertMenu(WrapperBodyDataModel<?> result) {
-        assertThat(result.getMenu(), equalTo(getControl(CONTROL_MENU, MenuDataModel.class)));
+        assertThat(result.menu(), equalTo(getControl(CONTROL_MENU, MenuDataModel.class)));
     }
 
     private Comparator<EntryDataModel> getComparator(OrderBy.Entry orderBy, OrderDirection orderDirection) {

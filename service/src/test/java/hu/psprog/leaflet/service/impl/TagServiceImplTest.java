@@ -49,16 +49,16 @@ public class TagServiceImplTest {
     private static final long ENTRY_ID = 1L;
     private static final String CONTROL_TAG_TITLE = "Tag #15";
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private TagDAO tagDAO;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private EntryDAO entryDAO;
 
     @Mock
     private TagToTagVOConverter tagToTagVOConverter;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private TagVOToTagConverter tagVOToTagConverter;
 
     @Mock
@@ -67,7 +67,7 @@ public class TagServiceImplTest {
     @Mock
     private TagVO tagVO;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private Entry entry;
 
     @InjectMocks

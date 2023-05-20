@@ -26,11 +26,10 @@ public class EntryVOToEntryDataModelListConverter implements Converter<List<Entr
     @Override
     public EntryListDataModel convert(List<EntryVO> entryVOList) {
 
-        EntryListDataModel.EntryListDataModelBuilder builder = EntryListDataModel.getBuilder();
-        entryVOList.stream()
-                .map(entryVOToEntryDataModelEntityConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return EntryListDataModel.getBuilder()
+                .withEntries(entryVOList.stream()
+                        .map(entryVOToEntryDataModelEntityConverter::convert)
+                        .toList())
+                .build();
     }
 }

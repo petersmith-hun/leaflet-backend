@@ -3,7 +3,7 @@ package hu.psprog.leaflet.web.filter.restrictions.strategy;
 import hu.psprog.leaflet.web.filter.restrictions.domain.RestrictionType;
 import hu.psprog.leaflet.web.filter.restrictions.exception.ClientSecurityViolationException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Client acceptor filter validation strategy interface.

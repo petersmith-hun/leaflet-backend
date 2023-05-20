@@ -22,8 +22,7 @@ public class CommentUpdateRequestModelToCommentVOConverter implements Converter<
         CommentVO.CommentVOBuilder<?, ?> builder = CommentVO.getBuilder()
                 .withContent(source.getContent());
 
-        if (source instanceof CommentCreateRequestModel) {
-            CommentCreateRequestModel createRequestModel = (CommentCreateRequestModel) source;
+        if (source instanceof CommentCreateRequestModel createRequestModel) {
             builder.withOwner(UserVO.getBuilder()
                     .withId(createRequestModel.getAuthenticatedUserId())
                     .withEmail(createRequestModel.getEmail())

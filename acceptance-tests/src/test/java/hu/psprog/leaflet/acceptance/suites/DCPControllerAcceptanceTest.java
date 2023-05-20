@@ -40,7 +40,7 @@ public class DCPControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getDcpStore().size(), equalTo(4));
+        assertThat(result.dcpStore().size(), equalTo(4));
     }
 
     @Test
@@ -92,22 +92,22 @@ public class DCPControllerAcceptanceTest extends AbstractParameterizedBaseTest {
 
     private void assertKey(String key) throws CommunicationFailureException {
         DCPListDataModel dcp = dcpStoreBridgeService.getAllDCPEntries();
-        assertThat(dcp.getDcpStore().stream()
-                .anyMatch(dcpDataModel -> key.equals(dcpDataModel.getKey())), is(true));
+        assertThat(dcp.dcpStore().stream()
+                .anyMatch(dcpDataModel -> key.equals(dcpDataModel.key())), is(true));
     }
 
     private void assertMissingKey(String key) throws CommunicationFailureException {
         DCPListDataModel dcp = dcpStoreBridgeService.getAllDCPEntries();
-        assertThat(dcp.getDcpStore().stream()
-                .noneMatch(dcpDataModel -> key.equals(dcpDataModel.getKey())), is(true));
+        assertThat(dcp.dcpStore().stream()
+                .noneMatch(dcpDataModel -> key.equals(dcpDataModel.key())), is(true));
     }
 
     private void assertValue(String key, String value) throws CommunicationFailureException {
         DCPListDataModel dcp = dcpStoreBridgeService.getAllDCPEntries();
-        assertThat(dcp.getDcpStore().stream()
-                .filter(dcpDataModel -> key.equals(dcpDataModel.getKey()))
+        assertThat(dcp.dcpStore().stream()
+                .filter(dcpDataModel -> key.equals(dcpDataModel.key()))
                 .findFirst()
-                .map(DCPDataModel::getValue)
+                .map(DCPDataModel::value)
                 .orElse(null), equalTo(value));
     }
 

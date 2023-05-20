@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.rest.conversion.sitemap;
 
 import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
+import hu.psprog.leaflet.api.rest.response.sitemap.SitemapLocationItem;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.web.test.ConversionTestObjects;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,10 @@ public class FrontEndRouteVOListToSitemapConverterTest extends ConversionTestObj
     private static final FrontEndRouteVO FRONT_END_ROUTE_VO_1 = prepareFrontEndRouteVO(URL_1);
     private static final FrontEndRouteVO FRONT_END_ROUTE_VO_2 = prepareFrontEndRouteVO(URL_2);
     private static final Sitemap EXPECTED_SITEMAP = Sitemap.getBuilder()
-            .withLocation(URL_1)
-            .withLocation(URL_2)
+            .withSitemapLocationItemList(List.of(
+                    new SitemapLocationItem(URL_1),
+                    new SitemapLocationItem(URL_2)
+            ))
             .build();
 
     @InjectMocks

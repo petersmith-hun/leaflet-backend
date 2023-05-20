@@ -26,11 +26,10 @@ public class CategoryVOToCategoryDataModelListConverter implements Converter<Lis
     @Override
     public CategoryListDataModel convert(List<CategoryVO> source) {
 
-        CategoryListDataModel.CategoryListDataModelBuilder builder = CategoryListDataModel.getBuilder();
-        source.stream()
-                .map(categoryVOToCategoryDataModelEntityConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return CategoryListDataModel.getBuilder()
+                .withCategories(source.stream()
+                        .map(categoryVOToCategoryDataModelEntityConverter::convert)
+                        .toList())
+                .build();
     }
 }

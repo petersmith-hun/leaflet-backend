@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -35,7 +35,7 @@ public class SEOResponseFillerTest {
     private static final String SEO_DESCRIPTION = "SEO Description";
     private static final String SEO_KEYWORDS = "SEO Keywords";
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private DynamicConfigurationPropertyService dcpService;
 
     private SEOResponseFiller responseFiller;
@@ -51,7 +51,7 @@ public class SEOResponseFillerTest {
         responseFiller.fill(builder);
 
         // then
-        assertThat(builder.build().getSeo(), equalTo(SEODataModel.getBuilder()
+        assertThat(builder.build().seo(), equalTo(SEODataModel.getBuilder()
                 .withPageTitle(DCP_PAGE_TITLE)
                 .withMetaTitle(SEO_TITLE)
                 .withMetaDescription(SEO_DESCRIPTION)
@@ -70,7 +70,7 @@ public class SEOResponseFillerTest {
         responseFiller.fill(builder);
 
         // then
-        assertThat(builder.build().getSeo(), equalTo(SEODataModel.getBuilder()
+        assertThat(builder.build().seo(), equalTo(SEODataModel.getBuilder()
                 .withPageTitle(DCP_PAGE_TITLE)
                 .withMetaTitle(SEO_TITLE)
                 .withMetaDescription(DCP_SEO_DESCRIPTION)
@@ -89,7 +89,7 @@ public class SEOResponseFillerTest {
         responseFiller.fill(builder);
 
         // then
-        assertThat(builder.build().getSeo(), equalTo(SEODataModel.getBuilder()
+        assertThat(builder.build().seo(), equalTo(SEODataModel.getBuilder()
                 .withPageTitle(StringUtils.EMPTY)
                 .withMetaTitle(StringUtils.EMPTY)
                 .withMetaDescription(StringUtils.EMPTY)

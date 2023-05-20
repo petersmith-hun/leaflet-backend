@@ -23,6 +23,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -42,11 +43,11 @@ public class ResponseFillerAspectTest {
     private static final EntryDataModel ENTRY_DATA_MODEL = EntryDataModel.getBuilder()
             .withLink("entry-link")
             .build();
-    private static final ExtendedEntryDataModel EXTENDED_ENTRY_DATA_MODEL = ExtendedEntryDataModel.getExtendedBuilder()
+    private static final ExtendedEntryDataModel EXTENDED_ENTRY_DATA_MODEL = ExtendedEntryDataModel.getBuilder()
             .withLink("entry-link")
             .build();
     private static final EntryListDataModel ENTRY_LIST_DATA_MODEL = EntryListDataModel.getBuilder()
-            .withItem(ENTRY_DATA_MODEL)
+            .withEntries(List.of(ENTRY_DATA_MODEL))
             .build();
     private static final ErrorMessageDataModel ERROR_MESSAGE_DATA_MODEL = ErrorMessageDataModel.getBuilder()
             .withMessage("Forbidden")
@@ -77,7 +78,7 @@ public class ResponseFillerAspectTest {
         Object result = responseFillerAspect.aspectToWrapAnswer(proceedingJoinPoint);
 
         // then
-        assertWrappedStandardResponse(result, ENTRY_DATA_MODEL);
+        assertWrappedStandardResponse(result);
     }
 
     @Test
@@ -146,7 +147,7 @@ public class ResponseFillerAspectTest {
         ResponseEntity<?> result = preparePointcut().getEntryByLink("link");
 
         // then
-        assertWrappedStandardResponse(result, EXTENDED_ENTRY_DATA_MODEL);
+        assertWrappedExtendedResponse(result);
     }
 
     @Test
@@ -164,12 +165,24 @@ public class ResponseFillerAspectTest {
         assertThat(result, equalTo(ResponseEntity.ok(ENTRY_LIST_DATA_MODEL)));
     }
 
-    private void assertWrappedStandardResponse(Object result, EntryDataModel entryDataModel) {
+    private void assertWrappedStandardResponse(Object result) {
+
         assertThat(result, notNullValue());
         ResponseEntity<?> responseEntity = (ResponseEntity<?>) result;
         assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(responseEntity.getBody(), equalTo(WrapperBodyDataModel.getBuilder()
-                .withBody(entryDataModel)
+                .withBody(ResponseFillerAspectTest.ENTRY_DATA_MODEL)
+                .withSeo(TEST_WRAPPING)
+                .build()));
+    }
+
+    private void assertWrappedExtendedResponse(Object result) {
+
+        assertThat(result, notNullValue());
+        ResponseEntity<?> responseEntity = (ResponseEntity<?>) result;
+        assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(responseEntity.getBody(), equalTo(WrapperBodyDataModel.getBuilder()
+                .withBody(ResponseFillerAspectTest.EXTENDED_ENTRY_DATA_MODEL)
                 .withSeo(TEST_WRAPPING)
                 .build()));
     }

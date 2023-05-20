@@ -17,7 +17,7 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;

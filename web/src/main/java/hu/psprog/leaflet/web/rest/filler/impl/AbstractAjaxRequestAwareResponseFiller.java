@@ -3,7 +3,7 @@ package hu.psprog.leaflet.web.rest.filler.impl;
 import hu.psprog.leaflet.web.rest.filler.RequestParameter;
 import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 /**

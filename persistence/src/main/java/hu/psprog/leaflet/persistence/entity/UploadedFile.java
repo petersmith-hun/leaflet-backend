@@ -1,16 +1,17 @@
 package hu.psprog.leaflet.persistence.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import java.util.UUID;
 
 /**
@@ -39,7 +40,7 @@ public class UploadedFile extends SelfStatusAwareIdentifiableEntity<Long> {
     @Column(name = DatabaseConstants.COLUMN_MIME)
     private String mime;
 
-    @Type(type = "uuid-char")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     @Column(name = DatabaseConstants.COLUMN_PATH_UUID)
     private UUID pathUUID;
 

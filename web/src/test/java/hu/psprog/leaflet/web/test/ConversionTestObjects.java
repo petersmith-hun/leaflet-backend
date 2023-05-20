@@ -69,7 +69,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -137,13 +137,15 @@ public abstract class ConversionTestObjects {
             prepareObjectError(false));
 
     protected static final ValidationErrorMessageListDataModel VALIDATION_ERROR_MESSAGE_LIST_DATA_MODEL = ValidationErrorMessageListDataModel.getBuilder()
-            .withItem(ValidationErrorMessageDataModel.getExtendedBuilder()
-                    .withField(FIELD)
-                    .withMessage(FIELD_VALIDATION_FAILED)
-                    .build())
-            .withItem(ValidationErrorMessageDataModel.getExtendedBuilder()
-                    .withMessage(VALIDATION_FAILED)
-                    .build())
+            .withValidation(List.of(
+                    ValidationErrorMessageDataModel.getBuilder()
+                            .withField(FIELD)
+                            .withMessage(FIELD_VALIDATION_FAILED)
+                            .build(),
+                    ValidationErrorMessageDataModel.getBuilder()
+                            .withMessage(VALIDATION_FAILED)
+                            .build()
+            ))
             .build();
 
     protected static final AttachmentRequestVO ATTACHMENT_REQUEST_VO = AttachmentRequestVO.getBuilder()
@@ -172,7 +174,7 @@ public abstract class ConversionTestObjects {
     protected static final CategoryCreateRequestModel CATEGORY_CREATE_REQUEST_MODEL = prepareCategoryCreateRequestModel();
 
     protected static final CategoryDataModel CATEGORY_DATA_MODEL = CategoryDataModel.getBuilder()
-            .withID(ID)
+            .withId(ID)
             .withTitle(TITLE)
             .withDescription(DESCRIPTION)
             .withCreated(ZONED_DATE_TIME_CREATED)
@@ -181,7 +183,7 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final CategoryListDataModel CATEGORY_LIST_DATA_MODEL = CategoryListDataModel.getBuilder()
-            .withItem(CATEGORY_DATA_MODEL)
+            .withCategories(List.of(CATEGORY_DATA_MODEL))
             .build();
 
     protected static final UserVO USER_VO = UserVO.getBuilder()
@@ -196,7 +198,7 @@ public abstract class ConversionTestObjects {
             .withEnabled(ENABLED)
             .build();
 
-    protected static final ExtendedUserDataModel EXTENDED_USER_DATA_MODEL = ExtendedUserDataModel.getExtendedBuilder()
+    protected static final ExtendedUserDataModel EXTENDED_USER_DATA_MODEL = ExtendedUserDataModel.getBuilder()
             .withId(ID)
             .withCreated(ZONED_DATE_TIME_CREATED)
             .withUsername(USERNAME)
@@ -207,7 +209,7 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final UserListDataModel USER_LIST_DATA_MODEL = UserListDataModel.getBuilder()
-            .withItem(EXTENDED_USER_DATA_MODEL)
+            .withUsers(List.of(EXTENDED_USER_DATA_MODEL))
             .build();
 
     protected static final UserVO USER_VO_FOR_UPDATE = UserVO.getBuilder()
@@ -265,7 +267,7 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final TagListDataModel TAG_LIST_DATA_MODEL = TagListDataModel.getBuilder()
-            .withItem(TAG_DATA_MODEL)
+            .withTags(List.of(TAG_DATA_MODEL))
             .build();
 
     protected static final TagVO TAG_VO_FOR_CREATE = TagVO.getBuilder()
@@ -347,7 +349,7 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
-                    .withID(ID)
+                    .withId(ID)
                     .withTitle(TITLE)
                     .build())
             .withUser(USER_DATA_MODEL)
@@ -355,7 +357,7 @@ public abstract class ConversionTestObjects {
             .withTags(Collections.emptyList())
             .build();
 
-    protected static final ExtendedEntryDataModel EXTENDED_ENTRY_DATA_MODEL = ExtendedEntryDataModel.getExtendedBuilder()
+    protected static final ExtendedEntryDataModel EXTENDED_ENTRY_DATA_MODEL = ExtendedEntryDataModel.getBuilder()
             .withRawContent(RAW_CONTENT)
             .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
             .withTitle(TITLE)
@@ -366,7 +368,7 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
-                    .withID(ID)
+                    .withId(ID)
                     .withTitle(TITLE)
                     .build())
             .withUser(USER_DATA_MODEL)
@@ -374,7 +376,7 @@ public abstract class ConversionTestObjects {
             .withTags(Collections.emptyList())
             .build();
 
-    protected static final EditEntryDataModel EDIT_ENTRY_DATA_MODEL = EditEntryDataModel.getExtendedBuilder()
+    protected static final EditEntryDataModel EDIT_ENTRY_DATA_MODEL = EditEntryDataModel.getBuilder()
             .withRawContent(RAW_CONTENT)
             .withEnabled(ENABLED)
             .withEntryStatus(ENTRY_STATUS)
@@ -387,7 +389,7 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withLocale(LOCALE.name())
             .withCategory(CategoryDataModel.getBuilder()
-                    .withID(ID)
+                    .withId(ID)
                     .withTitle(TITLE)
                     .build())
             .withUser(USER_DATA_MODEL)
@@ -396,7 +398,7 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final EntryListDataModel ENTRY_LIST_DATA_MODEL = EntryListDataModel.getBuilder()
-            .withItem(ENTRY_DATA_MODEL)
+            .withEntries(List.of(ENTRY_DATA_MODEL))
             .build();
 
     protected static final CommentVO COMMENT_VO = CommentVO.getBuilder()
@@ -439,10 +441,10 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final CommentListDataModel COMMENT_LIST_DATA_MODEL = CommentListDataModel.getBuilder()
-            .withItem(COMMENT_DATA_MODEL)
+            .withComments(List.of(COMMENT_DATA_MODEL))
             .build();
 
-    protected static final ExtendedCommentDataModel EXTENDED_COMMENT_DATA_MODEL = ExtendedCommentDataModel.getExtendedBuilder()
+    protected static final ExtendedCommentDataModel EXTENDED_COMMENT_DATA_MODEL = ExtendedCommentDataModel.getBuilder()
             .withId(ID)
             .withOwner(USER_DATA_MODEL)
             .withContent(CONTENT)
@@ -454,7 +456,7 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final ExtendedCommentListDataModel EXTENDED_COMMENT_LIST_DATA_MODEL = ExtendedCommentListDataModel.getBuilder()
-            .withItem(EXTENDED_COMMENT_DATA_MODEL)
+            .withComments(List.of(EXTENDED_COMMENT_DATA_MODEL))
             .build();
 
     protected static final CommentSearchParameters COMMENT_SEARCH_PARAMETERS = new CommentSearchParameters();
@@ -512,7 +514,7 @@ public abstract class ConversionTestObjects {
             .withUser(USER_DATA_MODEL)
             .build();
 
-    protected static final EditDocumentDataModel EDIT_DOCUMENT_DATA_MODEL = EditDocumentDataModel.getExtendedBuilder()
+    protected static final EditDocumentDataModel EDIT_DOCUMENT_DATA_MODEL = EditDocumentDataModel.getBuilder()
             .withId(ID)
             .withLink(LINK)
             .withTitle(TITLE)
@@ -525,7 +527,7 @@ public abstract class ConversionTestObjects {
             .build();
 
     protected static final DocumentListDataModel DOCUMENT_LIST_DATA_MODEL = DocumentListDataModel.getBuilder()
-            .withItem(EDIT_DOCUMENT_DATA_MODEL)
+            .withDocuments(List.of(EDIT_DOCUMENT_DATA_MODEL))
             .build();
 
     protected static final FrontEndRouteVO FRONT_END_ROUTE_VO = FrontEndRouteVO.getBuilder()
@@ -551,7 +553,7 @@ public abstract class ConversionTestObjects {
             .withAuthRequirement(AUTH_REQUIREMENT)
             .build();
 
-    protected static final ExtendedFrontEndRouteDataModel EXTENDED_FRONT_END_ROUTE_DATA_MODEL = ExtendedFrontEndRouteDataModel.getExtendedBuilder()
+    protected static final ExtendedFrontEndRouteDataModel EXTENDED_FRONT_END_ROUTE_DATA_MODEL = ExtendedFrontEndRouteDataModel.getBuilder()
             .withId(ID)
             .withCreated(ZONED_DATE_TIME_CREATED)
             .withLastModified(ZONED_DATE_TIME_LAST_MODIFIED)
@@ -571,12 +573,12 @@ public abstract class ConversionTestObjects {
             .withAuthRequirement(AUTH_REQUIREMENT.name())
             .build();
 
-    protected static final ExtendedFrontEndRouteListDataModel EXTENDED_FRONT_END_ROUTE_LIST_DATA_MODEL = ExtendedFrontEndRouteListDataModel.getExtendedBuilder()
-            .withItem(EXTENDED_FRONT_END_ROUTE_DATA_MODEL)
+    protected static final ExtendedFrontEndRouteListDataModel EXTENDED_FRONT_END_ROUTE_LIST_DATA_MODEL = ExtendedFrontEndRouteListDataModel.getBuilder()
+            .withRoutes(List.of(EXTENDED_FRONT_END_ROUTE_DATA_MODEL))
             .build();
 
     protected static final FrontEndRouteListDataModel FRONT_END_ROUTE_LIST_DATA_MODEL = FrontEndRouteListDataModel.getBuilder()
-            .withItem(FRONT_END_ROUTE_DATA_MODEL)
+            .withRoutes(List.of(FRONT_END_ROUTE_DATA_MODEL))
             .build();
 
     protected static final FrontEndRouteUpdateRequestModel FRONT_END_ROUTE_UPDATE_REQUEST_MODEL = prepareFrontEndRouteUpdateRequestModel();
@@ -796,13 +798,13 @@ public abstract class ConversionTestObjects {
         return frontEndRouteUpdateRequestModel;
     }
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     protected DateConverter dateConverter;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     protected HttpServletRequest httpServletRequest;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     protected JULocaleToLeafletLocaleConverter localeConverter;
 
     @BeforeEach

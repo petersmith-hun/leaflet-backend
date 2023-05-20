@@ -49,7 +49,7 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getTags().size(), equalTo(NUMBER_OF_ALL_TAGS));
+        assertThat(result.tags().size(), equalTo(NUMBER_OF_ALL_TAGS));
     }
 
     @Test
@@ -60,8 +60,8 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getBody().getTags().size(), equalTo(NUMBER_OF_PUBLIC_TAGS));
-        assertThat(result.getBody().getTags().stream().allMatch(TagDataModel::isEnabled), is(true));
+        assertThat(result.body().tags().size(), equalTo(NUMBER_OF_PUBLIC_TAGS));
+        assertThat(result.body().tags().stream().allMatch(TagDataModel::enabled), is(true));
     }
 
     @Test
@@ -102,10 +102,10 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
         TagDataModel result = tagBridgeService.createTag(tagCreateRequestModel);
 
         // then
-        assertThat(result.getId(), notNullValue());
-        TagDataModel current = tagBridgeService.getTag(result.getId());
-        assertThat(current.getName(), equalTo(tagCreateRequestModel.getName()));
-        assertThat(current.isEnabled(), is(false));
+        assertThat(result.id(), notNullValue());
+        TagDataModel current = tagBridgeService.getTag(result.id());
+        assertThat(current.name(), equalTo(tagCreateRequestModel.getName()));
+        assertThat(current.enabled(), is(false));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
 
         // then
         TagDataModel current = tagBridgeService.getTag(CONTROL_TAG_ID);
-        assertThat(current.getName(), equalTo(tagCreateRequestModel.getName()));
+        assertThat(current.name(), equalTo(tagCreateRequestModel.getName()));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
 
         // then
         TagDataModel current = tagBridgeService.getTag(CONTROL_TAG_ID);
-        assertThat(current.isEnabled(), is(false));
+        assertThat(current.enabled(), is(false));
     }
 
     @Test
@@ -147,9 +147,9 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
 
         // then
         TagListDataModel current = tagBridgeService.getAllTags();
-        assertThat(current.getTags().size(), equalTo(8));
-        assertThat(current.getTags().stream()
-                .noneMatch(tagDataModel -> tagToDelete.equals(tagDataModel.getId())), is(true));
+        assertThat(current.tags().size(), equalTo(8));
+        assertThat(current.tags().stream()
+                .noneMatch(tagDataModel -> tagToDelete.equals(tagDataModel.id())), is(true));
     }
 
     @Test
@@ -184,9 +184,9 @@ public class TagsControllerAcceptanceTest extends AbstractParameterizedBaseTest 
 
     private void assertTagAssignmentState(Long tagID, int numberOfTagsAttached, boolean attached) throws CommunicationFailureException {
         WrapperBodyDataModel<EditEntryDataModel> current = entryBridgeService.getEntryByID(CONTROL_ENTRY_ID);
-        assertThat(current.getBody().getTags().size(), equalTo(numberOfTagsAttached));
-        assertThat(current.getBody().getTags().stream()
-                .anyMatch(tagDataModel -> tagID.equals(tagDataModel.getId())), is(attached));
+        assertThat(current.body().tags().size(), equalTo(numberOfTagsAttached));
+        assertThat(current.body().tags().stream()
+                .anyMatch(tagDataModel -> tagID.equals(tagDataModel.id())), is(attached));
     }
 
     private TagAssignmentRequestModel prepareTagAssignmentRequestModel(Long tagID) {

@@ -36,6 +36,9 @@ bridge.clients:
 leaflet-link:
   security-checks-enabled: false
 
+tlp:
+  enabled: false
+
 tms:
   enabled: false
   packs: acceptance
@@ -49,14 +52,6 @@ test-auth:
   device-id: 5b375cd1-543c-48b2-bdee-bbc049aa09e5
   jwt-secret: acceptance-jwt-256-bit-hmac-secret
 
-metrics:
-  enabled: false
-  prefix: leaflet
-  host: localhost
-  port: 2003
-  period: 5
-  unit: SECONDS
-
 mail:
   event:
     contact-request:
@@ -67,3 +62,9 @@ mail:
       enabled: true
     startup:
       enabled: false
+
+management:
+  graphite:
+    metrics:
+      export:
+        enabled: false

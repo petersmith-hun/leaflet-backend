@@ -1,6 +1,6 @@
 package hu.psprog.leaflet.web.filter.restrictions.exception;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 import static hu.psprog.leaflet.web.filter.ClientAcceptorFilter.HEADER_USER_AGENT;

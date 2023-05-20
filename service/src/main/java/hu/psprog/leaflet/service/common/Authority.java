@@ -20,19 +20,13 @@ public class Authority {
 
     public static GrantedAuthority getAuthorityByName(String authorityName) {
 
-        switch (Authority.AuthorityName.valueOf(authorityName)) {
-            case ADMIN:
-                return Authority.ADMIN;
-            case EDITOR:
-                return Authority.EDITOR;
-            case SERVICE:
-                return Authority.SERVICE;
-            case NO_LOGIN:
-                return Authority.NO_LOGIN;
-            case USER:
-            default:
-                return Authority.USER;
-        }
+        return switch (AuthorityName.valueOf(authorityName)) {
+            case ADMIN -> Authority.ADMIN;
+            case EDITOR -> Authority.EDITOR;
+            case SERVICE -> Authority.SERVICE;
+            case NO_LOGIN -> Authority.NO_LOGIN;
+            default -> Authority.USER;
+        };
     }
 
     private enum AuthorityName {

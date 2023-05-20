@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -78,10 +77,10 @@ public class SitemapControllerAcceptanceTest extends AbstractParameterizedBaseTe
         assertThat(result, notNullValue());
         List<String> frontEndRouteVOList = frontEndRoutingSupportFacade.getSitemap().stream()
                 .map(FrontEndRouteVO::getUrl)
-                .collect(Collectors.toList());
-        List<String> locations = result.getSitemapLocationItemList().stream()
-                .map(SitemapLocationItem::getLocation)
-                .collect(Collectors.toList());
+                .toList();
+        List<String> locations = result.sitemapLocationItemList().stream()
+                .map(SitemapLocationItem::location)
+                .toList();
         assertThat(locations.containsAll(frontEndRouteVOList), is(true));
     }
 }

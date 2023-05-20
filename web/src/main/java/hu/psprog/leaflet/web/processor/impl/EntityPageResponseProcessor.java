@@ -7,7 +7,7 @@ import hu.psprog.leaflet.web.rest.filler.RequestParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * {@link ResponseProcessor} implementation to extract pagination information.

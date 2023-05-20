@@ -71,7 +71,7 @@ public class CategoryRouteMaskProcessorTest {
     @Mock
     private CategoryFacade categoryFacade;
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private FilenameGeneratorUtil filenameGeneratorUtil;
 
     @InjectMocks

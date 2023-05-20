@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.GenericType;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,8 +36,8 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
     private static final String CONTROL_DOCUMENT_LINK = "doc-1";
     private static final String CONTROL_DOCUMENT_5 = "doc-5";
     private static final Long CONTROL_DOCUMENT_ID = 1L;
-    private static final GenericType<WrapperBodyDataModel<DocumentDataModel>> GENERIC_TYPE_DOCUMENT_DATA_MODEL = new GenericType<WrapperBodyDataModel<DocumentDataModel>>() {};
-    private static final GenericType<WrapperBodyDataModel<EditDocumentDataModel>> GENERIC_TYPE_EDIT_DOCUMENT_DATA_MODEL = new GenericType<WrapperBodyDataModel<EditDocumentDataModel>>() {};
+    private static final GenericType<WrapperBodyDataModel<DocumentDataModel>> GENERIC_TYPE_DOCUMENT_DATA_MODEL = new GenericType<>() {};
+    private static final GenericType<WrapperBodyDataModel<EditDocumentDataModel>> GENERIC_TYPE_EDIT_DOCUMENT_DATA_MODEL = new GenericType<>() {};
 
     @Autowired
     private DocumentBridgeService documentBridgeService;
@@ -50,7 +50,7 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getDocuments().size(), equalTo(NUMBER_OF_ALL_DOCUMENTS));
+        assertThat(result.documents().size(), equalTo(NUMBER_OF_ALL_DOCUMENTS));
     }
 
     @Test
@@ -61,8 +61,8 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getDocuments().size(), equalTo(NUMBER_OF_PUBLIC_DOCUMENTS));
-        assertThat(result.getDocuments().stream().allMatch(EditDocumentDataModel::isEnabled), is(true));
+        assertThat(result.documents().size(), equalTo(NUMBER_OF_PUBLIC_DOCUMENTS));
+        assertThat(result.documents().stream().allMatch(EditDocumentDataModel::enabled), is(true));
     }
 
     @Test
@@ -115,8 +115,8 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
 
         // then
         DocumentListDataModel current = documentBridgeService.getPublicDocuments();
-        assertThat(current.getDocuments().stream().noneMatch(document -> CONTROL_DOCUMENT_LINK.equals(document.getLink())), is(true));
-        assertThat(current.getDocuments().size(), equalTo(2));
+        assertThat(current.documents().stream().noneMatch(document -> CONTROL_DOCUMENT_LINK.equals(document.link())), is(true));
+        assertThat(current.documents().size(), equalTo(2));
     }
 
     @Test
@@ -128,8 +128,8 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
 
         // then
         DocumentListDataModel current = documentBridgeService.getAllDocuments();
-        assertThat(current.getDocuments().stream().noneMatch(document -> CONTROL_DOCUMENT_LINK.equals(document.getLink())), is(true));
-        assertThat(current.getDocuments().size(), equalTo(3));
+        assertThat(current.documents().stream().noneMatch(document -> CONTROL_DOCUMENT_LINK.equals(document.link())), is(true));
+        assertThat(current.documents().size(), equalTo(3));
     }
 
     @Test
@@ -157,22 +157,22 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
         EditDocumentDataModel result = documentBridgeService.createDocument(documentCreateRequestModel);
 
         // then
-        assertModifiedDocuments(result.getId(), documentCreateRequestModel);
+        assertModifiedDocuments(result.id(), documentCreateRequestModel);
     }
 
     private void assertModifiedDocuments(Long documentID, DocumentUpdateRequestModel expected) throws CommunicationFailureException {
         WrapperBodyDataModel<EditDocumentDataModel> current = documentBridgeService.getDocumentByID(documentID);
-        assertThat(current.getBody().getRawContent(), equalTo(expected.getRawContent()));
-        assertThat(current.getBody().getTitle(), equalTo(expected.getTitle()));
-        assertThat(current.getBody().getLink(), equalTo(expected.getLink()));
-        assertThat(current.getBody().getLocale().toLowerCase(), equalTo(expected.getLocale().getLanguage()));
-        assertThat(current.getBody().isEnabled(), equalTo(expected.isEnabled()));
-        assertThat(current.getSeo().getMetaTitle(), equalTo(expected.getMetaTitle()));
-        assertThat(current.getSeo().getMetaDescription(), equalTo(expected.getMetaDescription()));
-        assertThat(current.getSeo().getMetaKeywords(), equalTo(expected.getMetaKeywords()));
+        assertThat(current.body().rawContent(), equalTo(expected.getRawContent()));
+        assertThat(current.body().title(), equalTo(expected.getTitle()));
+        assertThat(current.body().link(), equalTo(expected.getLink()));
+        assertThat(current.body().locale().toLowerCase(), equalTo(expected.getLocale().getLanguage()));
+        assertThat(current.body().enabled(), equalTo(expected.isEnabled()));
+        assertThat(current.seo().metaTitle(), equalTo(expected.getMetaTitle()));
+        assertThat(current.seo().metaDescription(), equalTo(expected.getMetaDescription()));
+        assertThat(current.seo().metaKeywords(), equalTo(expected.getMetaKeywords()));
 
         if (expected instanceof DocumentCreateRequestModel) {
-            assertThat(current.getBody().getUser().getId(), equalTo(((DocumentCreateRequestModel) expected).getUserID()));
+            assertThat(current.body().user().id(), equalTo(((DocumentCreateRequestModel) expected).getUserID()));
         }
     }
 }

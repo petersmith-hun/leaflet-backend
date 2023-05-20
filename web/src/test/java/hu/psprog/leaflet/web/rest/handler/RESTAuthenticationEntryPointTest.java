@@ -3,6 +3,8 @@ package hu.psprog.leaflet.web.rest.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,9 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.AuthenticationException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -72,7 +71,7 @@ public class RESTAuthenticationEntryPointTest {
     }
 
     @Test
-    public void shouldHandleFailure() throws IOException, ServletException {
+    public void shouldHandleFailure() throws IOException {
 
         // when
         restAuthenticationEntryPoint.onAuthenticationFailure(request, response, authenticationException);

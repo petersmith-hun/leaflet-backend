@@ -68,7 +68,7 @@ public class EntryServiceImplTest {
     private static final CategoryVO CATEGORY_VO = CategoryVO.wrapMinimumVO(2L);
     private static final TagVO TAG_VO = TagVO.wrapMinimumVO(3L);
 
-    @Mock(lenient = true)
+    @Mock(strictness = Mock.Strictness.LENIENT)
     private EntryDAO entryDAO;
 
     @Mock

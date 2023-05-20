@@ -26,11 +26,10 @@ public class TagVOToTagDataModelListConverter implements Converter<List<TagVO>, 
     @Override
     public TagListDataModel convert(List<TagVO> source) {
 
-        TagListDataModel.TagListDataModelBuilder builder = TagListDataModel.getBuilder();
-        source.stream()
-                .map(tagVOToTagDataModelEntityConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return TagListDataModel.getBuilder()
+                .withTags(source.stream()
+                        .map(tagVOToTagDataModelEntityConverter::convert)
+                        .toList())
+                .build();
     }
 }

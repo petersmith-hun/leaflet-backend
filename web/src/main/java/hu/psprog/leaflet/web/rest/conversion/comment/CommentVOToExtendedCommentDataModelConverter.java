@@ -29,7 +29,7 @@ public class CommentVOToExtendedCommentDataModelConverter implements Converter<C
     @Override
     public ExtendedCommentDataModel convert(CommentVO source) {
 
-        return ExtendedCommentDataModel.getExtendedBuilder()
+        return ExtendedCommentDataModel.getBuilder()
                 .withId(source.getId())
                 .withOwner(UserDataModel.getBuilder()
                         .withId(source.getOwner().getId())

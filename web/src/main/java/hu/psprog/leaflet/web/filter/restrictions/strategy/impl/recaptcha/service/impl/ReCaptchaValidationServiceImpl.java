@@ -35,11 +35,11 @@ public class ReCaptchaValidationServiceImpl implements ReCaptchaValidationServic
         boolean reCaptchaValid = false;
         try {
             ReCaptchaResponse reCaptchaResponse = reCaptchaClient.validate(reCaptchaRequest);
-            reCaptchaValid = reCaptchaResponse.isSuccessful();
+            reCaptchaValid = reCaptchaResponse.successful();
 
             if (!reCaptchaValid) {
                 LOGGER.warn("ReCaptcha service response for validation token [{}] is {}",
-                        stripResponseToken(reCaptchaRequest.getResponse()), reCaptchaResponse.getErrorCodes());
+                        stripResponseToken(reCaptchaRequest.getResponse()), reCaptchaResponse.errorCodes());
             }
 
         } catch (CommunicationFailureException e) {

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.Map;
 
 /**
@@ -58,12 +58,13 @@ public class DCPStoreController extends BaseController {
     public ResponseEntity<DCPListDataModel> getAll() {
 
         Map<String, String> dcpStore = dynamicConfigurationPropertyService.getAll();
-        DCPListDataModel.DCPListDataModelBuilder builder = DCPListDataModel.getBuilder();
-        dcpStore.entrySet().forEach(entry -> builder.withItem(createDataModel(entry)));
+        DCPListDataModel dcpListDataModel = DCPListDataModel.getBuilder()
+                .withDcpStore(dcpStore.entrySet().stream().map(this::createDataModel).toList())
+                .build();
 
         return ResponseEntity
                 .ok()
-                .body(builder.build());
+                .body(dcpListDataModel);
     }
 
     /**

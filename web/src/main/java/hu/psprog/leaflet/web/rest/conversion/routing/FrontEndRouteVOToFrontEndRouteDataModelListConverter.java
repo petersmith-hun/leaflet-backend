@@ -26,11 +26,10 @@ public class FrontEndRouteVOToFrontEndRouteDataModelListConverter implements Con
     @Override
     public FrontEndRouteListDataModel convert(List<FrontEndRouteVO> source) {
 
-        FrontEndRouteListDataModel.FrontEndRouteListDataModelBuilder builder = FrontEndRouteListDataModel.getBuilder();
-        source.stream()
-                .map(singleConverter::convert)
-                .forEach(builder::withItem);
-
-        return builder.build();
+        return FrontEndRouteListDataModel.getBuilder()
+                .withRoutes(source.stream()
+                        .map(singleConverter::convert)
+                        .toList())
+                .build();
     }
 }

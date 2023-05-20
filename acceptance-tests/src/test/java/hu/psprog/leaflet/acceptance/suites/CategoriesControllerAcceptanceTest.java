@@ -41,7 +41,7 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getCategories().size(), equalTo(NUMBER_OF_ALL_CATEGORIES));
+        assertThat(result.categories().size(), equalTo(NUMBER_OF_ALL_CATEGORIES));
     }
 
     @Test
@@ -52,8 +52,8 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
 
         // then
         assertThat(result, notNullValue());
-        assertThat(result.getCategories().size(), equalTo(NUMBER_OF_PUBLIC_CATEGORIES));
-        assertThat(result.getCategories().stream().allMatch(CategoryDataModel::isEnabled), is(true));
+        assertThat(result.categories().size(), equalTo(NUMBER_OF_PUBLIC_CATEGORIES));
+        assertThat(result.categories().stream().allMatch(CategoryDataModel::enabled), is(true));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
         CategoryDataModel result = categoryBridgeService.createCategory(categoryCreateRequestModel);
 
         // then
-        assertModifiedCategory(result.getId(), categoryCreateRequestModel);
+        assertModifiedCategory(result.id(), categoryCreateRequestModel);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
         categoryBridgeService.changeStatus(CONTROL_CATEGORY_ID);
 
         // then
-        assertThat(categoryBridgeService.getCategory(CONTROL_CATEGORY_ID).isEnabled(), is(false));
+        assertThat(categoryBridgeService.getCategory(CONTROL_CATEGORY_ID).enabled(), is(false));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class CategoriesControllerAcceptanceTest extends AbstractParameterizedBas
 
         CategoryDataModel current = categoryBridgeService.getCategory(categoryID);
         assertThat(current, notNullValue());
-        assertThat(current.getTitle(), equalTo(expected.getTitle()));
-        assertThat(current.getDescription(), equalTo(expected.getDescription()));
+        assertThat(current.title(), equalTo(expected.getTitle()));
+        assertThat(current.description(), equalTo(expected.getDescription()));
     }
 }

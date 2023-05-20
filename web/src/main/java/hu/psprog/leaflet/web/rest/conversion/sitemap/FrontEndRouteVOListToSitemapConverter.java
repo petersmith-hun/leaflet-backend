@@ -1,6 +1,7 @@
 package hu.psprog.leaflet.web.rest.conversion.sitemap;
 
 import hu.psprog.leaflet.api.rest.response.sitemap.Sitemap;
+import hu.psprog.leaflet.api.rest.response.sitemap.SitemapLocationItem;
 import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -18,11 +19,11 @@ public class FrontEndRouteVOListToSitemapConverter implements Converter<List<Fro
     @Override
     public Sitemap convert(List<FrontEndRouteVO> source) {
 
-        Sitemap.SitemapBuilder builder = Sitemap.getBuilder();
-        source.stream()
-                .map(FrontEndRouteVO::getUrl)
-                .forEach(builder::withLocation);
-
-        return builder.build();
+        return Sitemap.getBuilder()
+                .withSitemapLocationItemList(source.stream()
+                        .map(FrontEndRouteVO::getUrl)
+                        .map(SitemapLocationItem::new)
+                        .toList())
+                .build();
     }
 }

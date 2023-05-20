@@ -4,13 +4,17 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import com.nimbusds.jose.JWSAlgorithm;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.bridge.client.BridgeClient;
 import hu.psprog.leaflet.bridge.client.impl.BridgeClientImpl;
 import hu.psprog.leaflet.bridge.client.impl.InvocationFactoryConfig;
 import hu.psprog.leaflet.service.NotificationService;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +34,8 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
-import javax.annotation.PostConstruct;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import java.sql.SQLException;
 import java.text.DateFormat;
 
