@@ -7,7 +7,6 @@ import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
 import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
-import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -22,15 +21,6 @@ public interface UserService extends CreateOperationCapableService<UserVO, Long>
         DeleteOperationCapableService<UserVO, Long>,
         PageableService<UserVO, UserVO.OrderBy>,
         StatusChangeCapableService<Long> {
-
-    /**
-     * Creates a no-login user via anonymous commenting.
-     *
-     * @param entity user data
-     * @return created user's ID
-     * @throws ServiceException if user could not be created
-     */
-    Long registerNoLogin(UserVO entity) throws ServiceException;
 
     /**
      * Changes given user's password.

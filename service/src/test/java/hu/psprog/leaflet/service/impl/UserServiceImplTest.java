@@ -49,14 +49,6 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
 
-    private static final UserVO USER_VO_WITH_ADMIN_ROLE = UserVO.getBuilder()
-            .withAuthorities(Collections.singletonList(Authority.ADMIN))
-            .build();
-
-    private static final UserVO USER_VO_WITH_NO_LOGIN_ROLE = UserVO.getBuilder()
-            .withAuthorities(Collections.singletonList(Authority.NO_LOGIN))
-            .build();
-
     @Mock
     private UserDAO userDAO;
 
@@ -414,30 +406,6 @@ public class UserServiceImplTest {
         assertThat(result, nullValue());
         verify(userDAO).findByEmail(email);
         verify(userToUserVOConverter, never()).convert(any(User.class));
-    }
-
-    @Test
-    public void shouldRegisterNoLogin() throws ServiceException {
-
-        // given
-        given(userVOToUserConverter.convert(USER_VO_WITH_NO_LOGIN_ROLE)).willReturn(user);
-        given(userDAO.save(user)).willReturn(user);
-
-        // when
-        Long result = userService.registerNoLogin(USER_VO_WITH_NO_LOGIN_ROLE);
-
-        // then
-        assertThat(result, equalTo(user.getId()));
-    }
-
-    @Test
-    public void shouldRegisterNoLoginWithFailure() {
-
-        // when
-        Assertions.assertThrows(ServiceException.class, () -> userService.registerNoLogin(USER_VO_WITH_ADMIN_ROLE));
-
-        // then
-        // exception expected
     }
 
     @Test

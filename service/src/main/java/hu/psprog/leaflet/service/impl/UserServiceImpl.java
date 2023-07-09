@@ -3,7 +3,6 @@ package hu.psprog.leaflet.service.impl;
 import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.UserService;
-import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.converter.AuthorityToRoleConverter;
 import hu.psprog.leaflet.service.converter.UserToUserVOConverter;
@@ -126,16 +125,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long registerNoLogin(UserVO entity) throws ServiceException {
-
-        if (!isNoLoginRole(entity)) {
-            throw new ServiceException("Only users with role NO_LOGIN can be created via registerNoLogin service entry point.");
-        }
-
-        return createOne(entity);
-    }
-
-    @Override
     @PermitScope.Write.OwnUser
     public void changePassword(Long id, String password) throws EntityNotFoundException {
 
@@ -200,12 +189,6 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(userDAO.findByEmail(email))
                 .map(userToUserVOConverter::convert)
                 .orElse(null);
-    }
-
-    private boolean isNoLoginRole(UserVO entity) {
-
-        return entity.getAuthorities().stream()
-                .allMatch(grantedAuthority -> grantedAuthority.equals(Authority.NO_LOGIN));
     }
 
     private Function<User, User> logUpdate() {

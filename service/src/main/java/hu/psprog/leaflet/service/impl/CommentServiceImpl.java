@@ -142,6 +142,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PermitScope.Write.CreateComment
     public Long createOne(CommentVO entity) throws ServiceException {
 
         Comment comment = commentVOToCommentConverter.convert(entity);
