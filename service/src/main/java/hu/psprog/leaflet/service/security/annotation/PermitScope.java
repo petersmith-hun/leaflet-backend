@@ -120,6 +120,14 @@ public interface PermitScope {
         }
 
         /**
+         * Permits standard users to create comments.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @PreAuthorize("isAuthenticated() && hasAuthority('SCOPE_write:comments:own')")
+        @interface CreateComment {
+        }
+
+        /**
          * Permits standard users to create or modify their own comments or elevated users to create or modify other users' comments (by entity instead of ID).
          */
         @Retention(RetentionPolicy.RUNTIME)

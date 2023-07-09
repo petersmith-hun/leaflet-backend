@@ -14,13 +14,13 @@ import hu.psprog.leaflet.service.facade.CommentFacade;
 import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntityPageVO;
-import hu.psprog.leaflet.web.annotation.AuthenticatedRequest;
 import hu.psprog.leaflet.web.annotation.FillResponse;
 import hu.psprog.leaflet.web.annotation.ResponseFillMode;
 import hu.psprog.leaflet.web.exception.RequestCouldNotBeFulfilledException;
 import hu.psprog.leaflet.web.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import io.micrometer.core.annotation.Timed;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
 import java.net.URI;
 
 /**
@@ -215,7 +214,7 @@ public class CommentsController extends BaseController {
      */
     @RequestMapping(method = RequestMethod.POST)
     @Timed(value = "createComment", extraTags = {"controller", "comments"})
-    public ResponseEntity<BaseBodyDataModel> createComment(@RequestBody @AuthenticatedRequest @Valid CommentCreateRequestModel commentCreateRequestModel,
+    public ResponseEntity<BaseBodyDataModel> createComment(@RequestBody @Valid CommentCreateRequestModel commentCreateRequestModel,
                                                            BindingResult bindingResult)
             throws RequestCouldNotBeFulfilledException {
 

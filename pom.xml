@@ -6,12 +6,12 @@
 
     <artifactId>leaflet</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.1-dev</version>
+    <version>2.3.0-dev</version>
 
     <parent>
         <groupId>hu.psprog.leaflet</groupId>
         <artifactId>leaflet-stack-base-bom</artifactId>
-        <version>3.1-r2306.1</version>
+        <version>3.2-r2307.1</version>
     </parent>
 
     <modules>

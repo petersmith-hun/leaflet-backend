@@ -2,9 +2,7 @@ package hu.psprog.leaflet.service.facade.impl;
 
 import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.EntryService;
-import hu.psprog.leaflet.service.UserService;
 import hu.psprog.leaflet.service.common.OrderDirection;
-import hu.psprog.leaflet.service.exception.EntityCreationException;
 import hu.psprog.leaflet.service.exception.EntityNotFoundException;
 import hu.psprog.leaflet.service.exception.ServiceException;
 import hu.psprog.leaflet.service.facade.CommentFacade;
@@ -12,21 +10,17 @@ import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.authority.AuthorityUtils;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * Unit tests for {@link CommentFacadeImpl}.
@@ -37,7 +31,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 public class CommentFacadeImplTest {
 
     private static final long REGISTERED_USER_ID = 1L;
-    private static final long NEW_NO_LOGIN_USER_ID = 2L;
     private static final String USER_EMAIL = "lflt123test@leaflet.dev";
     private static final long COMMENT_ID = 5L;
     private static final long ENTRY_ID = 4L;
@@ -52,9 +45,6 @@ public class CommentFacadeImplTest {
     private static final String NON_EXISTING = "non-existing";
 
     @Mock
-    private UserService userService;
-
-    @Mock
     private CommentService commentService;
 
     @Mock
@@ -64,21 +54,20 @@ public class CommentFacadeImplTest {
 
     @BeforeEach
     public void setup() {
-        commentFacade = new CommentFacadeImpl(commentService, userService, entryService, true);
+        commentFacade = new CommentFacadeImpl(commentService, entryService, true);
     }
 
     @Test
     public void testCreateOneWithRegisteredUser() throws ServiceException {
 
         // given
-        CommentVO commentVO = prepareCommentVO(REGISTERED_USER_ID);
+        CommentVO commentVO = prepareCommentVO();
         given(commentService.createOne(commentVO)).willReturn(COMMENT_ID);
 
         // when
         commentFacade.createOne(commentVO);
 
         // then
-        verifyNoInteractions(userService);
         verify(commentService).createOne(commentVO);
         verify(commentService).notifyEntryAuthor(COMMENT_ID);
     }
@@ -87,74 +76,15 @@ public class CommentFacadeImplTest {
     public void testCreateOneWithRegisteredUserWithoutNotification() throws ServiceException {
 
         // given
-        commentFacade = new CommentFacadeImpl(commentService, userService, entryService, false);
-        CommentVO commentVO = prepareCommentVO(REGISTERED_USER_ID);
+        commentFacade = new CommentFacadeImpl(commentService, entryService, false);
+        CommentVO commentVO = prepareCommentVO();
 
         // when
         commentFacade.createOne(commentVO);
 
         // then
-        verifyNoInteractions(userService);
         verify(commentService).createOne(commentVO);
         verify(commentService, never()).notifyEntryAuthor(anyLong());
-    }
-
-    @Test
-    public void testCreateOneWithUnknownUser() throws ServiceException {
-
-        // given
-        CommentVO commentVO = prepareCommentVO(null);
-        CommentVO commentVOWithUserID = prepareCommentVO(NEW_NO_LOGIN_USER_ID);
-        given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(null);
-        given(userService.registerNoLogin(any(UserVO.class))).willReturn(NEW_NO_LOGIN_USER_ID);
-        given(commentService.createOne(commentVOWithUserID)).willReturn(COMMENT_ID);
-
-        // when
-        commentFacade.createOne(commentVO);
-
-        // then
-        verify(userService).silentGetUserByEmail(USER_EMAIL);
-        verify(userService).registerNoLogin(any(UserVO.class));
-        verify(commentService).createOne(commentVOWithUserID);
-        verify(commentService).notifyEntryAuthor(COMMENT_ID);
-    }
-
-    @Test
-    public void testCreateOneWithReturningNoLoginUser() throws ServiceException {
-
-        // given
-        CommentVO commentVO = prepareCommentVO(null);
-        CommentVO commentVOWithUserID = prepareCommentVO(REGISTERED_USER_ID);
-        UserVO userVO = prepareUserVO(false);
-        given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(userVO);
-        given(commentService.createOne(commentVOWithUserID)).willReturn(COMMENT_ID);
-
-        // when
-        commentFacade.createOne(commentVO);
-
-        // then
-        verify(userService).silentGetUserByEmail(USER_EMAIL);
-        verify(userService, never()).createOne(any(UserVO.class));
-        verify(commentService).createOne(commentVOWithUserID);
-        verify(commentService).notifyEntryAuthor(COMMENT_ID);
-    }
-
-    @Test
-    public void testCreateOneByAnExistingNormalUserWithoutLogin() throws ServiceException {
-
-        // given
-        CommentVO commentVO = prepareCommentVO(null);
-        UserVO userVO = prepareUserVO(true);
-        given(userService.silentGetUserByEmail(USER_EMAIL)).willReturn(userVO);
-
-        // when
-        Assertions.assertThrows(EntityCreationException.class, () -> commentFacade.createOne(commentVO));
-
-        // then
-        // expected exception
-        verify(userService).silentGetUserByEmail(USER_EMAIL);
-        verify(userService, never()).createOne(any(UserVO.class));
-        verify(commentService, never()).createOne(any(CommentVO.class));
     }
 
     @Test
@@ -321,20 +251,12 @@ public class CommentFacadeImplTest {
         verify(commentService).searchComments(commentSearchParametersVO);
     }
 
-    private CommentVO prepareCommentVO(Long userID) {
+    private CommentVO prepareCommentVO() {
         return CommentVO.getBuilder()
                 .withOwner(UserVO.getBuilder()
-                        .withId(userID)
+                        .withId(REGISTERED_USER_ID)
                         .withEmail(USER_EMAIL)
                         .build())
-                .build();
-    }
-
-    private UserVO prepareUserVO(boolean canLogin) {
-        return UserVO.getBuilder()
-                .withEmail(USER_EMAIL)
-                .withId(REGISTERED_USER_ID)
-                .withAuthorities(AuthorityUtils.createAuthorityList(canLogin ? "USER" : "NO_LOGIN"))
                 .build();
     }
 }

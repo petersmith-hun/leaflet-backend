@@ -13,9 +13,8 @@ import hu.psprog.leaflet.api.rest.response.common.WrapperBodyDataModel;
 import hu.psprog.leaflet.bridge.client.domain.OrderBy;
 import hu.psprog.leaflet.bridge.client.domain.OrderDirection;
 import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
-import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
-import hu.psprog.leaflet.bridge.client.exception.RequestProcessingFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
+import hu.psprog.leaflet.bridge.client.exception.UnauthorizedAccessException;
 import hu.psprog.leaflet.bridge.service.CommentBridgeService;
 import hu.psprog.leaflet.service.vo.mail.CommentNotification;
 import org.junit.jupiter.api.Assertions;
@@ -55,11 +54,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
     private static final String CONTROL_COMMENT_1 = "comment-1";
     private static final Long CONTROL_COMMENT_ID = 1L;
     private static final String DELETED_COMMENT = "DELETED_COMMENT";
-    private static final String CONTROL_COMMENT_AUTH = "comment-auth";
-    private static final String CONTROL_COMMENT_ANON = "comment-anon";
+    private static final String CONTROL_COMMENT = "comment";
 
-    private static final String ANONYMOUS_USER_NAME = "Anonymous User";
-    private static final String TEST_USER_1_EMAIL = "test-user-1@ac-leaflet.local";
     private static final String CONTROL_ENTRY_LINK = "entry-1";
     private static final String ENTRY_WITHOUT_COMMENTS_LINK = "entry-2";
     private static final String ENTRY_NON_EXISTING_LINK = "entry-non-existing";
@@ -193,8 +189,8 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
     public void shouldCreateCommentWithAuthenticatedUser() throws CommunicationFailureException {
 
         // given
-        CommentCreateRequestModel control = getControl(CONTROL_COMMENT_AUTH, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
-        CommentNotification expectedCommentNotification = prepareCommentNotification("Administrator", "test-admin@ac-leaflet.local");
+        CommentCreateRequestModel control = getControl(CONTROL_COMMENT, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
+        CommentNotification expectedCommentNotification = prepareCommentNotification();
 
         // when
         CommentDataModel result = commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
@@ -211,61 +207,22 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
 
     @Test
     @ResetDatabase
-    public void shouldCreateCommentWithAnonymousUser() throws CommunicationFailureException {
+    public void shouldCommentCreationFailForAnonymousUser() throws CommunicationFailureException {
 
         // given
         clearAuthentication();
-        CommentCreateRequestModel control = getControl(CONTROL_COMMENT_ANON, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
-        CommentNotification expectedCommentNotification = prepareCommentNotification("Anonymous User", "anonymous@ac-leaflet.local");
-
-        // when
-        CommentDataModel result = commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
-
-        // then
-        assertThat(result, notNullValue());
-        restoreAuthentication();
-        ExtendedCommentDataModel current = commentBridgeService.getComment(result.id());
-        assertThat(current.content(), equalTo(control.getContent()));
-        assertThat(current.associatedEntry().id(), equalTo(control.getEntryId()));
-        assertThat(current.owner().username(), equalTo(ANONYMOUS_USER_NAME));
-        assertThat(notificationService.getCommentNotification(), notNullValue());
-        assertThat(notificationService.getCommentNotification(), equalTo(expectedCommentNotification));
-    }
-
-    @Test
-    @ResetDatabase
-    public void shouldCommentCreationFailForAnonymousUserWithRegisteredUserEmail() throws CommunicationFailureException {
-
-        // given
-        clearAuthentication();
-        CommentCreateRequestModel control = getControl(CONTROL_COMMENT_ANON, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
-        control.setEmail(TEST_USER_1_EMAIL);
+        CommentCreateRequestModel control = getControl(CONTROL_COMMENT, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
 
         // when
         try {
             commentBridgeService.createComment(control, RECAPTCHA_TOKEN);
             fail("Test case should have thrown exception.");
-        } catch (ConflictingRequestException e) {
+        } catch (UnauthorizedAccessException e) {
 
             // then
             // exception expected
             restoreAuthentication();
         }
-    }
-
-    @Test
-    @ResetDatabase
-    public void shouldCommentCreationFailForAuthenticatedUserWithDifferentAuthenticatedUserID() {
-
-        // given
-        CommentCreateRequestModel control = getControl(CONTROL_COMMENT_AUTH, CONTROL_SUFFIX_CREATE, CommentCreateRequestModel.class);
-        control.setAuthenticatedUserId(2L);
-
-        // when
-        Assertions.assertThrows(RequestProcessingFailureException.class, () -> commentBridgeService.createComment(control, RECAPTCHA_TOKEN));
-
-        // then
-        // exception expected
     }
 
     @Test
@@ -326,11 +283,11 @@ public class CommentsControllerAcceptanceTest extends AbstractParameterizedBaseT
         Assertions.assertThrows(ResourceNotFoundException.class, () -> commentBridgeService.getComment(CONTROL_COMMENT_ID));
     }
 
-    private CommentNotification prepareCommentNotification(String username, String email) {
+    private CommentNotification prepareCommentNotification() {
 
         return CommentNotification.getBuilder()
-                .withEmail(email)
-                .withUsername(username)
+                .withEmail("test-admin@ac-leaflet.local")
+                .withUsername("Administrator")
                 .withContent("lorem ipsum dolor sit amet comment")
                 .withAuthorEmail("test-admin@ac-leaflet.local")
                 .withAuthorName("Administrator")

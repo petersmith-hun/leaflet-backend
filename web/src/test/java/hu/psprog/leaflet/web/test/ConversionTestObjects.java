@@ -418,11 +418,7 @@ public abstract class ConversionTestObjects {
 
     protected static final CommentVO COMMENT_VO_FOR_CREATE = CommentVO.getBuilder()
             .withContent(CONTENT)
-            .withOwner(UserVO.getBuilder()
-                    .withId(ID)
-                    .withEmail(EMAIL)
-                    .withUsername(USERNAME)
-                    .build())
+            .withOwner(UserVO.wrapMinimumVO(ID))
             .withEntryVO(ENTRY_MINIMUM_VO)
             .build();
 
@@ -637,9 +633,6 @@ public abstract class ConversionTestObjects {
 
         CommentCreateRequestModel commentCreateRequestModel = new CommentCreateRequestModel();
         commentCreateRequestModel.setContent(CONTENT);
-        commentCreateRequestModel.setAuthenticatedUserId(ID);
-        commentCreateRequestModel.setEmail(EMAIL);
-        commentCreateRequestModel.setUsername(USERNAME);
         commentCreateRequestModel.setEntryId(ID);
 
         return commentCreateRequestModel;

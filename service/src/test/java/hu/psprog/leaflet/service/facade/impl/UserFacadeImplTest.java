@@ -137,7 +137,6 @@ public class UserFacadeImplTest {
                 Arguments.of("ADMIN", Authority.ADMIN),
                 Arguments.of("EDITOR", Authority.EDITOR),
                 Arguments.of("SERVICE", Authority.SERVICE),
-                Arguments.of("NO_LOGIN", Authority.NO_LOGIN),
                 Arguments.of("USER", Authority.USER)
         );
     }

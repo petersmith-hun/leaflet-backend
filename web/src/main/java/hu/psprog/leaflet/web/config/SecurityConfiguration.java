@@ -39,7 +39,6 @@ public class SecurityConfiguration {
             "/tags/public",
             "/sitemap.xml"};
     private static final String[] PUBLIC_POST_ENDPOINTS = {
-            "/comments",
             "/contact",
             "/users/claim",
             "/users/register",
