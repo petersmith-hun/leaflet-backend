@@ -65,6 +65,7 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
     private static final String ACCEPTED_CLIENT_LOG_MESSAGE = "Registering service [{}] via Leaflet Link with ID [{}], requiring security restrictions {}";
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    private static final String HTTP_METHOD_OPTIONS = "OPTIONS";
 
     private final Map<RestrictionType, RestrictionValidatorStrategy> restrictionValidatorStrategies;
 
@@ -97,7 +98,7 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            if (!isRouteExcluded(request)) {
+            if (!(isOptionsRequest(request) || isRouteExcluded(request))) {
                 UUID clientID = extractClientID(request);
                 Optional.ofNullable(clientValidationMapping.get(clientID))
                         .orElseThrow(() -> new UnknownClientException(clientID, request))
@@ -108,6 +109,10 @@ public class ClientAcceptorFilter extends OncePerRequestFilter {
             LOGGER.error("Error occurred while performing security validation of request", exc);
             response.sendError(HttpServletResponse.SC_FORBIDDEN, exc.getMessage());
         }
+    }
+
+    private boolean isOptionsRequest(HttpServletRequest request) {
+        return HTTP_METHOD_OPTIONS.equals(request.getMethod());
     }
 
     private boolean isRouteExcluded(HttpServletRequest request) {
