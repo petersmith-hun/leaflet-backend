@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  jira: circleci/jira@1.3.1
-  jq: circleci/jq@2.2.0
+  jira: circleci/jira@2.1.0
+  jq: circleci/jq@3.0.0
 
 # Common parameters for CircleCI build config
 parameters:
@@ -184,8 +184,8 @@ workflows:
                - master
          post-steps:
            - jira/notify:
-               environment_type: development
-               job_type: build
+               pipeline_id: << pipeline.id >>
+               pipeline_number: << pipeline.number >>
 
       - publish-github-rc:
           context: leaflet_ci
@@ -203,8 +203,8 @@ workflows:
                 - deploy
           post-steps:
             - jira/notify:
-                environment_type: development
-                job_type: build
+                pipeline_id: << pipeline.id >>
+                pipeline_number: << pipeline.number >>
 
       - deploy-approval:
           context: leaflet_ci
@@ -218,8 +218,11 @@ workflows:
             - deploy-approval
           post-steps:
             - jira/notify:
+                environment: production
                 environment_type: production
                 job_type: deployment
+                pipeline_id: << pipeline.id >>
+                pipeline_number: << pipeline.number >>
 
       - publish-github-release:
           context: leaflet_ci
