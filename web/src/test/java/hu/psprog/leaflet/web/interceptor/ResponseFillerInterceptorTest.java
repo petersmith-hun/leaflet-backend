@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -65,6 +66,20 @@ public class ResponseFillerInterceptorTest {
 
         // then
         assertThat(getAJAXParameter(), is(true));
+    }
+
+    @Test
+    public void shouldPreHandleSkipAddingAJAXFlagForOptionsRequest() {
+
+        // given
+        request = new MockHttpServletRequest("OPTIONS", "/");
+        HandlerMethod handlerMethod = prepareHandlerMethod("testMethodWithFillResponseInAJAXFillMode");
+
+        // when
+        responseFillerInterceptor.preHandle(request, null, handlerMethod);
+
+        // then
+        assertThat(request.getAttribute(RequestParameter.IS_AJAX_REQUEST), nullValue());
     }
 
     private Boolean getAJAXParameter() {

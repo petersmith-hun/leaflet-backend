@@ -23,7 +23,9 @@ public class ResponseFillerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-        setAJAXFlag(request, getFillResponseAnnotation(handler));
+        if (!request.getMethod().equals("OPTIONS")) {
+            setAJAXFlag(request, getFillResponseAnnotation(handler));
+        }
 
         return true;
     }
