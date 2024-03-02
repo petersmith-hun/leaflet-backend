@@ -120,6 +120,22 @@ public class ClientAcceptorFilterTest {
     }
 
     @Test
+    public void shouldIgnoreClientForOptionsRequest() throws ServletException, IOException {
+
+        // given
+        clientAcceptorFilter.init();
+        given(request.getMethod()).willReturn("OPTIONS");
+
+        // when
+        clientAcceptorFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        verify(restrictionValidatorStrategy1, never()).validate(request);
+        verify(restrictionValidatorStrategy2, never()).validate(request);
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
     public void shouldIgnoreRequest() throws ServletException, IOException {
 
         // given
