@@ -8,6 +8,7 @@ import hu.psprog.leaflet.api.rest.response.entry.EntryDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.EntryListDataModel;
 import hu.psprog.leaflet.api.rest.response.entry.ExtendedEntryDataModel;
 import hu.psprog.leaflet.service.facade.EntryFacade;
+import hu.psprog.leaflet.service.vo.EntryVO;
 import hu.psprog.leaflet.web.rest.controller.EntriesController;
 import hu.psprog.leaflet.web.rest.filler.ResponseFiller;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -29,6 +30,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyNoInteractions;
 
@@ -141,7 +144,8 @@ public class ResponseFillerAspectTest {
 
         // given
         prepareAspect(true);
-        given(conversionService.convert(any(), any())).willReturn(EXTENDED_ENTRY_DATA_MODEL);
+        given(entryFacade.findByLink("link")).willReturn(EntryVO.wrapMinimumVO(1L));
+        given(conversionService.convert(any(EntryVO.class), eq(ExtendedEntryDataModel.class))).willReturn(EXTENDED_ENTRY_DATA_MODEL);
 
         // when
         ResponseEntity<?> result = preparePointcut().getEntryByLink("link");
@@ -155,7 +159,7 @@ public class ResponseFillerAspectTest {
 
         // given
         prepareAspect(true);
-        given(conversionService.convert(any(), any())).willReturn(ENTRY_LIST_DATA_MODEL);
+        given(conversionService.convert(anyList(), eq(EntryListDataModel.class))).willReturn(ENTRY_LIST_DATA_MODEL);
 
         // when
         ResponseEntity<?> result = preparePointcut().getAllEntries();
