@@ -25,7 +25,7 @@ public interface LogicallyDeletableJpaRepository<T extends LogicallyDeletableSel
      */
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE #{#entityName} e SET e.deleted = true, e.lastModified = CURRENT_DATE WHERE e.id = :id")
+    @Query("UPDATE #{#entityName} e SET e.deleted = true, e.lastModified = CURRENT_TIMESTAMP WHERE e.id = :id")
     void markAsDeleted(@Param("id") ID id);
 
     /**
@@ -35,6 +35,6 @@ public interface LogicallyDeletableJpaRepository<T extends LogicallyDeletableSel
      */
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE #{#entityName} e SET e.deleted = false, e.lastModified = CURRENT_DATE WHERE e.id = :id")
+    @Query("UPDATE #{#entityName} e SET e.deleted = false, e.lastModified = CURRENT_TIMESTAMP WHERE e.id = :id")
     void revertLogicalDeletion(@Param("id") ID id);
 }
