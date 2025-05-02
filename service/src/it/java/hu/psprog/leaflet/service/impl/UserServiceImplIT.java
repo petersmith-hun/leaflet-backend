@@ -53,7 +53,6 @@ public class UserServiceImplIT {
 
     private static final String USER_ID6_EMAIL = "lflt-it-5106@leaflet.dev";
     private static final String USER_ID6_USERNAME = "User Created";
-    private static final long USER_ID6_ID = 6L;
     private static final String USER_ID6_PASSWORD = "lflt1234";
     private static final Locale USER_ID6_LOCALE = Locale.EN;
     private static final boolean USER_ID6_ENABLED = true;
@@ -82,7 +81,6 @@ public class UserServiceImplIT {
                 .build();
 
         createdUserVO = UserVO.getBuilder()
-                .withId(USER_ID6_ID)
                 .withUsername(USER_ID6_USERNAME)
                 .withPassword(USER_ID6_PASSWORD)
                 .withLocale(USER_ID6_LOCALE)

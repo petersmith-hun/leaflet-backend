@@ -1,0 +1,40 @@
+domino:
+  deployments:
+    leaflet:
+      source:
+        type: DOCKER
+        home: "[dsm:common.home.docker]"
+        resource: leaflet
+      target:
+        hosts:
+          - psproghu
+      execution:
+        command-name: app_leaflet
+        via: STANDARD
+        args:
+          ports:
+            9082: 9082
+          network-mode: host
+          environment:
+            APP_ARGS: |
+              --spring.profiles.active=production
+              --spring.config.location=/opt/leaflet/appconfig_leaflet.yml
+          volumes:
+            "[dsm:volume.logs]": "/opt/leaflet/logs:rw"
+            "[dsm:volume.config.leaflet]": "/opt/leaflet/appconfig_leaflet.yml:ro"
+            "[dsm:volume.vfs]": "/opt/leaflet/storage:rw"
+            "/etc/timezone": "/etc/timezone:ro"
+            "/etc/localtime": "/etc/localtime:ro"
+          restart-policy: unless-stopped
+      health-check:
+        enabled: true
+        delay: 20 seconds
+        timeout: 2 seconds
+        max-attempts: 3
+        endpoint: "http://127.0.0.1:11081/api/actuator/info"
+      info:
+        enabled: true
+        endpoint: "https://api.psprog.hu/actuator/info"
+        field-mapping:
+          abbreviation: $.app.abbreviation
+          version: $.build.version

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -83,7 +82,6 @@ public class LeafletITContextConfig {
     }
 
     @Bean
-    @Autowired
     public ConversionService conversionService(List<Converter<?, ?>> converters) {
 
         DefaultConversionService conversionService = new DefaultConversionService();

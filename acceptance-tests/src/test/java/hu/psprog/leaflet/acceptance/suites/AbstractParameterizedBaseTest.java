@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
+import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import jakarta.ws.rs.core.GenericType;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -46,7 +46,7 @@ public abstract class AbstractParameterizedBaseTest {
 
     // keep it here, as context will restart if this is autowired separately in each tests
     @Autowired
-    @SpyBean
+    @MockitoSpyBean
     RequestAuthentication requestAuthentication;
 
     @AfterEach
