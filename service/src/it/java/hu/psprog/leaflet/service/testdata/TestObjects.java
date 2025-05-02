@@ -40,7 +40,6 @@ public interface TestObjects {
             .build();
 
     CategoryVO CATEGORY_VO_NEW = CategoryVO.getBuilder()
-            .withId(4L)
             .withTitle("IT category 4")
             .withDescription("Control category object JSON descriptor for new category")
             .withCreated(GENERAL_DATE)
@@ -60,7 +59,6 @@ public interface TestObjects {
             .build();
 
     CommentVO COMMENT_VO_NEW = CommentVO.getBuilder()
-            .withId(11L)
             .withCreated(GENERAL_DATE)
             .withLastModified(GENERAL_DATE)
             .withEnabled(true)
@@ -86,7 +84,6 @@ public interface TestObjects {
             .build();
 
     DocumentVO DOCUMENT_VO_NEW = DocumentVO.getBuilder()
-            .withId(5L)
             .withTitle("Test document newly created")
             .withLink("test-document-newly-created-20161009")
             .withRawContent("markdown code document 5")
@@ -118,7 +115,6 @@ public interface TestObjects {
             .build();
 
     EntryVO ENTRY_VO_NEW = EntryVO.getBuilder()
-            .withId(4L)
             .withTitle("Lorem ipsum dolor sit amet 2")
             .withLink("lorem-ipsum-dolor-sit-amet-2-20160818")
             .withPrologue("Fusce nec tortor vitae lorem volutpat finibus. Fusce condimentum diam sit amet leo pretium tincidunt. Duis vitae interdum dui. Nulla facilisi.")
@@ -171,7 +167,6 @@ public interface TestObjects {
             .build();
 
     TagVO TAG_VO_NEW = TagVO.getBuilder()
-            .withId(21L)
             .withTitle("Tag #21")
             .withCreated(GENERAL_DATE)
             .withLastModified(GENERAL_DATE)
