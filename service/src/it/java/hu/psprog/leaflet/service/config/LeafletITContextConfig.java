@@ -1,24 +1,31 @@
 package hu.psprog.leaflet.service.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.DateDeserializers;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import hu.psprog.leaflet.bridge.client.BridgeClient;
+import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
 import hu.psprog.leaflet.lens.client.EventNotificationServiceClient;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.mockito.Mockito;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,13 +34,18 @@ import java.util.Properties;
  * @author Peter Smith
  */
 @Profile(LeafletITContextConfig.INTEGRATION_TEST_CONFIG_PROFILE)
-@Configuration
-@Import(LeafletITDatasourceConfig.class)
+@SpringBootApplication
 @ComponentScan(basePackages = {
         "hu.psprog.leaflet.service",
         "hu.psprog.leaflet.persistence.dao"
 })
+@EnableJpaRepositories(basePackages = LeafletITContextConfig.REPOSITORY_PACKAGE)
+@EntityScan(basePackages = LeafletITContextConfig.ENTITY_PACKAGE)
+@EnableTransactionManagement
 public class LeafletITContextConfig {
+
+    static final String ENTITY_PACKAGE = "hu.psprog.leaflet.persistence.entity";
+    static final String REPOSITORY_PACKAGE = "hu.psprog.leaflet.persistence.repository";
 
     public static final String INTEGRATION_TEST_DB_SCRIPT_USERS = "classpath:/service_it_db_script_users.sql";
     public static final String INTEGRATION_TEST_DB_SCRIPT_ENTRIES = "classpath:/service_it_db_script_entries.sql";
@@ -66,12 +78,8 @@ public class LeafletITContextConfig {
     }
 
     @Bean
-    public ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule timestampDeserialization = new SimpleModule();
-        timestampDeserialization.addDeserializer(Date.class, new DateDeserializers.TimestampDeserializer());
-        objectMapper.registerModule(timestampDeserialization);
-        return objectMapper;
+    public JsonMapper jsonMapper() {
+        return new JsonMapper();
     }
 
     @Bean
@@ -88,5 +96,40 @@ public class LeafletITContextConfig {
         converters.forEach(conversionService::addConverter);
 
         return conversionService;
+    }
+
+    @Bean
+    public RequestAuthentication requestAuthentication() {
+        return Map::of;
+    }
+
+    @Bean
+    public HttpServletRequest httpServletRequest() {
+        return Mockito.mock(HttpServletRequest.class);
+    }
+
+    @Bean
+    public HttpServletResponse httpServletResponse() {
+        return Mockito.mock(HttpServletResponse.class);
+    }
+
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        return Mockito.mock(ClientRegistrationRepository.class);
+    }
+
+    @Bean
+    public OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository() {
+        return Mockito.mock(OAuth2AuthorizedClientRepository.class);
+    }
+
+    @Bean
+    public OAuth2AuthorizedClientService oAuth2AuthorizedClientService() {
+        return Mockito.mock(OAuth2AuthorizedClientService.class);
+    }
+
+    @Bean
+    public BridgeClient lens() {
+        return Mockito.mock(BridgeClient.class);
     }
 }

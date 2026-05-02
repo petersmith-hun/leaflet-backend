@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         List<UploadedFile> currentAttachments = getCurrentAttachments(entryVO);
         if (!isAttached(currentAttachments, uploadedFile)) {
             currentAttachments.add(uploadedFile);
-            entryDAO.updateAttachments(entryVO.getId(), currentAttachments);
+            entryDAO.updateAttachments(entryVO.getId(), new LinkedList<>(currentAttachments));
             LOGGER.info("File [{}] attached to entry [{}].", uploadedFile.getPath(), entryVO.getTitle());
         } else {
             LOGGER.warn("File [{}] is already attached to entry [{}].", uploadedFile.getPath(), entryVO.getTitle());
@@ -57,7 +58,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         List<UploadedFile> currentAttachments = getCurrentAttachments(entryVO);
         if (isAttached(currentAttachments, uploadedFile)) {
             currentAttachments.remove(uploadedFile);
-            entryDAO.updateAttachments(entryVO.getId(), currentAttachments);
+            entryDAO.updateAttachments(entryVO.getId(), new LinkedList<>(currentAttachments));
             LOGGER.info("File [{}] detached from entry [{}].", uploadedFile.getPath(), entryVO.getTitle());
         } else {
             LOGGER.warn("File [{}] is not attached to entry [{}].", uploadedFile.getPath(), entryVO.getTitle());

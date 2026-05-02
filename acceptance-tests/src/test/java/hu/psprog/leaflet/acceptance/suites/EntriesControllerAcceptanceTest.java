@@ -19,13 +19,13 @@ import hu.psprog.leaflet.bridge.client.exception.CommunicationFailureException;
 import hu.psprog.leaflet.bridge.client.exception.ConflictingRequestException;
 import hu.psprog.leaflet.bridge.client.exception.ResourceNotFoundException;
 import hu.psprog.leaflet.bridge.service.EntryBridgeService;
-import jakarta.ws.rs.core.GenericType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.type.TypeReference;
 
 import java.util.Comparator;
 import java.util.stream.Stream;
@@ -56,8 +56,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     private static final String CONTROL_ENTRY_LINK = "entry-1";
     private static final Long CONTROL_ENTRY_ID = 1L;
     private static final String CONTROL_ENTRY_26 = "entry-26";
-    private static final GenericType<WrapperBodyDataModel<ExtendedEntryDataModel>> GENERIC_TYPE_EXTENDED_ENTRY_DATA_MODEL = new GenericType<>() {};
-    private static final GenericType<WrapperBodyDataModel<EditEntryDataModel>> GENERIC_TYPE_EDIT_ENTRY_DATA_MODEL = new GenericType<>() {};
+    private static final TypeReference<WrapperBodyDataModel<ExtendedEntryDataModel>> TYPE_REFERENCE_EXTENDED_ENTRY_DATA_MODEL = new TypeReference<>() {};
+    private static final TypeReference<WrapperBodyDataModel<EditEntryDataModel>> TYPE_REFERENCE_EDIT_ENTRY_DATA_MODEL = new TypeReference<>() {};
 
     @Autowired
     private EntryBridgeService entryBridgeService;
@@ -189,8 +189,8 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
 
         // then
         assertThat(result.pagination().entityCount(), equalTo(1L));
-        assertThat(result.body().entries().get(0).category().id(), is(1L));
-        assertThat(result.body().entries().get(0).enabled(), is(false));
+        assertThat(result.body().entries().getFirst().category().id(), is(1L));
+        assertThat(result.body().entries().getFirst().enabled(), is(false));
     }
 
     @Test
@@ -212,7 +212,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     public void shouldReturnExistingEntryByLink() throws CommunicationFailureException {
 
         // given
-        WrapperBodyDataModel<ExtendedEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, GENERIC_TYPE_EXTENDED_ENTRY_DATA_MODEL);
+        WrapperBodyDataModel<ExtendedEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, TYPE_REFERENCE_EXTENDED_ENTRY_DATA_MODEL);
 
         // when
         WrapperBodyDataModel<ExtendedEntryDataModel> result = entryBridgeService.getEntryByLink(CONTROL_ENTRY_LINK);
@@ -226,7 +226,7 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     public void shouldReturnExistingEntryByID() throws CommunicationFailureException {
 
         // given
-        WrapperBodyDataModel<EditEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, CONTROL_SUFFIX_EDIT, GENERIC_TYPE_EDIT_ENTRY_DATA_MODEL);
+        WrapperBodyDataModel<EditEntryDataModel> control = getControl(CONTROL_ENTRY_LINK, CONTROL_SUFFIX_EDIT, TYPE_REFERENCE_EDIT_ENTRY_DATA_MODEL);
 
         // when
         WrapperBodyDataModel<EditEntryDataModel> result = entryBridgeService.getEntryByID(CONTROL_ENTRY_ID);

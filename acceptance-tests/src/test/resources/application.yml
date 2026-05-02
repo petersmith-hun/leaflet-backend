@@ -16,9 +16,6 @@ spring:
       load-on-startup: 1
   main:
     allow-bean-definition-overriding: true
-  jackson:
-    serialization:
-      write-dates-as-timestamps: false
   sql:
     init:
       mode: never
@@ -35,14 +32,6 @@ bridge.clients:
 
 leaflet-link:
   security-checks-enabled: false
-
-tlp:
-  enabled: false
-
-tms:
-  enabled: false
-  packs: acceptance
-  forced-locale: en
 
 sitemap.server-name: http://localhost:9988
 

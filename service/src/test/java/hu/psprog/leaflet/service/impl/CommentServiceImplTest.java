@@ -270,7 +270,7 @@ public class CommentServiceImplTest {
                 .build();
         Pageable expectedPageable = PageRequest.of(1, 30, Sort.Direction.DESC, "id");
         Page<Comment> commentPage = new PageImpl<>(Collections.singletonList(comment));
-        Specification<Comment> specification = Specification.where(null);
+        Specification<Comment> specification = Specification.unrestricted();
 
         given(searchHandler.createSpecification(commentSearchParametersVO)).willReturn(specification);
         given(commentDAO.findAll(same(specification), eq(expectedPageable))).willReturn(commentPage);

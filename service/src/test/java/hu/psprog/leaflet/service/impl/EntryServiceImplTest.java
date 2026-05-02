@@ -282,7 +282,7 @@ public class EntryServiceImplTest {
                 .build();
         Pageable expectedPageable = PageRequest.of(1, 30, Sort.Direction.DESC, "title");
         Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        Specification<Entry> specification = Specification.where(null);
+        Specification<Entry> specification = Specification.unrestricted();
 
         given(searchHandler.createSpecification(entrySearchParametersVO)).willReturn(specification);
         given(entryDAO.findAll(same(specification), eq(expectedPageable))).willReturn(entryPage);

@@ -25,6 +25,6 @@ public class CommentSearchHandler extends AbstractSearchHandler<CommentSearchPar
 
     @Override
     protected Supplier<Specification<Comment>> baseSpecificationSupplier() {
-        return () -> Specification.where(null);
+        return Specification::unrestricted;
     }
 }

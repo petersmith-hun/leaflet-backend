@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -94,7 +95,7 @@ public class TagServiceImpl implements TagService {
         Tag tagToAttach = tagVOToTagConverter.convert(tagVO);
         if (!currentTags.contains(tagToAttach)) {
             currentTags.add(tagToAttach);
-            entryDAO.updateTags(entryVO.getId(), currentTags);
+            entryDAO.updateTags(entryVO.getId(), new LinkedList<>(currentTags));
             LOGGER.info("Tag [{}] attached to entry [{}]", tagVO.getTitle(), entryVO.getTitle());
         } else {
             LOGGER.warn("Tag [{}] is already attached to entry [{}]", tagVO.getTitle(), entryVO.getTitle());
@@ -111,7 +112,7 @@ public class TagServiceImpl implements TagService {
         Tag tagToDetach = tagVOToTagConverter.convert(tagVO);
         if (currentTags.contains(tagToDetach)) {
             currentTags.remove(tagToDetach);
-            entryDAO.updateTags(entryVO.getId(), currentTags);
+            entryDAO.updateTags(entryVO.getId(), new LinkedList<>(currentTags));
             LOGGER.info("Tag [{}] detached from entry [{}]", tagVO.getTitle(), entryVO.getTitle());
         } else {
             LOGGER.warn("Tag [{}] is not attached to entry [{}]", tagVO.getTitle(), entryVO.getTitle());

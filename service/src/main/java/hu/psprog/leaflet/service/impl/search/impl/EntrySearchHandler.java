@@ -25,6 +25,6 @@ public class EntrySearchHandler extends AbstractSearchHandler<EntrySearchParamet
 
     @Override
     protected Supplier<Specification<Entry>> baseSpecificationSupplier() {
-        return () -> Specification.where(null);
+        return Specification::unrestricted;
     }
 }

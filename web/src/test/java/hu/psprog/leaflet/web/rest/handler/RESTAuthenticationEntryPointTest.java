@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.web.rest.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.api.rest.response.common.ErrorMessageDataModel;
 import hu.psprog.leaflet.web.metrics.ExceptionHandlerCounters;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.AuthenticationException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,7 +41,7 @@ public class RESTAuthenticationEntryPointTest {
     private AuthenticationException authenticationException;
 
     @Mock
-    private ObjectMapper objectMapper;
+    private JsonMapper jsonMapper;
 
     @Mock
     private PrintWriter printWriter;
@@ -57,7 +57,7 @@ public class RESTAuthenticationEntryPointTest {
 
         // given
         given(response.getWriter()).willReturn(printWriter);
-        given(objectMapper.writeValueAsString(prepareErrorMessageDataModel())).willReturn(ERROR_MESSAGE_AS_JSON);
+        given(jsonMapper.writeValueAsString(prepareErrorMessageDataModel())).willReturn(ERROR_MESSAGE_AS_JSON);
     }
 
     @Test
