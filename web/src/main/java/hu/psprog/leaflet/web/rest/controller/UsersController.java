@@ -36,7 +36,9 @@ import java.net.URI;
  * REST controller for user-related entry points.
  *
  * @author Peter Smith
+ * @deprecated Functionality has been moved to LAGS; will be removed in the upcoming major version.
  */
+@Deprecated(forRemoval = true, since = "2.5.0")
 @RestController
 @RequestMapping(BaseController.BASE_PATH_USERS)
 public class UsersController extends BaseController {

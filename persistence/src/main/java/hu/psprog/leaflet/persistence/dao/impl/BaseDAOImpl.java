@@ -56,6 +56,7 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
     }
 
     @Override
+    @Transactional
     public <S extends T> S save(S entity) {
 
         if (entity instanceof SelfStatusAwareIdentifiableEntity) {
@@ -63,7 +64,7 @@ public abstract class BaseDAOImpl<T extends SerializableEntity, ID extends Seria
         }
 
         S savedEntity = jpaRepository.saveAndFlush(entity);
-        jpaContext.getEntityManagerByManagedType(entity.getClass()).clear();
+        jpaContext.getEntityManagerByManagedType(savedEntity.getClass()).clear();
 
         return savedEntity;
     }

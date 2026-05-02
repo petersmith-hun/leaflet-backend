@@ -1,0 +1,57 @@
+domino:
+  oauth:
+    leaflet:
+      behavior:
+        target-provider: gateway-psproghu
+        roll-client-secret-on-deploy: true
+        use-secret-manager-for:
+          - client-secret
+          - client-id
+      tenant:
+        environment: prod
+        name: psproghu
+      client:
+        required-permissions:
+          - write:mail:comment_notification
+          - write:mail:contact_request
+          - write:mail:system_startup
+      resource-server:
+        use-audience: true
+        registered-permissions:
+          - read:access:profile
+          - read:admin
+          - read:categories
+          - read:comments
+          - read:comments:own
+          - read:documents
+          - read:entries
+          - read:tags
+          - write:admin
+          - write:categories
+          - write:comments
+          - write:comments:own
+          - write:documents
+          - write:entries
+          - write:tags
+        allowed-clients:
+          - name: lcfa
+            allowed-permissions:
+              - read:access:profile
+              - read:comments:own
+              - write:comments:own
+          - name: lpmc
+            allowed-permissions:
+              - read:admin
+              - read:categories
+              - read:comments
+              - read:comments:own
+              - read:documents
+              - read:entries
+              - read:tags
+              - write:admin
+              - write:categories
+              - write:comments
+              - write:comments:own
+              - write:documents
+              - write:entries
+              - write:tags

@@ -19,6 +19,10 @@ domino:
             APP_ARGS: |
               --spring.profiles.active=production
               --spring.config.location=/opt/leaflet/appconfig_leaflet.yml
+              --spring.datasource.username=[dsm:common.mysql.username]
+              --spring.datasource.password=[dsm:common.mysql.password]
+              --oauth.client-id=[dsm:domino.oauth.psproghu.prod.leaflet.client-id]
+              --oauth.client-secret=[dsm:domino.oauth.psproghu.prod.leaflet.client-secret]
           volumes:
             "[dsm:volume.logs]": "/opt/leaflet/logs:rw"
             "[dsm:volume.config.leaflet]": "/opt/leaflet/appconfig_leaflet.yml:ro"

@@ -1,10 +1,5 @@
 package hu.psprog.leaflet.acceptance.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider;
 import com.nimbusds.jose.JWSAlgorithm;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.bridge.client.BridgeClient;
@@ -13,12 +8,13 @@ import hu.psprog.leaflet.bridge.client.impl.InvocationFactoryConfig;
 import hu.psprog.leaflet.service.NotificationService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.client.Client;
-import jakarta.ws.rs.client.ClientBuilder;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.util.TimeValue;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.restclient.RestTemplateBuilder;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -27,17 +23,19 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.text.DateFormat;
 
 /**
  * Acceptance test mock context configuration.
@@ -63,25 +61,26 @@ public class AcceptanceTestConfig {
 
     @Bean
     @Primary
-    public ObjectMapper objectMapper() {
+    public JsonMapper jsonMapper() {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.setDateFormat(DateFormat.getInstance());
-
-        return objectMapper;
+        return new JsonMapper(JsonMapper.builder()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false));
     }
 
     @Bean
-    @Primary
-    public Client jacksonClient(ObjectMapper objectMapper) {
+    public TestRestTemplate testRestTemplate() {
 
-        return ClientBuilder.newBuilder()
-                .register(new JacksonJsonProvider(objectMapper))
-                .register(MultiPartFeature.class)
-                .build();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setHttpClient(HttpClientBuilder.create()
+                .disableAuthCaching()
+                .disableAutomaticRetries()
+                .disableConnectionState()
+                .disableCookieManagement()
+                .disableRedirectHandling()
+                .evictIdleConnections(TimeValue.ofSeconds(3L))
+                .build());
+
+        return new TestRestTemplate(new RestTemplateBuilder().requestFactory(() -> requestFactory));
     }
 
     @Bean

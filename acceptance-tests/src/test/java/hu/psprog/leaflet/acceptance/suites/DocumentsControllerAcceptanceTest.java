@@ -14,8 +14,7 @@ import hu.psprog.leaflet.bridge.service.DocumentBridgeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import jakarta.ws.rs.core.GenericType;
+import tools.jackson.core.type.TypeReference;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -36,8 +35,8 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
     private static final String CONTROL_DOCUMENT_LINK = "doc-1";
     private static final String CONTROL_DOCUMENT_5 = "doc-5";
     private static final Long CONTROL_DOCUMENT_ID = 1L;
-    private static final GenericType<WrapperBodyDataModel<DocumentDataModel>> GENERIC_TYPE_DOCUMENT_DATA_MODEL = new GenericType<>() {};
-    private static final GenericType<WrapperBodyDataModel<EditDocumentDataModel>> GENERIC_TYPE_EDIT_DOCUMENT_DATA_MODEL = new GenericType<>() {};
+    private static final TypeReference<WrapperBodyDataModel<DocumentDataModel>> TYPE_REFERENCE_DOCUMENT_DATA_MODEL = new TypeReference<>() {};
+    private static final TypeReference<WrapperBodyDataModel<EditDocumentDataModel>> TYPE_REFERENCE_EDIT_DOCUMENT_DATA_MODEL = new TypeReference<>() {};
 
     @Autowired
     private DocumentBridgeService documentBridgeService;
@@ -69,7 +68,7 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
     public void shouldReturnDocumentByLink() throws CommunicationFailureException {
 
         // given
-        WrapperBodyDataModel<DocumentDataModel> control = getControl(CONTROL_DOCUMENT_LINK, GENERIC_TYPE_DOCUMENT_DATA_MODEL);
+        WrapperBodyDataModel<DocumentDataModel> control = getControl(CONTROL_DOCUMENT_LINK, TYPE_REFERENCE_DOCUMENT_DATA_MODEL);
 
         // when
         WrapperBodyDataModel<DocumentDataModel> result = documentBridgeService.getDocumentByLink(CONTROL_DOCUMENT_LINK);
@@ -96,7 +95,7 @@ public class DocumentsControllerAcceptanceTest extends AbstractParameterizedBase
     public void shouldReturnDocumentByID() throws CommunicationFailureException {
 
         // given
-        WrapperBodyDataModel<EditDocumentDataModel> control = getControl(CONTROL_DOCUMENT_LINK, CONTROL_SUFFIX_EDIT, GENERIC_TYPE_EDIT_DOCUMENT_DATA_MODEL);
+        WrapperBodyDataModel<EditDocumentDataModel> control = getControl(CONTROL_DOCUMENT_LINK, CONTROL_SUFFIX_EDIT, TYPE_REFERENCE_EDIT_DOCUMENT_DATA_MODEL);
 
         // when
         WrapperBodyDataModel<EditDocumentDataModel> result = documentBridgeService.getDocumentByID(CONTROL_DOCUMENT_ID);

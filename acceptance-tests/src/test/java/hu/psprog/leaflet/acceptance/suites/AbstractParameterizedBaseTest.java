@@ -1,15 +1,14 @@
 package hu.psprog.leaflet.acceptance.suites;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hu.psprog.leaflet.acceptance.mock.MockNotificationService;
 import hu.psprog.leaflet.bridge.client.request.RequestAuthentication;
-import jakarta.ws.rs.core.GenericType;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -37,7 +36,7 @@ public abstract class AbstractParameterizedBaseTest {
     static final String RECAPTCHA_TOKEN = "recaptcha-token";
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper jsonMapper;
 
     private Map<String, String> requestAuthenticationHeaderTemp;
 
@@ -54,7 +53,7 @@ public abstract class AbstractParameterizedBaseTest {
         notificationService.reset();
     }
 
-    <T> T getControl(String id, GenericType<T> asType) {
+    <T> T getControl(String id, TypeReference<T> asType) {
         return getControl(id, null, asType);
     }
 
@@ -62,21 +61,21 @@ public abstract class AbstractParameterizedBaseTest {
         return getControl(id, null, asType);
     }
 
-    <T> T getControl(String id, String suffix, GenericType<T> asType) {
+    <T> T getControl(String id, String suffix, TypeReference<T> asType) {
         try {
-            return objectMapper.readValue(parseControlURL(id, suffix), new TypeReference<T>() {
-                @Override
-                public Type getType() {
-                    return asType.getType();
-                }
-            });
+            return jsonMapper.readValue(parseControlURL(id, suffix).openStream(), asType);
         } catch (IOException e) {
             throw new IllegalArgumentException("Failed to read control object", e);
         }
     }
 
     <T> T getControl(String id, String suffix, Class<T> asType) {
-        return getControl(id, suffix, new GenericType<>(asType));
+        return getControl(id, suffix, new TypeReference<>(){
+            @Override
+            public Type getType() {
+                return asType;
+            }
+        });
     }
 
     void clearAuthentication() {
