@@ -13,17 +13,9 @@ import java.lang.annotation.RetentionPolicy;
 public interface PermitScope {
 
     /**
-     * Scope based security expressions for read operations.
+     * Scope-based security expressions for read operations.
      */
     interface Read {
-
-        /**
-         * Permits standard users to read their own account data or elevated users to read other users' account data.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @PreAuthorize("isAuthenticated() && (hasAuthority('SCOPE_read:users:own') && @ownershipEvaluator.isSelf(authentication, #id) || hasAuthority('SCOPE_read:users'))")
-        @interface OwnUserOrElevated {
-        }
 
         /**
          * Permits standard users to read their own comments or elevated users to read other users' comments.
@@ -82,14 +74,6 @@ public interface PermitScope {
         }
 
         /**
-         * Permits read access for any user data.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @PreAuthorize("isAuthenticated() && hasAuthority('SCOPE_read:users')")
-        @interface Users {
-        }
-
-        /**
          * Permits read access for any administrative operation.
          */
         @Retention(RetentionPolicy.RUNTIME)
@@ -99,17 +83,9 @@ public interface PermitScope {
     }
 
     /**
-     * Scope based security expressions for write operations.
+     * Scope-based security expressions for write operations.
      */
     interface Write {
-
-        /**
-         * Permits standard users to modify their own account data.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @PreAuthorize("isAuthenticated() && hasAuthority('SCOPE_write:users:own') && @ownershipEvaluator.isSelf(authentication, #id)")
-        @interface OwnUser {
-        }
 
         /**
          * Permits standard users to create or modify their own comments or elevated users to create or modify other users' comments.
@@ -184,27 +160,11 @@ public interface PermitScope {
         }
 
         /**
-         * Permits (elevated) users to create or modify any user accounts.
-         */
-        @Retention(RetentionPolicy.RUNTIME)
-        @PreAuthorize("isAuthenticated() && hasAuthority('SCOPE_write:users')")
-        @interface Users {
-        }
-
-        /**
          * Permits write access for any administrative operation.
          */
         @Retention(RetentionPolicy.RUNTIME)
         @PreAuthorize("isAuthenticated() && hasAuthority('SCOPE_write:admin')")
         @interface Admin {
         }
-    }
-
-    /**
-     * Deny-all authorization for deprecated code paths.
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @PreAuthorize("denyAll()")
-    @interface DenyAlways {
     }
 }

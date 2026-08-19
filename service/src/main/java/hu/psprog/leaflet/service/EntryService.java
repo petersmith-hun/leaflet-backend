@@ -3,7 +3,6 @@ package hu.psprog.leaflet.service;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.crud.CreateOperationCapableService;
 import hu.psprog.leaflet.service.crud.DeleteOperationCapableService;
-import hu.psprog.leaflet.service.crud.PageableService;
 import hu.psprog.leaflet.service.crud.ReadOperationCapableService;
 import hu.psprog.leaflet.service.crud.StatusChangeCapableService;
 import hu.psprog.leaflet.service.crud.UpdateOperationCapableService;
@@ -26,7 +25,6 @@ public interface EntryService extends CreateOperationCapableService<EntryVO, Lon
         ReadOperationCapableService<EntryVO, Long>,
         UpdateOperationCapableService<EntryVO, EntryVO, Long>,
         DeleteOperationCapableService<EntryVO, Long>,
-        PageableService<EntryVO, EntryVO.OrderBy>,
         StatusChangeCapableService<Long> {
 
     /**

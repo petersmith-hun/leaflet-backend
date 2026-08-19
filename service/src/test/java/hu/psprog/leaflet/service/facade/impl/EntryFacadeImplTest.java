@@ -32,7 +32,6 @@ public class EntryFacadeImplTest {
     private static final int LIMIT = 10;
     private static final String DIRECTION = "DESC";
     private static final String ORDER_BY = "TITLE";
-    private static final String NON_EXISTING = "non-existing";
     private static final long CATEGORY_ID = 9L;
     private static final long TAG_ID = 8L;
     private static final CategoryVO CATEGORY_VO = CategoryVO.wrapMinimumVO(CATEGORY_ID);
@@ -175,26 +174,6 @@ public class EntryFacadeImplTest {
 
         // then
         verify(entryService).changePublicationStatus(ENTRY_ID, newStatus);
-    }
-
-    @Test
-    public void shouldGetEntityPage() {
-
-        // when
-        entryFacade.getEntityPage(PAGE, LIMIT, DIRECTION, ORDER_BY);
-
-        // then
-        verify(entryService).getEntityPage(PAGE, LIMIT, OrderDirection.DESC, EntryVO.OrderBy.TITLE);
-    }
-    
-    @Test
-    public void shouldGetEntityPageWithFallbackPagingParameters() {
-
-        // when
-        entryFacade.getEntityPage(PAGE, LIMIT, NON_EXISTING, NON_EXISTING);
-
-        // then
-        verify(entryService).getEntityPage(PAGE, LIMIT, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
     }
 
     @Test

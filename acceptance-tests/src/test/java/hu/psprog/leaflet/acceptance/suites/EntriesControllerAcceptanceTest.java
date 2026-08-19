@@ -74,20 +74,6 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
     }
 
     @ParameterizedTest
-    @MethodSource("pageOfEntriesDataProvider")
-    public void shouldReturnPageOfEntries(int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
-                                          long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
-            throws CommunicationFailureException {
-
-        // when
-        WrapperBodyDataModel<EntryListDataModel> result = entryBridgeService.getPageOfEntries(page, limit, orderBy, orderDirection);
-
-        // then
-        assertPaginatedResult(result, getComparator(orderBy, orderDirection), expectedEntityCount, expectedBodySize, expectedPageCount, expectedHasNext, expectedHasPrevious);
-        assertMenu(result);
-    }
-
-    @ParameterizedTest
     @MethodSource("pageOfPublicEntriesDataProvider")
     public void shouldReturnPageOfPublicEntries(int page, int limit, OrderBy.Entry orderBy, OrderDirection orderDirection,
                                                 long expectedEntityCount, int expectedBodySize, int expectedPageCount, boolean expectedHasNext, boolean expectedHasPrevious)
@@ -379,19 +365,6 @@ public class EntriesControllerAcceptanceTest extends AbstractParameterizedBaseTe
         } else {
             return DESC_BY_TITLE;
         }
-    }
-
-    private static Stream<Arguments> pageOfEntriesDataProvider() {
-        return Stream.of(
-                // page, limit, order by, order direction, exp. all entry, exp. body size, exp. num. of pages, exp. has next, exp. has previous
-                Arguments.of(1, 10, CREATED, ASC,  25, 10, 3, true,  false),
-                Arguments.of(2, 10, CREATED, ASC,  25, 10, 3, true,  true),
-                Arguments.of(3, 10, CREATED, ASC,  25, 5,  3, false, true),
-                Arguments.of(1, 30, CREATED, ASC,  25, 25, 1, false, false),
-                Arguments.of(1, 30, TITLE,   DESC, 25, 25, 1, false, false),
-                Arguments.of(3, 8,  TITLE,   ASC,  25, 8,  4, true,  true),
-                Arguments.of(2, 8,  CREATED, DESC, 25, 8,  4, true,  true)
-        );
     }
 
     private static Stream<Arguments> pageOfPublicEntriesDataProvider() {

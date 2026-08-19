@@ -26,17 +26,6 @@ public interface EntryFacade {
     EntryVO findByLink(String link) throws EntityNotFoundException;
 
     /**
-     * Returns a page of entries.
-     *
-     * @param page page number
-     * @param limit maximum number of items on a page
-     * @param direction order direction
-     * @param orderBy order by field
-     * @return page of entries
-     */
-    EntityPageVO<EntryVO> getEntityPage(int page, int limit, String direction, String orderBy);
-
-    /**
      * Returns a page of public entries.
      *
      * @param page page number

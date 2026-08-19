@@ -1,15 +1,13 @@
 package hu.psprog.leaflet.bridge.client.impl;
 
-import hu.psprog.leaflet.persistence.entity.Role;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Role to authority (scope) list mapping.
+ * Email-to-authority (scope) list mapping.
  *
  * @author Peter Smith
  */
@@ -17,10 +15,8 @@ import java.util.stream.Stream;
 public class RoleToAuthoritiesMapping {
 
     private static final String[] USER_AUTHORITIES = {
-            "read:users:own",
             "read:comments:own",
-            "write:comments:own",
-            "write:users:own"
+            "write:comments:own"
     };
 
     private static final String[] EDITOR_AUTHORITIES = Stream.concat(Stream.of(USER_AUTHORITIES), Stream.of(
@@ -34,29 +30,32 @@ public class RoleToAuthoritiesMapping {
             "write:documents",
             "write:entries",
             "write:tags"
-    )).collect(Collectors.toList()).toArray(String[]::new);
+    )).toList().toArray(String[]::new);
 
     private static final String[] ADMIN_AUTHORITIES = Stream.concat(Stream.of(EDITOR_AUTHORITIES), Stream.of(
             "read:admin",
-            "read:users",
-            "write:admin",
-            "write:users"
-    )).collect(Collectors.toList()).toArray(String[]::new);
+            "write:admin"
+    )).toList().toArray(String[]::new);
 
-    private static final Map<Role, String> ROLE_TO_AUTHORITY_LIST_MAP = Map.of(
-            Role.USER, String.join(StringUtils.SPACE, USER_AUTHORITIES),
-            Role.EDITOR, String.join(StringUtils.SPACE, EDITOR_AUTHORITIES),
-            Role.ADMIN, String.join(StringUtils.SPACE, ADMIN_AUTHORITIES)
+    private static final Map<String, String> ROLE_TO_AUTHORITY_LIST_MAP = Map.of(
+            "test-user-1@ac-leaflet.local", String.join(StringUtils.SPACE, USER_AUTHORITIES),
+            "test-user-3@ac-leaflet.local", String.join(StringUtils.SPACE, USER_AUTHORITIES),
+            "test-user-6@ac-leaflet.local", String.join(StringUtils.SPACE, USER_AUTHORITIES),
+            "test-user-7@ac-leaflet.local", String.join(StringUtils.SPACE, USER_AUTHORITIES),
+            "test-editor-4@ac-leaflet.local", String.join(StringUtils.SPACE, EDITOR_AUTHORITIES),
+            "test-editor-5@ac-leaflet.local", String.join(StringUtils.SPACE, EDITOR_AUTHORITIES),
+            "test-editor-8@ac-leaflet.local", String.join(StringUtils.SPACE, EDITOR_AUTHORITIES),
+            "test-admin@ac-leaflet.local", String.join(StringUtils.SPACE, ADMIN_AUTHORITIES)
     );
 
     /**
-     * Returns the relevant scope for the given role.
+     * Returns the relevant scope for the given email.
      * Multiple scope values are chained together with space character.
      *
-     * @param role {@link Role} to get scope for
+     * @param email email address to get scope for
      * @return scope chain as a single {@link String}
      */
-    public String getAuthoritiesForRole(Role role) {
-        return ROLE_TO_AUTHORITY_LIST_MAP.get(role);
+    public String getAuthoritiesByEmail(String email) {
+        return ROLE_TO_AUTHORITY_LIST_MAP.get(email);
     }
 }

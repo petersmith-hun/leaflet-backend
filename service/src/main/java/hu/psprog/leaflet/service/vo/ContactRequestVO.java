@@ -1,7 +1,7 @@
 package hu.psprog.leaflet.service.vo;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 
 /**
  * VO for contact request processing.
@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
  * @author Peter Smith
  */
 @Data
-@SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
+@Builder(builderMethodName = "getBuilder", setterPrefix = "with")
 public class ContactRequestVO {
 
     private final String name;

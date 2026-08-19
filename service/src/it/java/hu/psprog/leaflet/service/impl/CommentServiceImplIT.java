@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.service.impl;
 
-import hu.psprog.leaflet.persistence.entity.Locale;
 import hu.psprog.leaflet.service.CommentService;
 import hu.psprog.leaflet.service.common.OrderDirection;
 import hu.psprog.leaflet.service.config.LeafletITContextConfig;
@@ -18,12 +17,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -83,7 +80,7 @@ public class CommentServiceImplIT {
         // then
         assertThat(result.stream().allMatch(Objects::nonNull), equalTo(true));
         assertThat(result.size(), equalTo(10));
-        assertThat(result.get(0).getContent(), equalTo(controlCommentVO.getContent()));
+        assertThat(result.getFirst().getContent(), equalTo(controlCommentVO.getContent()));
     }
 
     @ParameterizedTest
@@ -154,12 +151,6 @@ public class CommentServiceImplIT {
                 .withId(2L)
                 .withUsername("IT Editor")
                 .withEmail("lflt-it-5101@leaflet.dev")
-                .withPassword("lflt1234")
-                .withAuthorities(List.of(new SimpleGrantedAuthority("EDITOR")))
-                .withEnabled(true)
-                .withLocale(Locale.EN)
-                .withCreated(new Date(1471514400000L))
-                .withLastModified(new Date(1471514400000L))
                 .build();
 
         // when

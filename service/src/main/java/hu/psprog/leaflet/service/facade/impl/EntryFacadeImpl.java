@@ -40,11 +40,6 @@ public class EntryFacadeImpl implements EntryFacade {
     }
 
     @Override
-    public EntityPageVO<EntryVO> getEntityPage(int page, int limit, String direction, String orderBy) {
-        return entryService.getEntityPage(page, limit, parseDirection(direction), parseOrderBy(orderBy));
-    }
-
-    @Override
     public EntityPageVO<EntryVO> getPageOfPublicEntries(int page, int limit, String direction, String orderBy) {
         return entryService.getPageOfPublicEntries(page, limit, parseDirection(direction), parseOrderBy(orderBy));
     }

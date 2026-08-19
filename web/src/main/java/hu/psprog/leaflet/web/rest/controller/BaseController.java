@@ -17,7 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 /**
- * Exception handlers, common constants and operations.
+ * Exception handlers, common constants, and operations.
  *
  * @author Peter Smith
  */
@@ -25,7 +25,6 @@ public class BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
-    static final String BASE_PATH_USERS = "/users";
     static final String BASE_PATH_ENTRIES = "/entries";
     static final String BASE_PATH_CATEGORIES = "/categories";
     static final String BASE_PATH_DCP = "/dcp";
