@@ -2,8 +2,8 @@ package hu.psprog.leaflet.service.vo;
 
 import hu.psprog.leaflet.persistence.entity.Document;
 import hu.psprog.leaflet.persistence.entity.Locale;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -12,12 +12,13 @@ import lombok.experimental.SuperBuilder;
  *
  * @author Peter Smith
  */
-@Data
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
-public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> implements CustomSEODataProviderVO {
+public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long> implements CustomSEODataProviderVO {
 
+    @Getter
     public enum OrderBy {
         ID("id"),
         CREATED("created");
@@ -26,10 +27,6 @@ public class DocumentVO extends SelfStatusAwareIdentifiableVO<Long, Document> im
 
         OrderBy(String field) {
             this.field = field;
-        }
-
-        public String getField() {
-            return field;
         }
     }
 

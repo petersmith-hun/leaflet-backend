@@ -9,11 +9,9 @@ import hu.psprog.leaflet.persistence.entity.FrontEndRoute;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
-import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.persistence.entity.Tag;
 import hu.psprog.leaflet.persistence.entity.UploadedFile;
 import hu.psprog.leaflet.persistence.entity.User;
-import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.DocumentVO;
@@ -22,12 +20,10 @@ import hu.psprog.leaflet.service.vo.FrontEndRouteVO;
 import hu.psprog.leaflet.service.vo.TagVO;
 import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.service.vo.UserVO;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -44,13 +40,9 @@ public abstract class ConversionTestObjects {
     private static final boolean ENABLED = true;
     private static final long ID = 1L;
     private static final String TITLE = "Title";
-    private static final String PASSWORD = "test-pw";
     private static final String USERNAME = "username";
     private static final Locale LOCALE = Locale.EN;
     private static final String EMAIL = "test@leaflet.dev";
-    private static final Date LAST_LOGIN = createDate(0);
-    private static final List<GrantedAuthority> AUTHORITIES = Collections.singletonList(Authority.ADMIN);
-    private static final Role ROLE = Role.ADMIN;
     private static final String PATH = "path";
     private static final String ORIGINAL_FILENAME = "original-filename";
     private static final String MIME = "mime";
@@ -96,28 +88,14 @@ public abstract class ConversionTestObjects {
 
     static final UserVO USER_VO = UserVO.getBuilder()
             .withId(ID)
-            .withCreated(CREATED)
-            .withPassword(PASSWORD)
             .withUsername(USERNAME)
-            .withLocale(LOCALE)
             .withEmail(EMAIL)
-            .withLastLogin(LAST_LOGIN)
-            .withAuthorities(AUTHORITIES)
-            .withEnabled(ENABLED)
             .build();
-
-    static final UserVO USER_MINIMUM_VO = UserVO.wrapMinimumVO(ID);
 
     static final User USER = User.getBuilder()
             .withId(ID)
-            .withCreated(CREATED)
-            .withPassword(PASSWORD)
             .withUsername(USERNAME)
-            .withDefaultLocale(LOCALE)
             .withEmail(EMAIL)
-            .withLastLogin(LAST_LOGIN)
-            .withRole(ROLE)
-            .withEnabled(ENABLED)
             .build();
 
     static final User USER_MINIMUM = User.getBuilder()
@@ -317,6 +295,21 @@ public abstract class ConversionTestObjects {
             .withSeoKeywords(SEO_KEYWORDS)
             .withTitle(TITLE)
             .withUser(USER)
+            .build();
+
+    static final Document DOCUMENT_WITH_OWNER_MINIMUM = Document.getBuilder()
+            .withRawContent(RAW_CONTENT)
+            .withCreated(CREATED)
+            .withEnabled(ENABLED)
+            .withLastModified(LAST_MODIFIED)
+            .withLocale(LOCALE)
+            .withId(ID)
+            .withLink(LINK)
+            .withSeoTitle(SEO_TITLE)
+            .withSeoDescription(SEO_DESCRIPTION)
+            .withSeoKeywords(SEO_KEYWORDS)
+            .withTitle(TITLE)
+            .withUser(USER_MINIMUM)
             .build();
 
     static final Document DOCUMENT_WITHOUT_OWNER = Document.getBuilder()

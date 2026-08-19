@@ -143,21 +143,6 @@ public class EntryServiceImplTest {
     }
 
     @Test
-    public void testGetEntityPage() {
-
-        // given
-        Page<Entry> entryPage = new PageImpl<>(Collections.singletonList(entry));
-        given(entryToEntryVOConverter.convert(any(Entry.class))).willReturn(ENTRY_VO);
-        given(entryDAO.findAll(any(Pageable.class))).willReturn(entryPage);
-
-        // when
-        EntityPageVO<EntryVO> result = entryService.getEntityPage(1, 10, OrderDirection.ASC, EntryVO.OrderBy.CREATED);
-
-        // then
-        assertThat(result, notNullValue());
-    }
-
-    @Test
     public void testGetPageOfPublicEntries() {
 
         // given

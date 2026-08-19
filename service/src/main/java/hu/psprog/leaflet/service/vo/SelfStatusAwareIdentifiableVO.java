@@ -1,8 +1,7 @@
 package hu.psprog.leaflet.service.vo;
 
-import hu.psprog.leaflet.persistence.entity.SelfStatusAwareIdentifiableEntity;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -14,11 +13,11 @@ import java.util.Date;
  *
  * @author Peter Smith
  */
-@Data
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
-public abstract class SelfStatusAwareIdentifiableVO<ID extends Serializable, T extends SelfStatusAwareIdentifiableEntity<ID>> extends IdentifiableVO<ID> {
+public abstract class SelfStatusAwareIdentifiableVO<ID extends Serializable> extends IdentifiableVO<ID> {
 
     private final Date created;
     private final Date lastModified;

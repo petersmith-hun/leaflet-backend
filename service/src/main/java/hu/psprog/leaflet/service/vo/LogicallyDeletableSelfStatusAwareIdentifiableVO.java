@@ -1,8 +1,7 @@
 package hu.psprog.leaflet.service.vo;
 
-import hu.psprog.leaflet.persistence.entity.LogicallyDeletableSelfStatusAwareIdentifiableEntity;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -13,12 +12,12 @@ import java.io.Serializable;
  *
  * @author Peter Smith
  */
-@Data
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
-public abstract class LogicallyDeletableSelfStatusAwareIdentifiableVO<ID extends Serializable, T extends LogicallyDeletableSelfStatusAwareIdentifiableEntity<ID>>
-        extends SelfStatusAwareIdentifiableVO<ID, T> {
+public abstract class LogicallyDeletableSelfStatusAwareIdentifiableVO<ID extends Serializable>
+        extends SelfStatusAwareIdentifiableVO<ID> {
 
     private final boolean deleted;
 }

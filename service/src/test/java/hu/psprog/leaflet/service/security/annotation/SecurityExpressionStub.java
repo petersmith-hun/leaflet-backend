@@ -10,11 +10,6 @@ import hu.psprog.leaflet.service.vo.UserVO;
  */
 class SecurityExpressionStub {
 
-    @PermitScope.Read.OwnUserOrElevated
-    boolean testPermitScopeReadOwnUserOrElevated(Long id) {
-        return true;
-    }
-
     @PermitScope.Read.OwnCommentsOrElevated
     boolean testPermitScopeReadOwnCommentsOrElevated(Long id) {
         return true;
@@ -50,18 +45,8 @@ class SecurityExpressionStub {
         return true;
     }
 
-    @PermitScope.Read.Users
-    boolean testPermitScopeReadUsers() {
-        return true;
-    }
-
     @PermitScope.Read.Admin
     boolean testPermitScopeReadAdmin() {
-        return true;
-    }
-
-    @PermitScope.Write.OwnUser
-    boolean testPermitScopeWriteOwnUser(Long id) {
         return true;
     }
 
@@ -105,18 +90,8 @@ class SecurityExpressionStub {
         return true;
     }
 
-    @PermitScope.Read.Users
-    boolean testPermitScopeWriteUsers() {
-        return true;
-    }
-
     @PermitScope.Write.Admin
     boolean testPermitScopeWriteAdmin() {
-        return true;
-    }
-
-    @PermitScope.DenyAlways
-    boolean testDenyAlways() {
         return true;
     }
 }

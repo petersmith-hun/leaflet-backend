@@ -250,16 +250,6 @@ public class EntryServiceImpl implements EntryService {
         LOGGER.info("Disabled entry of ID [{}]", id);
     }
 
-    @Override
-    @PermitScope.Read.Entries
-    public EntityPageVO<EntryVO> getEntityPage(int page, int limit, OrderDirection direction, EntryVO.OrderBy orderBy) {
-
-        Pageable pageable = PageableUtil.createPage(page, limit, direction, orderBy.getField());
-        Page<Entry> entityPage = entryDAO.findAll(pageable);
-
-        return PageableUtil.convertPage(entityPage, entryToEntryVOConverter);
-    }
-
     private EntityPageVO<EntryVO> getPageWithWhereSpecification(EntrySearchParametersVO entrySearchParametersVO) {
 
         Pageable pageable = PageableUtil.createPage(

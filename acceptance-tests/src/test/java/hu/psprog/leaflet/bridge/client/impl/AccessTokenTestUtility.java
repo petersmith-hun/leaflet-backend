@@ -8,8 +8,8 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.KeyLengthException;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.MACSigner;
-import hu.psprog.leaflet.persistence.dao.UserDAO;
 import hu.psprog.leaflet.persistence.entity.User;
+import hu.psprog.leaflet.acceptance.config.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -31,16 +31,16 @@ public class AccessTokenTestUtility {
     private static final int EXPIRATION_IN_MINUTES = 10;
 
     private final RoleToAuthoritiesMapping roleToAuthoritiesMapping;
-    private final UserDAO userDAO;
+    private final UserRepository userRepository;
     private final JWSSigner jwsSigner;
     private final JWSHeader jwsHeader;
     private final String defaultUser;
 
     @Autowired
-    public AccessTokenTestUtility(RoleToAuthoritiesMapping roleToAuthoritiesMapping, UserDAO userDAO, String jwtSecret,
+    public AccessTokenTestUtility(RoleToAuthoritiesMapping roleToAuthoritiesMapping, UserRepository userRepository, String jwtSecret,
                                   @Value("${test-auth.default-user}") String defaultUser) throws KeyLengthException {
         this.roleToAuthoritiesMapping = roleToAuthoritiesMapping;
-        this.userDAO = userDAO;
+        this.userRepository = userRepository;
         this.defaultUser = defaultUser;
         this.jwsHeader = new JWSHeader(JWSAlgorithm.HS256);
         this.jwsSigner = new MACSigner(jwtSecret);
@@ -63,8 +63,8 @@ public class AccessTokenTestUtility {
      */
     public String generateToken(String username) {
 
-        User user = userDAO.findByEmail(username);
-        String scope = roleToAuthoritiesMapping.getAuthoritiesForRole(user.getRole());
+        User user = userRepository.findByEmail(username);
+        String scope = roleToAuthoritiesMapping.getAuthoritiesByEmail(user.getEmail());
 
         Payload payload = new Payload(Map.of(
                 "scope", scope,

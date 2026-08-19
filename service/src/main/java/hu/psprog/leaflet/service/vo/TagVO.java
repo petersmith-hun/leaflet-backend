@@ -1,8 +1,8 @@
 package hu.psprog.leaflet.service.vo;
 
 import hu.psprog.leaflet.persistence.entity.Tag;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -11,12 +11,13 @@ import lombok.experimental.SuperBuilder;
  *
  * @author Peter Smith
  */
-@Data
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
-public class TagVO extends SelfStatusAwareIdentifiableVO<Long, Tag> {
+public class TagVO extends SelfStatusAwareIdentifiableVO<Long> {
 
+    @Getter
     public enum OrderBy {
         ID("id"),
         TITLE("title"),
@@ -26,10 +27,6 @@ public class TagVO extends SelfStatusAwareIdentifiableVO<Long, Tag> {
 
         OrderBy(String field) {
             this.field = field;
-        }
-
-        public String getField() {
-            return field;
         }
     }
 

@@ -1,6 +1,5 @@
 package hu.psprog.leaflet.service.security.annotation;
 
-import hu.psprog.leaflet.persistence.entity.Role;
 import hu.psprog.leaflet.service.vo.CommentVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import org.junit.jupiter.api.Assertions;
@@ -54,40 +53,6 @@ public class SecurityExpressionTest {
 
     @Autowired
     private SecurityExpressionStub securityExpressionStub;
-
-    @Test
-    @WithMockedJWTUser(userID = USER_UID, role = Role.USER)
-    public void shouldPermitScopeReadOwnUserOrElevatedAllowForSelf() {
-
-        // when
-        boolean result = securityExpressionStub.testPermitScopeReadOwnUserOrElevated(USER_UID);
-
-        // then
-        assertThat(result, is(true));
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = ADMIN_UID, role = Role.ADMIN)
-    public void shouldPermitScopeReadOwnUserOrElevatedAllowForAdmin() {
-
-        // when
-        boolean result = securityExpressionStub.testPermitScopeReadOwnUserOrElevated(USER_UID);
-
-        // then
-        assertThat(result, is(true));
-    }
-
-
-    @Test
-    @WithMockedJWTUser(userID = EDITOR_UID, role = Role.EDITOR)
-    public void shouldPermitScopeReadOwnUserOrElevatedRejectForDifferentUser() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeReadOwnUserOrElevated(USER_UID));
-
-        // then
-        // exception expected
-    }
 
     @Test
     @WithMockedJWTUser(userID = USER_UID, role = Role.USER)
@@ -269,39 +234,6 @@ public class SecurityExpressionTest {
 
     @Test
     @WithMockedJWTUser(userID = ADMIN_UID, role = Role.ADMIN)
-    public void shouldPermitScopeReadUsersAllowForAdmin() {
-
-        // when
-        boolean result = securityExpressionStub.testPermitScopeReadUsers();
-
-        // then
-        assertThat(result, is(true));
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = EDITOR_UID, role = Role.EDITOR)
-    public void shouldPermitScopeReadUsersRejectForEditor() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeReadUsers());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = USER_UID, role = Role.USER)
-    public void shouldPermitScopeReadUsersRejectForUser() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeReadUsers());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = ADMIN_UID, role = Role.ADMIN)
     public void shouldPermitScopeReadAdminAllowForAdmin() {
 
         // when
@@ -328,51 +260,6 @@ public class SecurityExpressionTest {
 
         // when
         Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeReadAdmin());
-
-        // then
-        // exception expected
-    }
-
-
-    @Test
-    @WithMockedJWTUser(userID = USER_UID, role = Role.USER)
-    public void shouldPermitScopeWriteOwnUserAllowForSelf() {
-
-        // when
-        boolean result = securityExpressionStub.testPermitScopeWriteOwnUser(USER_UID);
-
-        // then
-        assertThat(result, is(true));
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = ADMIN_UID, role = Role.ADMIN)
-    public void shouldPermitScopeWriteOwnUserRejectForAdmin() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeWriteOwnUser(USER_UID));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = EDITOR_UID, role = Role.EDITOR)
-    public void shouldPermitScopeWriteOwnUserRejectForEditor() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeWriteOwnUser(USER_UID));
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = OTHER_USER_UID, role = Role.USER)
-    public void shouldPermitScopeWriteOwnUserRejectForDifferentUser() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeWriteOwnUser(USER_UID));
 
         // then
         // exception expected
@@ -601,39 +488,6 @@ public class SecurityExpressionTest {
 
     @Test
     @WithMockedJWTUser(userID = ADMIN_UID, role = Role.ADMIN)
-    public void shouldPermitScopeWriteUsersAllowForAdmin() {
-
-        // when
-        boolean result = securityExpressionStub.testPermitScopeWriteUsers();
-
-        // then
-        assertThat(result, is(true));
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = EDITOR_UID, role = Role.EDITOR)
-    public void shouldPermitScopeWriteUsersRejectForEditor() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeWriteUsers());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = USER_UID, role = Role.USER)
-    public void shouldPermitScopeWriteUsersRejectForUser() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeWriteUsers());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = ADMIN_UID, role = Role.ADMIN)
     public void shouldPermitScopeWriteAdminAllowForAdmin() {
 
         // when
@@ -660,39 +514,6 @@ public class SecurityExpressionTest {
 
         // when
         Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testPermitScopeWriteAdmin());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = ADMIN_UID, role = Role.ADMIN)
-    public void shouldPermitDenyAllRejectForAdmin() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testDenyAlways());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = EDITOR_UID, role = Role.EDITOR)
-    public void shouldPermitDenyAllRejectForEditor() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testDenyAlways());
-
-        // then
-        // exception expected
-    }
-
-    @Test
-    @WithMockedJWTUser(userID = USER_UID, role = Role.USER)
-    public void shouldPermitDenyAllRejectForUser() {
-
-        // when
-        Assertions.assertThrows(AccessDeniedException.class, () -> securityExpressionStub.testDenyAlways());
 
         // then
         // exception expected

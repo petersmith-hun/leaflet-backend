@@ -1,12 +1,14 @@
 package hu.psprog.leaflet.service.common;
 
+import lombok.Getter;
 import org.springframework.data.domain.Sort;
 
 /**
- * Order directions page {@link hu.psprog.leaflet.service.crud.PageableService} services.
+ * Supported order directions.
  *
  * @author Peter Smith
  */
+@Getter
 public enum OrderDirection {
 
     ASC(Sort.Direction.ASC),
@@ -18,7 +20,4 @@ public enum OrderDirection {
         this.direction = direction;
     }
 
-    public Sort.Direction getDirection() {
-        return direction;
-    }
 }

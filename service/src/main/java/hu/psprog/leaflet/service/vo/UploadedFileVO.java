@@ -1,8 +1,7 @@
 package hu.psprog.leaflet.service.vo;
 
-import hu.psprog.leaflet.persistence.entity.UploadedFile;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -13,11 +12,11 @@ import java.util.UUID;
  *
  * @author Peter Smith
  */
-@Data
+@Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder(builderMethodName = "getBuilder", setterPrefix = "with")
-public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long, UploadedFile> {
+public class UploadedFileVO extends SelfStatusAwareIdentifiableVO<Long> {
 
     private final String originalFilename;
     private final String path;

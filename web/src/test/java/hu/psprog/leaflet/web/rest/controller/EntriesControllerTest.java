@@ -93,21 +93,6 @@ public class EntriesControllerTest extends AbstractControllerBaseTest {
     }
 
     @Test
-    public void shouldGetPageOfEntries() {
-
-        // given
-        given(entryFacade.getEntityPage(PAGE, LIMIT, DIRECTION, ORDER_BY)).willReturn(EntityPageVO.<EntryVO>getBuilder()
-                .withEntitiesOnPage(ENTRY_VO_LIST)
-                .build());
-
-        // when
-        ResponseEntity<EntryListDataModel> result = controller.getPageOfEntries(PAGE, LIMIT, ORDER_BY, DIRECTION);
-
-        // then
-        assertResponse(result, HttpStatus.OK, ENTRY_LIST_DATA_MODEL);
-    }
-
-    @Test
     public void shouldGetPageOfPublicEntriesByCategory() {
 
         // given

@@ -15,9 +15,6 @@ import hu.psprog.leaflet.api.rest.request.entry.EntryUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.routing.FrontEndRouteUpdateRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagAssignmentRequestModel;
 import hu.psprog.leaflet.api.rest.request.tag.TagCreateRequestModel;
-import hu.psprog.leaflet.api.rest.request.user.UpdateProfileRequestModel;
-import hu.psprog.leaflet.api.rest.request.user.UserCreateRequestModel;
-import hu.psprog.leaflet.api.rest.request.user.UserInitializeRequestModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryDataModel;
 import hu.psprog.leaflet.api.rest.response.category.CategoryListDataModel;
 import hu.psprog.leaflet.api.rest.response.comment.CommentDataModel;
@@ -41,13 +38,10 @@ import hu.psprog.leaflet.api.rest.response.routing.FrontEndRouteDataModel;
 import hu.psprog.leaflet.api.rest.response.routing.FrontEndRouteListDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagDataModel;
 import hu.psprog.leaflet.api.rest.response.tag.TagListDataModel;
-import hu.psprog.leaflet.api.rest.response.user.ExtendedUserDataModel;
 import hu.psprog.leaflet.api.rest.response.user.UserDataModel;
-import hu.psprog.leaflet.api.rest.response.user.UserListDataModel;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteAuthRequirement;
 import hu.psprog.leaflet.persistence.entity.FrontEndRouteType;
 import hu.psprog.leaflet.persistence.entity.Locale;
-import hu.psprog.leaflet.service.common.Authority;
 import hu.psprog.leaflet.service.vo.AttachmentRequestVO;
 import hu.psprog.leaflet.service.vo.CategoryVO;
 import hu.psprog.leaflet.service.vo.CommentSearchParametersVO;
@@ -63,13 +57,12 @@ import hu.psprog.leaflet.service.vo.UploadedFileVO;
 import hu.psprog.leaflet.service.vo.UserVO;
 import hu.psprog.leaflet.web.rest.conversion.DateConverter;
 import hu.psprog.leaflet.web.rest.conversion.JULocaleToLeafletLocaleConverter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -96,7 +89,6 @@ public abstract class ConversionTestObjects {
     private static final long ID = 1L;
     private static final String TITLE = "Title";
     private static final Date LAST_LOGIN = createDate(0);
-    private static final List<GrantedAuthority> AUTHORITIES = Collections.singletonList(Authority.ADMIN);
     private static final String PATH = "path";
     private static final String ORIGINAL_FILENAME = "original-filename";
     private static final String MIME = "mime";
@@ -118,7 +110,6 @@ public abstract class ConversionTestObjects {
     private static final ZonedDateTime ZONED_DATE_TIME_PUBLISHED = ZonedDateTime.of(2019, 2, 14, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final ZonedDateTime ZONED_DATE_TIME_LAST_MODIFIED = ZonedDateTime.of(2019, 2, 8, 19, 0, 0, 0, ZoneId.systemDefault());
     private static final ZonedDateTime ZONED_DATE_TIME_LAST_LOGIN = ZonedDateTime.of(2019, 2, 1, 19, 0, 0, 0, ZoneId.systemDefault());
-    private static final String ADMIN = "ADMIN";
     private static final String ROUTE_ID = "route-test";
     private static final String NAME = "Test Route";
     private static final String URL = "/test/route";
@@ -127,7 +118,6 @@ public abstract class ConversionTestObjects {
     private static final String MESSAGE = "contact message";
     private static final FrontEndRouteAuthRequirement AUTH_REQUIREMENT = FrontEndRouteAuthRequirement.AUTHENTICATED;
 
-    protected static final String PASSWORD = "test-pw";
     protected static final String USERNAME = "username";
     protected static final Locale LOCALE = Locale.EN;
     protected static final String EMAIL = "test@leaflet.dev";
@@ -188,33 +178,7 @@ public abstract class ConversionTestObjects {
 
     protected static final UserVO USER_VO = UserVO.getBuilder()
             .withId(ID)
-            .withCreated(CREATED)
-            .withPassword(PASSWORD)
             .withUsername(USERNAME)
-            .withLocale(LOCALE)
-            .withEmail(EMAIL)
-            .withLastLogin(LAST_LOGIN)
-            .withAuthorities(AUTHORITIES)
-            .withEnabled(ENABLED)
-            .build();
-
-    protected static final ExtendedUserDataModel EXTENDED_USER_DATA_MODEL = ExtendedUserDataModel.getBuilder()
-            .withId(ID)
-            .withCreated(ZONED_DATE_TIME_CREATED)
-            .withUsername(USERNAME)
-            .withLocale(LOCALE.name())
-            .withEmail(EMAIL)
-            .withLastLogin(ZONED_DATE_TIME_LAST_LOGIN)
-            .withRole(ADMIN)
-            .build();
-
-    protected static final UserListDataModel USER_LIST_DATA_MODEL = UserListDataModel.getBuilder()
-            .withUsers(List.of(EXTENDED_USER_DATA_MODEL))
-            .build();
-
-    protected static final UserVO USER_VO_FOR_UPDATE = UserVO.getBuilder()
-            .withUsername(USERNAME)
-            .withLocale(LOCALE)
             .withEmail(EMAIL)
             .build();
 
@@ -224,10 +188,6 @@ public abstract class ConversionTestObjects {
             .withId(ID)
             .withUsername(USERNAME)
             .build();
-
-    protected static final UserInitializeRequestModel USER_INITIALIZE_REQUEST_MODEL = prepareUserInitializeRequestModel();
-    protected static final UserCreateRequestModel USER_CREATE_REQUEST_MODEL = prepareUserCreateRequestModel();
-    protected static final UpdateProfileRequestModel UPDATE_PROFILE_REQUEST_MODEL = prepareUpdateProfileRequestModel();
 
     protected static final UploadedFileVO UPLOADED_FILE_VO = UploadedFileVO.getBuilder()
             .withId(ID)
@@ -721,41 +681,6 @@ public abstract class ConversionTestObjects {
         tagCreateRequestModel.setName(TITLE);
 
         return tagCreateRequestModel;
-    }
-
-    private static UpdateProfileRequestModel prepareUpdateProfileRequestModel() {
-
-        UpdateProfileRequestModel updateProfileRequestModel = new UpdateProfileRequestModel();
-        updateProfileRequestModel.setUsername(USERNAME);
-        updateProfileRequestModel.setEmail(EMAIL);
-        updateProfileRequestModel.setDefaultLocale(java.util.Locale.ENGLISH);
-
-        return updateProfileRequestModel;
-    }
-
-    private static UserInitializeRequestModel prepareUserInitializeRequestModel() {
-
-        UserInitializeRequestModel userInitializeRequestModel = new UserInitializeRequestModel();
-        userInitializeRequestModel.setEmail(EMAIL);
-        userInitializeRequestModel.setDefaultLocale(java.util.Locale.ENGLISH);
-        userInitializeRequestModel.setUsername(USERNAME);
-        userInitializeRequestModel.setPassword(PASSWORD);
-        userInitializeRequestModel.setPasswordConfirmation(PASSWORD);
-
-        return userInitializeRequestModel;
-    }
-
-    private static UserCreateRequestModel prepareUserCreateRequestModel() {
-
-        UserCreateRequestModel userCreateRequestModel = new UserCreateRequestModel();
-        userCreateRequestModel.setEmail(EMAIL);
-        userCreateRequestModel.setDefaultLocale(java.util.Locale.ENGLISH);
-        userCreateRequestModel.setUsername(USERNAME);
-        userCreateRequestModel.setPassword(PASSWORD);
-        userCreateRequestModel.setPasswordConfirmation(PASSWORD);
-        userCreateRequestModel.setRole(ADMIN);
-
-        return userCreateRequestModel;
     }
 
     private static ContactRequestModel prepareContactRequestModel() {

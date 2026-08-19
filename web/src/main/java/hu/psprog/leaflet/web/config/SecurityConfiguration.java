@@ -38,12 +38,11 @@ public class SecurityConfiguration {
             "/entries/content/page/*",
             "/files/*/*",
             "/tags/public",
-            "/sitemap.xml"};
+            "/sitemap.xml"
+    };
     private static final String[] PUBLIC_POST_ENDPOINTS = {
-            "/contact",
-            "/users/claim",
-            "/users/register",
-            "/users/reclaim"};
+            "/contact"
+    };
 
     private final RESTAuthenticationEntryPoint restAuthenticationEntryPoint;
 
@@ -58,7 +57,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
 
         return http
                 .authorizeHttpRequests(registry -> registry

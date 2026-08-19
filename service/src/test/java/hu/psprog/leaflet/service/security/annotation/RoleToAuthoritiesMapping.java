@@ -1,12 +1,10 @@
 package hu.psprog.leaflet.service.security.annotation;
 
-import hu.psprog.leaflet.persistence.entity.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -17,10 +15,8 @@ import java.util.stream.Stream;
 public class RoleToAuthoritiesMapping {
 
     private static final String[] USER_AUTHORITIES = {
-            "read:users:own",
             "read:comments:own",
-            "write:comments:own",
-            "write:users:own"
+            "write:comments:own"
     };
 
     private static final String[] EDITOR_AUTHORITIES = Stream.concat(Stream.of(USER_AUTHORITIES), Stream.of(
@@ -34,14 +30,12 @@ public class RoleToAuthoritiesMapping {
             "write:documents",
             "write:entries",
             "write:tags"
-    )).collect(Collectors.toList()).toArray(String[]::new);
+    )).toList().toArray(String[]::new);
 
     private static final String[] ADMIN_AUTHORITIES = Stream.concat(Stream.of(EDITOR_AUTHORITIES), Stream.of(
             "read:admin",
-            "read:users",
-            "write:admin",
-            "write:users"
-    )).collect(Collectors.toList()).toArray(String[]::new);
+            "write:admin"
+    )).toList().toArray(String[]::new);
 
     private static final Map<Role, List<GrantedAuthority>> ROLE_TO_AUTHORITY_LIST_MAP = Map.of(
             Role.USER, AuthorityUtils.createAuthorityList(applyScopePrefix(USER_AUTHORITIES)),

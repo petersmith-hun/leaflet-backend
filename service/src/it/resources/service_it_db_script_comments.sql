@@ -12,10 +12,10 @@ set @STATUS_PUBLIC = 'PUBLIC';
 
 -- add test user
 insert into leaflet_users
-    (id, date_created, is_enabled, date_last_modified, default_locale, email, date_last_login, password, role, username)
+    (id, email, username)
 values
-    (@USER_ID, @DEFAULT_DATE, true, @DEFAULT_DATE, @DEFAULT_LOCALE, 'lflt-it-5101@leaflet.dev', null, 'lflt1234', 'EDITOR', 'IT Editor'),
-    (@USER_ID_OTHER, @DEFAULT_DATE, true, @DEFAULT_DATE, @DEFAULT_LOCALE, 'lflt-it-5102@leaflet.dev', null, 'lflt1234', 'EDITOR', 'IT Editor 2');
+    (@USER_ID, 'lflt-it-5101@leaflet.dev', 'IT Editor'),
+    (@USER_ID_OTHER, 'lflt-it-5102@leaflet.dev', 'IT Editor 2');
 
 -- add test category
 insert into leaflet_categories

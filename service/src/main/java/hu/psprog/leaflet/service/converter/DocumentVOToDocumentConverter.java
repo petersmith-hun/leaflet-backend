@@ -1,8 +1,8 @@
 package hu.psprog.leaflet.service.converter;
 
 import hu.psprog.leaflet.persistence.entity.Document;
+import hu.psprog.leaflet.persistence.entity.User;
 import hu.psprog.leaflet.service.vo.DocumentVO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +15,6 @@ import java.util.Objects;
  */
 @Component
 public class DocumentVOToDocumentConverter implements Converter<DocumentVO, Document> {
-
-    private final UserVOToUserConverter userVOToUserConverter;
-
-    @Autowired
-    public DocumentVOToDocumentConverter(UserVOToUserConverter userVOToUserConverter) {
-        this.userVOToUserConverter = userVOToUserConverter;
-    }
 
     @Override
     public Document convert(DocumentVO source) {
@@ -40,7 +33,10 @@ public class DocumentVOToDocumentConverter implements Converter<DocumentVO, Docu
                 .withTitle(source.getTitle());
 
         if (Objects.nonNull(source.getOwner())) {
-            builder.withUser(userVOToUserConverter.convert(source.getOwner()));
+            User user = User.getBuilder()
+                    .withId(source.getOwner().getId())
+                    .build();
+            builder.withUser(user);
         }
 
         return builder.build();

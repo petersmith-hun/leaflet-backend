@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  *  - object: can be 'name', 'message' or 'email' respectively for matching the name, message or email parameter of the given contact request;
  *  - operator: can be 'equals' (exact match) or 'contains' (partial match);
  *  - and the value to check the given parameter against (inbetween apostrophes).
- *
+ *<p>
  * Examples of valid rules:
  *  - name equals 'Test User'
  *  - message contains 'something bad'
