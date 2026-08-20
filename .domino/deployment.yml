@@ -8,12 +8,20 @@ domino:
       target:
         hosts:
           - psproghu
+        multi-instance:
+          enabled: true
+          instance-count: 2
+          spread-mode: replicate
+          naming-strategy: custom-predefined
+          defined-names:
+            - primary
+            - standby
+          port-offset: 100
+          host-network-base-port: 9082
       execution:
         command-name: app_leaflet
         via: STANDARD
         args:
-          ports:
-            9082: 9082
           network-mode: host
           environment:
             APP_ARGS: |
@@ -35,7 +43,7 @@ domino:
         delay: 20 seconds
         timeout: 2 seconds
         max-attempts: 3
-        endpoint: "http://127.0.0.1:11081/api/actuator/info"
+        endpoint: "http://127.0.0.1:9082/api/actuator/info"
       info:
         enabled: true
         endpoint: "https://api.psprog.hu/actuator/info"
