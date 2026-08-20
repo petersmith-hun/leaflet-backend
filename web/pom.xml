@@ -140,6 +140,7 @@
                     <dockerfile>../Dockerfile</dockerfile>
                     <contextDirectory>../</contextDirectory>
                     <skip>${docker.skip}</skip>
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
         </plugins>
